@@ -1,0 +1,79 @@
+
+<div *ngIf="connectionMethod != 'KEYSTORE'">
+  <div class="modal-head">
+    <h1 mat-dialog-title>Connect to a wallet</h1>
+  </div>
+  <div class="dialog-content">
+    <div mat-dialog-content>
+
+      <!-- Connect Options -->
+
+      <button class="connect-option" (click)="connectWalletConnect()">
+        <span>Wallet Connect</span>
+        <img src="assets/images/wallet-connect-icon.svg" />
+      </button>
+      <button class="connect-option" (click)="connectKeystore()">
+        <span>Keystore</span>
+        <mat-icon>vpn_key</mat-icon>
+      </button>
+    </div>
+
+    <!-- close dialog -->
+    <div mat-dialog-actions class="dialog-actions">
+      <button mat-icon-button aria-label="Close Connect Wallet Dialog" mat-dialog-close>
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- KEYSTORE -->
+<div *ngIf="connectionMethod == 'KEYSTORE'">
+  <!-- <h1 mat-dialog-title>Connect Keystore</h1> -->
+  <div class="modal-head">
+    <button mat-flat-button style="color: #ff007a" (click)="clearKeystore()">
+      Back
+    </button>
+  </div>
+  <div class="dialog-content">
+    <div mat-dialog-content>
+
+      <!-- Connect Options -->
+
+      <!-- <button class="connect-option">
+        <span>Upload Keystore File</span>
+        <mat-icon>vpn_key</mat-icon>
+      </button> -->
+
+      <input #keystoreInput hidden="true" type="file" onclick="this.value=null" (change)="onKeystoreFileChange($event)" accept=".txt"/>
+      <button class="connect-option" (click)="keystoreInput.click()">
+        <span>Upload Keystore File</span>
+        <mat-icon *ngIf="!keystoreFileSelected">vpn_key</mat-icon>
+        <mat-icon *ngIf="keystoreFileSelected" [ngStyle]="{'color':'green'}">check</mat-icon>
+      </button>
+
+
+      <div class="keystore-input">
+        <label>Password</label>
+        <input [(ngModel)]="keystorePassword" name="keystore-password" placeholder="Please Enter Password" type="password" />
+      </div>
+      <!-- <button class="connect-option" (click)="connectWalletConnect()">
+        <span>Keystore</span>
+        <mat-icon>vpn_key</mat-icon>
+      </button> -->
+
+    </div>
+
+
+    <div>
+      <button style="float: right;" mat-flat-button color="accent">Unlock</button>
+    </div>
+
+    <!-- close dialog -->
+    <!-- <div mat-dialog-actions class="dialog-actions">
+      <button mat-icon-button aria-label="Close Connect Wallet Dialog" mat-dialog-close>
+        <mat-icon>close</mat-icon>
+      </button>
+    </div> -->
+  </div>
+</div>

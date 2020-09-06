@@ -1,1 +1,138 @@
-/* You can add global styles to this file, and also import other style files */
+// Inter Font
+@import url('https://rsms.me/inter/inter.css');
+@supports (font-variation-settings: normal) {
+  html { font-family: 'Inter var', sans-serif; }
+}
+
+
+// Custom Theming for Angular Material
+// For more information: https://material.angular.io/guide/theming
+@import '~@angular/material/theming';
+// Plus imports for other components in your app.
+
+// Define the palettes for your theme using the Material Design palettes available in palette.scss
+// (imported above). For each palette, you can optionally specify a default, lighter, and darker
+// hue. Available color palettes: https://material.io/design/color/
+// $asgard-exchange-primary: mat-palette($mat-indigo);
+// $asgard-exchange-accent: mat-palette($mat-pink, A200, A100, A400);
+
+$uniswap-primary: (
+  50: rgb(255, 255, 255),
+  contrast: (
+    50: rgb(255, 0, 122),
+  )
+);
+
+$uniswap-secondary: (
+  50: rgb(253, 234, 241),
+  contrast: (
+    50: rgb(255, 0, 122)
+  )
+);
+
+$custom-typography: mat-typography-config(
+  $font-family: 'Inter var, sans-serif',
+  $headline: mat-typography-level(32px, 48px, 700),
+  $body-1: mat-typography-level(16px, 24px, 500)
+);
+
+$asgard-exchange-primary: mat-palette($uniswap-primary, 50);
+$asgard-exchange-accent: mat-palette($uniswap-secondary, 50);
+
+// The warn palette is optional (defaults to red).
+$asgard-exchange-warn: mat-palette($mat-red);
+
+// Create the theme object (a Sass map containing all of the palettes).
+$asgard-exchange-theme: mat-light-theme($asgard-exchange-primary, $asgard-exchange-accent, $asgard-exchange-warn);
+
+// Include theme styles for core and each component used in your app.
+// Alternatively, you can import and @include the theme mixins for each component
+// that you are using.
+@include angular-material-theme($asgard-exchange-theme);
+
+// Include the common styles for Angular Material. We include this here so that you only
+// have to load a single css file for Angular Material in your app.
+// Be sure that you only ever include this mixin once!
+@include mat-core($custom-typography);
+
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+html, input, textarea, button {
+  font-family: "Inter var", sans-serif;
+}
+
+/* override browser default */
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  height: 100vh;
+  width: 100vw;
+  background-position: 0px -30vh;
+  background-repeat: no-repeat;
+  background-image: radial-gradient(50% 50% at 50% 50%, rgba(255, 0, 122, 0.1) 0%, rgba(255, 255, 255, 0) 100%);
+}
+
+
+html, body { height: 100%; }
+body { margin: 0; }
+
+/**
+ * Material Overrides
+ */
+
+ /**
+  * Material Dialog
+  */
+.mat-dialog-container {
+  padding: 0 !important;
+  box-shadow: none;
+  border-radius: 20px !important;
+  position: relative;
+
+  .dialog-content {
+    background-color: rgb(247, 248, 250);
+    padding: 2rem;
+    display: flex;
+    flex-flow: column;
+  }
+
+  .dialog-actions {
+    position: absolute;
+    top: 0;
+    right: 10px;
+  }
+
+  .modal-head {
+    padding: 1rem;
+  }
+
+  h1 {
+    font-size: 1rem;
+    margin: 0;
+    // text-align: center;
+    font-weight: 500;
+  }
+
+}
+
+/**
+ * Material Buttons
+ */
+
+ button.mat-primary {
+   color: white;
+   background-color: rgb(255, 0, 122);
+ }
