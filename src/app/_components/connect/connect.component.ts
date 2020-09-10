@@ -1,19 +1,25 @@
-import { Component, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { crypto } from '@binance-chain/javascript-sdk';
-import {
-  Client as binanceClient,
-  BinanceClient,
-} from '@thorchain/asgardex-binance';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { User } from 'src/app/_classes/user';
+import { UserService } from 'src/app/_services/user.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-connect',
   templateUrl: './connect.component.html',
   styleUrls: ['./connect.component.scss']
 })
-export class ConnectComponent implements OnInit {
+export class ConnectComponent implements OnInit, OnDestroy {
 
-  constructor(private dialog: MatDialog) { }
+  user: User;
+  subs: Subscription[];
+
+  constructor(private dialog: MatDialog, private userService: UserService) {
+    const user$ = this.userService.user$.subscribe(
+      (user) => this.user = user
+    );
+    this.subs = [user$];
+  }
 
   ngOnInit(): void {
   }
@@ -28,16 +34,18 @@ export class ConnectComponent implements OnInit {
     );
   }
 
+  ngOnDestroy() {
+    for (const sub of this.subs) {
+      sub.unsubscribe();
+    }
+  }
+
 }
 
 export enum ConnectionMethod {
   WALLET_CONNECT  = 'WALLET_CONNECT',
   KEYSTORE        = 'KEYSTORE'
 }
-
-// export interface Keystore {
-
-// }
 
 @Component({
   selector: 'app-connect-modal',
@@ -49,109 +57,22 @@ export class ConnectModal {
 
   connectionMethod: ConnectionMethod;
 
-  keystorePassword: string;
-  keystoreFile;
-  keystoreFileSelected: boolean;
-  keystore;
+  constructor(public dialogRef: MatDialogRef<ConnectModal>) { }
 
   connectWalletConnect() {
-
     this.connectionMethod = ConnectionMethod.WALLET_CONNECT;
-
-    console.log('connect clicked');
-
   }
 
   connectKeystore() {
-
     this.connectionMethod = ConnectionMethod.KEYSTORE;
-
-    console.log('connect keystore');
   }
 
-  async onKeystoreFileChange(event: Event) {
-    this.keystoreFileSelected = true;
-
-    const target = event.target as HTMLInputElement;
-    const files = target.files;
-
-    if (files && files.length > 0) {
-      console.log(files);
-
-      const keystoreFile = files[0];
-
-      const reader = new FileReader();
-
-      const onLoadHandler = () => {
-        try {
-          const key = JSON.parse(reader.result as string);
-          if (!('version' in key) || !('crypto' in key)) {
-            console.error('not a valid keystore file');
-            // setKeystoreError('Not a valid keystore file');
-          } else {
-            // setKeystoreError(Nothing);
-            // setKeystore(key);
-            console.log('success? ', key);
-            this.keystore = key;
-          }
-        } catch {
-          // setKeystoreError('Not a valid json file');
-          console.error('not a valid json file');
-        }
-      };
-      reader.addEventListener('load', onLoadHandler);
-
-      const blob = await reader.readAsText(keystoreFile);
-
-      // reader.removeEventListener('load', onLoadHandler);
-
-
-    }
-
-
-  }
-
-  keystoreUnlock() {
-    try {
-      const privateKey = crypto.getPrivateKeyFromKeyStore(this.keystore, this.keystorePassword);
-
-
-      const asgardexBncClient: BinanceClient = new binanceClient({
-        network: 'testnet',
-      });
-
-
-      const address = crypto.getAddressFromPrivateKey(
-        privateKey,
-        asgardexBncClient.getPrefix(),
-      );
-
-      console.log('address is: ', address);
-
-      // saveWallet({
-      //   type: 'keystore',
-      //   wallet: address,
-      //   keystore,
-      // });
-
-      // // clean up
-      // setPassword(Nothing);
-      // setKeystore(Nothing);
-
-      // // redirect to previous page
-      // history.goBack();
-    } catch (error) {
-      // setInvalideStatus(true);
-      console.error(error);
-    }
-    // setProcessing(false);
-  }
-
-  clearKeystore() {
-    this.keystorePassword = '';
-    this.keystoreFile = null;
-    this.keystoreFileSelected = false;
+  clearConnectionMethod() {
     this.connectionMethod = null;
+  }
+
+  close() {
+    this.dialogRef.close();
   }
 
 }

@@ -1,0 +1,37 @@
+.market-list-container {
+  position: relative;
+  height: 475px;
+  width: 100%;
+  overflow: auto;
+  will-change: transform;
+  direction: ltr;
+  border-top: 1px solid rgb(44, 47, 54);
+}
+
+.market-list {
+  // border-top: 1px solid #edeef2;
+}
+
+.market-list-item {
+  display: flex;
+  align-items: center;
+  padding: 4px 20px;
+  height: 56px;
+
+  &:hover {
+    background-color: rgb(44, 47, 54);
+    cursor: pointer;
+  }
+
+  &__symbol {
+    font-size: 1rem;
+    font-weight: 500;
+  }
+}
+
+.list-title {
+  font-size: 14px;
+  font-weight: 500;
+  padding: 0 1rem 1rem;
+}
+

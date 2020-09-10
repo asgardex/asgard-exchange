@@ -1,0 +1,49 @@
+
+<div>
+
+  <div class="modal-head">
+    <h1 mat-dialog-title>Select a token</h1>
+
+    <div class="uni-input" style="margin-top: 1rem;">
+      <input style="padding: 0" [(ngModel)]="searchTerm" name="keystore-password" placeholder="Search Token Symbol" />
+    </div>
+
+  </div>
+  <div>
+    <div mat-dialog-content>
+
+      <!-- Connect Options -->
+
+      <div class="list-title">
+        Token Name
+      </div>
+
+      <div class="market-list-container">
+
+        <ul class="market-list" *ngIf="marketListItems">
+
+          <li class="market-list-item" *ngFor="let item of marketListItems" (click)="selectItem(item)">
+            <!-- BTCB-1DE -->
+
+            <div class="asset-icon-container">
+              <img *ngIf="item.iconPath" class="asset-icon" [src]="item.iconPath" />
+            </div>
+
+            <span class="market-list-item__symbol">{{item.asset.ticker}}</span>
+          </li>
+        </ul>
+
+      </div>
+
+    </div>
+
+    <!-- close dialog -->
+    <div mat-dialog-actions class="dialog-actions">
+      <button mat-icon-button aria-label="Close Markets Dialog" (click)="closeDialog()" mat-dialog-close>
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+
+</div>
+

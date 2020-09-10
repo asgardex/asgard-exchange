@@ -1,0 +1,38 @@
+<div class="swap-input uni-input">
+
+  <div>
+    <div class="flxr flxr--just-space-between">
+      <label for="{{label}}Input">{{label}}</label>
+      <label *ngIf="balances">Balance: {{selectedFromBalance | number:"1.0-2"}}</label>
+    </div>
+
+    <div class="flxr flxr--just-space-between flxr--align-center">
+      <input
+        style="font-size: 1.4rem"
+        [ngModel]="assetUnit"
+        (ngModelChange)="updateAssetUnits($event)"
+        id="{{label}}Input"
+        name="fromUnit"
+        placeholder="0.0"
+        type="number"
+        [disabled]="disableInput" />
+
+      <button *ngIf="!selectedAsset" color="primary" style="min-width: 160px;" mat-flat-button (click)="launchMarketsModal()">
+        Select a token
+        <mat-icon>expand_more</mat-icon>
+      </button>
+
+
+      <button *ngIf="selectedAsset" class="launch-markets-btn" style="min-width: 143px; padding-right: 0px;" mat-flat-button (click)="launchMarketsModal()">
+        <div class="flxr flxr--align-center">
+          <div style="margin-right: 12px;" class="asset-icon-container flxr flxr--align-center">
+            <img *ngIf="selectedAsset.iconPath" [src]="selectedAsset.iconPath" />
+          </div>
+          <span style="margin-right: 8px; font-size: 20px">{{selectedAsset.asset.ticker}}</span>
+          <mat-icon>expand_more</mat-icon>
+        </div>
+      </button>
+    </div>
+  </div>
+
+</div>

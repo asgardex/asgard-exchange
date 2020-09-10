@@ -6,9 +6,10 @@ main {
   height: calc(100vh - 60px);
 
   .container {
-    background-color: white;
+    background: rgb(33, 36, 41);
     padding: 1rem;
     max-width: 420px;
+    min-height: 400px;
     width: 100%;
     box-shadow: rgba(0, 0, 0, 0.01) 0px 0px 1px, rgba(0, 0, 0, 0.04) 0px 4px 8px, rgba(0, 0, 0, 0.04) 0px 16px 24px, rgba(0, 0, 0, 0.01) 0px 24px 32px;
     border-radius: 30px;
@@ -21,6 +22,7 @@ main {
     align-items: center;
     border-radius: 3rem;
     justify-content: space-evenly;
+    margin-bottom: 20px;
 
     a {
       display: flex;
@@ -40,7 +42,7 @@ main {
       &.active {
         border-radius: 12px;
         font-weight: 500;
-        color: rgb(0, 0, 0);
+        color: white;
       }
     }
   }

@@ -17,16 +17,16 @@
 // $asgard-exchange-accent: mat-palette($mat-pink, A200, A100, A400);
 
 $uniswap-primary: (
-  50: rgb(255, 255, 255),
+  50: rgba(21, 61, 111, 0.44),
   contrast: (
-    50: rgb(255, 0, 122),
+    50: rgb(109, 168, 255),
   )
 );
 
 $uniswap-secondary: (
-  50: rgb(253, 234, 241),
+  50: rgba(21, 61, 111, 0.44),
   contrast: (
-    50: rgb(255, 0, 122)
+    50: rgb(109, 168, 255)
   )
 );
 
@@ -64,6 +64,7 @@ html {
   font-size: 16px;
     -webkit-font-smoothing: antialiased;
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  background-color: rgb(44, 47, 54);
 }
 
 html, input, textarea, button {
@@ -78,16 +79,23 @@ body {
 }
 
 body {
-  height: 100vh;
   width: 100vw;
+  min-height: 100vh;
   background-position: 0px -30vh;
   background-repeat: no-repeat;
-  background-image: radial-gradient(50% 50% at 50% 50%, rgba(255, 0, 122, 0.1) 0%, rgba(255, 255, 255, 0) 100%);
+  background-image: radial-gradient(50% 50% at 50% 50%, rgba(33, 114, 229, 0.1) 0%, rgba(33, 36, 41, 0) 100%);
+  color: white;
 }
 
 
 html, body { height: 100%; }
 body { margin: 0; }
+
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
 
 /**
  * Material Overrides
@@ -101,9 +109,11 @@ body { margin: 0; }
   box-shadow: none;
   border-radius: 20px !important;
   position: relative;
+  background-color: rgb(33, 36, 41);
+  color: white;
 
   .dialog-content {
-    background-color: rgb(247, 248, 250);
+    background-color: rgb(44, 47, 54);
     padding: 2rem;
     display: flex;
     flex-flow: column;
@@ -128,11 +138,185 @@ body { margin: 0; }
 
 }
 
+.cdk-overlay-dark-backdrop {
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.form-border {
+  outline: none;
+  border: 1px solid rgb(237, 238, 242);
+  border-radius: 12px;
+  padding: 1rem;
+  width: 100% !important;
+}
+
+.uni-input {
+  // background-color: rgb(247, 248, 250);
+  outline: none;
+  border: 1px solid #40444f;
+  border-radius: 12px;
+  display: flex;
+  -webkit-box-align: center;
+  align-items: center;
+  -webkit-box-pack: justify;
+  justify-content: space-between;
+  padding: 1rem;
+  margin-top: 0px;
+  opacity: 1;
+  width: 100% !important;
+  margin-bottom: 10px;
+
+  flex-flow: column;
+  justify-content: start;
+  align-items: flex-start;
+
+  label {
+    box-sizing: border-box;
+    margin: 0px;
+    min-width: 0px;
+    font-weight: 500;
+    font-size: 14px;
+    color: rgb(195, 197, 203);
+  }
+
+  input {
+    background-color: transparent;
+    border: none;
+    width: 100%;
+    color: white;
+    font-weight: 500;
+    outline: none;
+    border: none;
+    flex: 1 1 auto;
+    font-size: 1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0.75rem 0.75rem 0.75rem 0;
+    appearance: textfield;
+
+    &::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+      color: #565A69;
+      opacity: 1; /* Firefox */
+    }
+
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+/**
+ * Connect Styling
+ */
+.connect-option {
+  // background-color: rgb(247, 248, 250);
+  background-color: transparent;
+  display: flex;
+  flex-direction: row;
+  -webkit-box-align: center;
+  align-items: center;
+  -webkit-box-pack: justify;
+  justify-content: space-between;
+  // padding: 1rem;
+  margin-top: 0px;
+  opacity: 1;
+  // width: 100% !important;
+  margin-bottom: 10px;
+  border: 1px solid rgb(64, 68, 79);
+  color: white;
+
+  span {
+    display: flex;
+    flex-flow: row nowrap;
+    // color: rgb(0, 0, 0);
+    // color: white;
+    font-size: 1rem;
+    font-weight: 500;
+  }
+
+  &:hover {
+    cursor: pointer;
+    border: 1px solid rgb(33, 114, 229);
+  }
+}
+
 /**
  * Material Buttons
  */
 
  button.mat-primary {
-   color: white;
-   background-color: rgb(255, 0, 122);
+  background-color: rgb(33, 114, 229) !important;
+  color: white !important;
  }
+
+.mat-button, .mat-raised-button, .mat-icon-button, .mat-stroked-button, .mat-flat-button, .mat-fab, .mat-mini-fab {
+  font-size: 1rem;
+  color: white;
+  background-color: transparent;
+}
+
+.main-action-btn {
+  color: white !important;
+  background-color: rgb(255, 0, 122) !important;
+  width: 100%;
+  margin-top: 1rem !important;
+  padding: 10px !important;
+  border-radius: 20px !important;
+
+  &:disabled {
+    background-color: rgba(21, 61, 111, 0.44) !important;
+    color: rgb(109, 168, 255) !important;
+  }
+}
+
+
+.mat-progress-spinner circle, .mat-spinner circle {
+  stroke: #2172e5;
+}
+
+.flxr {
+  display: flex;
+
+  &--just-center {
+    justify-content: center;
+  }
+
+  &--just-space-between {
+    justify-content: space-between;
+  }
+
+  &--align-center {
+    align-items: center;
+  }
+
+  &--flow-col {
+    flex-flow: column;
+  }
+}
+
+/**
+ *
+ */
+.asset-icon-container {
+  width: 24px;
+  margin-right: 16px;
+
+  img {
+    width: 100%;
+  }
+}
