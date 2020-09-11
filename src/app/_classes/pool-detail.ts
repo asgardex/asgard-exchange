@@ -1,40 +1,48 @@
+
+export enum PoolDetailStatusEnum {
+  Bootstrapped = 'bootstrapped',
+  Enabled = 'enabled',
+  Disabled = 'disabled'
+}
+
 export interface PoolDetail {
-  asset: string;
-  // status: "bootstrapped",
-  price: string;
-  assetStakedTotal: string;
-  runeStakedTotal: string;
-  poolStakedTotal: string;
-  assetDepth: string;
-  runeDepth: string;
-  poolDepth: string;
-  poolUnits: string;
-  sellVolume: string;
-  buyVolume: string;
-  poolVolume: string;
-  poolVolume24hr: string;
-  sellTxAverage: string;
-  buyTxAverage: string;
-  poolTxAverage: string;
-  sellSlipAverage: string;
-  buySlipAverage: string;
-  poolSlipAverage: string;
-  sellFeeAverage: string;
-  buyFeeAverage: string;
-  poolFeeAverage: string;
-  sellFeesTotal: string;
-  buyFeesTotal: string;
-  poolFeesTotal: string;
-  sellAssetCount: string;
-  buyAssetCount: string;
-  swappingTxCount: string;
-  swappersCount: string;
-  stakeTxCount: string;
-  withdrawTxCount: string;
-  stakingTxCount: string;
-  stakersCount: string;
-  assetROI: string;
-  runeROI: string;
-  poolROI: string;
-  poolROI12: string;
+
+  asset?: string;
+  assetDepth?: string;
+  assetROI?: string;
+  assetStakedTotal?: string;
+  buyAssetCount?: string;
+  buyFeeAverage?: string;
+  buyFeesTotal?: string;
+  buySlipAverage?: string;
+  buyTxAverage?: string;
+  buyVolume?: string;
+  poolDepth?: string;
+  poolFeeAverage?: string;
+  poolFeesTotal?: string;
+  poolROI?: string;
+  poolROI12?: string;
+  poolSlipAverage?: string;
+  poolStakedTotal?: string;
+  poolTxAverage?: string;
+  poolUnits?: string;
+  poolVolume?: string;
+  poolVolume24hr?: string;
+  price?: string;
+  runeDepth?: string;
+  runeROI?: string;
+  runeStakedTotal?: string;
+  sellAssetCount?: string;
+  sellFeeAverage?: string;
+  sellFeesTotal?: string;
+  sellSlipAverage?: string;
+  sellTxAverage?: string;
+  sellVolume?: string;
+  stakeTxCount?: string;
+  stakersCount?: string;
+  stakingTxCount?: string;
+  status?: PoolDetailStatusEnum;
+  swappersCount?: string;
+  swappingTxCount?: string;
+  withdrawTxCount?: string;
 }

@@ -7,7 +7,12 @@
 </div>
 
 <!-- TO -->
-<app-asset-input label="To" [(selectedAsset)]="selectedTargetAsset" [(assetUnit)]="targetAssetUnit" [disableInput]="true"></app-asset-input>
+<app-asset-input label="To" [(selectedAsset)]="selectedTargetAsset" [(assetUnit)]="targetAssetUnitDisplay" [disableInput]="true"></app-asset-input>
+
+<div id="swap-details">
+  <span *ngIf="fee != null">Fee: {{fee | number:"0.0-4"}} + {{runeTransactionFee}} Rune</span>
+  <span *ngIf="slip">Slip: {{slip | number:"0.0-4"}}</span>
+</div>
 
 <div>
   <button class="main-action-btn" mat-flat-button color="primary" [disabled]="!sourceAssetUnit || !selectedSourceAsset || !selectedTargetAsset || !targetAssetUnit">

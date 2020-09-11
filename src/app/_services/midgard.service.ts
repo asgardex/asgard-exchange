@@ -3,6 +3,8 @@ import { environment } from 'src/environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { PoolDetail } from '../_classes/pool-detail';
+import { Asset } from '../_classes/asset';
+import { MidgardConstants } from '../_classes/midgard-constants';
 
 @Injectable({
   providedIn: 'root'
@@ -27,6 +29,22 @@ export class MidgardService {
     const params = new HttpParams().set('asset', commaSeparatedAssets);
 
     return this.http.get<PoolDetail[]>(`${this.basePath}/pools/detail`, {params});
+  }
+
+  getAssets(assetsString?: string): Observable<Asset[]> {
+
+    let params = new HttpParams();
+
+    if (assetsString) {
+      params = params.set('asset', assetsString);
+    }
+
+    return this.http.get<Asset[]>(`${this.basePath}/assets`, {params});
+
+  }
+
+  getConstants(): Observable<MidgardConstants> {
+    return this.http.get<MidgardConstants>(`${this.basePath}/thorchain/constants`);
   }
 
 }
