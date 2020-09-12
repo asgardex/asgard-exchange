@@ -17,6 +17,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { BinanceService } from './_services/binance.service';
 import { UserService } from './_services/user.service';
 import { MidgardService } from './_services/midgard.service';
+import { WalletService } from './_services/wallet.service';
 
 /** MATERIAL */
 import { MatButtonModule } from '@angular/material/button';
@@ -44,7 +45,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     MatProgressSpinnerModule,
     AppRoutingModule,
   ],
-  providers: [BinanceService, UserService, MidgardService],
+  providers: [BinanceService, UserService, MidgardService, WalletService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

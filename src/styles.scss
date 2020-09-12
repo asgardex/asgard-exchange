@@ -284,6 +284,14 @@ input[type=number] {
   }
 }
 
+.to-btn {
+  margin-bottom: 10px;
+  font-size: 16px;
+  color: rgb(86, 90, 105);
+  height: 16px !important;
+  width: 16px !important;
+}
+
 
 .mat-progress-spinner circle, .mat-spinner circle {
   stroke: #2172e5;
@@ -319,4 +327,9 @@ input[type=number] {
   img {
     width: 100%;
   }
+}
+
+.tx-detail-label {
+  font-size: 14px;
+  color: rgb(195, 197, 203);
 }

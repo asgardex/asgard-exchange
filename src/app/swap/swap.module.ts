@@ -9,12 +9,13 @@ import { MatIconModule } from '@angular/material/icon';
 
 /** COMPONENTS */
 import { SwapComponent } from './swap.component';
+import { ConfirmSwapModalComponent } from './confirm-swap-modal/confirm-swap-modal.component';
 
 /** MODULES */
 import { AssetInputModule } from '../_components/asset-input/asset-input.module';
 
 @NgModule({
-  declarations: [SwapComponent],
+  declarations: [SwapComponent, ConfirmSwapModalComponent],
   imports: [
     CommonModule,
     AssetInputModule,

@@ -6,6 +6,7 @@ import {
 } from '@thorchain/asgardex-binance';
 import { UserService } from 'src/app/_services/user.service';
 import { User } from 'src/app/_classes/user';
+import { WalletService } from 'src/app/_services/wallet.service';
 
 @Component({
   selector: 'app-keystore-connect',
@@ -23,7 +24,7 @@ export class KeystoreConnectComponent implements OnInit {
   @Output() back: EventEmitter<null>;
   @Output() closeModal: EventEmitter<null>;
 
-  constructor(private userService: UserService) {
+  constructor(private userService: UserService, private walletService: WalletService) {
     this.back = new EventEmitter<null>();
     this.closeModal = new EventEmitter<null>();
   }
@@ -89,7 +90,7 @@ export class KeystoreConnectComponent implements OnInit {
 
   }
 
-  keystoreUnlock() {
+  async keystoreUnlock() {
 
     this.keystoreError = false;
 
@@ -100,17 +101,15 @@ export class KeystoreConnectComponent implements OnInit {
 
       const privateKey = crypto.getPrivateKeyFromKeyStore(this.keystore, this.keystorePassword);
 
-      const asgardexBncClient: BinanceClient = new binanceClient({
-        network: 'testnet',
-      });
+      await this.walletService.bncClient.setPrivateKey(privateKey);
 
-      const prefix = asgardexBncClient.getPrefix();
+      const prefix = this.walletService.asgardexBncClient.getPrefix();
       console.log('prefix is: ', prefix);
 
 
       const address = crypto.getAddressFromPrivateKey(
         privateKey,
-        asgardexBncClient.getPrefix(),
+        prefix,
       );
 
       console.log('address is: ', address);

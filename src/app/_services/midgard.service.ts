@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { PoolDetail } from '../_classes/pool-detail';
 import { Asset } from '../_classes/asset';
 import { MidgardConstants } from '../_classes/midgard-constants';
+import { PoolAddressesDTO } from '../_classes/pool-address';
 
 @Injectable({
   providedIn: 'root'
@@ -45,6 +46,10 @@ export class MidgardService {
 
   getConstants(): Observable<MidgardConstants> {
     return this.http.get<MidgardConstants>(`${this.basePath}/thorchain/constants`);
+  }
+
+  getProxiedPoolAddresses(): Observable<PoolAddressesDTO> {
+    return this.http.get<PoolAddressesDTO>(`${this.basePath}/thorchain/pool_addresses`);
   }
 
 }

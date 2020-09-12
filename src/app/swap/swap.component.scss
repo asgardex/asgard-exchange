@@ -13,18 +13,24 @@
   padding: 0px 0.5rem;
 }
 
-.to-btn {
-  margin-bottom: 10px;
-  font-size: 16px;
-  color: rgb(86, 90, 105);
-  height: 16px;
-  width: 16px;
+.base-price {
+  padding: 6px 1rem 0;
+  font-weight: 500;
+  font-size: 14px;
+  color: rgb(195, 197, 203);
 }
 
-#swap-details {
-  display: flex;
-  justify-content: space-between;
-  font-size: .8rem;
-  padding: 0 1rem;
-  font-weight: 500;
+.tag {
+  position: absolute;
+  width: 100%;
+  bottom: -85px;
+  z-index: -1;
+  font-size: 14px;
+
+  .tag-contents {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    padding: 1rem;
+  }
 }

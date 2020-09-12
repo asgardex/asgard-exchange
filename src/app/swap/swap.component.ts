@@ -1,52 +1,32 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { MarketListItem, Asset } from '../_components/markets-modal/markets-list-item';
+import { MarketListItem } from '../_components/markets-modal/markets-list-item';
 import { UserService } from '../_services/user.service';
 import { Subscription } from 'rxjs';
 import { environment } from 'src/environments/environment';
-// import {
-//   TokenAmount,
-//   tokenAmount,
-//   baseToToken,
-//   tokenToBase,
-// } from '@thorchain/asgardex-token';
-import { Market, MarketResponse } from '../_classes/market';
+import { Market } from '../_classes/market';
 import {
-  Client as binanceClient,
-  BinanceClient,
-  Balance,
-  Fees,
-} from '@thorchain/asgardex-binance';
-import {
-  bnOrZero,
-  validBNOrZero,
+  bn,
   getSwapOutput,
   getSwapSlip,
-  baseAmount,
   BaseAmount,
   PoolData,
   assetToBase,
   assetAmount,
-  getSwapInput,
-  getSwapFee,
   getValueOfRuneInAsset
 } from '@thorchain/asgardex-util';
 import BigNumber from 'bignumber.js';
-import { PoolDetail, PoolDetailStatusEnum } from '../_classes/pool-detail';
-import { bn, isValidBN } from '@thorchain/asgardex-util';
+import { PoolDetail } from '../_classes/pool-detail';
 import { MidgardService } from '../_services/midgard.service';
-import { TransferFees } from '../_classes/binance-fee';
 import { AssetData } from '../_classes/asset-data';
 import { BinanceService } from '../_services/binance.service';
-import { baseToToken } from '@thorchain/asgardex-token';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmSwapModalComponent } from './confirm-swap-modal/confirm-swap-modal.component';
+import { string, number } from 'is_js';
+import { User } from '../_classes/user';
 
 export enum SwapType {
   DOUBLE_SWAP = 'double_swap',
   SINGLE_SWAP = 'single_swap',
-}
-
-export interface TokenData {
-  asset: string;
-  price: BigNumber;
 }
 
 @Component({
@@ -65,9 +45,16 @@ export class SwapComponent implements OnInit, OnDestroy {
     return this._sourceAssetUnit;
   }
   set sourceAssetUnit(val: number) {
+
     this._sourceAssetUnit = val;
-    this._sourceAssetTokenValue = assetToBase(assetAmount(val - 1));
-    this.handleUnitChange();
+    this._sourceAssetTokenValue = assetToBase(assetAmount(val));
+
+    if (val) {
+      this.handleUnitChange();
+    } else {
+      this.targetAssetUnit = null;
+    }
+
   }
   private _sourceAssetUnit: number;
 
@@ -88,6 +75,8 @@ export class SwapComponent implements OnInit, OnDestroy {
   selectedSourceBalance: number;
   sourcePoolDetail: PoolDetail;
 
+  user: User;
+
   /**
    * To
    */
@@ -96,9 +85,7 @@ export class SwapComponent implements OnInit, OnDestroy {
   }
   set targetAssetUnit(val: BigNumber) {
     this._targetAssetUnit = val;
-    this.targetAssetUnitDisplay = Number(val.div(10 ** 8).toPrecision());
-    console.log('target asset unit updated: ', this.targetAssetUnitDisplay);
-    // this.handleUnitChange();
+    this.targetAssetUnitDisplay = (val) ? Number(val.div(10 ** 8).toPrecision()) : null;
   }
   private _targetAssetUnit: BigNumber;
 
@@ -124,21 +111,28 @@ export class SwapComponent implements OnInit, OnDestroy {
   assetData: AssetData[];
   markets: Market[];
   subs: Subscription[];
-  // binanceFees: Fees;
-  tokensData: TokenData[];
 
-  fee: number;
   slip: number;
-  binanceTransferFees: TransferFees;
+  binanceTransferFee: number;
   runeTransactionFee: number;
+
+  basePrice: number;
   // swapData: {
   //   type: 'DOUBLE' | 'SINGLE'
   //   fromRune: boolean
   // };
-
-
+  // swapData: {
+  //   sourceAssetSymbol: string,
+  //   targetAssetSymbol: string,
+  //   runeFee: number,
+  //   bnbFee: number;
+  //   basePrice: number,
+  //   inputValue: number,
+  //   outputValue: number
+  // };
 
   constructor(
+    private dialog: MatDialog,
     private userService: UserService,
     private midgardService: MidgardService,
     private binanceService: BinanceService) {
@@ -153,7 +147,11 @@ export class SwapComponent implements OnInit, OnDestroy {
       }
     );
 
-    this.subs = [balances$];
+    const user$ = this.userService.user$.subscribe(
+      (user) => this.user = user
+    );
+
+    this.subs = [balances$, user$];
 
   }
 
@@ -161,6 +159,44 @@ export class SwapComponent implements OnInit, OnDestroy {
     this.getMarkets();
     this.getConstants();
     this.getBinanceFees();
+    this.getPoolAddresses();
+  }
+
+  getPoolAddresses() {
+    this.midgardService.getProxiedPoolAddresses().subscribe(
+      (res) => {
+        console.log('POOL ADDRESSES ARE: ', res);
+      }
+    );
+  }
+
+  openConfirmationDialog() {
+    const dialogRef = this.dialog.open(
+      ConfirmSwapModalComponent,
+      {
+        width: '50vw',
+        maxWidth: '420px',
+        data: {
+          sourceAsset: this.selectedSourceAsset,
+          targetAsset: this.selectedTargetAsset,
+          runeFee: this.runeTransactionFee,
+          bnbFee: this.binanceTransferFee,
+          basePrice: this.basePrice,
+          inputValue: this.sourceAssetUnit,
+          outputValue: this.targetAssetUnit.div(10 ** 8),
+          user: this.user
+        }
+      }
+    );
+
+    dialogRef.afterClosed().subscribe( (result) => {
+
+      if (result) {
+        console.log('RESULT IS: ', result);
+        // this.selectedAssetChange.emit(result);
+      }
+
+    });
   }
 
   getPoolDetails(symbol: string) {
@@ -188,55 +224,19 @@ export class SwapComponent implements OnInit, OnDestroy {
     );
   }
 
-
-  // getTokensData() {
-  //   const tokensData: TokenData[] = Object.keys(this.poolDetailMap).reduce(
-  //     (result: TokenData[], tokenName: string) => {
-  //       const tokenData = this.poolDetailMap[tokenName];
-  //       const assetStr = tokenData?.asset;
-
-  //       // const asset = assetStr ? this.getAssetFromString(assetStr) : null;
-  //       // const price = bnOrZero(tokenData?.price);
-
-  //       // if (
-  //       //   tokenData.status &&
-  //       //   tokenData.status === PoolDetailStatusEnum.Enabled
-  //       // ) {
-  //       //   result.push({
-  //       //     asset: asset?.symbol ?? '',
-  //       //     price,
-  //       //   });
-  //       // }
-  //       return result;
-  //     },
-  //     [],
-  //   );
-
-  //   const runePrice = bn(1);
-
-  //   // add rune data in the target token list
-  //   tokensData.push({
-  //     asset: this.runeSymbol,
-  //     price: runePrice,
-  //   });
-
-  //   this.tokensData = tokensData;
-
-  // }
-
   getBinanceFees() {
     this.binanceService.getBinanceFees().subscribe(
       (res) => {
         const binanceFees = res;
         console.log('BINANCE FEES ARE: ', res);
-        this.binanceTransferFees = this.binanceService.getTransferFees(binanceFees);
-        console.log('TRANSFER FEES ARE: ', this.binanceTransferFees);
+        const binanceTransferFees = this.binanceService.getTransferFees(binanceFees);
+        console.log('TRANSFER FEES ARE: ', binanceTransferFees);
 
-        const single = this.binanceTransferFees.single;
-        console.log('amount is: ', single.amount().toJSON());
-        const other = baseToToken(single);
+        this.binanceTransferFee = binanceTransferFees.single.amount().div(10 ** 8).toNumber();
+        // console.log('amount is: ', single.amount().toJSON());
+        // const other = baseToToken(single);
 
-        console.log('other: ', other.amount().toJSON());
+        // console.log('other: ', other.amount().toJSON());
 
       }
     );
@@ -259,9 +259,6 @@ export class SwapComponent implements OnInit, OnDestroy {
 
   handleUnitChange() {
     if (this.selectedSourceAsset && this.selectedTargetAsset) {
-      // const fromTokenAmount = tokenAmount(this.sourceAssetUnit);
-      // const amount = fromTokenAmount.amount();
-      // console.log('fromTokenAmount is: ', amount);
       console.log('source symbol is: ', this.selectedSourceAsset.asset.symbol);
       console.log('symbol is: ', this.selectedTargetAsset.asset.symbol);
 
@@ -277,29 +274,36 @@ export class SwapComponent implements OnInit, OnDestroy {
         runeBalance: assetToBase(assetAmount(poolDetail.runeDepth)),
       };
 
+      const baseOutput = getSwapOutput(assetToBase(assetAmount(1)), pool, false);
+      const baseOutputDisplay = baseOutput.amount().div(10 ** 8).toNumber();
+      this.basePrice = baseOutputDisplay;
+      console.log('this base price is: ', this.basePrice);
+
       const swapOutput = getSwapOutput(this._sourceAssetTokenValue, pool, false);
       const val = swapOutput.amount().div(10 ** 8).toPrecision();
       console.log('swapOutput IS: ', val);
 
-      const swapInput = getSwapInput(false, pool, swapOutput);
-      const swapInputStr = swapInput.amount().div(10 ** 8).toPrecision();
-      console.log('swapOutput IS: ', swapInputStr);
+      // const swapInput = getSwapInput(false, pool, swapOutput);
+      // const swapInputStr = swapInput.amount().div(10 ** 8).toPrecision();
+      // console.log('swapOutput IS: ', swapInputStr);
 
+      /**
+       * TODO: reduce 1 RUNE + BNB fee from Input Amount
+       */
       const slip = getSwapSlip(this._sourceAssetTokenValue, pool, false);
-      const slipStr = slip.toPrecision();
-      console.log('SLIP IS: ', slipStr);
-      this.slip = slip.toNumber();
+      this.slip = slip.multipliedBy(100).toNumber();
+      console.log('slip is: ', this.slip.toPrecision().toString());
 
-      const fee = getSwapFee(this._sourceAssetTokenValue, pool, false);
-      const feeStr = fee.amount().div(10 ** 8).toNumber();
-      console.log('feeStr is: ', feeStr);
-      this.fee = feeStr;
+      // const fee = getSwapFee(this._sourceAssetTokenValue, pool, false);
+      // const feeStr = fee.amount().div(10 ** 8).toNumber();
+      // console.log('feeStr is: ', feeStr);
+      // this.fee = feeStr;
 
       const valRuneInAsset = getValueOfRuneInAsset(this._sourceAssetTokenValue, pool);
       const valRuneInAssetStr = valRuneInAsset.amount().div(10 ** 8).toPrecision();
       console.log('valRuneInAssetStr is: ', valRuneInAssetStr);
 
-      const total = valRuneInAsset.amount().minus(fee.amount());
+      const total = valRuneInAsset.amount();
 
       this.targetAssetUnit = total;
 

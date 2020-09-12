@@ -1,0 +1,83 @@
+
+<div>
+
+  <div class="modal-head swap-modal-head">
+    <h1 mat-dialog-title>Confirm Swap</h1>
+
+    <div class="flxr flxr--just-space-between transaction-detail">
+
+      <div class="flxr flxr--align-center">
+        <div style="margin-right: 12px;" class="asset-icon-container flxr flxr--align-center">
+          <img *ngIf="swapData.sourceAsset.iconPath" [src]="swapData.sourceAsset.iconPath" />
+        </div>
+        <span style="margin-right: 8px; font-size: 20px">{{swapData.inputValue}}</span>
+      </div>
+
+      <span>{{swapData.sourceAsset.asset.ticker}}</span>
+    </div>
+
+    <div class="flxr">
+      <mat-icon style="margin-left: 4px; margin-bottom: 12px;" class="to-btn">arrow_downward</mat-icon>
+    </div>
+
+    <div class="flxr flxr--just-space-between transaction-detail">
+      <!-- <span>{{swapData.targetAsset.asset.ticker}}</span>
+      <span>{{swapData.outputValue}}</span> -->
+
+
+
+      <div class="flxr flxr--align-center">
+        <div style="margin-right: 12px;" class="asset-icon-container flxr flxr--align-center">
+          <img *ngIf="swapData.targetAsset.iconPath" [src]="swapData.targetAsset.iconPath" />
+        </div>
+        <span style="margin-right: 8px; font-size: 20px">{{swapData.outputValue}}</span>
+      </div>
+
+
+      <span>{{swapData.targetAsset.asset.ticker}}</span>
+
+    </div>
+
+    <span style="font-style: italic; font-size: 12px; color: rgb(195, 197, 203)">Output is estimated. You will receive at least lorem ipsum or the transaction will revert.</span>
+
+
+    <!-- <div class="uni-input" style="margin-top: 1rem;">
+      <input style="padding: 0" [(ngModel)]="searchTerm" name="keystore-password" placeholder="Search Token Symbol" />
+    </div> -->
+
+  </div>
+  <div>
+    <div mat-dialog-content class="swap-modal-content">
+
+      <!-- Connect Options -->
+
+      <div>
+
+        <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
+          <span class="tx-detail-label">Price</span>
+          <span>{{swapData.basePrice | number:"1.2-4"}} {{swapData.targetAsset.asset.ticker}} per {{swapData.sourceAsset.asset.ticker}}</span>
+        </div>
+
+        <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
+          <span class="tx-detail-label">Total Fee</span>
+          <span>{{swapData.bnbFee | number:"0.0-6"}} BNB + {{swapData.runeFee}} Rune</span>
+        </div>
+        <div class="flxr flxr--just-space-between">
+          <span class="tx-detail-label">Slip</span>
+          <!-- <span>{{swapData | number:"0.04" | percent}}</span> -->
+        </div>
+      </div>
+
+      <button (click)="submitTransaction()" mat-flat-button color="primary" class="main-action-btn">Confirm Swap</button>
+
+    </div>
+
+    <!-- close dialog -->
+    <div mat-dialog-actions class="dialog-actions">
+      <button mat-icon-button aria-label="Close Markets Dialog" (click)="closeDialog()" mat-dialog-close>
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+
+</div>
