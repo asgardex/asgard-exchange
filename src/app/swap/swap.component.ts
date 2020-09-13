@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { MarketListItem } from '../_components/markets-modal/markets-list-item';
+import { Asset } from '../_classes/asset';
 import { UserService } from '../_services/user.service';
 import { Subscription } from 'rxjs';
 import { environment } from 'src/environments/environment';
@@ -21,7 +21,6 @@ import { AssetData } from '../_classes/asset-data';
 import { BinanceService } from '../_services/binance.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmSwapModalComponent } from './confirm-swap-modal/confirm-swap-modal.component';
-import { string, number } from 'is_js';
 import { User } from '../_classes/user';
 
 export enum SwapType {
@@ -63,15 +62,15 @@ export class SwapComponent implements OnInit, OnDestroy {
   get selectedSourceAsset() {
     return this._selectedSourceAsset;
   }
-  set selectedSourceAsset(asset: MarketListItem) {
+  set selectedSourceAsset(asset: Asset) {
     this._selectedSourceAsset = asset;
 
-    if (this._selectedSourceAsset && this._selectedSourceAsset.asset.symbol !== this.runeSymbol) {
-      this.getPoolDetails(this._selectedSourceAsset.asset.symbol);
+    if (this._selectedSourceAsset && this._selectedSourceAsset.symbol !== this.runeSymbol) {
+      this.getPoolDetails(this._selectedSourceAsset.symbol);
     }
 
   }
-  private _selectedSourceAsset: MarketListItem;
+  private _selectedSourceAsset: Asset;
   selectedSourceBalance: number;
   sourcePoolDetail: PoolDetail;
 
@@ -94,15 +93,15 @@ export class SwapComponent implements OnInit, OnDestroy {
   get selectedTargetAsset() {
     return this._selectedTargetAsset;
   }
-  set selectedTargetAsset(asset: MarketListItem) {
+  set selectedTargetAsset(asset: Asset) {
     this._selectedTargetAsset = asset;
 
-    if (this._selectedTargetAsset && this._selectedTargetAsset.asset.symbol !== this.runeSymbol) {
-      this.getPoolDetails(this._selectedTargetAsset.asset.symbol);
+    if (this._selectedTargetAsset && this._selectedTargetAsset.symbol !== this.runeSymbol) {
+      this.getPoolDetails(this._selectedTargetAsset.symbol);
     }
 
   }
-  private _selectedTargetAsset: MarketListItem;
+  private _selectedTargetAsset: Asset;
   targetPoolDetail: PoolDetail;
 
   poolDetailMap: {
@@ -125,7 +124,7 @@ export class SwapComponent implements OnInit, OnDestroy {
     private midgardService: MidgardService,
     private binanceService: BinanceService) {
 
-    this.selectedSourceAsset = new MarketListItem(this.runeSymbol);
+    this.selectedSourceAsset = new Asset(this.runeSymbol);
     console.log('selected from asset is: ', this.selectedSourceAsset);
 
     const balances$ = this.userService.userBalances$.subscribe(
@@ -185,7 +184,7 @@ export class SwapComponent implements OnInit, OnDestroy {
         this.targetAssetUnit = null;
         this.sourceAssetUnit = null;
         this.selectedTargetAsset = null;
-        this.selectedSourceAsset = new MarketListItem(this.runeSymbol);
+        this.selectedSourceAsset = new Asset(this.runeSymbol);
         this.basePrice = null;
         // this.selectedAssetChange.emit(result);
       }
@@ -245,7 +244,7 @@ export class SwapComponent implements OnInit, OnDestroy {
     if (this.selectedSourceAsset && this.selectedTargetAsset) {
 
       console.log('this._sourceAssetTokenValue is: ', this._sourceAssetTokenValue);
-      this.calculateTargetUnits(this.poolDetailMap[this.selectedTargetAsset.asset.symbol]);
+      this.calculateTargetUnits(this.poolDetailMap[this.selectedTargetAsset.symbol]);
 
     }
 
@@ -253,10 +252,10 @@ export class SwapComponent implements OnInit, OnDestroy {
 
   handleUnitChange() {
     if (this.selectedSourceAsset && this.selectedTargetAsset) {
-      console.log('source symbol is: ', this.selectedSourceAsset.asset.symbol);
-      console.log('symbol is: ', this.selectedTargetAsset.asset.symbol);
+      console.log('source symbol is: ', this.selectedSourceAsset.symbol);
+      console.log('symbol is: ', this.selectedTargetAsset.symbol);
 
-      this.calculateTargetUnits(this.poolDetailMap[this.selectedTargetAsset.asset.symbol]);
+      this.calculateTargetUnits(this.poolDetailMap[this.selectedTargetAsset.symbol]);
     }
   }
 
@@ -319,9 +318,9 @@ export class SwapComponent implements OnInit, OnDestroy {
 
     if (this.assetData) {
 
-      console.log('asset is: ', this.selectedSourceAsset.asset);
+      console.log('asset is: ', this.selectedSourceAsset);
 
-      const match = this.assetData.find( (balance) => balance.asset === this.selectedSourceAsset.asset.ticker );
+      const match = this.assetData.find( (balance) => balance.asset === this.selectedSourceAsset.ticker );
 
       if (match) {
         console.log('match is: ', match);

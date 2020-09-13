@@ -1,19 +1,14 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { MarketListItem } from 'src/app/_components/markets-modal/markets-list-item';
-import {
-  Client as binanceClient,
-  BinanceClient,
-  Balance,
-  TransferResult, WS
-} from '@thorchain/asgardex-binance';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { Asset } from 'src/app/_classes/asset';
+import { TransferResult } from '@thorchain/asgardex-binance';
 import { User } from 'src/app/_classes/user';
 import { MidgardService } from 'src/app/_services/midgard.service';
 import { WalletService } from 'src/app/_services/wallet.service';
 
 export interface SwapData {
-  sourceAsset: MarketListItem;
-  targetAsset: MarketListItem;
+  sourceAsset: Asset;
+  targetAsset: Asset;
   runeFee: number;
   bnbFee: number;
   basePrice: number;
@@ -82,30 +77,22 @@ export class ConfirmSwapModalComponent implements OnInit {
 
           if (matchingPool) {
 
-            // const asgardexBncClient: BinanceClient = new binanceClient({
-            //   network: 'testnet',
-            //   // phrase: '1234'
-            // });
-
-            // const bncClient = asgardexBncClient.getBncClient();
-
             await this.walletService.bncClient.initChain();
-            // bncClient.
 
             // Check of `validateSwap` before makes sure that we have a valid number here
             const amountNumber = this.swapData.inputValue;
 
             // const limit = protectSlip && slipLimit ? slipLimit.amount().toString() : '';
-            const memo = this.getSwapMemo(this.swapData.targetAsset.asset.symbol, this.swapData.user.wallet);
+            const memo = this.getSwapMemo(this.swapData.targetAsset.symbol, this.swapData.user.wallet);
 
             console.log('user wallet is: ', this.swapData.user.wallet);
             console.log('matching pool address is: ', matchingPool.address);
             console.log('amount number is: ', amountNumber);
-            console.log('from symbol is: ', this.swapData.sourceAsset.asset.symbol);
+            console.log('from symbol is: ', this.swapData.sourceAsset.symbol);
             console.log('memo is: ', memo);
 
             this.walletService.bncClient
-              .transfer(this.swapData.user.wallet, matchingPool.address, amountNumber, this.swapData.sourceAsset.asset.symbol, memo)
+              .transfer(this.swapData.user.wallet, matchingPool.address, amountNumber, this.swapData.sourceAsset.symbol, memo)
               .then((response: TransferResult) => {
                 console.log('transfer response is: ', response);
                 this.txState = ConfirmSwapModalState.SUCCESS;
@@ -114,7 +101,6 @@ export class ConfirmSwapModalComponent implements OnInit {
                   this.hash = response.result[0].hash;
                 }
 
-                // this.hash = response.result.
               })
               .catch((error: Error) => {
                 console.log('error making transfer: ', error);

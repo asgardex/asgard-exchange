@@ -13,7 +13,7 @@
         <span style="margin-right: 8px; font-size: 20px">{{swapData.inputValue}}</span>
       </div>
 
-      <span>{{swapData.sourceAsset.asset.ticker}}</span>
+      <span>{{swapData.sourceAsset.ticker}}</span>
     </div>
 
     <div class="flxr">
@@ -34,7 +34,7 @@
       </div>
 
 
-      <span>{{swapData.targetAsset.asset.ticker}}</span>
+      <span>{{swapData.targetAsset.ticker}}</span>
 
     </div>
 
@@ -55,7 +55,7 @@
 
         <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
           <span class="tx-detail-label">Price</span>
-          <span>{{swapData.basePrice | number:"1.2-4"}} {{swapData.targetAsset.asset.ticker}} per {{swapData.sourceAsset.asset.ticker}}</span>
+          <span>{{swapData.basePrice | number:"1.2-4"}} {{swapData.targetAsset.ticker}} per {{swapData.sourceAsset.ticker}}</span>
         </div>
 
         <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
@@ -91,7 +91,7 @@
 
     <h1 mat-dialog-title style="font-size: 1.4rem">Transaction Processing</h1>
 
-    <span class="swap-details">Swapping {{this.swapData.inputValue}} {{this.swapData.sourceAsset.asset.ticker}} for {{this.swapData.outputValue}} {{this.swapData.targetAsset.asset.ticker}}</span>
+    <span class="swap-details">Swapping {{this.swapData.inputValue}} {{this.swapData.sourceAsset.ticker}} for {{this.swapData.outputValue}} {{this.swapData.targetAsset.ticker}}</span>
 
     <span class="addendum">Confirm this transaction in your wallet</span>
 

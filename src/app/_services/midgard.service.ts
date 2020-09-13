@@ -3,7 +3,7 @@ import { environment } from 'src/environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { PoolDetail } from '../_classes/pool-detail';
-import { Asset } from '../_classes/asset';
+import { MidgardAsset } from '../_classes/midgard-asset';
 import { MidgardConstants } from '../_classes/midgard-constants';
 import { PoolAddressesDTO } from '../_classes/pool-address';
 
@@ -32,7 +32,7 @@ export class MidgardService {
     return this.http.get<PoolDetail[]>(`${this.basePath}/pools/detail`, {params});
   }
 
-  getAssets(assetsString?: string): Observable<Asset[]> {
+  getAssets(assetsString?: string): Observable<MidgardAsset[]> {
 
     let params = new HttpParams();
 
@@ -40,7 +40,7 @@ export class MidgardService {
       params = params.set('asset', assetsString);
     }
 
-    return this.http.get<Asset[]>(`${this.basePath}/assets`, {params});
+    return this.http.get<MidgardAsset[]>(`${this.basePath}/assets`, {params});
 
   }
 

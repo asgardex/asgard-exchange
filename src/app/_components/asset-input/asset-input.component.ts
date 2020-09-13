@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Balance } from '@thorchain/asgardex-binance';
-import { MarketListItem } from 'src/app/_components/markets-modal/markets-list-item';
+import { Asset } from 'src/app/_classes/asset';
 import { MarketsModalComponent } from '../markets-modal/markets-modal.component';
 import { MatDialog } from '@angular/material/dialog';
 
@@ -13,9 +13,9 @@ export class AssetInputComponent implements OnInit {
 
   @Input() label: string;
   @Input() balances: Balance[];
-  @Input() selectedAsset: MarketListItem;
+  @Input() selectedAsset: Asset;
   @Input() disableInput?: boolean;
-  @Output() selectedAssetChange = new EventEmitter<MarketListItem>();
+  @Output() selectedAssetChange = new EventEmitter<Asset>();
   @Input() assetUnit: number;
   @Output() assetUnitChange = new EventEmitter<number>();
 
@@ -40,7 +40,7 @@ export class AssetInputComponent implements OnInit {
       }
     );
 
-    dialogRef.afterClosed().subscribe( (result: MarketListItem) => {
+    dialogRef.afterClosed().subscribe( (result: Asset) => {
 
       if (result) {
         this.selectedAssetChange.emit(result);

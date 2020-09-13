@@ -1,9 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { UserService } from 'src/app/_services/user.service';
-// import { Market } from '@thorchain/asgardex-binance';
-import { MarketResponse, Market } from 'src/app/_classes/market';
+import { Market } from 'src/app/_classes/market';
 import { MidgardService } from 'src/app/_services/midgard.service';
-import { MarketListItem } from './markets-list-item';
+import { Asset } from '../../_classes/asset';
 import { Subscription } from 'rxjs';
 import { MatDialogRef } from '@angular/material/dialog';
 import { environment } from 'src/environments/environment';
@@ -17,22 +15,13 @@ export class MarketsModalComponent implements OnInit, OnDestroy {
 
   searchTerm: string;
   markets: Market[] = [];
-  marketListItems: MarketListItem[];
+  marketListItems: Asset[];
   subs: Subscription[];
 
   constructor(
-    private userService: UserService,
     private midgardService: MidgardService,
     public dialogRef: MatDialogRef<MarketsModalComponent>) {
-
-      // const markets$ = this.userService.markets$.subscribe(
-      //   (markets) => {
-      //     this.markets = markets;
-      //   }
-      // );
-
       this.subs = [];
-
   }
 
   ngOnInit(): void {
@@ -42,15 +31,14 @@ export class MarketsModalComponent implements OnInit, OnDestroy {
   getPools() {
     this.midgardService.getPools().subscribe(
       (res) => {
-        // this.pools = res;
 
         const sortedByName = res.sort();
 
         // export const RUNE_SYMBOL = isMainnet ? 'RUNE-B1A' : 'RUNE-67C';
 
-        this.marketListItems = sortedByName.map( (poolName) => new MarketListItem(poolName) );
+        this.marketListItems = sortedByName.map( (poolName) => new Asset(poolName) );
         this.marketListItems.unshift(
-          new MarketListItem(environment.network === 'chaosnet' ? 'RUNE-B1A' : 'RUNE-67C')
+          new Asset(environment.network === 'chaosnet' ? 'RUNE-B1A' : 'RUNE-67C')
         );
         console.log('market list items are: ', this.marketListItems);
       },
@@ -64,7 +52,7 @@ export class MarketsModalComponent implements OnInit, OnDestroy {
     }
   }
 
-  selectItem(item: MarketListItem) {
+  selectItem(item: Asset) {
 
     this.dialogRef.close(item);
 
