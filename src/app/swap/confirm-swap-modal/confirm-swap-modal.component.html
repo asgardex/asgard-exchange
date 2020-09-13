@@ -1,5 +1,5 @@
 
-<div>
+<div *ngIf="txState === 'PENDING_CONFIRMATION'">
 
   <div class="modal-head swap-modal-head">
     <h1 mat-dialog-title>Confirm Swap</h1>
@@ -81,3 +81,44 @@
   </div>
 
 </div>
+
+<div class="submitting" *ngIf="txState === 'SUBMITTING'">
+  <div class="icon-container">
+    <mat-progress-spinner mode="indeterminate" diameter="60"></mat-progress-spinner>
+  </div>
+
+  <div class="flxr flxr--just-center flxr--flow-col flxr--align-center modal-head">
+
+    <h1 mat-dialog-title style="font-size: 1.4rem">Transaction Processing</h1>
+
+    <span class="swap-details">Swapping {{this.swapData.inputValue}} {{this.swapData.sourceAsset.asset.ticker}} for {{this.swapData.outputValue}} {{this.swapData.targetAsset.asset.ticker}}</span>
+
+    <span class="addendum">Confirm this transaction in your wallet</span>
+
+  </div>
+
+  <div mat-dialog-actions class="dialog-actions">
+    <button mat-icon-button aria-label="Close Markets Dialog" (click)="closeDialog()" mat-dialog-close>
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+</div>
+
+<div class="success" *ngIf="txState === 'SUCCESS'">
+  <div class="icon-container icon-container--sent">
+    <mat-icon>arrow_circle_up</mat-icon>
+  </div>
+
+  <div class="flxr flxr--just-center flxr--flow-col flxr--align-center modal-head">
+
+    <h1 mat-dialog-title style="font-size: 1.4rem">Transaction Submitted</h1>
+
+    <a *ngIf="hash" [href]="'https://testnet-explorer.binance.org/tx/' + hash">View on BNC Explorer</a>
+
+    <button (click)="closeDialog(true)" mat-flat-button color="primary" class="main-action-btn">Close</button>
+
+  </div>
+
+</div>
+
+<div *ngIf="txState === 'ERROR'"></div>

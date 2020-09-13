@@ -13,6 +13,7 @@ import { ConfirmSwapModalComponent } from './confirm-swap-modal/confirm-swap-mod
 
 /** MODULES */
 import { AssetInputModule } from '../_components/asset-input/asset-input.module';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @NgModule({
   declarations: [SwapComponent, ConfirmSwapModalComponent],
@@ -22,12 +23,14 @@ import { AssetInputModule } from '../_components/asset-input/asset-input.module'
     FormsModule,
     MatButtonModule,
     MatIconModule,
+    MatProgressSpinnerModule,
     RouterModule.forChild([
       {
         path: '',
         component: SwapComponent
       }
     ])
-  ]
+  ],
+  entryComponents: [ConfirmSwapModalComponent]
 })
 export class SwapModule { }

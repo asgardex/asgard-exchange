@@ -23,10 +23,10 @@ export interface SwapData {
 }
 
 enum ConfirmSwapModalState {
-  PENDING     = 'PENDING',
-  SUBMITTING  = 'SUBMITTING',
-  SUCCESS     = 'SUCCESS',
-  ERROR       = 'ERROR'
+  PENDING_CONFIRMATION  = 'PENDING_CONFIRMATION',
+  SUBMITTING            = 'SUBMITTING',
+  SUCCESS               = 'SUCCESS',
+  ERROR                 = 'ERROR'
 }
 
 @Component({
@@ -41,6 +41,8 @@ export class ConfirmSwapModalComponent implements OnInit {
 
   txState: ConfirmSwapModalState;
 
+  hash: string;
+
   user: User;
 
   constructor(
@@ -49,14 +51,14 @@ export class ConfirmSwapModalComponent implements OnInit {
     private midgardService: MidgardService,
     private walletService: WalletService
   ) {
-    this.txState = ConfirmSwapModalState.PENDING;
+    this.txState = ConfirmSwapModalState.PENDING_CONFIRMATION;
   }
 
   ngOnInit(): void {
   }
 
-  closeDialog() {
-    this.dialogRef.close();
+  closeDialog(transactionSucess?: boolean) {
+    this.dialogRef.close(transactionSucess);
   }
 
   submitTransaction() {
@@ -65,6 +67,8 @@ export class ConfirmSwapModalComponent implements OnInit {
     // if (validationErrorMsg) {
     //   return reject(new Error(validationErrorMsg));
     // }
+
+    this.txState = ConfirmSwapModalState.SUBMITTING;
 
     this.midgardService.getProxiedPoolAddresses().subscribe(
       async (res) => {
@@ -104,9 +108,17 @@ export class ConfirmSwapModalComponent implements OnInit {
               .transfer(this.swapData.user.wallet, matchingPool.address, amountNumber, this.swapData.sourceAsset.asset.symbol, memo)
               .then((response: TransferResult) => {
                 console.log('transfer response is: ', response);
+                this.txState = ConfirmSwapModalState.SUCCESS;
+
+                if (response.result && response.result.length > 0) {
+                  this.hash = response.result[0].hash;
+                }
+
+                // this.hash = response.result.
               })
               .catch((error: Error) => {
                 console.log('error making transfer: ', error);
+                this.txState = ConfirmSwapModalState.ERROR;
               });
 
           }
@@ -119,13 +131,6 @@ export class ConfirmSwapModalComponent implements OnInit {
 
   }
 
-  // getPoolAddresses() {
-  //   this.midgardService.getProxiedPoolAddresses().subscribe(
-  //     (res) => {
-  //       console.log('POOL ADDRESSES ARE: ', res);
-  //     }
-  //   );
-  // }
 
   getSwapMemo(
     symbol: string,
@@ -134,44 +139,6 @@ export class ConfirmSwapModalComponent implements OnInit {
   ) {
     return `SWAP:BNB.${symbol}:${addr}:${sliplimit}`;
   }
-
-
-
-
-
-
-  // export const confirmSwap = (
-  //   bncClient: FixmeType,
-  //   wallet: string,
-  //   symbolFrom: string,
-  //   symbolTo: string,
-  //   amount: TokenAmount,
-  //   protectSlip: boolean,
-  //   slipLimit: BaseAmount,
-  //   poolAddress: string,
-  //   destAddr = '',
-  // ): Promise<TransferResult> => {
-  //   return new Promise((resolve, reject) => {
-  //     const validationErrorMsg = validateSwap(wallet, amount);
-  //     if (validationErrorMsg) {
-  //       return reject(new Error(validationErrorMsg));
-  //     }
-
-  //     // Check of `validateSwap` before makes sure that we have a valid number here
-  //     const amountNumber = amount.amount().toNumber();
-
-  //     const limit = protectSlip && slipLimit ? slipLimit.amount().toString() : '';
-  //     const memo = getSwapMemo(symbolTo, destAddr, limit);
-
-  //     bncClient
-  //       .transfer(wallet, poolAddress, amountNumber, symbolFrom, memo)
-  //       .then((response: TransferResult) => resolve(response))
-  //       .catch((error: Error) => reject(error));
-  //   });
-  // };
-
-
-
 
 
 }

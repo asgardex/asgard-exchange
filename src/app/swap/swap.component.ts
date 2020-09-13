@@ -66,7 +66,7 @@ export class SwapComponent implements OnInit, OnDestroy {
   set selectedSourceAsset(asset: MarketListItem) {
     this._selectedSourceAsset = asset;
 
-    if (this._selectedSourceAsset.asset.symbol !== this.runeSymbol) {
+    if (this._selectedSourceAsset && this._selectedSourceAsset.asset.symbol !== this.runeSymbol) {
       this.getPoolDetails(this._selectedSourceAsset.asset.symbol);
     }
 
@@ -97,7 +97,7 @@ export class SwapComponent implements OnInit, OnDestroy {
   set selectedTargetAsset(asset: MarketListItem) {
     this._selectedTargetAsset = asset;
 
-    if (this._selectedTargetAsset.asset.symbol !== this.runeSymbol) {
+    if (this._selectedTargetAsset && this._selectedTargetAsset.asset.symbol !== this.runeSymbol) {
       this.getPoolDetails(this._selectedTargetAsset.asset.symbol);
     }
 
@@ -117,19 +117,7 @@ export class SwapComponent implements OnInit, OnDestroy {
   runeTransactionFee: number;
 
   basePrice: number;
-  // swapData: {
-  //   type: 'DOUBLE' | 'SINGLE'
-  //   fromRune: boolean
-  // };
-  // swapData: {
-  //   sourceAssetSymbol: string,
-  //   targetAssetSymbol: string,
-  //   runeFee: number,
-  //   bnbFee: number;
-  //   basePrice: number,
-  //   inputValue: number,
-  //   outputValue: number
-  // };
+
 
   constructor(
     private dialog: MatDialog,
@@ -189,10 +177,16 @@ export class SwapComponent implements OnInit, OnDestroy {
       }
     );
 
-    dialogRef.afterClosed().subscribe( (result) => {
+    dialogRef.afterClosed().subscribe( (transactionSuccess: boolean) => {
 
-      if (result) {
-        console.log('RESULT IS: ', result);
+      if (transactionSuccess) {
+        console.log('RESULT IS: ', transactionSuccess);
+
+        this.targetAssetUnit = null;
+        this.sourceAssetUnit = null;
+        this.selectedTargetAsset = null;
+        this.selectedSourceAsset = new MarketListItem(this.runeSymbol);
+        this.basePrice = null;
         // this.selectedAssetChange.emit(result);
       }
 
