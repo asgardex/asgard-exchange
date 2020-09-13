@@ -22,7 +22,7 @@
 
         <ul class="market-list" *ngIf="marketListItems">
 
-          <li class="market-list-item" *ngFor="let item of marketListItems" (click)="selectItem(item)">
+          <li class="market-list-item" *ngFor="let item of marketListItems" (click)="selectItem(item)" [class.disabled]="item.symbol == data.disabledAssetSymbol">
             <!-- BTCB-1DE -->
 
             <div class="asset-icon-container">

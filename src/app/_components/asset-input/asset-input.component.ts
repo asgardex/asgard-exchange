@@ -11,8 +11,6 @@ import { AssetBalance } from 'src/app/_classes/asset-balance';
 })
 export class AssetInputComponent implements OnInit {
 
-  @Input() label: string;
-
   /**
    * Wallet balances
    */
@@ -24,6 +22,7 @@ export class AssetInputComponent implements OnInit {
     return this._balances;
   }
   private _balances: AssetBalance[];
+  balance: number;
 
   /**
    * Selected Asset
@@ -43,9 +42,10 @@ export class AssetInputComponent implements OnInit {
    */
   @Input() assetUnit: number;
   @Output() assetUnitChange = new EventEmitter<number>();
-  @Input() disableInput?: boolean;
 
-  balance: number;
+  @Input() label: string;
+  @Input() disableInput?: boolean;
+  @Input() disabledAssetSymbol: string;
 
   constructor(private dialog: MatDialog) { }
 
@@ -76,7 +76,10 @@ export class AssetInputComponent implements OnInit {
       MarketsModalComponent,
       {
         width: '50vw',
-        maxWidth: '420px'
+        maxWidth: '420px',
+        data: {
+          disabledAssetSymbol: this.disabledAssetSymbol
+        }
       }
     );
 

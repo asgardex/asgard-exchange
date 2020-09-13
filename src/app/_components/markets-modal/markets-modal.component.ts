@@ -1,9 +1,9 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Inject } from '@angular/core';
 import { Market } from 'src/app/_classes/market';
 import { MidgardService } from 'src/app/_services/midgard.service';
 import { Asset } from '../../_classes/asset';
 import { Subscription } from 'rxjs';
-import { MatDialogRef } from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -20,6 +20,7 @@ export class MarketsModalComponent implements OnInit, OnDestroy {
 
   constructor(
     private midgardService: MidgardService,
+    @Inject(MAT_DIALOG_DATA) public data: {disabledAssetSymbol: string},
     public dialogRef: MatDialogRef<MarketsModalComponent>) {
       this.subs = [];
   }
@@ -33,8 +34,6 @@ export class MarketsModalComponent implements OnInit, OnDestroy {
       (res) => {
 
         const sortedByName = res.sort();
-
-        // export const RUNE_SYMBOL = isMainnet ? 'RUNE-B1A' : 'RUNE-67C';
 
         this.marketListItems = sortedByName.map( (poolName) => new Asset(poolName) );
         this.marketListItems.unshift(
@@ -54,7 +53,9 @@ export class MarketsModalComponent implements OnInit, OnDestroy {
 
   selectItem(item: Asset) {
 
-    this.dialogRef.close(item);
+    if (item.symbol !== this.data.disabledAssetSymbol) {
+      this.dialogRef.close(item);
+    }
 
   }
 

@@ -6,7 +6,8 @@
     label="From"
     [(selectedAsset)]="selectedSourceAsset"
     [(assetUnit)]="sourceAssetUnit"
-    [balances]="balances">
+    [balances]="balances"
+    [disabledAssetSymbol]="selectedTargetAsset ? selectedTargetAsset.symbol : null">
   </app-asset-input>
 
   <div class="flxr flxr--align-center flxr--just-center">
@@ -19,7 +20,8 @@
     [(selectedAsset)]="selectedTargetAsset"
     [(assetUnit)]="targetAssetUnitDisplay"
     [balances]="balances"
-    [disableInput]="true">
+    [disableInput]="true"
+    [disabledAssetSymbol]="selectedSourceAsset ? selectedSourceAsset.symbol : null">
   </app-asset-input>
 
   <div *ngIf="basePrice && selectedTargetAsset && selectedSourceAsset" class="flxr flxr--just-space-between base-price">

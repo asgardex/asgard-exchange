@@ -17,10 +17,17 @@
   align-items: center;
   padding: 4px 20px;
   height: 56px;
+  cursor: pointer;
 
   &:hover {
     background-color: rgb(44, 47, 54);
-    cursor: pointer;
+  }
+
+  &.disabled {
+    // background-color: rgb(44, 47, 54);
+    color: #565a69;
+    background-color: transparent;
+    cursor: inherit;
   }
 
   &__symbol {
