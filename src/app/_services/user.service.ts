@@ -11,7 +11,7 @@ import {
 } from '@thorchain/asgardex-token';
 import { Market, MarketResponse } from '../_classes/market';
 import { bnOrZero, bn } from '@thorchain/asgardex-util';
-import { AssetData } from '../_classes/asset-data';
+import { AssetBalance } from '../_classes/asset-balance';
 
 @Injectable({
   providedIn: 'root'
@@ -24,7 +24,7 @@ export class UserService {
   private marketsSource = new BehaviorSubject<Market[]>([]);
   markets$ = this.marketsSource.asObservable();
 
-  private userBalancesSource = new BehaviorSubject<AssetData[]>(null);
+  private userBalancesSource = new BehaviorSubject<AssetBalance[]>(null);
   userBalances$ = this.userBalancesSource.asObservable();
 
   asgardexBncClient: BinanceClient;
@@ -86,7 +86,7 @@ export class UserService {
           asset: coin.symbol,
           assetValue: tokenAmount(coin.free),
           price: market ? bnOrZero(market.listPrice) : bn(0),
-        } as AssetData;
+        } as AssetBalance;
       });
 
       this.userBalancesSource.next(coins);

@@ -3,7 +3,7 @@
   <div>
     <div class="flxr flxr--just-space-between">
       <label for="{{label}}Input">{{label}}</label>
-      <label *ngIf="balances">Balance: {{selectedFromBalance | number:"1.0-2"}}</label>
+      <label *ngIf="balance">Balance: {{balance | number:"1.0-2"}}</label>
     </div>
 
     <div class="flxr flxr--just-space-between flxr--align-center">

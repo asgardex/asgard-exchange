@@ -1,20 +1,26 @@
 <div style="position: relative;">
 
 
-  <!-- FROM -->
-  <app-asset-input label="From" [(selectedAsset)]="selectedSourceAsset" [(assetUnit)]="sourceAssetUnit"></app-asset-input>
+  <!-- SOURCE -->
+  <app-asset-input
+    label="From"
+    [(selectedAsset)]="selectedSourceAsset"
+    [(assetUnit)]="sourceAssetUnit"
+    [balances]="balances">
+  </app-asset-input>
 
   <div class="flxr flxr--align-center flxr--just-center">
     <mat-icon class="to-btn">arrow_downward</mat-icon>
   </div>
 
-  <!-- TO -->
-  <app-asset-input label="To" [(selectedAsset)]="selectedTargetAsset" [(assetUnit)]="targetAssetUnitDisplay" [disableInput]="true"></app-asset-input>
-
-  <!-- <div id="swap-details">
-    <span *ngIf="fee != null">Fee: {{fee | number:"0.0-4"}} + {{runeTransactionFee}} Rune</span>
-    <span *ngIf="slip">Slip: {{slip | number:"0.0-4"}}</span>
-  </div> -->
+  <!-- TARGET -->
+  <app-asset-input
+    label="To"
+    [(selectedAsset)]="selectedTargetAsset"
+    [(assetUnit)]="targetAssetUnitDisplay"
+    [balances]="balances"
+    [disableInput]="true">
+  </app-asset-input>
 
   <div *ngIf="basePrice && selectedTargetAsset && selectedSourceAsset" class="flxr flxr--just-space-between base-price">
     <span>Price:</span>

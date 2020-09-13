@@ -17,7 +17,7 @@ import {
 import BigNumber from 'bignumber.js';
 import { PoolDetail } from '../_classes/pool-detail';
 import { MidgardService } from '../_services/midgard.service';
-import { AssetData } from '../_classes/asset-data';
+import { AssetBalance } from '../_classes/asset-balance';
 import { BinanceService } from '../_services/binance.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmSwapModalComponent } from './confirm-swap-modal/confirm-swap-modal.component';
@@ -56,7 +56,6 @@ export class SwapComponent implements OnInit, OnDestroy {
 
   }
   private _sourceAssetUnit: number;
-
   private _sourceAssetTokenValue: BaseAmount;
 
   get selectedSourceAsset() {
@@ -73,8 +72,6 @@ export class SwapComponent implements OnInit, OnDestroy {
   private _selectedSourceAsset: Asset;
   selectedSourceBalance: number;
   sourcePoolDetail: PoolDetail;
-
-  user: User;
 
   /**
    * To
@@ -107,14 +104,14 @@ export class SwapComponent implements OnInit, OnDestroy {
   poolDetailMap: {
     [key: string]: PoolDetail
   } = {};
-  assetData: AssetData[];
+  balances: AssetBalance[];
   markets: Market[];
   subs: Subscription[];
 
   slip: number;
   binanceTransferFee: number;
   runeTransactionFee: number;
-
+  user: User;
   basePrice: number;
 
 
@@ -129,8 +126,8 @@ export class SwapComponent implements OnInit, OnDestroy {
 
     const balances$ = this.userService.userBalances$.subscribe(
       (balances) => {
-        this.assetData = balances;
-        this.updateSelectedFromBalance();
+        console.log('BALANCES ARE: ', balances);
+        this.balances = balances;
       }
     );
 
@@ -213,7 +210,7 @@ export class SwapComponent implements OnInit, OnDestroy {
       (res) => {
         this.runeTransactionFee = bn(res.int_64_values.TransactionFee).div(10 ** 8).toNumber();
       },
-      (err) => console.error('error fetching constants')
+      (err) => console.error('error fetching constants: ', err)
     );
   }
 
@@ -221,16 +218,8 @@ export class SwapComponent implements OnInit, OnDestroy {
     this.binanceService.getBinanceFees().subscribe(
       (res) => {
         const binanceFees = res;
-        console.log('BINANCE FEES ARE: ', res);
         const binanceTransferFees = this.binanceService.getTransferFees(binanceFees);
-        console.log('TRANSFER FEES ARE: ', binanceTransferFees);
-
         this.binanceTransferFee = binanceTransferFees.single.amount().div(10 ** 8).toNumber();
-        // console.log('amount is: ', single.amount().toJSON());
-        // const other = baseToToken(single);
-
-        // console.log('other: ', other.amount().toJSON());
-
       }
     );
   }
@@ -312,24 +301,6 @@ export class SwapComponent implements OnInit, OnDestroy {
       },
       (err) => console.error('error is: ', err)
     );
-  }
-
-  updateSelectedFromBalance() {
-
-    if (this.assetData) {
-
-      console.log('asset is: ', this.selectedSourceAsset);
-
-      const match = this.assetData.find( (balance) => balance.asset === this.selectedSourceAsset.ticker );
-
-      if (match) {
-        console.log('match is: ', match);
-      } else {
-        this.selectedSourceBalance = 0.0;
-      }
-      console.log('match is: ', match);
-    }
-
   }
 
   ngOnDestroy() {
