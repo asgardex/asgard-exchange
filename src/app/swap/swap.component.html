@@ -37,11 +37,11 @@
     </button>
   </div>
 
-  <div class="tag" *ngIf="basePrice && selectedTargetAsset && selectedSourceAsset && runeTransactionFee && binanceTransferFee">
+  <div class="tag" *ngIf="basePrice && selectedTargetAsset && selectedSourceAsset && runeTransactionFee && binanceTransferFeeDisplay">
     <div class="tag-contents">
       <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
         <span class="tx-detail-label">Total Fee</span>
-        <span>{{binanceTransferFee | number:"0.0-6"}} BNB + {{runeTransactionFee}} Rune</span>
+        <span>{{binanceTransferFeeDisplay | number:"0.0-6"}} BNB + {{runeTransactionFee}} Rune</span>
       </div>
       <div class="flxr flxr--just-space-between">
         <span class="tx-detail-label">Slip</span>

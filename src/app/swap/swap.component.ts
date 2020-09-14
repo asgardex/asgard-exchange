@@ -7,12 +7,16 @@ import { Market } from '../_classes/market';
 import {
   bn,
   getSwapOutput,
+  getDoubleSwapOutput,
   getSwapSlip,
+  getDoubleSwapSlip,
   BaseAmount,
   PoolData,
   assetToBase,
   assetAmount,
-  getValueOfRuneInAsset
+  getValueOfAssetInRune,
+  getValueOfRuneInAsset,
+  getValueOfAsset1InAsset2, getSwapFee
 } from '@thorchain/asgardex-util';
 import BigNumber from 'bignumber.js';
 import { PoolDetail } from '../_classes/pool-detail';
@@ -22,6 +26,7 @@ import { BinanceService } from '../_services/binance.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmSwapModalComponent } from './confirm-swap-modal/confirm-swap-modal.component';
 import { User } from '../_classes/user';
+import { baseAmount, baseToToken, tokenAmount, TokenAmount } from '@thorchain/asgardex-token';
 
 export enum SwapType {
   DOUBLE_SWAP = 'double_swap',
@@ -49,7 +54,7 @@ export class SwapComponent implements OnInit, OnDestroy {
     this._sourceAssetTokenValue = assetToBase(assetAmount(val));
 
     if (val) {
-      this.handleUnitChange();
+      this.updateSwapDetails();
     } else {
       this.targetAssetUnit = null;
     }
@@ -66,6 +71,8 @@ export class SwapComponent implements OnInit, OnDestroy {
 
     if (this._selectedSourceAsset && this._selectedSourceAsset.symbol !== this.runeSymbol) {
       this.getPoolDetails(this._selectedSourceAsset.symbol);
+    } else if (this._selectedSourceAsset && this._selectedSourceAsset.symbol === this.runeSymbol) {
+      this.updateSwapDetails();
     }
 
   }
@@ -95,6 +102,8 @@ export class SwapComponent implements OnInit, OnDestroy {
 
     if (this._selectedTargetAsset && this._selectedTargetAsset.symbol !== this.runeSymbol) {
       this.getPoolDetails(this._selectedTargetAsset.symbol);
+    } else if (this._selectedTargetAsset && this._selectedTargetAsset.symbol === this.runeSymbol) {
+      this.updateSwapDetails();
     }
 
   }
@@ -109,10 +118,12 @@ export class SwapComponent implements OnInit, OnDestroy {
   subs: Subscription[];
 
   slip: number;
-  binanceTransferFee: number;
   runeTransactionFee: number;
   user: User;
   basePrice: number;
+
+  binanceTransferFee: BigNumber;
+  binanceTransferFeeDisplay: number;
 
 
   constructor(
@@ -164,7 +175,7 @@ export class SwapComponent implements OnInit, OnDestroy {
           sourceAsset: this.selectedSourceAsset,
           targetAsset: this.selectedTargetAsset,
           runeFee: this.runeTransactionFee,
-          bnbFee: this.binanceTransferFee,
+          bnbFee: this.binanceTransferFeeDisplay,
           basePrice: this.basePrice,
           inputValue: this.sourceAssetUnit,
           outputValue: this.targetAssetUnit.div(10 ** 8),
@@ -183,7 +194,6 @@ export class SwapComponent implements OnInit, OnDestroy {
         this.selectedTargetAsset = null;
         this.selectedSourceAsset = new Asset(this.runeSymbol);
         this.basePrice = null;
-        // this.selectedAssetChange.emit(result);
       }
 
     });
@@ -196,8 +206,7 @@ export class SwapComponent implements OnInit, OnDestroy {
 
         if (res && res.length > 0) {
           this.poolDetailMap[symbol] = res[0];
-          this.handleUnitChange();
-          // this.getTokensData();
+          this.updateSwapDetails();
         }
 
       },
@@ -219,7 +228,8 @@ export class SwapComponent implements OnInit, OnDestroy {
       (res) => {
         const binanceFees = res;
         const binanceTransferFees = this.binanceService.getTransferFees(binanceFees);
-        this.binanceTransferFee = binanceTransferFees.single.amount().div(10 ** 8).toNumber();
+        this.binanceTransferFee = binanceTransferFees.single.amount();
+        this.binanceTransferFeeDisplay = this.binanceTransferFee.div(10 ** 8).toNumber();
       }
     );
   }
@@ -228,79 +238,184 @@ export class SwapComponent implements OnInit, OnDestroy {
     this.markets = await this.userService.getMarkets();
   }
 
-  handleAssetChange() {
-
-    if (this.selectedSourceAsset && this.selectedTargetAsset) {
-
-      console.log('this._sourceAssetTokenValue is: ', this._sourceAssetTokenValue);
-      this.calculateTargetUnits(this.poolDetailMap[this.selectedTargetAsset.symbol]);
-
-    }
-
-  }
-
-  handleUnitChange() {
+  updateSwapDetails() {
     if (this.selectedSourceAsset && this.selectedTargetAsset) {
       console.log('source symbol is: ', this.selectedSourceAsset.symbol);
       console.log('symbol is: ', this.selectedTargetAsset.symbol);
 
-      this.calculateTargetUnits(this.poolDetailMap[this.selectedTargetAsset.symbol]);
+      this.calculateTargetUnits();
     }
   }
 
-  async calculateTargetUnits(poolDetail: PoolDetail) {
+  async calculateTargetUnits() {
 
     if (this._sourceAssetTokenValue) {
-      const pool: PoolData = {
-        assetBalance: assetToBase(assetAmount(poolDetail.assetDepth)),
-        runeBalance: assetToBase(assetAmount(poolDetail.runeDepth)),
-      };
 
-      const baseOutput = getSwapOutput(assetToBase(assetAmount(1)), pool, false);
-      const baseOutputDisplay = baseOutput.amount().div(10 ** 8).toNumber();
-      this.basePrice = baseOutputDisplay;
-      console.log('this base price is: ', this.basePrice);
+      const swapType = this.selectedSourceAsset.symbol === this.runeSymbol || this.selectedTargetAsset.symbol === this.runeSymbol
+        ? SwapType.SINGLE_SWAP
+        : SwapType.DOUBLE_SWAP;
 
-      const swapOutput = getSwapOutput(this._sourceAssetTokenValue, pool, false);
-      const val = swapOutput.amount().div(10 ** 8).toPrecision();
-      console.log('swapOutput IS: ', val);
+      if (swapType === SwapType.SINGLE_SWAP) {
+        this.calculateSingleSwap();
+      } else if (swapType === SwapType.DOUBLE_SWAP
+          && this.poolDetailMap[this.selectedTargetAsset.symbol]
+          && this.poolDetailMap[this.selectedSourceAsset.symbol]) {
 
-      // const swapInput = getSwapInput(false, pool, swapOutput);
-      // const swapInputStr = swapInput.amount().div(10 ** 8).toPrecision();
-      // console.log('swapOutput IS: ', swapInputStr);
+        this.calculateDoubleSwap();
 
-      /**
-       * TODO: reduce 1 RUNE + BNB fee from Input Amount
-       */
-      const slip = getSwapSlip(this._sourceAssetTokenValue, pool, false);
-      this.slip = slip.multipliedBy(100).toNumber();
-      console.log('slip is: ', this.slip.toPrecision().toString());
+      } else {
+        console.error('swap type is undefined: ', swapType);
+      }
 
-      // const fee = getSwapFee(this._sourceAssetTokenValue, pool, false);
-      // const feeStr = fee.amount().div(10 ** 8).toNumber();
-      // console.log('feeStr is: ', feeStr);
-      // this.fee = feeStr;
-
-      const valRuneInAsset = getValueOfRuneInAsset(this._sourceAssetTokenValue, pool);
-      const valRuneInAssetStr = valRuneInAsset.amount().div(10 ** 8).toPrecision();
-      console.log('valRuneInAssetStr is: ', valRuneInAssetStr);
-
-      const total = valRuneInAsset.amount();
-
-      this.targetAssetUnit = total;
-
-      console.log('total is: ', total.div(10 ** 8).toPrecision());
     }
 
   }
 
-  getAssets() {
-    return this.midgardService.getAssets().subscribe(
-      (res) => {
-        console.log('get assets response is: ', res);
-      },
-      (err) => console.error('error is: ', err)
+  /**
+   * When RUNE is one of the assets being exchanged
+   * For example RUNE <==> DAI
+   */
+  calculateSingleSwap() {
+
+    const toRune = this.selectedTargetAsset.symbol === this.runeSymbol
+      ? true
+      : false;
+
+    const poolDetail = this.poolDetailMap[toRune ? this.selectedSourceAsset.symbol : this.selectedTargetAsset.symbol];
+    const pool: PoolData = {
+      assetBalance: assetToBase(assetAmount(poolDetail.assetDepth)),
+      runeBalance: assetToBase(assetAmount(poolDetail.runeDepth)),
+    };
+
+    const singleSwapOutput = getSwapOutput(assetToBase(assetAmount(1)), pool, toRune);
+    const singleSwapOutputDisplay = singleSwapOutput.amount().div(10 ** 8).toNumber();
+    this.basePrice = singleSwapOutputDisplay;
+
+    /**
+     * TODO: reduce 1 RUNE + BNB fee from Input Amount
+     */
+    const slip = getSwapSlip(this._sourceAssetTokenValue, pool, toRune);
+    this.slip = slip.toNumber();
+    console.log('slip is: ', this.slip.toPrecision().toString());
+
+    let totalAmount: BaseAmount;
+
+    if (toRune) {
+      totalAmount = getValueOfAssetInRune(this._sourceAssetTokenValue, pool); // Asset to RUNE
+      const totalAmountStr = totalAmount.amount().div(10 ** 8).toPrecision();
+      console.log('totalAmountStr is: ', totalAmountStr);
+    } else {
+      totalAmount = getValueOfRuneInAsset(this._sourceAssetTokenValue, pool); // RUNE to Asset
+      const totalAmountStr = totalAmount.amount().div(10 ** 8).toPrecision();
+      console.log('valRuneInAssetStr is: ', totalAmountStr);
+    }
+
+    const total = totalAmount.amount();
+
+    const totalMinusRuneFee = this.getAmountAfterRuneFee(
+      tokenAmount(total),
+      toRune ? this.selectedSourceAsset.symbol : this.selectedTargetAsset.symbol
     );
+
+    this.targetAssetUnit = totalMinusRuneFee.amount();
+
+  }
+
+  /**
+   * Asset <==> Asset
+   * RUNE is not being directly exchanged
+   * For example DAI <==> BUSD
+   */
+  calculateDoubleSwap() {
+
+    const sourcePool = this.poolDetailMap[this.selectedSourceAsset.symbol];
+    const pool1: PoolData = {
+      assetBalance: assetToBase(assetAmount(sourcePool.assetDepth)),
+      runeBalance: assetToBase(assetAmount(sourcePool.runeDepth)),
+    };
+
+    const targetPool = this.poolDetailMap[this.selectedTargetAsset.symbol];
+    const pool2: PoolData = {
+      assetBalance: assetToBase(assetAmount(targetPool.assetDepth)),
+      runeBalance: assetToBase(assetAmount(targetPool.runeDepth)),
+    };
+
+    const doubleSwapOutput = getDoubleSwapOutput(assetToBase(assetAmount(1)), pool1, pool2);
+    const doubleSwapOutputDisplay = doubleSwapOutput.amount().div(10 ** 8).toNumber();
+    this.basePrice = doubleSwapOutputDisplay;
+
+
+    /**
+     * TODO: reduce 1 RUNE + BNB fee from Input Amount
+     */
+    const slip = getDoubleSwapSlip(this._sourceAssetTokenValue, pool1, pool2);
+    this.slip = slip.toNumber();
+    console.log('slip is: ', this.slip.toPrecision().toString());
+
+    const total = getValueOfAsset1InAsset2(this._sourceAssetTokenValue, pool1, pool2);
+
+    const totalMinusRuneFee = this.getAmountAfterRuneFee(
+      tokenAmount(total.amount()),
+      this.selectedTargetAsset.symbol
+    );
+
+    this.targetAssetUnit = totalMinusRuneFee.amount();
+
+
+  }
+
+  /**
+   * get token amount after bnb fee (subtract the fee for only bnb asset)
+   */
+  getAmountAfterBnbFee(value: TokenAmount, symbol: string): TokenAmount {
+    if (symbol.toUpperCase() !== 'BNB') {
+      return value;
+    }
+
+    const feeAsTokenAmount = baseToToken(baseAmount(this.binanceTransferFee)).amount();
+    // const thresholdAmount = thresholdBnbAmount.amount();
+
+    const amountAfterBnbFee = value.amount().minus(feeAsTokenAmount);
+
+    if (amountAfterBnbFee.isLessThan(0)) {
+      return tokenAmount(0);
+    }
+
+    // if (amountAfterBnbFee.isGreaterThan(thresholdAmount)) {
+    //   return tokenAmount(thresholdAmount);
+    // }
+
+    return tokenAmount(amountAfterBnbFee);
+  }
+
+  /**
+   * get asset amount after 1 RUNE Fee (for thorchain fee, not binance)
+   * @param value asset amount
+   * @param symbol asset symbol
+   */
+  getAmountAfterRuneFee(
+    value: TokenAmount,
+    symbol: string,
+  ): TokenAmount {
+    const runeFee = bn(this.getRuneFeeAmount(symbol));
+    const feeBn = assetToBase(assetAmount(runeFee)).amount();
+
+    return value.amount().isGreaterThan(feeBn)
+      ? tokenAmount(value.amount().minus(feeBn))
+      : tokenAmount(0);
+  }
+
+  /**
+   * calculate the asset amount of 1 RUNE value
+   * @param symbol asset symbol
+   */
+  getRuneFeeAmount(symbol: string): BigNumber {
+
+    const runePrice = bn(1);
+
+    const curTokenPrice = bn(this.poolDetailMap[symbol].price);
+
+    return runePrice.dividedBy(curTokenPrice);
   }
 
   ngOnDestroy() {
