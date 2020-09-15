@@ -58,6 +58,7 @@ export class SwapComponent implements OnInit, OnDestroy {
       this.updateSwapDetails();
     } else {
       this.targetAssetUnit = null;
+      this.slip = 0;
     }
 
   }
@@ -286,30 +287,10 @@ export class SwapComponent implements OnInit, OnDestroy {
       ? this.poolDetailMap[this.selectedSourceAsset.symbol]
       : this.poolDetailMap[this.selectedTargetAsset.symbol];
 
-    console.log('pool detail from midgard is: ', poolDetail);
-
     const pool: PoolData = {
       assetBalance: baseAmount(poolDetail.assetDepth),
       runeBalance: baseAmount(poolDetail.runeDepth),
     };
-
-    console.log(`pool detail found at: https://midgard.bepswap.com/v1/pools/detail?asset=${(toRune) ? this.selectedSourceAsset.symbol : this.selectedTargetAsset.symbol}`);
-
-    console.log('source asset is: ', this.selectedSourceAsset.symbol);
-    console.log('target asset is: ', this.selectedTargetAsset.symbol);
-
-    console.log('pool assetBalance is: ', pool.assetBalance.amount().toNumber());
-    console.log('pool runeBalance is: ', pool.runeBalance.amount().toNumber());
-
-    console.log('raw input is: ', this._sourceAssetTokenValue.amount().toNumber());
-
-    const totalMinusRuneFee = this.getAmountAfterRuneFee(
-      tokenAmount(this._sourceAssetTokenValue.amount()),
-      toRune ? this.selectedSourceAsset.symbol : this.runeSymbol
-    );
-
-    console.log('total minus (RUNE FEE): ', totalMinusRuneFee.amount().toNumber());
-
 
     /**
      * TO SHOW BASE PRICE
@@ -317,56 +298,31 @@ export class SwapComponent implements OnInit, OnDestroy {
     const basePrice = (toRune)
       ? getValueOfAssetInRune(assetToBase(assetAmount(1)), pool)
       : getValueOfRuneInAsset(assetToBase(assetAmount(1)), pool);
-
     this.basePrice = basePrice.amount().div(10 ** 8).toNumber();
-    console.log('the base price is: ', this.basePrice);
 
-
-    // const basePrice = getSwapOutput(assetToBase(assetAmount(1)), pool, toRune);
 
     /**
-     * Slip percentage after RUNE fee subtracted
+     * Slip percentage using original input
      */
-    const slip = getSwapSlip(baseAmount(totalMinusRuneFee.amount()), pool, toRune);
+    const slip = getSwapSlip(this._sourceAssetTokenValue, pool, toRune);
     this.slip = slip.toNumber();
-    console.log('the slip (using input MINUS RUNE FEE) is: ', this.slip);
+
 
     /**
-     * Slip percentage using original input (without fee deducted)
+     * Total output amount in target units minus 1 RUNE
      */
-    // const slip = getSwapSlip(this._sourceAssetTokenValue, pool, toRune);
-    // this.slip = slip.toNumber();
-    // console.log('the slip (using original input without deduction) is: ', this.slip);
-
-    /**
-     * Total output amount in target units
-     */
-    const totalAmount = getSwapOutput(baseAmount(totalMinusRuneFee.amount()), pool, toRune);
-    console.log('totalAmount is: ', totalAmount.amount().toNumber());
-    // this.basePrice = basePrice.amount().div(10 ** 8).toNumber();
-
-    const total = totalAmount.amount();
-
-    console.log('total: ', total.toNumber());
+    const totalAmount = getSwapOutput(baseAmount(this._sourceAssetTokenValue.amount()), pool, toRune);
+    const total = totalAmount.amount().minus(basePrice.amount());
 
     /**
      * Subtract "Swap fee" from (total)
      */
-    const swapFee = getSwapFee(baseAmount(totalAmount.amount()), pool, toRune);
-    console.log('swap fee is: ', swapFee.amount().toNumber());
+    // const swapFee = getSwapFee(baseAmount(this._sourceAssetTokenValue.amount()), pool, toRune);
+    // console.log('swap fee is: ', swapFee.amount().plus(basePrice.amount()).toNumber());
+    // const totalMinusSwapFee = totalAmount.amount().minus(swapFee.amount().plus(basePrice.amount()));
+    // console.log('total minus (RUNE FEE + SWAP FEE): ', totalMinusSwapFee.toNumber());
 
-    const totalMinusSwapFee = totalAmount.amount().minus(swapFee.amount());
-    console.log('total minus (RUNE FEE + SWAP FEE): ', totalMinusSwapFee.toNumber());
-
-    // const slipAmount = total.multipliedBy(this.slip);
-
-    // console.log('total * slip is: ', slipAmount.toNumber());
-
-    // console.log('total minus slip ==> final number is: ', total.minus(slipAmount).toNumber());
-
-    // this.targetAssetUnit = total.minus(slipAmount);
-
-    this.targetAssetUnit = totalMinusSwapFee;
+    this.targetAssetUnit = (total.isLessThan(0)) ? bn(0) : total;
 
   }
 
