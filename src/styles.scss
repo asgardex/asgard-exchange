@@ -253,6 +253,16 @@ input[type=number] {
     cursor: pointer;
     border: 1px solid rgb(33, 114, 229);
   }
+
+  &:disabled {
+    color: #888d9b;
+
+    &:hover {
+      border: 1px solid rgb(64, 68, 79);
+      cursor: inherit;
+    }
+
+  }
 }
 
 /**

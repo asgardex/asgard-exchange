@@ -3,6 +3,7 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { User } from 'src/app/_classes/user';
 import { UserService } from 'src/app/_services/user.service';
 import { Subscription } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-connect',
@@ -56,8 +57,11 @@ export enum ConnectionMethod {
 export class ConnectModal {
 
   connectionMethod: ConnectionMethod;
+  isTestnet: boolean;
 
-  constructor(public dialogRef: MatDialogRef<ConnectModal>) { }
+  constructor(public dialogRef: MatDialogRef<ConnectModal>) {
+    this.isTestnet = environment.network === 'testnet' ? true : false;
+  }
 
   connectWalletConnect() {
     this.connectionMethod = ConnectionMethod.WALLET_CONNECT;

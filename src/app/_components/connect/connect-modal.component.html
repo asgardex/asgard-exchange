@@ -8,7 +8,7 @@
 
       <!-- Connect Options -->
 
-      <button class="connect-option form-border" (click)="connectWalletConnect()">
+      <button class="connect-option form-border" (click)="connectWalletConnect()" [disabled]="isTestnet">
         <span>Wallet Connect</span>
         <img src="assets/images/wallet-connect-icon.svg" />
       </button>
