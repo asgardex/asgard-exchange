@@ -28,7 +28,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { ConfirmSwapModalComponent } from './confirm-swap-modal/confirm-swap-modal.component';
 import { User } from '../_classes/user';
 import { baseToToken, tokenAmount, TokenAmount } from '@thorchain/asgardex-token';
-import { ThrowStmt } from '@angular/compiler';
 
 export enum SwapType {
   DOUBLE_SWAP = 'double_swap',
@@ -157,6 +156,9 @@ export class SwapComponent implements OnInit, OnDestroy {
     this.getConstants();
     this.getBinanceFees();
     this.getPoolAddresses();
+
+    console.log('network is: ', environment.network);
+
   }
 
   getPoolAddresses() {
