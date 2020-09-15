@@ -16,7 +16,7 @@
 
   <!-- TARGET -->
   <app-asset-input
-    label="To"
+    [label]="selectedTargetAsset ? 'To (estimated)' : 'To'"
     [(selectedAsset)]="selectedTargetAsset"
     [(assetUnit)]="targetAssetUnitDisplay"
     [balances]="balances"

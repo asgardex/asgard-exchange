@@ -335,92 +335,29 @@ export class SwapComponent implements OnInit, OnDestroy {
 
     const sourcePool = this.poolDetailMap[this.selectedSourceAsset.symbol];
     const pool1: PoolData = {
-      assetBalance: assetToBase(assetAmount(sourcePool.assetDepth)),
-      runeBalance: assetToBase(assetAmount(sourcePool.runeDepth)),
+      assetBalance: baseAmount(sourcePool.assetDepth),
+      runeBalance: baseAmount(sourcePool.runeDepth),
     };
 
     const targetPool = this.poolDetailMap[this.selectedTargetAsset.symbol];
     const pool2: PoolData = {
-      assetBalance: assetToBase(assetAmount(targetPool.assetDepth)),
-      runeBalance: assetToBase(assetAmount(targetPool.runeDepth)),
+      assetBalance: baseAmount(targetPool.assetDepth),
+      runeBalance: baseAmount(targetPool.runeDepth),
     };
 
-    const doubleSwapOutput = getDoubleSwapOutput(assetToBase(assetAmount(1)), pool1, pool2);
-    const doubleSwapOutputDisplay = doubleSwapOutput.amount().div(10 ** 8).toNumber();
-    this.basePrice = doubleSwapOutputDisplay;
+    const basePrice = getDoubleSwapOutput(assetToBase(assetAmount(1)), pool1, pool2);
+    this.basePrice = basePrice.amount().div(10 ** 8).toNumber();
 
-
-    /**
-     * TODO: reduce 1 RUNE + BNB fee from Input Amount
-     */
     const slip = getDoubleSwapSlip(this._sourceAssetTokenValue, pool1, pool2);
     this.slip = slip.toNumber();
-    console.log('slip is: ', this.slip.toPrecision().toString());
-
-    const total = getValueOfAsset1InAsset2(this._sourceAssetTokenValue, pool1, pool2);
-
-    const totalMinusRuneFee = this.getAmountAfterRuneFee(
-      tokenAmount(total.amount()),
-      this.selectedTargetAsset.symbol
-    );
-
-    this.targetAssetUnit = totalMinusRuneFee.amount();
 
 
-  }
+    const doubleSwapOutput = getDoubleSwapOutput(this._sourceAssetTokenValue, pool1, pool2);
+    const total = doubleSwapOutput.amount().minus(basePrice.amount());
 
-  /**
-   * get token amount after bnb fee (subtract the fee for only bnb asset)
-   */
-  // getAmountAfterBnbFee(value: TokenAmount, symbol: string): TokenAmount {
-  //   if (symbol.toUpperCase() !== 'BNB') {
-  //     return value;
-  //   }
+    this.targetAssetUnit = total;
 
-  //   const feeAsTokenAmount = baseToToken(baseAmount(this.binanceTransferFee)).amount();
-  //   // const thresholdAmount = thresholdBnbAmount.amount();
 
-  //   const amountAfterBnbFee = value.amount().minus(feeAsTokenAmount);
-
-  //   if (amountAfterBnbFee.isLessThan(0)) {
-  //     return tokenAmount(0);
-  //   }
-
-  //   // if (amountAfterBnbFee.isGreaterThan(thresholdAmount)) {
-  //   //   return tokenAmount(thresholdAmount);
-  //   // }
-
-  //   return tokenAmount(amountAfterBnbFee);
-  // }
-
-  /**
-   * get asset amount after 1 RUNE Fee (for thorchain fee, not binance)
-   * @param value asset amount
-   * @param symbol asset symbol
-   */
-  getAmountAfterRuneFee(
-    value: TokenAmount,
-    symbol: string,
-  ): TokenAmount {
-    const runeFee = bn(this.getRuneFeeAmount(symbol));
-    const feeBn = assetToBase(assetAmount(runeFee)).amount();
-
-    return value.amount().isGreaterThan(feeBn)
-      ? tokenAmount(value.amount().minus(feeBn))
-      : tokenAmount(0);
-  }
-
-  /**
-   * calculate the asset amount of 1 RUNE value
-   * @param symbol asset symbol
-   */
-  getRuneFeeAmount(symbol: string): BigNumber {
-
-    const runePrice = bn(1);
-
-    const curTokenPrice = (symbol === this.runeSymbol) ? runePrice : bn(this.poolDetailMap[symbol].price);
-
-    return runePrice.dividedBy(curTokenPrice);
   }
 
   ngOnDestroy() {
