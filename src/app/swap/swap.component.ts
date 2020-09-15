@@ -291,6 +291,8 @@ export class SwapComponent implements OnInit, OnDestroy {
       runeBalance: baseAmount(poolDetail.runeDepth),
     };
 
+    console.log(`pool detail found at: https://midgard.bepswap.com/v1/pools/detail?asset=${(toRune) ? this.selectedSourceAsset.symbol : this.selectedTargetAsset.symbol}`);
+
     console.log('source asset is: ', this.selectedSourceAsset.symbol);
     console.log('target asset is: ', this.selectedTargetAsset.symbol);
 
@@ -304,7 +306,8 @@ export class SwapComponent implements OnInit, OnDestroy {
       toRune ? this.selectedSourceAsset.symbol : this.runeSymbol
     );
 
-    console.log('TOTAL MINUS FEE: ', totalMinusRuneFee.amount().toNumber());
+    console.log('total minus (RUNE FEE): ', totalMinusRuneFee.amount().toNumber());
+
 
     /**
      * TO SHOW BASE PRICE
@@ -344,6 +347,15 @@ export class SwapComponent implements OnInit, OnDestroy {
 
     console.log('total: ', total.toNumber());
 
+    /**
+     * Subtract "Swap fee" from (total)
+     */
+    const swapFee = getSwapFee(baseAmount(totalAmount.amount()), pool, toRune);
+    console.log('swap fee is: ', swapFee.amount().toNumber());
+
+    const totalMinusSwapFee = totalAmount.amount().minus(swapFee.amount());
+    console.log('total minus (RUNE FEE + SWAP FEE): ', totalMinusSwapFee.toNumber());
+
     // const slipAmount = total.multipliedBy(this.slip);
 
     // console.log('total * slip is: ', slipAmount.toNumber());
@@ -352,7 +364,7 @@ export class SwapComponent implements OnInit, OnDestroy {
 
     // this.targetAssetUnit = total.minus(slipAmount);
 
-    this.targetAssetUnit = total;
+    this.targetAssetUnit = totalMinusSwapFee;
 
   }
 
