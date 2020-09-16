@@ -5,6 +5,7 @@ import { TransferResult } from '@thorchain/asgardex-binance';
 import { User } from 'src/app/_classes/user';
 import { MidgardService } from 'src/app/_services/midgard.service';
 import { WalletService } from 'src/app/_services/wallet.service';
+import { UserService } from 'src/app/_services/user.service';
 
 export interface SwapData {
   sourceAsset: Asset;
@@ -44,7 +45,8 @@ export class ConfirmSwapModalComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public swapData: SwapData,
     public dialogRef: MatDialogRef<ConfirmSwapModalComponent>,
     private midgardService: MidgardService,
-    private walletService: WalletService
+    private walletService: WalletService,
+    private userService: UserService
   ) {
     this.txState = ConfirmSwapModalState.PENDING_CONFIRMATION;
   }
@@ -99,6 +101,7 @@ export class ConfirmSwapModalComponent implements OnInit {
 
                 if (response.result && response.result.length > 0) {
                   this.hash = response.result[0].hash;
+                  this.userService.setPendingTransaction(this.hash);
                 }
 
               })

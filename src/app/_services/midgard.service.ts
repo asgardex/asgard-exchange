@@ -6,6 +6,7 @@ import { PoolDetail } from '../_classes/pool-detail';
 import { MidgardAsset } from '../_classes/midgard-asset';
 import { MidgardConstants } from '../_classes/midgard-constants';
 import { PoolAddressesDTO } from '../_classes/pool-address';
+import { TransactionDTO } from '../_classes/transaction';
 
 @Injectable({
   providedIn: 'root'
@@ -50,6 +51,13 @@ export class MidgardService {
 
   getProxiedPoolAddresses(): Observable<PoolAddressesDTO> {
     return this.http.get<PoolAddressesDTO>(`${this.basePath}/thorchain/pool_addresses`);
+  }
+
+  getTransaction(txId: string): Observable<TransactionDTO> {
+
+    const params = new HttpParams().set('offset', '0').set('limit', '1').set('txid', txId);
+
+    return this.http.get<TransactionDTO>(`${this.basePath}/txs`, {params});
   }
 
 }

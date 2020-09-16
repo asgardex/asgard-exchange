@@ -321,8 +321,20 @@ input[type=number] {
   }
 }
 
-.mat-progress-spinner circle, .mat-spinner circle {
-  stroke: #2172e5;
+.mat-progress-spinner, .mat-spinner {
+
+  circle {
+    stroke: #2172e5;
+  }
+
+  &.light-spinner {
+    stroke: white;
+
+    circle {
+      stroke: white !important;
+    }
+  }
+
 }
 
 .flxr {

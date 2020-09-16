@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { Subject, BehaviorSubject } from 'rxjs';
 import { User } from '../_classes/user';
 import {
   Client as binanceClient,
@@ -27,6 +27,9 @@ export class UserService {
   private userBalancesSource = new BehaviorSubject<AssetBalance[]>(null);
   userBalances$ = this.userBalancesSource.asObservable();
 
+  private pendingTransactionSource = new Subject<string>();
+  pendingTransaction$ = this.pendingTransactionSource.asObservable();
+
   asgardexBncClient: BinanceClient;
 
   constructor() {
@@ -39,6 +42,10 @@ export class UserService {
   setUser(user: User) {
     this.getBalance(user.wallet);
     this.userSource.next(user);
+  }
+
+  setPendingTransaction(txId: string) {
+    this.pendingTransactionSource.next(txId);
   }
 
   async setMarkets() {
@@ -95,8 +102,6 @@ export class UserService {
       // yield put(actions.refreshBalanceFailed(error));
       console.log('error getting balance: ', error);
     }
-
-
 
   }
 

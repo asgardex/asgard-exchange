@@ -156,6 +156,15 @@ export class SwapComponent implements OnInit, OnDestroy {
         this.balances = balances;
         this.sourceBalance = this.updateBalance(this.selectedSourceAsset);
         this.targetBalance = this.updateBalance(this.selectedTargetAsset);
+
+        if (this.selectedTargetAsset && this.selectedTargetAsset.symbol !== this.runeSymbol) {
+          this.getPoolDetails(this.selectedTargetAsset.symbol);
+        }
+
+        if (this.selectedSourceAsset && this.selectedSourceAsset.symbol !== this.runeSymbol) {
+          this.getPoolDetails(this.selectedSourceAsset.symbol);
+        }
+
       }
     );
 
@@ -243,9 +252,6 @@ export class SwapComponent implements OnInit, OnDestroy {
       if (transactionSuccess) {
         this.targetAssetUnit = null;
         this.sourceAssetUnit = null;
-        this.selectedTargetAsset = null;
-        this.selectedSourceAsset = new Asset(this.runeSymbol);
-        this.basePrice = null;
       }
 
     });
