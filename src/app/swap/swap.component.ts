@@ -77,6 +77,8 @@ export class SwapComponent implements OnInit, OnDestroy {
       this.updateSwapDetails();
     }
 
+    this.sourceBalance = this.updateBalance(asset);
+
   }
   private _selectedSourceAsset: Asset;
   selectedSourceBalance: number;
@@ -108,6 +110,8 @@ export class SwapComponent implements OnInit, OnDestroy {
       this.updateSwapDetails();
     }
 
+    this.targetBalance = this.updateBalance(asset);
+
   }
   private _selectedTargetAsset: Asset;
   targetPoolDetail: PoolDetail;
@@ -115,7 +119,6 @@ export class SwapComponent implements OnInit, OnDestroy {
   poolDetailMap: {
     [key: string]: PoolDetail
   } = {};
-  balances: AssetBalance[];
   markets: Market[];
   subs: Subscription[];
 
@@ -127,6 +130,10 @@ export class SwapComponent implements OnInit, OnDestroy {
   binanceTransferFee: BigNumber;
   binanceTransferFeeDisplay: number;
 
+  balances: AssetBalance[];
+  sourceBalance: number;
+  targetBalance: number;
+
 
   constructor(
     private dialog: MatDialog,
@@ -135,12 +142,12 @@ export class SwapComponent implements OnInit, OnDestroy {
     private binanceService: BinanceService) {
 
     this.selectedSourceAsset = new Asset(this.runeSymbol);
-    console.log('selected from asset is: ', this.selectedSourceAsset);
 
     const balances$ = this.userService.userBalances$.subscribe(
       (balances) => {
-        console.log('BALANCES ARE: ', balances);
         this.balances = balances;
+        this.sourceBalance = this.updateBalance(this.selectedSourceAsset);
+        this.targetBalance = this.updateBalance(this.selectedTargetAsset);
       }
     );
 
@@ -160,6 +167,18 @@ export class SwapComponent implements OnInit, OnDestroy {
 
     console.log('network is: ', environment.network);
 
+  }
+
+  updateBalance(asset: Asset): number {
+    if (this.balances && asset) {
+      const match = this.balances.find( (balance) => balance.asset === asset.symbol );
+
+      if (match) {
+        return match.assetValue.amount().toNumber();
+      } else {
+        return 0.0;
+      }
+    }
   }
 
   getPoolAddresses() {

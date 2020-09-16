@@ -2,7 +2,6 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Asset } from 'src/app/_classes/asset';
 import { MarketsModalComponent } from '../markets-modal/markets-modal.component';
 import { MatDialog } from '@angular/material/dialog';
-import { AssetBalance } from 'src/app/_classes/asset-balance';
 
 @Component({
   selector: 'app-asset-input',
@@ -12,24 +11,10 @@ import { AssetBalance } from 'src/app/_classes/asset-balance';
 export class AssetInputComponent implements OnInit {
 
   /**
-   * Wallet balances
-   */
-  @Input() set balances(balances: AssetBalance[]) {
-    this._balances = balances;
-    this.updateBalance();
-  }
-  get balances() {
-    return this._balances;
-  }
-  private _balances: AssetBalance[];
-  balance: number;
-
-  /**
    * Selected Asset
    */
   @Input() set selectedAsset(asset: Asset) {
     this._selectedAsset = asset;
-    this.updateBalance();
   }
   get selectedAsset() {
     return this._selectedAsset;
@@ -47,7 +32,16 @@ export class AssetInputComponent implements OnInit {
   @Input() disableInput?: boolean;
   @Input() disabledAssetSymbol: string;
 
-  constructor(private dialog: MatDialog) { }
+  /**
+   * Wallet balance
+   */
+  @Input() balance: number;
+
+
+  @Input() hideMax: boolean;
+
+  constructor(private dialog: MatDialog) {
+  }
 
   ngOnInit(): void {
   }
@@ -56,18 +50,12 @@ export class AssetInputComponent implements OnInit {
     this.assetUnitChange.emit(val);
   }
 
-  updateBalance() {
-    if (this.balances && this.selectedAsset) {
-      const match = this.balances.find( (balance) => balance.asset === this.selectedAsset.symbol );
+  setMax() {
 
-      if (match) {
-        this.balance = match.assetValue.amount().toNumber();
-        console.log('selected source balance is: ', this.balance);
-      } else {
-        this.balance = 0.0;
-      }
-      console.log('match is: ', match);
+    if (this.balance) {
+      this.assetUnitChange.emit(this.balance);
     }
+
   }
 
   launchMarketsModal() {

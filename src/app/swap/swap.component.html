@@ -6,7 +6,7 @@
     label="From"
     [(selectedAsset)]="selectedSourceAsset"
     [(assetUnit)]="sourceAssetUnit"
-    [balances]="balances"
+    [balance]="sourceBalance"
     [disabledAssetSymbol]="selectedTargetAsset ? selectedTargetAsset.symbol : null">
   </app-asset-input>
 
@@ -19,9 +19,10 @@
     [label]="selectedTargetAsset ? 'To (estimated)' : 'To'"
     [(selectedAsset)]="selectedTargetAsset"
     [(assetUnit)]="targetAssetUnitDisplay"
-    [balances]="balances"
+    [balance]="targetBalance"
     [disableInput]="true"
-    [disabledAssetSymbol]="selectedSourceAsset ? selectedSourceAsset.symbol : null">
+    [disabledAssetSymbol]="selectedSourceAsset ? selectedSourceAsset.symbol : null"
+    [hideMax]="true">
   </app-asset-input>
 
   <div *ngIf="basePrice && selectedTargetAsset && selectedSourceAsset" class="flxr flxr--just-space-between base-price">
@@ -30,10 +31,17 @@
   </div>
 
   <div>
-    <button (click)="openConfirmationDialog()" class="main-action-btn" mat-flat-button color="primary" [disabled]="!sourceAssetUnit || !selectedSourceAsset || !selectedTargetAsset || !targetAssetUnit">
+    <button
+      (click)="openConfirmationDialog()"
+      class="main-action-btn"
+      mat-flat-button
+      color="primary"
+      [disabled]="!sourceAssetUnit || !selectedSourceAsset || !selectedTargetAsset || !targetAssetUnit || sourceAssetUnit > sourceBalance"
+    >
       <span *ngIf="!sourceAssetUnit">Enter an amount</span>
       <span *ngIf="sourceAssetUnit && !selectedTargetAsset">Select a token</span>
-      <span *ngIf="selectedSourceAsset && sourceAssetUnit && selectedTargetAsset">Swap</span>
+      <span *ngIf="selectedSourceAsset && sourceAssetUnit && selectedTargetAsset && sourceAssetUnit > sourceBalance">Insufficient balance</span>
+      <span *ngIf="selectedSourceAsset && sourceAssetUnit && selectedTargetAsset && sourceAssetUnit <= sourceBalance">Swap</span>
     </button>
   </div>
 
