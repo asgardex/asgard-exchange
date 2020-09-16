@@ -11,7 +11,9 @@
   </app-asset-input>
 
   <div class="flxr flxr--align-center flxr--just-center">
-    <mat-icon class="to-btn">arrow_downward</mat-icon>
+    <button (click)="reverseTransaction()" [disabled]="!selectedSourceAsset || !selectedTargetAsset">
+      <mat-icon [class.disabled]="!selectedSourceAsset || !selectedTargetAsset" class="to-btn-icon">arrow_downward</mat-icon>
+    </button>
   </div>
 
   <!-- TARGET -->
@@ -36,12 +38,9 @@
       class="main-action-btn"
       mat-flat-button
       color="primary"
-      [disabled]="!sourceAssetUnit || !selectedSourceAsset || !selectedTargetAsset || !targetAssetUnit || sourceAssetUnit > sourceBalance"
+      [disabled]="!sourceAssetUnit || !selectedSourceAsset || !selectedTargetAsset || !targetAssetUnit || sourceAssetUnit > sourceBalance || !user || !balances"
     >
-      <span *ngIf="!sourceAssetUnit">Enter an amount</span>
-      <span *ngIf="sourceAssetUnit && !selectedTargetAsset">Select a token</span>
-      <span *ngIf="selectedSourceAsset && sourceAssetUnit && selectedTargetAsset && sourceAssetUnit > sourceBalance">Insufficient balance</span>
-      <span *ngIf="selectedSourceAsset && sourceAssetUnit && selectedTargetAsset && sourceAssetUnit <= sourceBalance">Swap</span>
+      {{mainButtonText()}}
     </button>
   </div>
 

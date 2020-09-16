@@ -103,6 +103,25 @@ button {
   background: none;
   outline: none;
   cursor: pointer;
+
+  // &:disabled {
+  //   .to-btn-icon {
+  //     color: rgb(86, 90, 105);
+  //   }
+  // }
+
+}
+
+.to-btn-icon {
+  margin-bottom: 10px;
+  font-size: 16px;
+  color: #2172e5;
+  height: 16px !important;
+  width: 16px !important;
+
+  &.disabled {
+    color: rgb(86, 90, 105);
+  }
 }
 
 /**
@@ -301,15 +320,6 @@ input[type=number] {
     color:rgb(108, 114, 132) !important;
   }
 }
-
-.to-btn {
-  margin-bottom: 10px;
-  font-size: 16px;
-  color: rgb(86, 90, 105);
-  height: 16px !important;
-  width: 16px !important;
-}
-
 
 .mat-progress-spinner circle, .mat-spinner circle {
   stroke: #2172e5;

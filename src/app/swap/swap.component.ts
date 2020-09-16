@@ -79,6 +79,14 @@ export class SwapComponent implements OnInit, OnDestroy {
 
     this.sourceBalance = this.updateBalance(asset);
 
+    /**
+     * If input value is more than balance of newly selected asset
+     * set the input to the max
+     */
+    if (this.sourceBalance < this.sourceAssetUnit) {
+      this.sourceAssetUnit = this.sourceBalance;
+    }
+
   }
   private _selectedSourceAsset: Asset;
   selectedSourceBalance: number;
@@ -181,6 +189,28 @@ export class SwapComponent implements OnInit, OnDestroy {
     }
   }
 
+  mainButtonText(): string {
+
+    if (!this.user || !this.balances) {
+      return 'Please connect wallet';
+    }
+    else if (!this.selectedTargetAsset) {
+      return 'Select a token';
+    }
+    else if (!this.sourceAssetUnit) {
+      return 'Enter an amount';
+    }
+    else if (this.sourceAssetUnit > this.sourceBalance) {
+      return 'Insufficient balance';
+    }
+    else if (this.user && this.sourceAssetUnit && this.sourceAssetUnit <= this.sourceBalance && this.selectedTargetAsset) {
+      return 'Swap';
+    } else {
+      console.log('error creating main button text');
+    }
+
+  }
+
   getPoolAddresses() {
     this.midgardService.getProxiedPoolAddresses().subscribe(
       (res) => {
@@ -211,8 +241,6 @@ export class SwapComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe( (transactionSuccess: boolean) => {
 
       if (transactionSuccess) {
-        console.log('RESULT IS: ', transactionSuccess);
-
         this.targetAssetUnit = null;
         this.sourceAssetUnit = null;
         this.selectedTargetAsset = null;
@@ -225,8 +253,7 @@ export class SwapComponent implements OnInit, OnDestroy {
 
   getPoolDetails(symbol: string) {
     this.midgardService.getPoolDetails(symbol).subscribe(
-      async (res) => {
-        console.log('pool details are: ', res);
+      (res) => {
 
         if (res && res.length > 0) {
           this.poolDetailMap[symbol] = res[0];
@@ -292,6 +319,30 @@ export class SwapComponent implements OnInit, OnDestroy {
 
   }
 
+  reverseTransaction() {
+
+    if (this.selectedSourceAsset && this.selectedTargetAsset) {
+
+      const source = this.selectedSourceAsset;
+      const target = this.selectedTargetAsset;
+      const targetInput = this.targetAssetUnit;
+      const targetBalance = this.targetBalance;
+
+      this.selectedTargetAsset = source;
+      this.selectedSourceAsset = target;
+
+      if (targetBalance) {
+        this.sourceAssetUnit = (targetBalance < targetInput.div(10 ** 8 ).toNumber())
+          ? targetBalance
+          : targetInput.div(10 ** 8 ).toNumber();
+      } else {
+        this.sourceAssetUnit = targetInput.div(10 ** 8 ).toNumber();
+      }
+
+    }
+
+  }
+
   /**
    * When RUNE is one of the assets being exchanged
    * For example RUNE <==> DAI
@@ -306,42 +357,44 @@ export class SwapComponent implements OnInit, OnDestroy {
       ? this.poolDetailMap[this.selectedSourceAsset.symbol]
       : this.poolDetailMap[this.selectedTargetAsset.symbol];
 
-    const pool: PoolData = {
-      assetBalance: baseAmount(poolDetail.assetDepth),
-      runeBalance: baseAmount(poolDetail.runeDepth),
-    };
+    if (poolDetail) {
+      const pool: PoolData = {
+        assetBalance: baseAmount(poolDetail.assetDepth),
+        runeBalance: baseAmount(poolDetail.runeDepth),
+      };
 
-    /**
-     * TO SHOW BASE PRICE
-     */
-    const basePrice = (toRune)
-      ? getValueOfAssetInRune(assetToBase(assetAmount(1)), pool)
-      : getValueOfRuneInAsset(assetToBase(assetAmount(1)), pool);
-    this.basePrice = basePrice.amount().div(10 ** 8).toNumber();
-
-
-    /**
-     * Slip percentage using original input
-     */
-    const slip = getSwapSlip(this._sourceAssetTokenValue, pool, toRune);
-    this.slip = slip.toNumber();
+      /**
+       * TO SHOW BASE PRICE
+       */
+      const basePrice = (toRune)
+        ? getValueOfAssetInRune(assetToBase(assetAmount(1)), pool)
+        : getValueOfRuneInAsset(assetToBase(assetAmount(1)), pool);
+      this.basePrice = basePrice.amount().div(10 ** 8).toNumber();
 
 
-    /**
-     * Total output amount in target units minus 1 RUNE
-     */
-    const totalAmount = getSwapOutput(baseAmount(this._sourceAssetTokenValue.amount()), pool, toRune);
-    const total = totalAmount.amount().minus(basePrice.amount());
+      /**
+       * Slip percentage using original input
+       */
+      const slip = getSwapSlip(this._sourceAssetTokenValue, pool, toRune);
+      this.slip = slip.toNumber();
 
-    /**
-     * Subtract "Swap fee" from (total)
-     */
-    // const swapFee = getSwapFee(baseAmount(this._sourceAssetTokenValue.amount()), pool, toRune);
-    // console.log('swap fee is: ', swapFee.amount().plus(basePrice.amount()).toNumber());
-    // const totalMinusSwapFee = totalAmount.amount().minus(swapFee.amount().plus(basePrice.amount()));
-    // console.log('total minus (RUNE FEE + SWAP FEE): ', totalMinusSwapFee.toNumber());
 
-    this.targetAssetUnit = (total.isLessThan(0)) ? bn(0) : total;
+      /**
+       * Total output amount in target units minus 1 RUNE
+       */
+      const totalAmount = getSwapOutput(baseAmount(this._sourceAssetTokenValue.amount()), pool, toRune);
+      const total = totalAmount.amount().minus(basePrice.amount());
+
+      /**
+       * Subtract "Swap fee" from (total)
+       */
+      // const swapFee = getSwapFee(baseAmount(this._sourceAssetTokenValue.amount()), pool, toRune);
+      // console.log('swap fee is: ', swapFee.amount().plus(basePrice.amount()).toNumber());
+      // const totalMinusSwapFee = totalAmount.amount().minus(swapFee.amount().plus(basePrice.amount()));
+      // console.log('total minus (RUNE FEE + SWAP FEE): ', totalMinusSwapFee.toNumber());
+
+      this.targetAssetUnit = (total.isLessThan(0)) ? bn(0) : total;
+    }
 
   }
 
@@ -353,29 +406,30 @@ export class SwapComponent implements OnInit, OnDestroy {
   calculateDoubleSwap() {
 
     const sourcePool = this.poolDetailMap[this.selectedSourceAsset.symbol];
-    const pool1: PoolData = {
-      assetBalance: baseAmount(sourcePool.assetDepth),
-      runeBalance: baseAmount(sourcePool.runeDepth),
-    };
-
     const targetPool = this.poolDetailMap[this.selectedTargetAsset.symbol];
-    const pool2: PoolData = {
-      assetBalance: baseAmount(targetPool.assetDepth),
-      runeBalance: baseAmount(targetPool.runeDepth),
-    };
 
-    const basePrice = getDoubleSwapOutput(assetToBase(assetAmount(1)), pool1, pool2);
-    this.basePrice = basePrice.amount().div(10 ** 8).toNumber();
+    if (sourcePool && targetPool) {
+      const pool1: PoolData = {
+        assetBalance: baseAmount(sourcePool.assetDepth),
+        runeBalance: baseAmount(sourcePool.runeDepth),
+      };
+      const pool2: PoolData = {
+        assetBalance: baseAmount(targetPool.assetDepth),
+        runeBalance: baseAmount(targetPool.runeDepth),
+      };
 
-    const slip = getDoubleSwapSlip(this._sourceAssetTokenValue, pool1, pool2);
-    this.slip = slip.toNumber();
+      const basePrice = getDoubleSwapOutput(assetToBase(assetAmount(1)), pool1, pool2);
+      this.basePrice = basePrice.amount().div(10 ** 8).toNumber();
+
+      const slip = getDoubleSwapSlip(this._sourceAssetTokenValue, pool1, pool2);
+      this.slip = slip.toNumber();
 
 
-    const doubleSwapOutput = getDoubleSwapOutput(this._sourceAssetTokenValue, pool1, pool2);
-    const total = doubleSwapOutput.amount().minus(basePrice.amount());
+      const doubleSwapOutput = getDoubleSwapOutput(this._sourceAssetTokenValue, pool1, pool2);
+      const total = doubleSwapOutput.amount().minus(basePrice.amount());
 
-    this.targetAssetUnit = total;
-
+      this.targetAssetUnit = (total.isLessThan(0)) ? bn(0) : total;
+    }
 
   }
 
