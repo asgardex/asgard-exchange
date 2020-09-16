@@ -367,8 +367,8 @@ export class SwapComponent implements OnInit, OnDestroy {
        * TO SHOW BASE PRICE
        */
       const basePrice = (toRune)
-        ? getValueOfAssetInRune(assetToBase(assetAmount(1)), pool)
-        : getValueOfRuneInAsset(assetToBase(assetAmount(1)), pool);
+        ? getValueOfRuneInAsset(assetToBase(assetAmount(1)), pool)
+        : getValueOfAssetInRune(assetToBase(assetAmount(1)), pool);
       this.basePrice = basePrice.amount().div(10 ** 8).toNumber();
 
 

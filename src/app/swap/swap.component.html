@@ -29,7 +29,7 @@
 
   <div *ngIf="basePrice && selectedTargetAsset && selectedSourceAsset" class="flxr flxr--just-space-between base-price">
     <span>Price:</span>
-    <span>{{basePrice | number:"1.2-4"}} {{selectedTargetAsset.ticker}} per {{selectedSourceAsset.ticker}}</span>
+    <span>{{basePrice | number:"1.2-6"}}  {{selectedSourceAsset.ticker}} per {{selectedTargetAsset.ticker}}</span>
   </div>
 
   <div>
