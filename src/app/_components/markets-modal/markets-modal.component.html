@@ -27,6 +27,7 @@
 
             <div class="asset-icon-container">
               <img *ngIf="item.iconPath" class="asset-icon" [src]="item.iconPath" />
+              <mat-icon *ngIf="!item.iconPath">help_outline</mat-icon>
             </div>
 
             <span class="market-list-item__symbol">{{item.ticker}}</span>

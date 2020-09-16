@@ -4,6 +4,7 @@
   html { font-family: 'Inter var', sans-serif; }
 }
 
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond&display=swap');
 
 // Custom Theming for Angular Material
 // For more information: https://material.angular.io/guide/theming
@@ -95,6 +96,13 @@ ul {
   list-style-type: none;
   padding: 0;
   margin: 0;
+}
+
+button {
+  border: none;
+  background: none;
+  outline: none;
+  cursor: pointer;
 }
 
 /**
