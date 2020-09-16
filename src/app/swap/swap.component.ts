@@ -331,12 +331,12 @@ export class SwapComponent implements OnInit, OnDestroy {
       this.selectedTargetAsset = source;
       this.selectedSourceAsset = target;
 
-      if (targetBalance) {
+      if (targetBalance && targetInput) {
         this.sourceAssetUnit = (targetBalance < targetInput.div(10 ** 8 ).toNumber())
           ? targetBalance
           : targetInput.div(10 ** 8 ).toNumber();
       } else {
-        this.sourceAssetUnit = targetInput.div(10 ** 8 ).toNumber();
+        this.sourceAssetUnit = (targetInput) ? targetInput.div(10 ** 8 ).toNumber() : 0;
       }
 
     }
