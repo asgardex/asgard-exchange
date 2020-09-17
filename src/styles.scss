@@ -373,3 +373,15 @@ input[type=number] {
   font-size: 14px;
   color: rgb(195, 197, 203);
 }
+
+.disabled-list {
+  width: 100%;
+  border-radius: 16px;
+  padding: 40px;
+  border: 1px solid rgb(44, 47, 54);
+  background-color: rgb(33, 36, 41);
+  font-weight: 400;
+  font-size: 16px;
+  color: rgb(108, 114, 132);
+  text-align: center;
+}

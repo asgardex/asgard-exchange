@@ -258,7 +258,7 @@ export class SwapComponent implements OnInit, OnDestroy {
   }
 
   getPoolDetails(symbol: string) {
-    this.midgardService.getPoolDetails(symbol).subscribe(
+    this.midgardService.getPoolDetails([symbol]).subscribe(
       (res) => {
 
         if (res && res.length > 0) {

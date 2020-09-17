@@ -1,0 +1,9 @@
+<span class="section-label">Your liquidity</span>
+
+<div *ngIf="!stakedPools || (stakedPools && stakedPools.length < 1)" class="disabled-list">
+  No staked pools found
+</div>
+
+<div *ngIf="stakedPools && stakedPools.length > 0 && poolsData">
+  <app-staked-pool-list-item *ngFor="let stakeData of stakedPools" [stakeData]="stakeData" [poolData]="poolsData[stakeData.asset.chain + '.' + stakeData.asset.symbol]"></app-staked-pool-list-item>
+</div>

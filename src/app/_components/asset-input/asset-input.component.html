@@ -28,11 +28,15 @@
 
       <button *ngIf="selectedAsset" class="launch-markets-btn" (click)="launchMarketsModal()">
         <div class="flxr flxr--align-center">
+
+          <!--TODO: this is used in pool list item, should be refactored -->
           <div style="margin-right: 8px;" class="asset-icon-container flxr flxr--align-center">
             <img *ngIf="selectedAsset.iconPath" [src]="selectedAsset.iconPath" />
             <mat-icon *ngIf="!selectedAsset.iconPath">help_outline</mat-icon>
           </div>
           <span style="font-size: 20px">{{selectedAsset.ticker}}</span>
+          <!-- end -->
+
           <mat-icon>expand_more</mat-icon>
         </div>
       </button>

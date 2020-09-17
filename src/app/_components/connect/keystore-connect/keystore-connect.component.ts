@@ -43,7 +43,6 @@ export class KeystoreConnectComponent implements OnInit {
     const files = target.files;
 
     if (files && files.length > 0) {
-      console.log(files);
 
       const keystoreFile = files[0];
 
@@ -55,7 +54,6 @@ export class KeystoreConnectComponent implements OnInit {
           if (!('version' in key) || !('crypto' in key)) {
             console.error('not a valid keystore file');
           } else {
-            console.log('success? ', key);
             this.keystore = key;
           }
         } catch {
