@@ -16,6 +16,10 @@ const routes: Routes = [
     path: 'pool',
     loadChildren: () => import('./pool/pool.module').then(m => m.PoolModule),
   },
+  {
+    path: 'stake',
+    loadChildren: () => import('./stake/stake.module').then(m => m.StakeModule),
+  },
 ];
 
 @NgModule({

@@ -1,0 +1,49 @@
+<div *ngIf="assetPoolData" class="container">
+
+  <div class="section-head-container">
+    <a [routerLink]="['/', 'pool']" mat-icon-button>
+      <mat-icon>arrow_back</mat-icon>
+    </a>
+    <h1>Add Liquidity</h1>
+    <div style="width: 40px"></div>
+  </div>
+
+  <app-asset-input
+    label="Input"
+    [(selectedAsset)]="asset"
+    [(assetUnit)]="assetAmount"
+    [balance]="assetBalance"
+    [disabledAssetSymbol]="asset ? asset.symbol : null">
+  </app-asset-input>
+
+  <div class="flxr flxr--align-center flxr--just-center">
+    <button [disabled]="true">
+      <mat-icon [class.disabled]="true" class="to-btn-icon">add</mat-icon>
+    </button>
+  </div>
+
+  <app-asset-input
+    label="Input"
+    [(selectedAsset)]="rune"
+    [(assetUnit)]="runeAmount"
+    [balance]="runeBalance"
+    [hideMax]="true"
+    [disableInput]="true"
+    [disabledMarketSelect]="true">
+  </app-asset-input>
+
+  <button
+    (click)="openConfirmationDialog()"
+    class="main-action-btn"
+    mat-flat-button
+    color="primary"
+    [disabled]="!balances || !runeAmount || !assetAmount || (balances && (runeAmount > runeBalance || assetAmount > assetBalance))"
+  >
+    <span *ngIf="!balances">Please connect wallet</span>
+    <span *ngIf="balances && (!runeAmount || !assetAmount)">Enter an amount</span>
+    <span *ngIf="balances && (runeAmount > runeBalance || assetAmount > assetBalance)">Insufficient balance</span>
+    <span *ngIf="balances && runeAmount && assetAmount && (runeAmount <= runeBalance) && (assetAmount <= assetBalance)">Supply</span>
+  </button>
+
+</div>
+

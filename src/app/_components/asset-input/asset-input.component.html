@@ -26,7 +26,7 @@
         MAX
       </button>
 
-      <button *ngIf="selectedAsset" class="launch-markets-btn" (click)="launchMarketsModal()">
+      <button *ngIf="selectedAsset" class="launch-markets-btn" (click)="launchMarketsModal()" [disabled]="disabledMarketSelect">
         <div class="flxr flxr--align-center">
 
           <!--TODO: this is used in pool list item, should be refactored -->
@@ -37,7 +37,7 @@
           <span style="font-size: 20px">{{selectedAsset.ticker}}</span>
           <!-- end -->
 
-          <mat-icon>expand_more</mat-icon>
+          <mat-icon *ngIf="!disabledMarketSelect">expand_more</mat-icon>
         </div>
       </button>
 

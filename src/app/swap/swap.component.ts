@@ -186,6 +186,10 @@ export class SwapComponent implements OnInit, OnDestroy {
 
   }
 
+  /**
+   *
+   * TODO: refactor this is used in stake.component as well
+   */
   updateBalance(asset: Asset): number {
     if (this.balances && asset) {
       const match = this.balances.find( (balance) => balance.asset === asset.symbol );

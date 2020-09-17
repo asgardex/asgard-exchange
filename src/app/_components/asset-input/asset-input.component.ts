@@ -37,8 +37,9 @@ export class AssetInputComponent implements OnInit {
    */
   @Input() balance: number;
 
-
   @Input() hideMax: boolean;
+
+  @Input() disabledMarketSelect: boolean;
 
   constructor(private dialog: MatDialog) {
   }

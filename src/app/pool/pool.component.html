@@ -1,7 +1,22 @@
 
+<div class="container">
+  <nav>
+    <a [routerLink]="['/', 'swap']" routerLinkActive="active">Swap</a>
+    <a [routerLink]="['/', 'pool']" routerLinkActive="active">Pool</a>
+  </nav>
 
-<div *ngIf="!user" class="disabled-list">
-  Connect to a wallet to view liquidity
+  <div *ngIf="pools" style="margin: -12px 0 24px;">
+    <a [routerLink]="['/', 'stake', pools[0]]" class="main-action-btn" mat-flat-button color="primary">
+      Add Liquidity
+    </a>
+  </div>
+
+  <span class="section-label">Your liquidity</span>
+
+  <div *ngIf="!user" class="disabled-list">
+    Connect to a wallet to view liquidity
+  </div>
+
+  <app-staked-pools-list *ngIf="user && stakedPools && poolDetailIndex" [stakedPools]="stakedPools" [poolsData]="poolDetailIndex"></app-staked-pools-list>
+
 </div>
-
-<app-staked-pools-list *ngIf="user && stakedPools && poolDetailIndex" [stakedPools]="stakedPools" [poolsData]="poolDetailIndex"></app-staked-pools-list>

@@ -1,64 +1,72 @@
-<div style="position: relative;">
+<div class="container">
+  <nav>
+    <a [routerLink]="['/', 'swap']" routerLinkActive="active">Swap</a>
+    <a [routerLink]="['/', 'pool']" routerLinkActive="active">Pool</a>
+  </nav>
 
+  <div style="position: relative;">
 
-  <!-- SOURCE -->
-  <app-asset-input
-    label="From"
-    [(selectedAsset)]="selectedSourceAsset"
-    [(assetUnit)]="sourceAssetUnit"
-    [balance]="sourceBalance"
-    [disabledAssetSymbol]="selectedTargetAsset ? selectedTargetAsset.symbol : null">
-  </app-asset-input>
+    <!-- SOURCE -->
+    <app-asset-input
+      label="From"
+      [(selectedAsset)]="selectedSourceAsset"
+      [(assetUnit)]="sourceAssetUnit"
+      [balance]="sourceBalance"
+      [disabledAssetSymbol]="selectedTargetAsset ? selectedTargetAsset.symbol : null">
+    </app-asset-input>
 
-  <div class="flxr flxr--align-center flxr--just-center">
-    <button (click)="reverseTransaction()" [disabled]="!selectedSourceAsset || !selectedTargetAsset">
-      <mat-icon [class.disabled]="!selectedSourceAsset || !selectedTargetAsset" class="to-btn-icon">arrow_downward</mat-icon>
-    </button>
-  </div>
+    <div class="flxr flxr--align-center flxr--just-center">
+      <button (click)="reverseTransaction()" [disabled]="!selectedSourceAsset || !selectedTargetAsset">
+        <mat-icon [class.disabled]="!selectedSourceAsset || !selectedTargetAsset" class="to-btn-icon">arrow_downward</mat-icon>
+      </button>
+    </div>
 
-  <!-- TARGET -->
-  <app-asset-input
-    [label]="selectedTargetAsset ? 'To (estimated)' : 'To'"
-    [(selectedAsset)]="selectedTargetAsset"
-    [(assetUnit)]="targetAssetUnitDisplay"
-    [balance]="targetBalance"
-    [disableInput]="true"
-    [disabledAssetSymbol]="selectedSourceAsset ? selectedSourceAsset.symbol : null"
-    [hideMax]="true">
-  </app-asset-input>
+    <!-- TARGET -->
+    <app-asset-input
+      [label]="selectedTargetAsset ? 'To (estimated)' : 'To'"
+      [(selectedAsset)]="selectedTargetAsset"
+      [(assetUnit)]="targetAssetUnitDisplay"
+      [balance]="targetBalance"
+      [disableInput]="true"
+      [disabledAssetSymbol]="selectedSourceAsset ? selectedSourceAsset.symbol : null"
+      [hideMax]="true">
+    </app-asset-input>
 
-  <div *ngIf="basePrice && selectedTargetAsset && selectedSourceAsset" class="flxr flxr--just-space-between base-price">
-    <span>Price:</span>
-    <span>{{basePrice | number:"1.2-6"}}  {{selectedSourceAsset.ticker}} per {{selectedTargetAsset.ticker}}</span>
-  </div>
+    <div *ngIf="basePrice && selectedTargetAsset && selectedSourceAsset" class="flxr flxr--just-space-between base-price">
+      <span>Price:</span>
+      <span>{{basePrice | number:"1.2-6"}}  {{selectedSourceAsset.ticker}} per {{selectedTargetAsset.ticker}}</span>
+    </div>
 
-  <div>
-    <button
-      (click)="openConfirmationDialog()"
-      class="main-action-btn"
-      mat-flat-button
-      color="primary"
-      [disabled]="!sourceAssetUnit || !selectedSourceAsset || !selectedTargetAsset || !targetAssetUnit || sourceAssetUnit > sourceBalance || !user || !balances"
-    >
-      {{mainButtonText()}}
-    </button>
-  </div>
+    <div>
+      <button
+        (click)="openConfirmationDialog()"
+        class="main-action-btn"
+        mat-flat-button
+        color="primary"
+        [disabled]="!sourceAssetUnit || !selectedSourceAsset || !selectedTargetAsset || !targetAssetUnit || sourceAssetUnit > sourceBalance || !user || !balances"
+      >
+        {{mainButtonText()}}
+      </button>
+    </div>
 
-  <div class="tag" *ngIf="basePrice && selectedTargetAsset && selectedSourceAsset && runeTransactionFee && binanceTransferFeeDisplay">
-    <div class="tag-contents">
-      <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
-        <span class="tx-detail-label">Total Fee</span>
-        <span>{{binanceTransferFeeDisplay | number:"0.0-6"}} BNB + {{runeTransactionFee}} Rune</span>
+    <div class="tag" *ngIf="basePrice && selectedTargetAsset && selectedSourceAsset && runeTransactionFee && binanceTransferFeeDisplay">
+      <div class="tag-contents">
+        <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
+          <span class="tx-detail-label">Total Fee</span>
+          <span>{{binanceTransferFeeDisplay | number:"0.0-6"}} BNB + {{runeTransactionFee}} Rune</span>
+        </div>
+        <div class="flxr flxr--just-space-between">
+          <span class="tx-detail-label">Slip</span>
+          <span>{{slip | percent:"0.0-2" }}</span>
+        </div>
       </div>
-      <div class="flxr flxr--just-space-between">
-        <span class="tx-detail-label">Slip</span>
-        <span>{{slip | percent:"0.0-2" }}</span>
-      </div>
+
     </div>
 
   </div>
 
 </div>
+
 
 
 

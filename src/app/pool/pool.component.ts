@@ -19,6 +19,7 @@ export class PoolComponent implements OnInit, OnDestroy {
   poolDetailIndex: {
     [key: string]: PoolDetail
   };
+  pools: string[];
 
   constructor(private userService: UserService, private midgardService: MidgardService) {
 
@@ -37,6 +38,15 @@ export class PoolComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.getPools();
+  }
+
+  getPools() {
+    this.midgardService.getPools().subscribe(
+      (res) => {
+        this.pools = res;
+      }
+    );
   }
 
   getAccountPools() {

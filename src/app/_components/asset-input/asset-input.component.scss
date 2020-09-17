@@ -6,6 +6,10 @@
 .launch-markets-btn {
   color: white;
   background-color: transparent;
+
+  &:disabled {
+    cursor: inherit;
+  }
 }
 
 .max {
