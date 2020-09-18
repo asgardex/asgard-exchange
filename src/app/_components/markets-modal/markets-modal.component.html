@@ -20,9 +20,9 @@
 
       <div class="market-list-container">
 
-        <ul class="market-list" *ngIf="marketListItems">
+        <ul class="market-list" *ngIf="filteredMarketListItems">
 
-          <li class="market-list-item" *ngFor="let item of marketListItems" (click)="selectItem(item)" [class.disabled]="item.symbol == data.disabledAssetSymbol">
+          <li class="market-list-item" *ngFor="let item of filteredMarketListItems" (click)="selectItem(item)" [class.disabled]="item.symbol == data.disabledAssetSymbol">
             <!-- BTCB-1DE -->
 
             <div class="asset-icon-container">

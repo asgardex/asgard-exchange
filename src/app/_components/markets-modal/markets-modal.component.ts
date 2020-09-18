@@ -13,9 +13,26 @@ import { environment } from 'src/environments/environment';
 })
 export class MarketsModalComponent implements OnInit, OnDestroy {
 
-  searchTerm: string;
+  get searchTerm(): string {
+    return this._searchTerm;
+  }
+  set searchTerm(term: string) {
+    this._searchTerm = term;
+
+    if (term && term.length > 0) {
+      this.filteredMarketListItems = this.marketListItems.filter( (asset) => {
+        const search = term.toUpperCase();
+        return asset.symbol.includes(search);
+      });
+    } else {
+      this.filteredMarketListItems = this.marketListItems;
+    }
+
+  }
+  _searchTerm: string;
   markets: Market[] = [];
   marketListItems: Asset[];
+  filteredMarketListItems: Asset[];
   subs: Subscription[];
 
   constructor(
@@ -39,6 +56,7 @@ export class MarketsModalComponent implements OnInit, OnDestroy {
         this.marketListItems.unshift(
           new Asset(environment.network === 'chaosnet' ? 'RUNE-B1A' : 'RUNE-67C')
         );
+        this.filteredMarketListItems = this.marketListItems;
         console.log('market list items are: ', this.marketListItems);
       },
       (err) => console.error('error fetching pools: ', err)
