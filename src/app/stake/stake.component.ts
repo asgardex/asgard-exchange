@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { assetAmount, assetToBase, baseAmount, BaseAmount, getSwapOutput, getValueOfAssetInRune, getValueOfRuneInAsset, PoolData } from '@thorchain/asgardex-util';
 import { Subscription } from 'rxjs';
 import { environment } from 'src/environments/environment';
@@ -43,7 +43,34 @@ export class StakeComponent implements OnInit, OnDestroy {
   /**
    * Asset
    */
-  asset: Asset;
+  set asset(val: Asset) {
+
+    if (val) {
+
+      if (!this._asset) {
+        this._asset = val;
+      } else {
+
+        if (val.symbol !== this._asset.symbol) {
+          this.router.navigate(['/', 'stake', val.symbol]);
+          this._asset = val;
+          this.assetBalance = this.updateBalance(this.asset);
+        }
+
+      }
+
+    }
+
+    // if (this.router) {
+
+    // } else {
+    //   console.log('NO ROUTER');
+    // }
+  }
+  get asset() {
+    return this._asset;
+  }
+  _asset: Asset;
   get assetAmount() {
     return this._assetAmount;
   }
@@ -80,6 +107,7 @@ export class StakeComponent implements OnInit, OnDestroy {
   constructor(
     private dialog: MatDialog,
     private userService: UserService,
+    private router: Router,
     private route: ActivatedRoute,
     private midgardService: MidgardService
   ) {
@@ -148,6 +176,8 @@ export class StakeComponent implements OnInit, OnDestroy {
   getPoolDetail(asset: string) {
     this.midgardService.getPoolDetails([asset]).subscribe(
       (res) => {
+        console.log('got some pool detail');
+
         if (res && res.length > 0) {
 
           this.assetPoolData = {
@@ -166,6 +196,7 @@ export class StakeComponent implements OnInit, OnDestroy {
    * TODO: refactor this is used in stake.component as well
    */
   updateBalance(asset: Asset): number {
+
     if (this.balances && asset) {
       const match = this.balances.find( (balance) => balance.asset === asset.symbol );
 
@@ -179,8 +210,8 @@ export class StakeComponent implements OnInit, OnDestroy {
 
   openConfirmationDialog() {
 
-    const runeBasePrice = getValueOfAssetInRune(assetToBase(assetAmount(1)), this.assetPoolData);
-    const assetBasePrice = getValueOfRuneInAsset(assetToBase(assetAmount(1)), this.assetPoolData);
+    const runeBasePrice = getValueOfAssetInRune(assetToBase(assetAmount(1)), this.assetPoolData).amount().div(10 ** 8).toNumber();
+    const assetBasePrice = getValueOfRuneInAsset(assetToBase(assetAmount(1)), this.assetPoolData).amount().div(10 ** 8).toNumber();
 
     const dialogRef = this.dialog.open(
       ConfirmStakeModalComponent,
@@ -189,6 +220,7 @@ export class StakeComponent implements OnInit, OnDestroy {
         maxWidth: '420px',
         data: {
           asset: this.asset,
+          rune: this.rune,
           // targetAsset: this.selectedTargetAsset,
           assetAmount: this.assetAmount,
           runeAmount: this.runeAmount,

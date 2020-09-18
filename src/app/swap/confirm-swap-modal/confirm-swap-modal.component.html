@@ -1,7 +1,7 @@
 
 <div *ngIf="txState === 'PENDING_CONFIRMATION'">
 
-  <div class="modal-head swap-modal-head">
+  <div class="modal-head confirm-modal-head">
     <h1 mat-dialog-title>Confirm Swap</h1>
 
     <div class="flxr flxr--just-space-between transaction-detail">
@@ -9,6 +9,7 @@
       <div class="flxr flxr--align-center">
         <div style="margin-right: 12px;" class="asset-icon-container flxr flxr--align-center">
           <img *ngIf="swapData.sourceAsset.iconPath" [src]="swapData.sourceAsset.iconPath" />
+          <mat-icon *ngIf="!swapData.sourceAsset.iconPath">help_outline</mat-icon>
         </div>
         <span style="margin-right: 8px; font-size: 20px">{{swapData.inputValue}}</span>
       </div>
@@ -21,18 +22,14 @@
     </div>
 
     <div class="flxr flxr--just-space-between transaction-detail">
-      <!-- <span>{{swapData.targetAsset.asset.ticker}}</span>
-      <span>{{swapData.outputValue}}</span> -->
-
-
 
       <div class="flxr flxr--align-center">
         <div style="margin-right: 12px;" class="asset-icon-container flxr flxr--align-center">
           <img *ngIf="swapData.targetAsset.iconPath" [src]="swapData.targetAsset.iconPath" />
+          <mat-icon *ngIf="!swapData.targetAsset.iconPath">help_outline</mat-icon>
         </div>
         <span style="margin-right: 8px; font-size: 20px">{{swapData.outputValue}}</span>
       </div>
-
 
       <span>{{swapData.targetAsset.ticker}}</span>
 
@@ -40,16 +37,10 @@
 
     <span style="font-style: italic; font-size: 12px; color: rgb(195, 197, 203)">Output is estimated. You will receive at least lorem ipsum or the transaction will revert.</span>
 
-
-    <!-- <div class="uni-input" style="margin-top: 1rem;">
-      <input style="padding: 0" [(ngModel)]="searchTerm" name="keystore-password" placeholder="Search Token Symbol" />
-    </div> -->
-
   </div>
-  <div>
-    <div mat-dialog-content class="swap-modal-content">
 
-      <!-- Connect Options -->
+  <div>
+    <div mat-dialog-content class="confirm-modal-content">
 
       <div>
 
@@ -82,43 +73,17 @@
 
 </div>
 
-<div class="submitting" *ngIf="txState === 'SUBMITTING'">
-  <div class="icon-container">
-    <mat-progress-spinner mode="indeterminate" diameter="60"></mat-progress-spinner>
-  </div>
+<app-transaction-processing-modal
+  *ngIf="txState === 'SUBMITTING'"
+  (closeDialog)="closeDialog()"
+  transactionDetail="Swapping {{swapData.inputValue}} {{swapData.sourceAsset.ticker}} for {{swapData.outputValue}} {{swapData.targetAsset.ticker}}">
+</app-transaction-processing-modal>
 
-  <div class="flxr flxr--just-center flxr--flow-col flxr--align-center modal-head">
+<app-transaction-success-modal
+  *ngIf="txState === 'SUCCESS'"
+  [hash]="hash"
+  (closeDialog)="closeDialog(true)">
+</app-transaction-success-modal>
 
-    <h1 mat-dialog-title style="font-size: 1.4rem">Transaction Processing</h1>
-
-    <span class="swap-details">Swapping {{this.swapData.inputValue}} {{this.swapData.sourceAsset.ticker}} for {{this.swapData.outputValue}} {{this.swapData.targetAsset.ticker}}</span>
-
-    <span class="addendum">Confirm this transaction in your wallet</span>
-
-  </div>
-
-  <div mat-dialog-actions class="dialog-actions">
-    <button mat-icon-button aria-label="Close Markets Dialog" (click)="closeDialog()" mat-dialog-close>
-      <mat-icon>close</mat-icon>
-    </button>
-  </div>
-</div>
-
-<div class="success" *ngIf="txState === 'SUCCESS'">
-  <div class="icon-container icon-container--sent">
-    <mat-icon>arrow_circle_up</mat-icon>
-  </div>
-
-  <div class="flxr flxr--just-center flxr--flow-col flxr--align-center modal-head">
-
-    <h1 mat-dialog-title style="font-size: 1.4rem">Transaction Submitted</h1>
-
-    <a *ngIf="hash" [href]="'https://testnet-explorer.binance.org/tx/' + hash">View on BNC Explorer</a>
-
-    <button (click)="closeDialog(true)" mat-flat-button color="primary" class="main-action-btn">Close</button>
-
-  </div>
-
-</div>
 
 <div *ngIf="txState === 'ERROR'"></div>

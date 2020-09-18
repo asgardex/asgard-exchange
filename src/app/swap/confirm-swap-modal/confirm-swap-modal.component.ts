@@ -6,6 +6,7 @@ import { User } from 'src/app/_classes/user';
 import { MidgardService } from 'src/app/_services/midgard.service';
 import { WalletService } from 'src/app/_services/wallet.service';
 import { UserService } from 'src/app/_services/user.service';
+import { TransactionConfirmationState } from 'src/app/_const/transaction-confirmation-state';
 
 export interface SwapData {
   sourceAsset: Asset;
@@ -18,13 +19,6 @@ export interface SwapData {
   user: User;
 }
 
-enum ConfirmSwapModalState {
-  PENDING_CONFIRMATION  = 'PENDING_CONFIRMATION',
-  SUBMITTING            = 'SUBMITTING',
-  SUCCESS               = 'SUCCESS',
-  ERROR                 = 'ERROR'
-}
-
 @Component({
   selector: 'app-confirm-swap-modal',
   templateUrl: './confirm-swap-modal.component.html',
@@ -35,7 +29,7 @@ export class ConfirmSwapModalComponent implements OnInit {
   confirmationPending: boolean;
   transactionSubmitted: boolean;
 
-  txState: ConfirmSwapModalState;
+  txState: TransactionConfirmationState;
 
   hash: string;
 
@@ -48,7 +42,7 @@ export class ConfirmSwapModalComponent implements OnInit {
     private walletService: WalletService,
     private userService: UserService
   ) {
-    this.txState = ConfirmSwapModalState.PENDING_CONFIRMATION;
+    this.txState = TransactionConfirmationState.PENDING_CONFIRMATION;
   }
 
   ngOnInit(): void {
@@ -65,7 +59,7 @@ export class ConfirmSwapModalComponent implements OnInit {
     //   return reject(new Error(validationErrorMsg));
     // }
 
-    this.txState = ConfirmSwapModalState.SUBMITTING;
+    this.txState = TransactionConfirmationState.SUBMITTING;
 
     this.midgardService.getProxiedPoolAddresses().subscribe(
       async (res) => {
@@ -97,7 +91,7 @@ export class ConfirmSwapModalComponent implements OnInit {
               .transfer(this.swapData.user.wallet, matchingPool.address, amountNumber, this.swapData.sourceAsset.symbol, memo)
               .then((response: TransferResult) => {
                 console.log('transfer response is: ', response);
-                this.txState = ConfirmSwapModalState.SUCCESS;
+                this.txState = TransactionConfirmationState.SUCCESS;
 
                 if (response.result && response.result.length > 0) {
                   this.hash = response.result[0].hash;
@@ -107,11 +101,10 @@ export class ConfirmSwapModalComponent implements OnInit {
               })
               .catch((error: Error) => {
                 console.log('error making transfer: ', error);
-                this.txState = ConfirmSwapModalState.ERROR;
+                this.txState = TransactionConfirmationState.ERROR;
               });
 
           }
-
 
         }
 
@@ -119,7 +112,6 @@ export class ConfirmSwapModalComponent implements OnInit {
     );
 
   }
-
 
   getSwapMemo(
     symbol: string,

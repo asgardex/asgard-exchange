@@ -6,6 +6,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { AssetInputModule } from '../_components/asset-input/asset-input.module';
 import { ConfirmStakeModalComponent } from './confirm-stake-modal/confirm-stake-modal.component';
+import { TransactionProcessingModalModule } from '../_components/transaction-processing-modal/transaction-processing-modal.module';
+import { TransactionSuccessModalModule } from '../_components/transaction-success-modal/transaction-success-modal.module';
 
 
 
@@ -16,6 +18,8 @@ import { ConfirmStakeModalComponent } from './confirm-stake-modal/confirm-stake-
     MatButtonModule,
     MatIconModule,
     AssetInputModule,
+    TransactionSuccessModalModule,
+    TransactionProcessingModalModule,
     RouterModule.forChild([
       {
         path: ':asset',

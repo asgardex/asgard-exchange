@@ -14,6 +14,8 @@ import { ConfirmSwapModalComponent } from './confirm-swap-modal/confirm-swap-mod
 /** MODULES */
 import { AssetInputModule } from '../_components/asset-input/asset-input.module';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { TransactionProcessingModalModule } from '../_components/transaction-processing-modal/transaction-processing-modal.module';
+import { TransactionSuccessModalModule } from '../_components/transaction-success-modal/transaction-success-modal.module';
 
 @NgModule({
   declarations: [SwapComponent, ConfirmSwapModalComponent],
@@ -24,6 +26,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
+    TransactionProcessingModalModule,
+    TransactionSuccessModalModule,
     RouterModule.forChild([
       {
         path: '',

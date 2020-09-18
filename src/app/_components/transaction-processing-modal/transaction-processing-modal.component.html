@@ -1,0 +1,28 @@
+
+
+<div class="submitting">
+
+  <div class="icon-container">
+    <mat-progress-spinner mode="indeterminate" diameter="60"></mat-progress-spinner>
+  </div>
+
+  <div class="flxr flxr--just-center flxr--flow-col flxr--align-center modal-head">
+
+    <h1 mat-dialog-title style="font-size: 1.4rem">Transaction Processing</h1>
+
+    <!-- <span class="swap-details">Swapping {{this.swapData.inputValue}} {{this.swapData.sourceAsset.ticker}} for {{this.swapData.outputValue}} {{this.swapData.targetAsset.ticker}}</span> -->
+    <span *ngIf="transactionDetail" class="swap-details">{{transactionDetail}}</span>
+
+    <span class="addendum">Confirm this transaction in your wallet</span>
+
+  </div>
+
+  <div mat-dialog-actions class="dialog-actions">
+    <button mat-icon-button aria-label="Close Markets Dialog" (click)="onCloseDialog()" mat-dialog-close>
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+</div>
+
+

@@ -309,7 +309,7 @@ input[type=number] {
 
 .main-action-btn {
   color: white !important;
-  background-color: rgb(255, 0, 122) !important;
+  // background-color: rgb(255, 0, 122) !important;
   width: 100%;
   margin-top: 1rem !important;
   padding: 10px !important;
@@ -453,6 +453,68 @@ main {
     font-weight: 500;
     color: white;
     margin: 0;
+  }
+
+}
+
+.confirm-modal-head {
+  // font-size: 20px;
+
+  h1, .transaction-detail {
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: 1rem;
+  }
+
+}
+
+.confirm-modal-content {
+  padding: 1rem;
+  background-color: rgb(44, 47, 54);
+  font-size: 14px;
+}
+
+.icon-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+
+  &--sent {
+
+    mat-icon {
+      height: auto;
+      width: auto;
+      font-size: 5.0rem;
+      color: #2172e5 !important;
+    }
+  }
+}
+
+.submitting, .success {
+
+  .modal-head {
+
+    h1, span, a {
+      margin-bottom: 10px;
+    }
+
+    a {
+      color: #2172e5 !important;
+      text-decoration: none;
+    }
+
+    .swap-details {
+      font-size: .8rem;
+      font-weight: 500;
+    }
+
+    .addendum {
+      color: rgb(195, 197, 203);
+      font-size: .8rem;
+      font-style: italic;
+    }
+
   }
 
 }
