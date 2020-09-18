@@ -24,13 +24,7 @@ export class StakeComponent implements OnInit, OnDestroy {
   /**
    * Rune
    */
-  get rune() {
-    return this._rune;
-  }
-  set rune(asset: Asset) {
-    this._rune = asset;
-  }
-  private _rune: Asset;
+  rune: Asset;
 
   get runeAmount() {
     return this._runeAmount;
@@ -163,11 +157,6 @@ export class StakeComponent implements OnInit, OnDestroy {
 
   updateRuneAmount() {
 
-    // const pool: PoolData = {
-    //   assetBalance: baseAmount(this.assetDetail.assetDepth),
-    //   runeBalance: baseAmount(this.assetDetail.runeDepth),
-    // };
-
     const runeAmount = getValueOfAssetInRune(assetToBase(assetAmount(this.assetAmount)), this.assetPoolData);
 
     this.runeAmount = runeAmount.amount().div(10 ** 8 ).toNumber();
@@ -177,7 +166,6 @@ export class StakeComponent implements OnInit, OnDestroy {
   getPoolDetail(asset: string) {
     this.midgardService.getPoolDetails([asset]).subscribe(
       (res) => {
-        console.log('got some pool detail');
 
         if (res && res.length > 0) {
 
@@ -222,7 +210,6 @@ export class StakeComponent implements OnInit, OnDestroy {
         data: {
           asset: this.asset,
           rune: this.rune,
-          // targetAsset: this.selectedTargetAsset,
           assetAmount: this.assetAmount,
           runeAmount: this.runeAmount,
           user: this.user,
@@ -235,8 +222,7 @@ export class StakeComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe( (transactionSuccess: boolean) => {
 
       if (transactionSuccess) {
-        // this.targetAssetUnit = null;
-        // this.sourceAssetUnit = null;
+        this.assetAmount = 0;
       }
 
     });

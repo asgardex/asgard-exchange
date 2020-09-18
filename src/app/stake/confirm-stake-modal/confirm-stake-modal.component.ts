@@ -58,12 +58,6 @@ export class ConfirmStakeModalComponent implements OnInit {
 
             await this.walletService.bncClient.initChain();
 
-            // Check of `validateSwap` before makes sure that we have a valid number here
-            const amountNumber = this.data.assetAmount;
-
-            // const limit = protectSlip && slipLimit ? slipLimit.amount().toString() : '';
-            // const memo = this.getSwapMemo(this.swapData.targetAsset.symbol, this.swapData.user.wallet);
-
             const memo = `STAKE:BNB.${this.data.asset.symbol}`;
 
             const outputs: MultiTransfer[] = [
@@ -97,26 +91,6 @@ export class ConfirmStakeModalComponent implements OnInit {
                 console.log('error making transfer: ', error);
                 this.txState = TransactionConfirmationState.ERROR;
               });
-
-
-
-
-            // this.walletService.bncClient
-            //   .transfer(this.data.user.wallet, matchingPool.address, amountNumber, this.swapData.sourceAsset.symbol, memo)
-            //   .then((response: TransferResult) => {
-            //     console.log('transfer response is: ', response);
-            //     this.txState = TransactionConfirmationState.SUCCESS;
-
-            //     if (response.result && response.result.length > 0) {
-            //       this.hash = response.result[0].hash;
-            //       this.userService.setPendingTransaction(this.hash);
-            //     }
-
-            //   })
-            //   .catch((error: Error) => {
-            //     console.log('error making transfer: ', error);
-            //     this.txState = TransactionConfirmationState.ERROR;
-            //   });
 
           }
 

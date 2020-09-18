@@ -20,6 +20,10 @@ const routes: Routes = [
     path: 'stake',
     loadChildren: () => import('./stake/stake.module').then(m => m.StakeModule),
   },
+  {
+    path: 'unstake',
+    loadChildren: () => import('./unstake/unstake.module').then(m => m.UnstakeModule),
+  },
 ];
 
 @NgModule({

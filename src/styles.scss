@@ -1,7 +1,10 @@
 // Inter Font
 @import url('https://rsms.me/inter/inter.css');
 @supports (font-variation-settings: normal) {
-  html { font-family: 'Inter var', sans-serif; }
+  html {
+    font-family: 'Inter var', sans-serif;
+    font-feature-settings: "ss01", "ss02", "cv01", "cv03";
+  }
 }
 
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond&display=swap');
@@ -392,7 +395,8 @@ main {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: calc(100vh - 60px);
+  padding-top: 100px;
+  padding-bottom: 100px;
 
   .container {
     background: rgb(33, 36, 41);
@@ -402,7 +406,7 @@ main {
     width: 100%;
     box-shadow: rgba(0, 0, 0, 0.01) 0px 0px 1px, rgba(0, 0, 0, 0.04) 0px 4px 8px, rgba(0, 0, 0, 0.04) 0px 16px 24px, rgba(0, 0, 0, 0.01) 0px 24px 32px;
     border-radius: 30px;
-    margin-top: -75px;
+    // margin-top: -75px;
   }
 
   nav {
@@ -517,4 +521,16 @@ main {
 
   }
 
+}
+
+.mat-slider-wrapper {
+  background-color: rgb(195, 197, 203);
+}
+
+.mat-accent .mat-slider-track-fill, .mat-accent .mat-slider-thumb, .mat-accent .mat-slider-thumb-label {
+  background-color: rgb(195, 197, 203);
+}
+
+.mat-slider-min-value:not(.mat-slider-thumb-label-showing) .mat-slider-thumb {
+  background-color: rgb(195, 197, 203);
 }
