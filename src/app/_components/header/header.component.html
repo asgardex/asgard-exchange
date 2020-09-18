@@ -1,7 +1,9 @@
 <header>
-  <h1 class="flxr flxr--align-center">
-    <img style="width: 25px; margin-right: 8px" src="assets/images/thorchain-transparent.svg" />
-    ASGARDEX
+  <h1>
+    <a class="flxr flxr--align-center" [routerLink]="['/', 'swap']">
+      <img style="width: 25px; margin-right: 8px" src="assets/images/thorchain-transparent.svg" />
+      ASGARDEX
+    </a>
   </h1>
   <div>
     <span id="testnet-indicator" *ngIf="isTestnet">Testnet</span>

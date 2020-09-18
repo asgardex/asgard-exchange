@@ -376,11 +376,18 @@ export class SwapComponent implements OnInit, OnDestroy {
       /**
        * TO SHOW BASE PRICE
        */
-      const basePrice = (toRune)
-        ? getValueOfRuneInAsset(assetToBase(assetAmount(1)), pool)
-        : getValueOfAssetInRune(assetToBase(assetAmount(1)), pool);
-      this.basePrice = basePrice.amount().div(10 ** 8).toNumber();
 
+      const valueOfRuneInAsset = getValueOfRuneInAsset(assetToBase(assetAmount(1)), pool);
+      const valueOfAssetInRune = getValueOfAssetInRune(assetToBase(assetAmount(1)), pool);
+
+      console.log('valueOfRuneInAsset is: ', valueOfRuneInAsset.amount().toNumber());
+      console.log('valueOfAssetInRune is: ', valueOfAssetInRune.amount().toNumber());
+
+      const basePrice = (toRune)
+        ? valueOfRuneInAsset
+        : valueOfAssetInRune;
+      this.basePrice = basePrice.amount().div(10 ** 8).toNumber();
+      console.log('base price is: ', this.basePrice);
 
       /**
        * Slip percentage using original input
@@ -388,12 +395,18 @@ export class SwapComponent implements OnInit, OnDestroy {
       const slip = getSwapSlip(this._sourceAssetTokenValue, pool, toRune);
       this.slip = slip.toNumber();
 
+      console.log('source is: ', this._sourceAssetTokenValue.amount().toNumber());
+      console.log('to rune is: ', toRune);
 
       /**
        * Total output amount in target units minus 1 RUNE
        */
       const totalAmount = getSwapOutput(baseAmount(this._sourceAssetTokenValue.amount()), pool, toRune);
-      const total = totalAmount.amount().minus(basePrice.amount());
+
+      console.log('total amount is: ', totalAmount.amount().toNumber());
+      console.log('basePrice is: ', basePrice.amount().toNumber());
+
+      const total = totalAmount.amount().minus(toRune ? valueOfAssetInRune.amount() : valueOfRuneInAsset.amount());
 
       /**
        * Subtract "Swap fee" from (total)

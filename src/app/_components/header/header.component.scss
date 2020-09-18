@@ -9,6 +9,11 @@ header {
     letter-spacing: 1px;
     font-size: 1.2rem;
     font-family: 'Cormorant Garamond', serif;
+
+    a {
+      color: white;
+      text-decoration: none;;
+    }
   }
 
   #testnet-indicator {
