@@ -449,7 +449,11 @@ export class SwapComponent implements OnInit, OnDestroy {
 
 
       const doubleSwapOutput = getDoubleSwapOutput(this._sourceAssetTokenValue, pool1, pool2);
-      const total = doubleSwapOutput.amount().minus(basePrice.amount());
+      // const total = doubleSwapOutput.amount().minus(basePrice.amount());
+
+      const valueOfRuneInAsset = getValueOfRuneInAsset(assetToBase(assetAmount(1)), pool1).amount().toNumber();
+
+      const total = doubleSwapOutput.amount().minus(valueOfRuneInAsset);
 
       this.targetAssetUnit = (total.isLessThan(0)) ? bn(0) : total;
     }
