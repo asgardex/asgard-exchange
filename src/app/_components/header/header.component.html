@@ -3,5 +3,8 @@
     <img style="width: 25px; margin-right: 8px" src="assets/images/thorchain-transparent.svg" />
     ASGARDEX
   </h1>
-  <app-connect></app-connect>
+  <div>
+    <span id="testnet-indicator" *ngIf="isTestnet">Testnet</span>
+    <app-connect></app-connect>
+  </div>
 </header>
