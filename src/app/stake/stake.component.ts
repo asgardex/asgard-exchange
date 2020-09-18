@@ -150,6 +150,7 @@ export class StakeComponent implements OnInit, OnDestroy {
         this.asset = new Asset(asset);
         console.log('the asset is: ', this.asset);
         this.getPoolDetail(asset);
+        this.assetBalance = this.updateBalance(this.asset);
 
 
       }

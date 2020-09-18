@@ -34,6 +34,12 @@
       <span>Pool Share</span>
       <span>{{poolShare | percent:"0.0-6"}}</span>
     </div>
+
+
+    <div class="flxr flxr--just-space-between">
+      <a mat-flat-button style="width: 50%; margin-right: 5px" color="primary" [routerLink]="['/', 'stake', 'BNB.' + stakeData.asset.symbol]">Add</a>
+      <a mat-flat-button style="width: 50%; margin-left: 5px" color="primary" [routerLink]="['/', 'unstake', 'BNB.' +  stakeData.asset.symbol]">Remove</a>
+    </div>
   </div>
 
 </div>

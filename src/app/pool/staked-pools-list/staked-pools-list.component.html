@@ -2,6 +2,6 @@
   No staked pools found
 </div>
 
-<div *ngIf="stakedPools && stakedPools.length > 0 && poolsData">
+<div style="clear: both;" class="flxr flxr--flow-col" *ngIf="stakedPools && stakedPools.length > 0 && poolsData">
   <app-staked-pool-list-item *ngFor="let stakeData of stakedPools" [stakeData]="stakeData" [poolData]="poolsData[stakeData.asset.chain + '.' + stakeData.asset.symbol]"></app-staked-pool-list-item>
 </div>
