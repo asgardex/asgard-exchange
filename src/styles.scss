@@ -331,6 +331,7 @@ input[type=number] {
   font-size: 0.8rem;
   color: white;
   background-color: transparent;
+  border-radius: 8px !important;
 }
 
 .main-action-btn {
@@ -347,6 +348,7 @@ input[type=number] {
     color: #f3841e !important;
     background-color: rgba(243, 132, 30, 0.05) !important;
   }
+
 }
 
 .mat-progress-spinner, .mat-spinner {
