@@ -159,13 +159,15 @@ button {
 .mat-dialog-container {
   padding: 0 !important;
   box-shadow: none;
-  border-radius: 20px !important;
+  border-radius: 8px !important;
   position: relative;
-  background-color: rgb(33, 36, 41);
+  // background-color: #212A26;
+  background-color: rgba(30, 36, 36, 1);
   color: white;
 
   .dialog-content {
-    background-color: rgb(44, 47, 54);
+    // background-color: rgb(44, 47, 54);
+    background-color: rgba(255, 255, 255, 0.04);
     padding: 2rem;
     display: flex;
     flex-flow: column;
@@ -191,19 +193,10 @@ button {
 }
 
 .cdk-overlay-dark-backdrop {
-  background: rgba(0, 0, 0, 0.45);
-}
-
-.form-border {
-  outline: none;
-  border: 1px solid rgb(237, 238, 242);
-  border-radius: 12px;
-  padding: 1rem;
-  width: 100% !important;
+  background: rgba(0, 0, 0, 0.75);
 }
 
 .uni-input {
-  // background-color: rgb(247, 248, 250);
   outline: none;
   border: 2px dashed rgba(255, 255, 255, 0.05);
   border-radius: 8px;
@@ -217,7 +210,6 @@ button {
   opacity: 1;
   width: 100% !important;
   margin-bottom: 10px;
-
   flex-flow: column;
   justify-content: start;
   align-items: flex-start;
@@ -258,6 +250,13 @@ button {
     }
   }
 
+  &--file {
+    color: white;
+    flex-flow: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
 }
 
 /* Chrome, Safari, Edge, Opera */
@@ -276,41 +275,38 @@ input[type=number] {
  * Connect Styling
  */
 .connect-option {
-  // background-color: rgb(247, 248, 250);
   background-color: transparent;
   display: flex;
   flex-direction: row;
   -webkit-box-align: center;
   align-items: center;
   -webkit-box-pack: justify;
-  justify-content: space-between;
-  // padding: 1rem;
   margin-top: 0px;
-  opacity: 1;
-  // width: 100% !important;
-  margin-bottom: 10px;
-  border: 1px solid rgb(64, 68, 79);
   color: white;
+  width: 100%;
+  padding: 4px 20px;
+  height: 56px;
 
   span {
     display: flex;
     flex-flow: row nowrap;
-    // color: rgb(0, 0, 0);
-    // color: white;
     font-size: 1rem;
     font-weight: 500;
+    margin-left: 10px;
   }
 
   &:hover {
     cursor: pointer;
-    border: 1px solid rgb(33, 114, 229);
+    background-color: rgba(255, 255, 255, 0.05);
+    // border: 1px solid rgb(33, 114, 229);
   }
 
   &:disabled {
     color: #888d9b;
 
     &:hover {
-      border: 1px solid rgb(64, 68, 79);
+      // border: 1px solid rgb(64, 68, 79);
+      background-color: transparent;
       cursor: inherit;
     }
 
@@ -409,11 +405,11 @@ input[type=number] {
   width: 100%;
   border-radius: 16px;
   padding: 40px;
-  border: 1px solid rgb(44, 47, 54);
-  background-color: rgb(33, 36, 41);
+  // border: 1px solid rgb(44, 47, 54);
+  background-color: rgba(243, 132, 30, 0.05);
   font-weight: 400;
-  font-size: 16px;
-  color: rgb(108, 114, 132);
+  font-size: .8rem;
+  color: #f3841e;
   text-align: center;
 }
 

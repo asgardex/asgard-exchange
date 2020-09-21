@@ -3,19 +3,21 @@
   <div class="modal-head">
     <h1 mat-dialog-title>Connect to a wallet</h1>
   </div>
-  <div class="dialog-content">
+  <div>
     <div mat-dialog-content>
 
       <!-- Connect Options -->
 
-      <button class="connect-option form-border" (click)="connectWalletConnect()" [disabled]="isTestnet">
-        <span>Wallet Connect</span>
+      <button class="connect-option" (click)="connectWalletConnect()" [disabled]="isTestnet">
         <img src="assets/images/wallet-connect-icon.svg" />
+        <span>Wallet Connect</span>
       </button>
-      <button class="connect-option form-border" (click)="connectKeystore()">
-        <span>Keystore</span>
+
+      <button class="connect-option" (click)="connectKeystore()">
         <mat-icon>vpn_key</mat-icon>
+        <span>Keystore</span>
       </button>
+
     </div>
 
     <!-- close dialog -->

@@ -14,7 +14,7 @@
   <span class="section-label">Your liquidity</span>
 
   <div *ngIf="!user" class="disabled-list">
-    Connect to a wallet to view liquidity
+    Connect wallet to view liquidity
   </div>
 
   <app-staked-pools-list *ngIf="user && stakedPools && poolDetailIndex" [stakedPools]="stakedPools" [poolsData]="poolDetailIndex"></app-staked-pools-list>
