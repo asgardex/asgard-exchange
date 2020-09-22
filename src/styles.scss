@@ -198,7 +198,7 @@ button {
 
 .uni-input {
   outline: none;
-  border: 2px dashed rgba(255, 255, 255, 0.05);
+  // border: 2px dashed rgba(255, 255, 255, 0.05);
   border-radius: 8px;
   display: flex;
   -webkit-box-align: center;
@@ -213,6 +213,8 @@ button {
   flex-flow: column;
   justify-content: start;
   align-items: flex-start;
+  background-color: rgba(255, 255, 255, 0.02);
+  border: none;
 
   label {
     box-sizing: border-box;
