@@ -24,6 +24,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { WalletConnectComponent } from './_components/connect/wallet-connect/wallet-connect.component';
+import { ConnectErrorComponent } from './_components/connect/connect-error/connect-error.component';
 
 
 @NgModule({
@@ -33,6 +35,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     ConnectComponent,
     ConnectModal,
     KeystoreConnectComponent,
+    WalletConnectComponent,
+    ConnectErrorComponent,
   ],
   imports: [
     BrowserModule,
