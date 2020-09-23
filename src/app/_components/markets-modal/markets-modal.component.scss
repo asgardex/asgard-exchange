@@ -8,10 +8,6 @@
   border-top: 1px solid rgb(44, 47, 54);
 }
 
-.market-list {
-  // border-top: 1px solid #edeef2;
-}
-
 .market-list-item {
   display: flex;
   align-items: center;
@@ -20,7 +16,7 @@
   cursor: pointer;
 
   &:hover {
-    background-color: rgb(44, 47, 54);
+    background-color: rgb(255, 255, 255, 0.1);
   }
 
   &.disabled {

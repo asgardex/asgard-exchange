@@ -1,6 +1,21 @@
 .swap-input {
   flex-flow: row;
   height: 90px;
+  border: 1px solid transparent;
+}
+
+.swap-input:focus-within{
+  border: 1px solid white;
+  transition: border-color 100ms;
+}
+
+.asset-selector {
+  padding: 3px 5px;
+  border-radius: 4px;
+
+  &:hover {
+    background: #2c2f36;
+  }
 }
 
 .launch-markets-btn {
@@ -23,3 +38,4 @@
     border: 1px solid rgb(33, 114, 229);
   }
 }
+
