@@ -23,6 +23,17 @@ export class Asset {
 
     if (trustWalletMatch) {
       this.iconPath = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/${trustWalletMatch}/logo.png`;
+    }else{
+      // Override token icons when not found in trustwallet
+      switch (poolName){
+        case 'BNB.BNB':
+          this.iconPath =  'assets/images/token-icons/bnb.png';
+          break;
+        default:
+          console.warn(`Icon not available for poolName ${poolName}. Add override in src\\app\\_classes\\asset.ts`);
+          this.iconPath = 'assets/images/token-icons/unknown.png';
+          break;
+      }
     }
 
   }

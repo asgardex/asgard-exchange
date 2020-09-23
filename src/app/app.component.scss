@@ -221,4 +221,8 @@ main {
   background-repeat: repeat;
   // background-color: slategray;
   background-image: url('/assets/noisy-texture-transparent.png');
+
+  // In case we want to put gradients instead of patterns
+  // https://mycolor.space/gradient3?ori=circle&hex=%23000129&hex2=%23011538&hex3=%23002643&submit=submit
+  // background-image: linear-gradient(to top, #000118, #04051e, #060924, #060e2a, #051130, #031332, #021534, #001736, #001835, #001933, #001a31, #001b2f);
 }

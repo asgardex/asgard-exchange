@@ -8,7 +8,7 @@
 
     <!-- SOURCE -->
     <app-asset-input
-      label="From"
+      label="Send"
       [(selectedAsset)]="selectedSourceAsset"
       [(assetUnit)]="sourceAssetUnit"
       [balance]="sourceBalance"
@@ -16,14 +16,14 @@
     </app-asset-input>
 
     <div class="flxr flxr--align-center flxr--just-center">
-      <button (click)="reverseTransaction()" [disabled]="!selectedSourceAsset || !selectedTargetAsset">
+      <button class="reverse-transaction" (click)="reverseTransaction()" [disabled]="!selectedSourceAsset || !selectedTargetAsset">
         <mat-icon [class.disabled]="!selectedSourceAsset || !selectedTargetAsset" class="to-btn-icon">arrow_downward</mat-icon>
       </button>
     </div>
 
     <!-- TARGET -->
     <app-asset-input
-      [label]="selectedTargetAsset ? 'To (estimated)' : 'To'"
+      [label]="selectedTargetAsset ? 'Receive (estimated)' : 'Receive'"
       [(selectedAsset)]="selectedTargetAsset"
       [(assetUnit)]="targetAssetUnitDisplay"
       [balance]="targetBalance"
