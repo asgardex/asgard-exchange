@@ -1,11 +1,13 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import {
   Client as binanceClient,
   BinanceClient,
   Balance,
 } from '@thorchain/asgardex-binance';
-import WalletConnect from '@walletconnect/client';
+import WalletConnect from '@trustwallet/walletconnect';
 import QRCodeModal from '@walletconnect/qrcode-modal';
+import { environment } from 'src/environments/environment';
 import { User } from '../_classes/user';
 import { UserService } from './user.service';
 
@@ -21,37 +23,27 @@ export class WalletService {
     return this.asgardexBncClient.getBncClient();
   }
 
-  constructor(private userService: UserService) {
+  constructor(private userService: UserService, private http: HttpClient) {
     this.asgardexBncClient = new binanceClient({
-      network: 'testnet',
+      network: environment.network === 'testnet' ? 'testnet' : 'mainnet',
     });
 
   }
 
   initWalletConnect() {
 
-    console.log('init wallet connect');
-
     this.walletConnector = new WalletConnect({
       bridge: 'https://bridge.walletconnect.org', // Required
       // qrcodeModal: QRCodeModal,
     });
 
-    // this.walletConnector.killSession();
+    this.walletConnector.killSession();
 
     console.log('connected is: ', this.walletConnector.connected);
 
     if (this.walletConnector.connected && this.walletConnector.accounts && this.walletConnector.accounts.length > 0) {
 
-      console.log(this.walletConnector);
-
-      console.log('this.walletConnector.connected?', this.walletConnector.connected);
-
-      console.log('wallet connector accounts are: ', this.walletConnector.accounts);
-
-      const user = new User({type: 'keystore', wallet: this.walletConnector.accounts[0]});
-
-      this.userService.setUser(user);
+      this.connectWalletConnect();
 
     }
 
@@ -59,29 +51,19 @@ export class WalletService {
 
   async connectWalletConnect() {
 
-    console.log('connect wallet connect!');
-
-    // // Create a connector
-    // this.walletConnecter = new WalletConnect({
-    //   bridge: 'https://bridge.walletconnect.org', // Required
-    //   qrcodeModal: QRCodeModal,
-    // });
-
     // this.walletConnector.killSession();
 
     // Check if connection is already established
     if (!this.walletConnector.connected) {
       // create new session
-      await this.walletConnector.createSession({
-        // chainId: 714
-      });
+      await this.walletConnector.createSession();
       const uri = this.walletConnector.uri;
       // display QR Code modal
       QRCodeModal.open(uri, () => {});
     }
 
     // Subscribe to connection events
-    this.walletConnector.on('connect', (error, payload) => {
+    this.walletConnector.on('connect', async (error, payload) => {
       if (error) {
         throw error;
       }
@@ -91,15 +73,29 @@ export class WalletService {
       // Close QR Code Modal
       QRCodeModal.close();
 
-      const user = new User({type: 'keystore', wallet: this.walletConnector.accounts[0]});
+      const accounts = await this.walletConnector.getAccounts();
+      const bnbAccount = accounts.find( (account) => account.network === 714 );
+      console.log('accoutns are: ', accounts);
 
-      this.userService.setUser(null);
+      const user = new User({type: 'walletconnect', wallet: bnbAccount.address});
 
-      console.log('CONNETED!');
-      console.log('payload is: ');
-      console.log(payload);
+      this.userService.setUser(user);
 
       // Get provided accounts and chainId
+      // const { accounts, chainId } = payload.params[0];
+    });
+
+    this.walletConnector.on('session_update', (error, payload) => {
+      if (error) {
+        throw error;
+      }
+
+      console.log('====== session updated ======');
+      console.log('payload is: ', payload);
+      console.log('network id is: ', this.walletConnector.networkId);
+      console.log('chain id is: ', this.walletConnector.chainId);
+
+      // Get updated accounts and chainId
       const { accounts, chainId } = payload.params[0];
     });
 

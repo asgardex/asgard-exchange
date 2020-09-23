@@ -113,13 +113,25 @@ export enum ConnectionMethod {
   styleUrls: ['./connect.component.scss']
 })
 // tslint:disable-next-line:component-class-suffix
-export class ConnectModal {
+export class ConnectModal implements OnDestroy {
 
   connectionMethod: ConnectionMethod;
   isTestnet: boolean;
+  subs: Subscription[];
 
-  constructor(public dialogRef: MatDialogRef<ConnectModal>, private walletService: WalletService) {
+  constructor(public dialogRef: MatDialogRef<ConnectModal>, private walletService: WalletService, private userService: UserService) {
     this.isTestnet = environment.network === 'testnet' ? true : false;
+
+    const user$ = this.userService.user$.subscribe(
+      (user) => {
+        if (user) {
+          this.close();
+        }
+      }
+    );
+
+    this.subs = [user$];
+
   }
 
   connectWalletConnect() {
@@ -139,6 +151,12 @@ export class ConnectModal {
 
   close() {
     this.dialogRef.close();
+  }
+
+  ngOnDestroy() {
+    for (const sub of this.subs) {
+      sub.unsubscribe();
+    }
   }
 
 }

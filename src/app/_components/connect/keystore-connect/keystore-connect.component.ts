@@ -96,7 +96,7 @@ export class KeystoreConnectComponent implements OnInit {
       const user = new User({type: 'keystore', wallet: address, keystore: this.keystore});
 
       this.userService.setUser(user);
-      this.closeModal.emit();
+      // this.closeModal.emit();
 
     } catch (error) {
       this.keystoreConnecting = false;

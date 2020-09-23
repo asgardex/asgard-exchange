@@ -15,7 +15,9 @@ export class BinanceService {
 
   constructor(private http: HttpClient) {
 
-    this.baseUrl = environment.network === 'testnet'
+    console.log('NETWORK IS: ', environment.network);
+
+    this.baseUrl = (environment.network === 'testnet')
       ? 'https://testnet-dex.binance.org/api/v1'
       : 'https://dex.binance.org/api/v1';
 

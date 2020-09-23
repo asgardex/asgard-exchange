@@ -12,6 +12,7 @@ import {
 import { Market, MarketResponse } from '../_classes/market';
 import { bnOrZero, bn } from '@thorchain/asgardex-util';
 import { AssetBalance } from '../_classes/asset-balance';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -34,13 +35,15 @@ export class UserService {
 
   constructor() {
     this.asgardexBncClient = new binanceClient({
-      network: 'testnet',
+      network: (environment.network) === 'testnet' ? 'testnet' : 'mainnet',
     });
     // this.setMarkets();
   }
 
   setUser(user: User) {
-    this.getBalance(user.wallet);
+    if (user) {
+      this.getBalance(user.wallet);
+    }
     this.userSource.next(user);
   }
 

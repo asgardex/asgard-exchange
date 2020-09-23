@@ -29,6 +29,7 @@
     "@thorchain/asgardex-util": "^0.3.0",
     "@walletconnect/client": "^1.2.2",
     "@walletconnect/qrcode-modal": "^1.2.2",
+    "@trustwallet/walletconnect": "0.0.12",
     "bignumber.js": "^9.0.0",
     "cipher-base": "^1.0.4",
     "i": "^0.3.6",
