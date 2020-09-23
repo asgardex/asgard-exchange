@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 
 @Component({
   selector: 'app-connect-error',
@@ -7,7 +7,11 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ConnectErrorComponent implements OnInit {
 
-  constructor() { }
+  @Output() back: EventEmitter<null>;
+
+  constructor() {
+    this.back = new EventEmitter<null>();
+  }
 
   ngOnInit(): void {
   }
