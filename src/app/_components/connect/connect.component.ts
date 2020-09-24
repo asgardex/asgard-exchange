@@ -136,9 +136,6 @@ export class ConnectModal implements OnDestroy {
 
   connectWalletConnect() {
     this.walletService.connectWalletConnect();
-    setTimeout(() => {
-      this.connectionMethod = ConnectionMethod.WALLET_CONNECT;
-    }, 1000);
   }
 
   connectKeystore() {

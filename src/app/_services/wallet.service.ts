@@ -32,14 +32,14 @@ export class WalletService {
 
   }
 
-  initWalletConnect() {
+  async initWalletConnect() {
 
     this.walletConnector = new WalletConnect({
       bridge: 'https://bridge.walletconnect.org', // Required
       // qrcodeModal: QRCodeModal,
     });
 
-    this.walletConnector.killSession();
+    await this.walletConnector.killSession();
 
     console.log('connected is: ', this.walletConnector.connected);
 
