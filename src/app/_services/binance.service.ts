@@ -15,7 +15,7 @@ export class BinanceService {
 
   constructor(private http: HttpClient) {
 
-    this.baseUrl = environment.network === 'testnet'
+    this.baseUrl = (environment.network === 'testnet')
       ? 'https://testnet-dex.binance.org/api/v1'
       : 'https://dex.binance.org/api/v1';
 
@@ -27,7 +27,6 @@ export class BinanceService {
 
   getTransferFees(feesData: Fees) {
 
-
     const fees = this.getTransferFeeds(feesData);
     if (fees) {
       console.log('transfer feeds 1234567: ', fees);
@@ -36,22 +35,6 @@ export class BinanceService {
       return null;
     }
 
-
-    // yield takeEvery('GET_BINANCE_FEES', function*({
-    //   net,
-    // }: ReturnType<typeof actions.getBinanceFees>) {
-    //   try {
-    //     // const data = yield call(tryGetBinanceFees, net);
-    //     // parse fees
-    //     const fees = getTransferFeeds(data);
-    //     const result = fees
-    //       ? success(fees)
-    //       : failure(new Error(`No feeds for transfers defined in ${data}`));
-    //     yield put(actions.getBinanceTransferFeesResult(result));
-    //   } catch (error) {
-    //     yield put(actions.getBinanceTransferFeesResult(failure(error)));
-    //   }
-    // });
   }
 
   /**
@@ -70,8 +53,6 @@ export class BinanceService {
     return this.isFee((v as TransferFee)?.fixed_fee_params) &&
     !!(v as TransferFee)?.multi_transfer_fee;
   }
-
-
 
   getTransferFeeds(fees: Fees): TransferFees {
     return fees.reduce((acc: TransferFees, dataItem) => {

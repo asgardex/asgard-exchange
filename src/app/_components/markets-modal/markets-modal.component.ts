@@ -57,7 +57,6 @@ export class MarketsModalComponent implements OnInit, OnDestroy {
           new Asset(environment.network === 'chaosnet' ? 'RUNE-B1A' : 'RUNE-67C')
         );
         this.filteredMarketListItems = this.marketListItems;
-        console.log('market list items are: ', this.marketListItems);
       },
       (err) => console.error('error fetching pools: ', err)
     );

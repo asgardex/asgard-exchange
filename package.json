@@ -26,9 +26,11 @@
     "@thorchain/asgardex-binance": "^3.0.1",
     "@thorchain/asgardex-crypto": "^0.1.0",
     "@thorchain/asgardex-token": "^0.1.1",
-    "@thorchain/asgardex-util": "^0.3.0",
+    "@thorchain/asgardex-util": "^0.4.2",
+    "@trustwallet/walletconnect": "0.0.12",
     "@walletconnect/client": "^1.2.2",
     "@walletconnect/qrcode-modal": "^1.2.2",
+    "bech32": "^1.1.4",
     "bignumber.js": "^9.0.0",
     "cipher-base": "^1.0.4",
     "i": "^0.3.6",
@@ -59,5 +61,8 @@
     "ts-node": "~8.3.0",
     "tslint": "~6.1.0",
     "typescript": "~4.0.2"
+  },
+  "browser": {
+    "crypto": false
   }
 }

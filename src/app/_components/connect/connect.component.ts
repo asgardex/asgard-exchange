@@ -8,6 +8,7 @@ import { MidgardService } from 'src/app/_services/midgard.service';
 import { Subject, Subscription, of, timer } from 'rxjs';
 import { takeUntil, switchMap, catchError } from 'rxjs/operators';
 import { TransactionDTO } from 'src/app/_classes/transaction';
+import { WalletService } from 'src/app/_services/wallet.service';
 
 @Component({
   selector: 'app-connect',
@@ -21,7 +22,12 @@ export class ConnectComponent implements OnInit, OnDestroy {
   pendingTxCount: number;
   killTxPolling: Subject<void> = new Subject();
 
-  constructor(private dialog: MatDialog, private userService: UserService, private midgardService: MidgardService) {
+  constructor(
+    private dialog: MatDialog,
+    private userService: UserService,
+    private midgardService: MidgardService,
+    private walletService: WalletService
+  ) {
 
     this.pendingTxCount = 0;
 
@@ -41,6 +47,7 @@ export class ConnectComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.walletService.initWalletConnect();
   }
 
   pollTx(txId: string) {
@@ -106,17 +113,29 @@ export enum ConnectionMethod {
   styleUrls: ['./connect.component.scss']
 })
 // tslint:disable-next-line:component-class-suffix
-export class ConnectModal {
+export class ConnectModal implements OnDestroy {
 
   connectionMethod: ConnectionMethod;
   isTestnet: boolean;
+  subs: Subscription[];
 
-  constructor(public dialogRef: MatDialogRef<ConnectModal>) {
+  constructor(public dialogRef: MatDialogRef<ConnectModal>, private walletService: WalletService, private userService: UserService) {
     this.isTestnet = environment.network === 'testnet' ? true : false;
+
+    const user$ = this.userService.user$.subscribe(
+      (user) => {
+        if (user) {
+          this.close();
+        }
+      }
+    );
+
+    this.subs = [user$];
+
   }
 
   connectWalletConnect() {
-    this.connectionMethod = ConnectionMethod.WALLET_CONNECT;
+    this.walletService.connectWalletConnect();
   }
 
   connectKeystore() {
@@ -129,6 +148,12 @@ export class ConnectModal {
 
   close() {
     this.dialogRef.close();
+  }
+
+  ngOnDestroy() {
+    for (const sub of this.subs) {
+      sub.unsubscribe();
+    }
   }
 
 }

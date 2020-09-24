@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Asset } from 'src/app/_classes/asset';
 import { TransferResult } from '@thorchain/asgardex-binance';
@@ -7,6 +7,13 @@ import { MidgardService } from 'src/app/_services/midgard.service';
 import { WalletService } from 'src/app/_services/wallet.service';
 import { UserService } from 'src/app/_services/user.service';
 import { TransactionConfirmationState } from 'src/app/_const/transaction-confirmation-state';
+import { PoolAddressDTO } from 'src/app/_classes/pool-address';
+import base64js from 'base64-js';
+import { environment } from 'src/environments/environment';
+import { tokenAmount, tokenToBase } from '@thorchain/asgardex-token';
+import { Subscription } from 'rxjs';
+
+const bech32 = require('bech32');
 
 export interface SwapData {
   sourceAsset: Asset;
@@ -17,6 +24,7 @@ export interface SwapData {
   inputValue: number;
   outputValue: number;
   user: User;
+  slip: number;
 }
 
 @Component({
@@ -24,16 +32,14 @@ export interface SwapData {
   templateUrl: './confirm-swap-modal.component.html',
   styleUrls: ['./confirm-swap-modal.component.scss']
 })
-export class ConfirmSwapModalComponent implements OnInit {
+export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
 
   confirmationPending: boolean;
   transactionSubmitted: boolean;
-
   txState: TransactionConfirmationState;
-
   hash: string;
-
   user: User;
+  subs: Subscription[];
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public swapData: SwapData,
@@ -43,6 +49,17 @@ export class ConfirmSwapModalComponent implements OnInit {
     private userService: UserService
   ) {
     this.txState = TransactionConfirmationState.PENDING_CONFIRMATION;
+
+    const user$ = this.userService.user$.subscribe(
+      (user) => {
+        if (!user) {
+          this.closeDialog();
+        }
+      }
+    );
+
+    this.subs = [user$];
+
   }
 
   ngOnInit(): void {
@@ -54,16 +71,10 @@ export class ConfirmSwapModalComponent implements OnInit {
 
   submitTransaction() {
 
-    // const validationErrorMsg = validateSwap(wallet, amount);
-    // if (validationErrorMsg) {
-    //   return reject(new Error(validationErrorMsg));
-    // }
-
     this.txState = TransactionConfirmationState.SUBMITTING;
 
     this.midgardService.getProxiedPoolAddresses().subscribe(
       async (res) => {
-        console.log('POOL ADDRESSES ARE: ', res);
 
         const currentPools = res.current;
 
@@ -73,36 +84,11 @@ export class ConfirmSwapModalComponent implements OnInit {
 
           if (matchingPool) {
 
-            await this.walletService.bncClient.initChain();
-
-            // Check of `validateSwap` before makes sure that we have a valid number here
-            const amountNumber = this.swapData.inputValue;
-
-            // const limit = protectSlip && slipLimit ? slipLimit.amount().toString() : '';
-            const memo = this.getSwapMemo(this.swapData.targetAsset.symbol, this.swapData.user.wallet);
-
-            console.log('user wallet is: ', this.swapData.user.wallet);
-            console.log('matching pool address is: ', matchingPool.address);
-            console.log('amount number is: ', amountNumber);
-            console.log('from symbol is: ', this.swapData.sourceAsset.symbol);
-            console.log('memo is: ', memo);
-
-            this.walletService.bncClient
-              .transfer(this.swapData.user.wallet, matchingPool.address, amountNumber, this.swapData.sourceAsset.symbol, memo)
-              .then((response: TransferResult) => {
-                console.log('transfer response is: ', response);
-                this.txState = TransactionConfirmationState.SUCCESS;
-
-                if (response.result && response.result.length > 0) {
-                  this.hash = response.result[0].hash;
-                  this.userService.setPendingTransaction(this.hash);
-                }
-
-              })
-              .catch((error: Error) => {
-                console.log('error making transfer: ', error);
-                this.txState = TransactionConfirmationState.ERROR;
-              });
+            if (this.swapData.user.type === 'keystore') {
+              this.keystoreTransfer(matchingPool);
+            } else if (this.swapData.user.type === 'walletconnect') {
+              this.walletConnectTransfer(matchingPool);
+            }
 
           }
 
@@ -110,6 +96,87 @@ export class ConfirmSwapModalComponent implements OnInit {
 
       }
     );
+
+  }
+
+  async keystoreTransfer(matchingPool: PoolAddressDTO) {
+    await this.walletService.bncClient.initChain();
+
+    // Check of `validateSwap` before makes sure that we have a valid number here
+    const amountNumber = this.swapData.inputValue;
+
+    // const limit = protectSlip && slipLimit ? slipLimit.amount().toString() : '';
+    const memo = this.getSwapMemo(this.swapData.targetAsset.symbol, this.swapData.user.wallet);
+
+    this.walletService.bncClient
+      .transfer(this.swapData.user.wallet, matchingPool.address, amountNumber, this.swapData.sourceAsset.symbol, memo)
+      .then((response: TransferResult) => {
+        console.log('transfer response is: ', response);
+        this.txState = TransactionConfirmationState.SUCCESS;
+
+        if (response.result && response.result.length > 0) {
+          this.hash = response.result[0].hash;
+          this.userService.setPendingTransaction(this.hash);
+        }
+
+      })
+      .catch((error: Error) => {
+        console.log('error making transfer: ', error);
+        this.txState = TransactionConfirmationState.ERROR;
+      });
+  }
+
+  walletConnectTransfer(matchingPool: PoolAddressDTO) {
+
+    const coins = [{
+      denom: this.swapData.sourceAsset.symbol,
+      amount: tokenToBase(tokenAmount(this.swapData.inputValue))
+        .amount()
+        .toNumber(),
+    }];
+    const sendOrder = this.walletService.walletConnectGetSendOrderMsg({
+      fromAddress: this.swapData.user.wallet,
+      toAddress: matchingPool.address,
+      coins,
+    });
+    const memo = this.getSwapMemo(this.swapData.targetAsset.symbol, this.swapData.user.wallet);
+
+    // if (walletConnect && bncClient && sendOrder && walletAddress) {
+    this.walletService.bncClient
+      .getAccount(this.swapData.user.wallet)
+      .then( async (response) => {
+
+        if (!response) {
+          console.error('no response getting account:', response);
+          return;
+        }
+
+        const account = response.result;
+        const chainId = environment.network === 'testnet' ? 'Binance-Chain-Nile' : 'Binance-Chain-Tigris';
+        const tx = {
+          accountNumber: account.account_number.toString(),
+          sequence: account.sequence.toString(),
+          send_order: sendOrder,
+          chainId,
+          memo,
+        };
+
+        const res = await this.walletService.walletConnectSendTx(tx);
+
+        if (res) {
+          this.txState = TransactionConfirmationState.SUCCESS;
+
+          if (res.result && res.result.length > 0) {
+            this.hash = res.result[0].hash;
+            this.userService.setPendingTransaction(this.hash);
+          }
+        }
+
+
+      })
+      .catch((error) => {
+        console.error('getAccount error: ', error);
+      });
 
   }
 
@@ -121,5 +188,10 @@ export class ConfirmSwapModalComponent implements OnInit {
     return `SWAP:BNB.${symbol}:${addr}:${sliplimit}`;
   }
 
+  ngOnDestroy() {
+    for (const sub of this.subs) {
+      sub.unsubscribe();
+    }
+  }
 
 }

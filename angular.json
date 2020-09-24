@@ -127,6 +127,9 @@
           "configurations": {
             "production": {
               "browserTarget": "asgard-exchange:build:production"
+            },
+            "chaosnet": {
+              "browserTarget": "asgard-exchange:build:chaosnet"
             }
           }
         },

@@ -9,6 +9,7 @@ import { PoolAddressesDTO } from '../_classes/pool-address';
 import { TransactionDTO } from '../_classes/transaction';
 import { StakerDTO } from '../_classes/staker';
 import { StakerPoolDataDTO } from '../_classes/staker-pool-data';
+import { LastBlock } from '../_classes/last-block';
 
 @Injectable({
   providedIn: 'root'
@@ -71,6 +72,10 @@ export class MidgardService {
     const params = new HttpParams().set('asset', assets.join(','));
 
     return this.http.get<StakerPoolDataDTO[]>(`${this.basePath}/stakers/${accountId}/pools`, {params});
+  }
+
+  getLastBlock(): Observable<LastBlock> {
+    return this.http.get<LastBlock>(`${this.basePath}/thorchain/lastblock`);
   }
 
 }

@@ -37,6 +37,12 @@ export class UnstakeComponent implements OnInit {
   user: User;
   stakedPool: StakerPoolData;
 
+  // checking for cooloff for withdraw
+  lastBlock: number;
+  lockBlocks: number;
+  heightLastStaked: number;
+  remainingTime: string;
+
   removeRuneAmount: number;
   removeAssetAmount: number;
 
@@ -95,9 +101,16 @@ export class UnstakeComponent implements OnInit {
 
       this.midgardService.getStakerPoolData(this.user.wallet, [`${this.asset.chain}.${this.asset.symbol}`]).subscribe(
         (res) => {
+
+          console.log('get account staked res is: ', res);
+          // res[0].heightLastStaked
+
           if (res && res.length > 0) {
             // this.stakedPool = res.map( (dto) => new StakerPoolData(dto) );
             this.stakedPool = new StakerPoolData(res[0]);
+            this.heightLastStaked = res[0].heightLastStaked;
+            this.getConstants();
+
           }
 
         },
@@ -122,8 +135,48 @@ export class UnstakeComponent implements OnInit {
       this.removeRuneAmount = poolShare.rune.amount().div(10 ** 8 ).multipliedBy(this.unstakePercent / 100).toNumber();
       this.removeAssetAmount = poolShare.asset.amount().div(10 ** 8 ).multipliedBy(this.unstakePercent / 100).toNumber();
 
-      // this.poolShare = Number(this.stakedPool.stakeUnits) / Number(this.poolData.poolUnits);
     }
+
+  }
+
+  getConstants() {
+    this.midgardService.getConstants().subscribe(
+      (res) => {
+        this.lockBlocks = res.int_64_values.StakeLockUpBlocks;
+        // this.checkCooldown();
+        this.getLastBlock();
+        console.log('res is: ', res);
+      },
+      (err) => console.error('error fetching constants: ', err)
+    );
+  }
+
+  getLastBlock() {
+    this.midgardService.getLastBlock().subscribe(
+      (res) => {
+        this.lastBlock = res.thorchain;
+        this.checkCooldown();
+      },
+      (err) => console.error('error fetching last block: ', err)
+    );
+  }
+
+  checkCooldown() {
+        const heightLastStaked = this.heightLastStaked;
+        const currentBlockHeight = this.lastBlock;
+        const stakeLockUpBlocks = this.lockBlocks;
+        const totalBlocksToUnlock = heightLastStaked + stakeLockUpBlocks;
+        const remainingBlocks = totalBlocksToUnlock - currentBlockHeight;
+        const withdrawDisabled = remainingBlocks > 0;
+
+        if (withdrawDisabled) {
+          const remainingSeconds = remainingBlocks * 5;
+          const remainingHours =
+            (remainingSeconds - (remainingSeconds % 3600)) / 3600;
+          const remainingMinutes =
+            ((remainingSeconds % 3600) - (remainingSeconds % 60)) / 60;
+          this.remainingTime = `${remainingHours} Hours ${remainingMinutes} Minutes`;
+        }
 
   }
 

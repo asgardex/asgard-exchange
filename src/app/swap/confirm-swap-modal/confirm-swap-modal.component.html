@@ -46,7 +46,7 @@
 
         <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
           <span class="tx-detail-label">Price</span>
-          <span>{{swapData.basePrice | number:"1.2-4"}} {{swapData.targetAsset.ticker}} per {{swapData.sourceAsset.ticker}}</span>
+          <span>{{swapData.basePrice | number:"1.2-4"}} {{swapData.sourceAsset.ticker}} per {{swapData.targetAsset.ticker}}</span>
         </div>
 
         <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
@@ -55,7 +55,7 @@
         </div>
         <div class="flxr flxr--just-space-between">
           <span class="tx-detail-label">Slip</span>
-          <!-- <span>{{swapData | number:"0.04" | percent}}</span> -->
+          <span>{{swapData.slip | percent:"0.0-4"}}</span>
         </div>
       </div>
 
