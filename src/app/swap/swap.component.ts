@@ -7,7 +7,9 @@ import { Market } from '../_classes/market';
 import {
   bn,
   getSwapOutput,
+  getSwapOutputWithFee,
   getDoubleSwapOutput,
+  getDoubleSwapOutputWithFee,
   getSwapSlip,
   getDoubleSwapSlip,
   baseAmount,
@@ -390,19 +392,8 @@ export class SwapComponent implements OnInit, OnDestroy {
       /**
        * Total output amount in target units minus 1 RUNE
        */
-      const totalAmount = getSwapOutput(baseAmount(this._sourceAssetTokenValue.amount()), pool, toRune);
-
-      const total = totalAmount.amount().minus(toRune ? valueOfAssetInRune.amount() : valueOfRuneInAsset.amount());
-
-      /**
-       * Subtract "Swap fee" from (total)
-       */
-      // const swapFee = getSwapFee(baseAmount(this._sourceAssetTokenValue.amount()), pool, toRune);
-      // console.log('swap fee is: ', swapFee.amount().plus(basePrice.amount()).toNumber());
-      // const totalMinusSwapFee = totalAmount.amount().minus(swapFee.amount().plus(basePrice.amount()));
-      // console.log('total minus (RUNE FEE + SWAP FEE): ', totalMinusSwapFee.toNumber());
-
-      this.targetAssetUnit = (total.isLessThan(0)) ? bn(0) : total;
+      const totalAmount = getSwapOutputWithFee(baseAmount(this._sourceAssetTokenValue.amount()), pool, toRune);
+      this.targetAssetUnit = (totalAmount.amount().isLessThan(0)) ? bn(0) : totalAmount.amount();
     }
 
   }
@@ -433,15 +424,9 @@ export class SwapComponent implements OnInit, OnDestroy {
       const slip = getDoubleSwapSlip(this._sourceAssetTokenValue, pool1, pool2);
       this.slip = slip.toNumber();
 
+      const total = getDoubleSwapOutputWithFee(this._sourceAssetTokenValue, pool1, pool2);
 
-      const doubleSwapOutput = getDoubleSwapOutput(this._sourceAssetTokenValue, pool1, pool2);
-      // const total = doubleSwapOutput.amount().minus(basePrice.amount());
-
-      const valueOfRuneInAsset = getValueOfRuneInAsset(assetToBase(assetAmount(1)), pool1).amount().toNumber();
-
-      const total = doubleSwapOutput.amount().minus(valueOfRuneInAsset);
-
-      this.targetAssetUnit = (total.isLessThan(0)) ? bn(0) : total;
+      this.targetAssetUnit = (total.amount().isLessThan(0)) ? bn(0) : total.amount();
     }
 
   }
