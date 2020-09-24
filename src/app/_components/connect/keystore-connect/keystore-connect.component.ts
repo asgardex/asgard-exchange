@@ -33,7 +33,6 @@ export class KeystoreConnectComponent implements OnInit {
     this.keystoreFile = null;
     this.keystoreFileSelected = false;
     this.back.emit();
-    // this.connectionMethod = null;
   }
 
   async onKeystoreFileChange(event: Event) {
@@ -90,13 +89,9 @@ export class KeystoreConnectComponent implements OnInit {
 
       const prefix = this.walletService.asgardexBncClient.getPrefix();
       const address = getAddressFromPrivateKey(privateKey, prefix);
-
-      console.log('address is: ', address);
-
       const user = new User({type: 'keystore', wallet: address, keystore: this.keystore});
 
       this.userService.setUser(user);
-      // this.closeModal.emit();
 
     } catch (error) {
       this.keystoreConnecting = false;

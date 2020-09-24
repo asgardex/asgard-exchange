@@ -128,45 +128,12 @@ export class ConfirmStakeModalComponent implements OnInit, OnDestroy {
   }
 
   walletConnectTransaction(outputs: MultiTransfer[], memo: string, matchingPool: PoolAddressDTO) {
-    // const memo = getStakeMemo(symbol);
-
-    // const runeAmountNumber = tokenToBase(runeAmount)
-    //   .amount()
-    //   .toNumber();
-    // const tokenAmountNumber = tokenToBase(assetAmount)
-    //   .amount()
-    //   .toNumber();
-
-    // const coins = [
-    //   {
-    //     denom: RUNE,
-    //     amount: runeAmountNumber,
-    //   },
-    //   {
-    //     denom: symbol,
-    //     amount: tokenAmountNumber,
-    //   },
-    // ];
-
-    console.log('memo is: ', memo);
-
-    console.log('outputs are: ', outputs);
 
     const sendOrder = this.walletService.walletConnectGetSendOrderMsg({
       fromAddress: this.data.user.wallet,
       toAddress: matchingPool.address,
       coins: outputs[0].coins
     });
-
-    console.log('send order is: ', sendOrder);
-
-    // return sendTrustSignedTx({
-    //   walletConnect,
-    //   bncClient,
-    //   walletAddress,
-    //   sendOrder,
-    //   memo,
-    // });
 
     /**
      * TODO: clean up, this is used in confirm-swap-modal as well
@@ -189,8 +156,6 @@ export class ConfirmStakeModalComponent implements OnInit, OnDestroy {
           memo,
         };
 
-        console.log('tx is: ', tx);
-
         const res = await this.walletService.walletConnectSendTx(tx);
 
         if (res) {
@@ -201,37 +166,6 @@ export class ConfirmStakeModalComponent implements OnInit, OnDestroy {
             this.userService.setPendingTransaction(this.hash);
           }
         }
-
-      //   walletConnect
-      //     .trustSignTransaction(NETWORK_ID, tx)
-      //     .then((result: FixmeType) => {
-      //       console.log('Successfully signed stake tx msg:', result);
-      //       bncClient
-      //         .sendRawTransaction(result, true)
-      //         .then((response: FixmeType) => {
-      //           console.log('Response', response);
-      //           resolve(response);
-      //         })
-      //         .catch((error: FixmeType) => {
-      //           console.log('sendRawTransaction error: ', error);
-      //           reject(error);
-      //         });
-      //     })
-      //     .catch((error: FixmeType) => {
-      //       console.log('trustSignTransaction error: ', error);
-
-      //       reject(error);
-      //     });
-      // })
-      // .catch((error: FixmeType) => {
-      //   console.log('getAccount error: ', error);
-
-      //   reject(error);
-      // });
-  // } else {
-  //   // eslint-disable-next-line prefer-promise-reject-errors
-  //   reject('Transaction Error');
-  // }
 
     })
     .catch((error) => {

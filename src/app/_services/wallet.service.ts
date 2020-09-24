@@ -122,11 +122,9 @@ export class WalletService {
         this.bncClient
           .sendRawTransaction(result, true)
           .then((response) => {
-            console.log('Response', response);
             resolve(response);
           })
           .catch((error) => {
-            console.log('sendRawTransaction error: ', error);
             reject(error);
           });
       })
@@ -156,9 +154,6 @@ export class WalletService {
       .filter(data => {
         return data.amount > 0;
       });
-
-
-    console.log('coins are: ', coins);
 
     // if coin data is invalid, return null
     if (!coins.length) {
