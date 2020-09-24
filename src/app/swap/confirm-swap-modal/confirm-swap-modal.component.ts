@@ -134,7 +134,7 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
         .amount()
         .toNumber(),
     }];
-    const sendOrder = this.getSendOrderMsg({
+    const sendOrder = this.walletService.walletConnectGetSendOrderMsg({
       fromAddress: this.swapData.user.wallet,
       toAddress: matchingPool.address,
       coins,
@@ -178,47 +178,6 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
         console.error('getAccount error: ', error);
       });
 
-  }
-
-  getByteArrayFromAddress(address: string) {
-    const decodeAddress = bech32.decode(address);
-    return base64js.fromByteArray(Buffer.from(bech32.fromWords(decodeAddress.words)));
-  }
-
-  getSendOrderMsg({
-    fromAddress,
-    toAddress,
-    coins: coinData,
-  }) {
-    // 1. sort denoms by alphabet order
-    // 2. validate coins with zero amounts
-    const coins = coinData
-      .sort((a, b) => a.denom.localeCompare(b.denom))
-      .filter(data => {
-        return data.amount > 0;
-      });
-
-    // if coin data is invalid, return null
-    if (!coins.length) {
-      return null;
-    }
-
-    const msg = {
-      inputs: [
-        {
-          address: this.getByteArrayFromAddress(fromAddress),
-          coins,
-        },
-      ],
-      outputs: [
-        {
-          address: this.getByteArrayFromAddress(toAddress),
-          coins,
-        },
-      ],
-    };
-
-    return msg;
   }
 
   getSwapMemo(

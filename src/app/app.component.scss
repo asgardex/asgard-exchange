@@ -130,9 +130,11 @@ footer {
   bottom: 0;
   left: 0;
   width: 100%;
-  text-align: right;
+  // text-align: right;
   padding: 15px 15px;
   font-family: 'VT323', monospace;
+  display: flex;
+  justify-content: space-between;
 
    a {
     color: rgb(21, 163, 111);

@@ -58,6 +58,9 @@ export class PoolComponent implements OnInit, OnDestroy {
           if (res.poolsArray && res.poolsArray.length > 0) {
             this.getAccountStaked(res.poolsArray);
             this.getPoolData(res.poolsArray);
+          } else {
+            this.stakedPools = [];
+            this.poolDetailIndex = {};
           }
         },
         (err) => console.error('error fetching account pools: ', err)

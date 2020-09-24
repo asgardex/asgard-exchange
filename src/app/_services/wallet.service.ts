@@ -10,6 +10,8 @@ import QRCodeModal from '@walletconnect/qrcode-modal';
 import { environment } from 'src/environments/environment';
 import { User } from '../_classes/user';
 import { UserService } from './user.service';
+import base64js from 'base64-js';
+const bech32 = require('bech32');
 
 @Injectable({
   providedIn: 'root'
@@ -90,13 +92,8 @@ export class WalletService {
         throw error;
       }
 
-      console.log('====== session updated ======');
-      console.log('payload is: ', payload);
-      console.log('network id is: ', this.walletConnector.networkId);
-      console.log('chain id is: ', this.walletConnector.chainId);
-
       // Get updated accounts and chainId
-      const { accounts, chainId } = payload.params[0];
+      // const { accounts, chainId } = payload.params[0];
     });
 
     this.walletConnector.on('disconnect', (error, payload) => {
@@ -140,6 +137,50 @@ export class WalletService {
       });
     });
 
+  }
+
+  _getByteArrayFromAddress(address: string) {
+    const decodeAddress = bech32.decode(address);
+    return base64js.fromByteArray(Buffer.from(bech32.fromWords(decodeAddress.words)));
+  }
+
+  walletConnectGetSendOrderMsg({
+    fromAddress,
+    toAddress,
+    coins: coinData,
+  }) {
+    // 1. sort denoms by alphabet order
+    // 2. validate coins with zero amounts
+    const coins = coinData
+      .sort((a, b) => a.denom.localeCompare(b.denom))
+      .filter(data => {
+        return data.amount > 0;
+      });
+
+
+    console.log('coins are: ', coins);
+
+    // if coin data is invalid, return null
+    if (!coins.length) {
+      return null;
+    }
+
+    const msg = {
+      inputs: [
+        {
+          address: this._getByteArrayFromAddress(fromAddress),
+          coins,
+        },
+      ],
+      outputs: [
+        {
+          address: this._getByteArrayFromAddress(toAddress),
+          coins,
+        },
+      ],
+    };
+
+    return msg;
   }
 
 }
