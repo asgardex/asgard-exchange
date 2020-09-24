@@ -1,7 +1,10 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { TransferResult } from '@thorchain/asgardex-binance';
+import { tokenAmount, tokenToBase } from '@thorchain/asgardex-token';
+import { Subscription } from 'rxjs';
 import { Asset } from 'src/app/_classes/asset';
+import { PoolAddressDTO } from 'src/app/_classes/pool-address';
 import { User } from 'src/app/_classes/user';
 import { TransactionConfirmationState } from 'src/app/_const/transaction-confirmation-state';
 import { MidgardService } from 'src/app/_services/midgard.service';
@@ -26,12 +29,12 @@ export interface ConfirmUnstakeData {
   templateUrl: './confirm-unstake-modal.component.html',
   styleUrls: ['./confirm-unstake-modal.component.scss']
 })
-export class ConfirmUnstakeModalComponent implements OnInit {
+export class ConfirmUnstakeModalComponent implements OnInit, OnDestroy {
 
   runeSymbol = environment.network === 'chaosnet' ? 'RUNE-B1A' : 'RUNE-67C';
-
   txState: TransactionConfirmationState;
   hash: string;
+  subs: Subscription[];
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: ConfirmUnstakeData,
@@ -41,7 +44,15 @@ export class ConfirmUnstakeModalComponent implements OnInit {
     private userService: UserService
   ) {
     this.txState = TransactionConfirmationState.PENDING_CONFIRMATION;
-    console.log('unstake percent is: ', this.data.unstakePercent);
+    const user$ = this.userService.user$.subscribe(
+      (user) => {
+        if (!user) {
+          this.closeDialog();
+        }
+      }
+    );
+
+    this.subs = [user$];
   }
 
   ngOnInit(): void {
@@ -59,35 +70,16 @@ export class ConfirmUnstakeModalComponent implements OnInit {
         if (currentPools && currentPools.length > 0) {
 
           const matchingPool = currentPools.find( (pool) => pool.chain === 'BNB' );
+          const memo = `WITHDRAW:${this.data.asset.chain}.${this.data.asset.symbol}:${this.data.unstakePercent * 100}`;
+          console.log('this memo is: ', memo);
 
           if (matchingPool) {
 
-            await this.walletService.bncClient.initChain();
-
-            // const memo = `STAKE:BNB.${this.data.asset.symbol}`;
-            const memo = `WITHDRAW:${this.data.asset.chain}.${this.data.asset.symbol}:${this.data.unstakePercent * 100}`;
-
-            const amount = 0.00000001;
-            this.walletService.bncClient
-              .transfer(this.data.user.wallet, matchingPool.address, amount, this.runeSymbol, memo)
-              .then((response: TransferResult) => {
-                this.txSuccess(response);
-              })
-              // If first tx ^ fails (e.g. there is no RUNE available)
-              // another tx w/ same memo will be sent, but by using BNB now
-              .catch((unstakeErr1: Error) => {
-
-                console.log('not enough RUNE: ', unstakeErr1);
-
-                this.walletService.bncClient
-                  .transfer(this.data.user.wallet, matchingPool.address, amount, 'BNB', memo)
-                  .then((response: TransferResult) => {
-                    this.txSuccess(response);
-                  })
-                  .catch((unstakeErr2: Error) => {
-                    console.error('error unstaking: ', unstakeErr2);
-                  });
-              });
+            if (this.data.user.type === 'keystore') {
+              this.keystoreTransaction(matchingPool, memo);
+            } else if (this.data.user.type === 'walletconnect') {
+              this.walletConnectTransaction(matchingPool, memo);
+            }
 
           }
 
@@ -95,6 +87,91 @@ export class ConfirmUnstakeModalComponent implements OnInit {
 
       }
     );
+  }
+
+  async keystoreTransaction(matchingPool: PoolAddressDTO, memo: string) {
+
+    await this.walletService.bncClient.initChain();
+
+    const amount = 0.00000001;
+    this.walletService.bncClient
+      .transfer(this.data.user.wallet, matchingPool.address, amount, this.runeSymbol, memo)
+      .then((response: TransferResult) => {
+        this.txSuccess(response);
+      })
+      // If first tx ^ fails (e.g. there is no RUNE available)
+      // another tx w/ same memo will be sent, but by using BNB now
+      .catch((unstakeErr1: Error) => {
+
+        console.log('not enough RUNE: ', unstakeErr1);
+
+        this.walletService.bncClient
+          .transfer(this.data.user.wallet, matchingPool.address, amount, 'BNB', memo)
+          .then((response: TransferResult) => {
+            this.txSuccess(response);
+          })
+          .catch((unstakeErr2: Error) => {
+            console.error('error unstaking: ', unstakeErr2);
+          });
+      });
+
+  }
+
+  walletConnectTransaction(matchingPool: PoolAddressDTO, memo: string) {
+    const runeAmount = tokenToBase(tokenAmount(0.00000001))
+      .amount()
+      .toNumber();
+
+    const coins = [
+      {
+        denom: this.runeSymbol,
+        amount: runeAmount,
+      },
+    ];
+
+    const sendOrder = this.walletService.walletConnectGetSendOrderMsg({
+      fromAddress: this.data.user.wallet,
+      toAddress: matchingPool.address,
+      coins,
+    });
+
+    /**
+     * TODO: clean up, this is used in confirm-swap-modal as well
+     */
+    this.walletService.bncClient
+      .getAccount(this.data.user.wallet)
+      .then(async (response) => {
+        if (!response) {
+          console.error('error getting response from getAccount');
+          return;
+        }
+
+        const account = response.result;
+        const chainId = environment.network === 'testnet' ? 'Binance-Chain-Nile' : 'Binance-Chain-Tigris';
+        const tx = {
+          accountNumber: account.account_number.toString(),
+          sequence: account.sequence.toString(),
+          send_order: sendOrder,
+          chainId,
+          memo,
+        };
+
+        const res = await this.walletService.walletConnectSendTx(tx);
+
+        if (res) {
+          this.txState = TransactionConfirmationState.SUCCESS;
+
+          if (res.result && res.result.length > 0) {
+            this.hash = res.result[0].hash;
+            this.userService.setPendingTransaction(this.hash);
+          }
+        }
+
+    })
+    .catch((error) => {
+      console.error('getAccount error: ', error);
+    });
+
   }
 
   txSuccess(response: TransferResult) {
@@ -109,6 +186,12 @@ export class ConfirmUnstakeModalComponent implements OnInit {
 
   closeDialog(transactionSucess?: boolean) {
     this.dialogRef.close(transactionSucess);
+  }
+
+  ngOnDestroy() {
+    for (const sub of this.subs) {
+      sub.unsubscribe();
+    }
   }
 
 }
