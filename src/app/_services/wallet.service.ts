@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import {
   Client as binanceClient,
   BinanceClient,
-  Balance,
+  TransferResult
 } from '@thorchain/asgardex-binance';
 import WalletConnect from '@trustwallet/walletconnect';
 import QRCodeModal from '@walletconnect/qrcode-modal';
@@ -109,6 +109,35 @@ export class WalletService {
       this.walletConnector = null;
 
       // Delete connector
+    });
+
+  }
+
+  walletConnectSendTx(tx): Promise<TransferResult> {
+
+    const NETWORK_ID = 714;
+
+    return new Promise( (resolve, reject) => {
+      this.walletConnector
+      .trustSignTransaction(NETWORK_ID, tx)
+      .then((result) => {
+        console.log('Successfully signed stake tx msg:', result);
+        this.bncClient
+          .sendRawTransaction(result, true)
+          .then((response) => {
+            console.log('Response', response);
+            resolve(response);
+          })
+          .catch((error) => {
+            console.log('sendRawTransaction error: ', error);
+            reject(error);
+          });
+      })
+      .catch((error) => {
+        console.log('trustSignTransaction error: ', error);
+
+        reject(error);
+      });
     });
 
   }

@@ -91,87 +91,6 @@ main {
 
 	&:after { --i: 1 }
 
-	// --ang: 45deg;
-
-	// &:before, &:after {
-	// 	--strip-end: transparent;
-	// 	--strip-mid: var(--c0);
-	// 	--strip-stop: 10px;
-	// 	--strip-f: .4;
-	// 	background:
-	// 		repeating-linear-gradient(var(--strip-list)),
-	// 		repeating-linear-gradient(60deg, var(--strip-list)),
-	// 		repeating-linear-gradient(-60deg, var(--strip-list));
-	// 	--mask:
-	// 		conic-gradient(from calc((var(--i) - .75)*180deg),
-	// 				transparent, red, transparent 50%)
-  // }
-
-
-
-
-	// --d: 4em;
-
-	// &:before, &:after {
-	// 	--o: calc(50% - .5*var(--d));
-	// 	--strip-stop: calc(2*var(--d)/14.1);
-	// 	--strip-end: var(--c0);
-	// 	background:
-	// 		repeating-linear-gradient(calc(var(--sgni)*45deg),
-	// 			var(--strip-list));
-	// 	--mask:
-	// 		var(--fill),
-	// 		var(--joint-3), var(--joint-3),
-	// 		var(--joint-0), var(--joint-0);
-	// 	--mask-o: 50%, var(--o) var(--o);
-	// 	--mask-d: var(--d) var(--d);
-	// 	-webkit-mask-composite: xor;
-	// 					mask-composite: exclude
-	// }
-
-
-
-  // --d: 1em;
-	// --ang: 45deg;
-
-	// &:before, &:after {
-	// 	--o1: calc(50% + var(--sgni)*.25*var(--d));
-	// 	--o0: calc(50% - var(--sgni)*.25*var(--d));
-	// 	background:
-	// 		radial-gradient(circle, var(--c0) 35%, transparent 37%)
-	// 				var(--o0) var(--o0),
-	// 		radial-gradient(circle, var(--c1) 19%, transparent 21%)
-	// 				var(--o1) var(--o1);
-	// 	background-size: var(--d) var(--d);
-	// 	--strip-stop: calc(4*var(--d));
-	// 	--o: calc(var(--i)*var(--d));
-	// 	--mask:
-	// 		repeating-linear-gradient(var(--strip-list)),
-	// 		repeating-linear-gradient(90deg, var(--strip-list));
-	// 	--mask-o: 0 var(--o), var(--o);
-	// 	-webkit-mask-composite: xor;
-	// 					mask-composite: exclude
-	// }
-
-
-
-
-	// --d: 2em;
-	// background: conic-gradient($c0, $c1, $c0);
-
-	// &:before, &:after {
-	// 	background:
-	// 		linear-gradient(calc(var(--i)*180deg),
-	// 			var(--c0), var(--c1), var(--c0));
-	// 	--mask:
-	// 		linear-gradient(90deg, var(--joint-list));
-	// 	--mask-o: calc(50% + (var(--i) - .25)*.5*var(--d));
-	// 	--mask-d: var(--d)
-  // }
-
-
-
-
   --d: 8em;
 	--ang: 45deg;
 
@@ -191,27 +110,6 @@ main {
 						mask-composite: intersect
 	}
 
-
-
-
-
-
-	// --d: 4em;
-
-	// &:before, &:after {
-	// 	--strip-end: var(--c0);
-	// 	background:
-	// 		linear-gradient(calc(var(--sgni)*45deg),
-	// 			var(--strip-list)) 50%/ calc(.25*var(--d)) calc(.25*var(--d));
-	// 	--mask:
-	// 		linear-gradient(calc(-90deg - var(--sgni)*45deg),
-	// 				var(--joint-list)),
-	// 		linear-gradient(calc(90deg - var(--sgni)*45deg),
-	// 				var(--joint-list));
-	// 	--mask-o: 50%, 50% calc(50% - .5*var(--d));
-	// 	--mask-d: var(--d) var(--d);
-	// }
-
 }
 
 .noise-background {
@@ -225,4 +123,19 @@ main {
   // In case we want to put gradients instead of patterns
   // https://mycolor.space/gradient3?ori=circle&hex=%23000129&hex2=%23011538&hex3=%23002643&submit=submit
   // background-image: linear-gradient(to top, #000118, #04051e, #060924, #060e2a, #051130, #031332, #021534, #001736, #001835, #001933, #001a31, #001b2f);
+}
+
+footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  text-align: right;
+  padding: 15px 15px;
+  font-family: 'VT323', monospace;
+
+   a {
+    color: rgb(21, 163, 111);
+    text-decoration: none;
+   }
 }

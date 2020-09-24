@@ -14,6 +14,14 @@ import { bnOrZero, bn } from '@thorchain/asgardex-util';
 import { AssetBalance } from '../_classes/asset-balance';
 import { environment } from 'src/environments/environment';
 
+
+
+export interface MidgardData<T> {
+  key: string;
+  value: T;
+  link: string[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -53,25 +61,16 @@ export class UserService {
 
   async setMarkets() {
     const res: MarketResponse = await this.asgardexBncClient.getMarkets({});
-
     if (res.status === 200) {
-
       const markets = res.result.map( (dto) => new Market(dto) );
-      console.log('markets are: ', markets);
-
       this.marketsSource.next(markets);
     }
-
   }
 
   async getMarkets(): Promise<Market[]> {
     const res: MarketResponse = await this.asgardexBncClient.getMarkets({});
-
     if (res.status === 200) {
-
       const markets = res.result.map( (dto) => new Market(dto) );
-      console.log('markets are: ', markets);
-
       return markets;
     }
   }

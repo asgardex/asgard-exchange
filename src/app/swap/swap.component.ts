@@ -17,7 +17,6 @@ import {
   assetAmount,
   getValueOfAssetInRune,
   getValueOfRuneInAsset,
-  getValueOfAsset1InAsset2, getSwapFee, formatBN
 } from '@thorchain/asgardex-util';
 import BigNumber from 'bignumber.js';
 import { PoolDetail } from '../_classes/pool-detail';
@@ -27,7 +26,6 @@ import { BinanceService } from '../_services/binance.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmSwapModalComponent } from './confirm-swap-modal/confirm-swap-modal.component';
 import { User } from '../_classes/user';
-import { baseToToken, tokenAmount, TokenAmount } from '@thorchain/asgardex-token';
 
 export enum SwapType {
   DOUBLE_SWAP = 'double_swap',
@@ -181,9 +179,6 @@ export class SwapComponent implements OnInit, OnDestroy {
     this.getConstants();
     this.getBinanceFees();
     this.getPoolAddresses();
-
-    console.log('network is: ', environment.network);
-
   }
 
   /**
@@ -246,7 +241,8 @@ export class SwapComponent implements OnInit, OnDestroy {
           basePrice: this.basePrice,
           inputValue: this.sourceAssetUnit,
           outputValue: this.targetAssetUnit.div(10 ** 8),
-          user: this.user
+          user: this.user,
+          slip: this.slip
         }
       }
     );
@@ -380,14 +376,10 @@ export class SwapComponent implements OnInit, OnDestroy {
       const valueOfRuneInAsset = getValueOfRuneInAsset(assetToBase(assetAmount(1)), pool);
       const valueOfAssetInRune = getValueOfAssetInRune(assetToBase(assetAmount(1)), pool);
 
-      console.log('valueOfRuneInAsset is: ', valueOfRuneInAsset.amount().toNumber());
-      console.log('valueOfAssetInRune is: ', valueOfAssetInRune.amount().toNumber());
-
       const basePrice = (toRune)
         ? valueOfRuneInAsset
         : valueOfAssetInRune;
       this.basePrice = basePrice.amount().div(10 ** 8).toNumber();
-      console.log('base price is: ', this.basePrice);
 
       /**
        * Slip percentage using original input
@@ -395,16 +387,10 @@ export class SwapComponent implements OnInit, OnDestroy {
       const slip = getSwapSlip(this._sourceAssetTokenValue, pool, toRune);
       this.slip = slip.toNumber();
 
-      console.log('source is: ', this._sourceAssetTokenValue.amount().toNumber());
-      console.log('to rune is: ', toRune);
-
       /**
        * Total output amount in target units minus 1 RUNE
        */
       const totalAmount = getSwapOutput(baseAmount(this._sourceAssetTokenValue.amount()), pool, toRune);
-
-      console.log('total amount is: ', totalAmount.amount().toNumber());
-      console.log('basePrice is: ', basePrice.amount().toNumber());
 
       const total = totalAmount.amount().minus(toRune ? valueOfAssetInRune.amount() : valueOfRuneInAsset.amount());
 

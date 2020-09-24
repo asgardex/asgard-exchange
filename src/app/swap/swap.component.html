@@ -37,6 +37,11 @@
       <span>{{basePrice | number:"1.2-6"}}  {{selectedSourceAsset.ticker}} per {{selectedTargetAsset.ticker}}</span>
     </div>
 
+    <!-- <div *ngIf="slip && selectedTargetAsset && selectedSourceAsset" class="flxr flxr--just-space-between base-price">
+      <span>Slip:</span>
+      <span>{{slip | percent:"1.2-6"}}</span>
+    </div> -->
+
     <div>
       <button
         (click)="openConfirmationDialog()"

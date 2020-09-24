@@ -1,21 +1,4 @@
-// Inter Font
-@import url('https://rsms.me/inter/inter.css');
-@supports (font-variation-settings: normal) {
-  html {
-    font-family: 'Inter var', sans-serif;
-    font-feature-settings: "ss01", "ss02", "cv01", "cv03";
-  }
-}
-
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond&display=swap');
-
-// @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
-
-@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@500&family=VT323&display=swap');
-
-@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500&display=swap');
-
-@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=PT+Mono&family=Roboto+Mono:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=VT323&display=swap');
 
 // Custom Theming for Angular Material
 // For more information: https://material.angular.io/guide/theming
@@ -94,15 +77,6 @@ body {
   padding: 0;
 }
 
-// body {
-//   width: 100vw;
-//   min-height: 100vh;
-//   background-position: 0px -30vh;
-//   background-repeat: no-repeat;
-//   background-image: radial-gradient(50% 50% at 50% 50%, rgba(33, 114, 229, 0.1) 0%, rgba(33, 36, 41, 0) 100%);
-//   color: white;
-// }
-
 body {
   width: 100vw;
   min-height: 100vh;
@@ -128,13 +102,6 @@ button {
   background: none;
   outline: none;
   cursor: pointer;
-
-  // &:disabled {
-  //   .to-btn-icon {
-  //     color: rgb(86, 90, 105);
-  //   }
-  // }
-
 }
 
 .to-btn-icon {
@@ -198,7 +165,6 @@ button {
 
 .uni-input {
   outline: none;
-  // border: 2px dashed rgba(255, 255, 255, 0.05);
   border-radius: 8px;
   display: flex;
   -webkit-box-align: center;
