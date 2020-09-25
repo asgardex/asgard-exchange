@@ -8,89 +8,91 @@
     <div style="width: 40px"></div>
   </div>
 
+  <div style="position: relative;">
+    <div class="uni-input">
 
-  <div class="uni-input">
+      <span>Amount</span>
 
-    <span>Amount</span>
+      <span class="unstake-percent">{{unstakePercent}}%</span>
 
-    <span class="unstake-percent">{{unstakePercent}}%</span>
+      <mat-slider
+        class="slider"
+        [disabled]="!user"
+        [max]="100"
+        [min]="0"
+        step="1"
+        [tickInterval]="25"
+        [(ngModel)]="unstakePercent">
+      </mat-slider>
 
-    <mat-slider
-      class="slider"
-      [disabled]="!user"
-      [max]="100"
-      [min]="0"
-      step="1"
-      [tickInterval]="25"
-      [(ngModel)]="unstakePercent">
-    </mat-slider>
+    </div>
 
-  </div>
+    <div class="flxr flxr--align-center flxr--just-center">
+      <button [disabled]="true">
+        <mat-icon [class.disabled]="true" class="to-btn-icon">arrow_downward</mat-icon>
+      </button>
+    </div>
 
-  <div class="flxr flxr--align-center flxr--just-center">
-    <button [disabled]="true">
-      <mat-icon [class.disabled]="true" class="to-btn-icon">arrow_downward</mat-icon>
+    <div class="uni-input">
+
+      <div *ngIf="asset" class="unstake-calc flxr flxr--just-space-between">
+        <span *ngIf="removeAssetAmount">{{removeAssetAmount | number:"0.0-6"}}</span>
+        <span *ngIf="!removeAssetAmount">-</span>
+
+        <div class="flxr flxr--align-center">
+          <!-- TODO this is reused in pool component -->
+          <div style="margin-right: 8px;" class="asset-icon-container flxr flxr--align-center">
+            <img *ngIf="asset.iconPath" [src]="asset.iconPath" />
+            <mat-icon *ngIf="!asset.iconPath">help_outline</mat-icon>
+          </div>
+          <span style="font-size: 20px">{{asset.ticker}}</span>
+        </div>
+
+      </div>
+
+      <div class="unstake-calc flxr flxr--just-space-between">
+        <span *ngIf="removeRuneAmount">{{removeRuneAmount | number:"0.0-6"}}</span>
+        <span *ngIf="!removeRuneAmount">-</span>
+
+        <div class="flxr flxr--align-center">
+          <!-- TODO this is reused in pool component -->
+          <div *ngIf="rune" style="margin-right: 8px;" class="asset-icon-container flxr flxr--align-center">
+            <img *ngIf="rune.iconPath" [src]="rune.iconPath" />
+            <mat-icon *ngIf="!rune.iconPath">help_outline</mat-icon>
+          </div>
+          <span style="font-size: 20px">{{rune.ticker}}</span>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div *ngIf="asset" style="padding: 10px 20px;" class="prices">
+      <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
+        <span>Prices</span>
+        <span>1 {{rune.ticker}} = {{assetBasePrice | number:"1.2-4"}} {{asset.ticker}}</span>
+      </div>
+
+      <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
+        <span class="tx-detail-label"></span>
+        <span>1 {{asset.ticker}} = {{runeBasePrice | number:"1.2-4"}} {{rune.ticker}}</span>
+      </div>
+    </div>
+
+    <button
+      (click)="openConfirmationDialog()"
+      class="main-action-btn"
+      mat-flat-button
+      color="primary"
+      [disabled]="!user || !removeAssetAmount || (removeAssetAmount && removeAssetAmount <= 0 || remainingTime)"
+    >
+      <span *ngIf="!user">Please connect wallet</span>
+      <span *ngIf="user && remainingTime">Withdraw Enabled in {{remainingTime}}</span>
+      <span *ngIf="user && !remainingTime && !removeAssetAmount || (removeAssetAmount && removeAssetAmount <= 0)">Enter an amount</span>
+      <span *ngIf="user && !remainingTime && removeAssetAmount && removeAssetAmount > 0">Unstake</span>
     </button>
-  </div>
-
-  <div class="uni-input">
-
-    <div *ngIf="asset" class="unstake-calc flxr flxr--just-space-between">
-      <span *ngIf="removeAssetAmount">{{removeAssetAmount | number:"0.0-6"}}</span>
-      <span *ngIf="!removeAssetAmount">-</span>
-
-      <div class="flxr flxr--align-center">
-        <!-- TODO this is reused in pool component -->
-        <div style="margin-right: 8px;" class="asset-icon-container flxr flxr--align-center">
-          <img *ngIf="asset.iconPath" [src]="asset.iconPath" />
-          <mat-icon *ngIf="!asset.iconPath">help_outline</mat-icon>
-        </div>
-        <span style="font-size: 20px">{{asset.ticker}}</span>
-      </div>
-
-    </div>
-
-    <div class="unstake-calc flxr flxr--just-space-between">
-      <span *ngIf="removeRuneAmount">{{removeRuneAmount | number:"0.0-6"}}</span>
-      <span *ngIf="!removeRuneAmount">-</span>
-
-      <div class="flxr flxr--align-center">
-        <!-- TODO this is reused in pool component -->
-        <div *ngIf="rune" style="margin-right: 8px;" class="asset-icon-container flxr flxr--align-center">
-          <img *ngIf="rune.iconPath" [src]="rune.iconPath" />
-          <mat-icon *ngIf="!rune.iconPath">help_outline</mat-icon>
-        </div>
-        <span style="font-size: 20px">{{rune.ticker}}</span>
-      </div>
-
-    </div>
 
   </div>
-
-  <div *ngIf="asset" style="padding: 10px 20px;" class="prices">
-    <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
-      <span>Prices</span>
-      <span>1 {{rune.ticker}} = {{assetBasePrice | number:"1.2-4"}} {{asset.ticker}}</span>
-    </div>
-
-    <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
-      <span class="tx-detail-label"></span>
-      <span>1 {{asset.ticker}} = {{runeBasePrice | number:"1.2-4"}} {{rune.ticker}}</span>
-    </div>
-  </div>
-
-  <button
-    (click)="openConfirmationDialog()"
-    class="main-action-btn"
-    mat-flat-button
-    color="primary"
-    [disabled]="!user || !removeAssetAmount || (removeAssetAmount && removeAssetAmount <= 0 || remainingTime)"
-  >
-    <span *ngIf="!user">Please connect wallet</span>
-    <span *ngIf="user && remainingTime">Withdraw Enabled in {{remainingTime}}</span>
-    <span *ngIf="user && !remainingTime && !removeAssetAmount || (removeAssetAmount && removeAssetAmount <= 0)">Enter an amount</span>
-    <span *ngIf="user && !remainingTime && removeAssetAmount && removeAssetAmount > 0">Unstake</span>
-  </button>
 
 </div>
 

@@ -402,9 +402,16 @@ main {
     padding: 1.2rem 2rem 2rem 2rem;
     min-height: 400px;
     width: 100%;
-    max-width: 450px;
+    max-width: 420px;
     display: flex;
     flex-flow: column;
+    // width: 450px;
+
+    @media (min-width: 768px) {
+      // width: 100%;
+      // max-width: 450px;
+      width: 450px;
+    }
 
     // This box shadow doesn't do much on dark background
     // box-shadow: rgba(0, 0, 0, 0.01) 0px 0px 1px, rgba(0, 0, 0, 0.04) 0px 4px 8px, rgba(0, 0, 0, 0.04) 0px 16px 24px, rgba(0, 0, 0, 0.01) 0px 24px 32px;
