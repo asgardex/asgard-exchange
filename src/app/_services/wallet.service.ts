@@ -77,11 +77,14 @@ export class WalletService {
 
       const accounts = await this.walletConnector.getAccounts();
       const bnbAccount = accounts.find( (account) => account.network === 714 );
-      console.log('accoutns are: ', accounts);
 
-      const user = new User({type: 'walletconnect', wallet: bnbAccount.address});
+      if (bnbAccount) {
+        console.log('accoutns are: ', accounts);
 
-      this.userService.setUser(user);
+        const user = new User({type: 'walletconnect', wallet: bnbAccount.address});
+
+        this.userService.setUser(user);
+      }
 
       // Get provided accounts and chainId
       // const { accounts, chainId } = payload.params[0];
