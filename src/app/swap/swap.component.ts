@@ -233,8 +233,7 @@ export class SwapComponent implements OnInit, OnDestroy {
     const dialogRef = this.dialog.open(
       ConfirmSwapModalComponent,
       {
-        width: '50vw',
-        maxWidth: '420px',
+        minWidth: '260px',
         data: {
           sourceAsset: this.selectedSourceAsset,
           targetAsset: this.selectedTargetAsset,

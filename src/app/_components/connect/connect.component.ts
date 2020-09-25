@@ -88,8 +88,9 @@ export class ConnectComponent implements OnInit, OnDestroy {
     this.dialog.open(
       ConnectModal,
       {
-        width: '50vw',
-        maxWidth: '420px'
+        // width: '50vw',
+        // maxWidth: '420px'
+        minWidth: '260px'
       }
     );
   }

@@ -188,8 +188,9 @@ export class UnstakeComponent implements OnInit {
     const dialogRef = this.dialog.open(
       ConfirmUnstakeModalComponent,
       {
-        width: '50vw',
-        maxWidth: '420px',
+        // width: '50vw',
+        // maxWidth: '420px',
+        minWidth: '260px',
         data: {
           asset: this.asset,
           rune: this.rune,
