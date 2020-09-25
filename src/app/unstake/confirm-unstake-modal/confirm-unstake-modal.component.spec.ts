@@ -26,7 +26,7 @@ describe('ConfirmUnstakeModalComponent', () => {
             unstakePercent: 0
           }
         },
-        { provide: MatDialogRef, useValue:{ close: (dialogResult: any) => { } } }
+        { provide: MatDialogRef, useValue: { close: (dialogResult: any) => { } } }
       ],
       imports: [
         HttpClientTestingModule,
