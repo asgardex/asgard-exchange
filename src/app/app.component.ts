@@ -14,7 +14,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
   killPolling: Subject<void> = new Subject();
   subs: Subscription[];
-  // lastBlock: number;
 
   constructor(private midgardService: MidgardService, private lastBlockService: LastBlockService) {
     this.subs = [];
