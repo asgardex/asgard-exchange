@@ -26,7 +26,7 @@ describe('ConfirmSwapModalComponent', () => {
             slip: .03
           }
         },
-        { provide: MatDialogRef, useValue: {} }
+        { provide: MatDialogRef, useValue: { close: (dialogResult: any) => { } } }
       ],
       imports: [HttpClientTestingModule]
     })
