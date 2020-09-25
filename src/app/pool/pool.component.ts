@@ -20,6 +20,7 @@ export class PoolComponent implements OnInit, OnDestroy {
     [key: string]: PoolDetail
   };
   pools: string[];
+  userPoolError: boolean;
 
   constructor(private userService: UserService, private midgardService: MidgardService) {
 
@@ -51,6 +52,8 @@ export class PoolComponent implements OnInit, OnDestroy {
 
   getAccountPools() {
 
+    this.userPoolError = false;
+
     if (this.user) {
       this.midgardService.getStaker(this.user.wallet).subscribe(
         (res) => {
@@ -62,8 +65,12 @@ export class PoolComponent implements OnInit, OnDestroy {
             this.stakedPools = [];
             this.poolDetailIndex = {};
           }
+
         },
-        (err) => console.error('error fetching account pools: ', err)
+        (err) => {
+          console.error('error fetching account pools: ', err);
+          this.userPoolError = true;
+        }
       );
     }
 
@@ -82,7 +89,10 @@ export class PoolComponent implements OnInit, OnDestroy {
         console.log('pool detail index is: ', this.poolDetailIndex);
 
       },
-      (err) => console.error('error fetching pool data: ', err)
+      (err) => {
+        console.error('error fetching pool data: ', err);
+        this.userPoolError = true;
+      }
     );
   }
 
@@ -90,11 +100,16 @@ export class PoolComponent implements OnInit, OnDestroy {
 
     if (this.user) {
 
+      this.stakedPools = null;
+
       this.midgardService.getStakerPoolData(this.user.wallet, assets).subscribe(
         (res) => {
           this.stakedPools = res.map( (dto) => new StakerPoolData(dto) );
         },
-        (err) => console.error('error fetching pool staker data: ', err)
+        (err) => {
+          console.error('error fetching pool staker data: ', err);
+          this.userPoolError = true;
+        }
       );
 
     }

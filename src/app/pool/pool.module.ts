@@ -6,6 +6,7 @@ import { StakedPoolsListComponent } from './staked-pools-list/staked-pools-list.
 import { StakedPoolListItemComponent } from './staked-pool-list-item/staked-pool-list-item.component';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 
 
@@ -15,6 +16,7 @@ import { MatButtonModule } from '@angular/material/button';
     CommonModule,
     MatButtonModule,
     MatIconModule,
+    MatProgressSpinnerModule,
     RouterModule.forChild([
       {
         path: '',

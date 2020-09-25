@@ -19,4 +19,18 @@
 
   <app-staked-pools-list *ngIf="user && stakedPools && poolDetailIndex" [stakedPools]="stakedPools" [poolsData]="poolDetailIndex"></app-staked-pools-list>
 
+  <br *ngIf="user && !stakedPools" />
+
+  <div style="float: left; width: 100%; height: 140px" class="flxr flxr--just-center flxr--align-center" *ngIf="user && (!stakedPools || !poolDetailIndex)">
+    <div *ngIf="!userPoolError">
+      <mat-progress-spinner color="primary" mode="indeterminate" diameter="30"></mat-progress-spinner>
+    </div>
+
+    <div style="font-size: 0.8rem" class="flxr flxr--flow-col flxr--align-center" *ngIf="userPoolError">
+      <mat-icon>warning</mat-icon>
+      Error fetching user pools
+    </div>
+
+  </div>
+
 </div>
