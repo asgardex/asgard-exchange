@@ -7,6 +7,7 @@ import { environment } from 'src/environments/environment';
 import { Asset } from '../_classes/asset';
 import { StakerPoolData } from '../_classes/staker-pool-data';
 import { User } from '../_classes/user';
+import { LastBlockService } from '../_services/last-block.service';
 import { MidgardService } from '../_services/midgard.service';
 import { UserService } from '../_services/user.service';
 import { ConfirmUnstakeModalComponent } from './confirm-unstake-modal/confirm-unstake-modal.component';
@@ -53,6 +54,7 @@ export class UnstakeComponent implements OnInit {
     private dialog: MatDialog,
     private route: ActivatedRoute,
     private userService: UserService,
+    private lastBlockService: LastBlockService,
     private midgardService: MidgardService
   ) {
 
@@ -62,7 +64,6 @@ export class UnstakeComponent implements OnInit {
 
     const user$ = this.userService.user$.subscribe(
       (user) => {
-        console.log('user HIT');
         this.user = user;
         this.getAccountStaked();
         if (this.assetPoolData) {
@@ -71,7 +72,12 @@ export class UnstakeComponent implements OnInit {
       }
     );
 
-    this.subs = [user$];
+    const lastBlock$ = this.lastBlockService.lastBlock$.subscribe( (block) => {
+      this.lastBlock = block;
+      this.checkCooldown();
+    });
+
+    this.subs = [user$, lastBlock$];
   }
 
   ngOnInit(): void {
@@ -143,40 +149,34 @@ export class UnstakeComponent implements OnInit {
     this.midgardService.getConstants().subscribe(
       (res) => {
         this.lockBlocks = res.int_64_values.StakeLockUpBlocks;
-        // this.checkCooldown();
-        this.getLastBlock();
+        this.checkCooldown();
         console.log('res is: ', res);
       },
       (err) => console.error('error fetching constants: ', err)
     );
   }
 
-  getLastBlock() {
-    this.midgardService.getLastBlock().subscribe(
-      (res) => {
-        this.lastBlock = res.thorchain;
-        this.checkCooldown();
-      },
-      (err) => console.error('error fetching last block: ', err)
-    );
-  }
-
   checkCooldown() {
-        const heightLastStaked = this.heightLastStaked;
-        const currentBlockHeight = this.lastBlock;
-        const stakeLockUpBlocks = this.lockBlocks;
-        const totalBlocksToUnlock = heightLastStaked + stakeLockUpBlocks;
-        const remainingBlocks = totalBlocksToUnlock - currentBlockHeight;
-        const withdrawDisabled = remainingBlocks > 0;
 
-        if (withdrawDisabled) {
-          const remainingSeconds = remainingBlocks * 5;
-          const remainingHours =
-            (remainingSeconds - (remainingSeconds % 3600)) / 3600;
-          const remainingMinutes =
-            ((remainingSeconds % 3600) - (remainingSeconds % 60)) / 60;
-          this.remainingTime = `${remainingHours} Hours ${remainingMinutes} Minutes`;
-        }
+    if (this.heightLastStaked && this.lastBlock && this.lockBlocks) {
+
+      const heightLastStaked = this.heightLastStaked;
+      const currentBlockHeight = this.lastBlock;
+      const stakeLockUpBlocks = this.lockBlocks;
+      const totalBlocksToUnlock = heightLastStaked + stakeLockUpBlocks;
+      const remainingBlocks = totalBlocksToUnlock - currentBlockHeight;
+      const withdrawDisabled = remainingBlocks > 0;
+
+      if (withdrawDisabled) {
+        const remainingSeconds = remainingBlocks * 5;
+        const remainingHours =
+          (remainingSeconds - (remainingSeconds % 3600)) / 3600;
+        const remainingMinutes =
+          ((remainingSeconds % 3600) - (remainingSeconds % 60)) / 60;
+        this.remainingTime = `${remainingHours} Hours ${remainingMinutes} Minutes`;
+      }
+
+    }
 
   }
 

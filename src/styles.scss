@@ -342,6 +342,10 @@ input[type=number] {
     justify-content: space-between;
   }
 
+  &--just-end {
+    justify-content: flex-end;
+  }
+
   &--align-center {
     align-items: center;
   }

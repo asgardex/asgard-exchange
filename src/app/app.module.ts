@@ -15,8 +15,9 @@ import { AppRoutingModule } from './app-routing.module';
 
 /** SERVICES */
 import { BinanceService } from './_services/binance.service';
-import { UserService } from './_services/user.service';
+import { LastBlockService } from './_services/last-block.service';
 import { MidgardService } from './_services/midgard.service';
+import { UserService } from './_services/user.service';
 import { WalletService } from './_services/wallet.service';
 
 /** MATERIAL */
@@ -25,6 +26,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ConnectErrorComponent } from './_components/connect/connect-error/connect-error.component';
+import { LastBlockIndicatorComponent } from './_components/last-block-indicator/last-block-indicator.component';
 
 
 @NgModule({
@@ -35,6 +37,7 @@ import { ConnectErrorComponent } from './_components/connect/connect-error/conne
     ConnectModal,
     KeystoreConnectComponent,
     ConnectErrorComponent,
+    LastBlockIndicatorComponent,
   ],
   imports: [
     BrowserModule,
@@ -47,7 +50,7 @@ import { ConnectErrorComponent } from './_components/connect/connect-error/conne
     MatProgressSpinnerModule,
     AppRoutingModule,
   ],
-  providers: [BinanceService, UserService, MidgardService, WalletService],
+  providers: [BinanceService, UserService, MidgardService, LastBlockService, WalletService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

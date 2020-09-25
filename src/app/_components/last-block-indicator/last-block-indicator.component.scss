@@ -1,0 +1,47 @@
+#indicator-container {
+
+  position: relative;
+
+  #last-block-indicator {
+    position: relative;
+    display: block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-left: 8px;
+    background-color: rgb(21, 163, 111);
+  }
+
+  .spin::before {
+    // animation: 1s linear infinite spinner;
+    animation: 1s cubic-bezier(0.455, 0.03, 0.515, 0.955) spinner;
+    animation-play-state: inherit;
+    border: solid 2px transparent;
+    border-bottom-color: rgb(21, 163, 111);
+    border-radius: 50%;
+    content: "";
+    height: 12px;
+    position: absolute;
+    top: 4px;
+    left: 12px;
+    transform: translate3d(-50%, -50%, 0);
+    width: 12px;
+    will-change: transform;
+  }
+
+}
+
+
+span {
+  color: rgba(255, 255, 255, 0.4)
+}
+
+@keyframes spinner {
+  0% {
+    transform: translate3d(-50%, -50%, 0) rotate(0deg);
+  }
+  100% {
+    transform: translate3d(-50%, -50%, 0) rotate(360deg);
+  }
+}
+
