@@ -204,8 +204,10 @@ export class StakeComponent implements OnInit, OnDestroy {
     const dialogRef = this.dialog.open(
       ConfirmStakeModalComponent,
       {
-        width: '50vw',
-        maxWidth: '420px',
+        // width: '50vw',
+        // maxWidth: '420px',
+        minWidth: '260px',
+        // width: '50vw',
         data: {
           asset: this.asset,
           rune: this.rune,

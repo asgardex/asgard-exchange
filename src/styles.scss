@@ -390,17 +390,21 @@ main {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding-top: 100px;
-  padding-bottom: 100px;
+  padding: 45px 15px;
   min-height: calc(100vh - 98px);
+
+  @media (min-width: 768px) {
+    padding: 100px 15px;
+  }
 
   .container {
     background: rgba(22,25,27, 1);
     padding: 1.2rem 2rem 2rem 2rem;
     min-height: 400px;
-    // width: 100%;
-    // max-width: 450px;
-    width: 450px;
+    width: 100%;
+    max-width: 450px;
+    display: flex;
+    flex-flow: column;
 
     // This box shadow doesn't do much on dark background
     // box-shadow: rgba(0, 0, 0, 0.01) 0px 0px 1px, rgba(0, 0, 0, 0.04) 0px 4px 8px, rgba(0, 0, 0, 0.04) 0px 16px 24px, rgba(0, 0, 0, 0.01) 0px 24px 32px;
