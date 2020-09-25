@@ -1,6 +1,8 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SwapComponent } from './swap.component';
+import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('SwapComponent', () => {
   let component: SwapComponent;
@@ -8,7 +10,11 @@ describe('SwapComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ SwapComponent ]
+      declarations: [ SwapComponent ],
+      providers: [
+        { provide: MAT_DIALOG_DATA, useValue: {} },
+      ],
+      imports: [ MatDialogModule, HttpClientTestingModule ]
     })
     .compileComponents();
   }));

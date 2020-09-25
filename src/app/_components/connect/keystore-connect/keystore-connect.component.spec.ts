@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { KeystoreConnectComponent } from './keystore-connect.component';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('KeystoreConnectComponent', () => {
   let component: KeystoreConnectComponent;
@@ -8,7 +9,8 @@ describe('KeystoreConnectComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ KeystoreConnectComponent ]
+      declarations: [ KeystoreConnectComponent ],
+      imports: [ HttpClientTestingModule ]
     })
     .compileComponents();
   });

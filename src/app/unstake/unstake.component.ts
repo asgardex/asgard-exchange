@@ -89,7 +89,7 @@ export class UnstakeComponent implements OnInit {
       if (asset) {
 
         this.asset = new Asset(asset);
-        console.log('the asset is: ', this.asset);
+
         this.getPoolDetail(asset);
         this.getAccountStaked();
 

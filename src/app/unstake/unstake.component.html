@@ -35,7 +35,7 @@
 
   <div class="uni-input">
 
-    <div class="unstake-calc flxr flxr--just-space-between">
+    <div *ngIf="asset" class="unstake-calc flxr flxr--just-space-between">
       <span *ngIf="removeAssetAmount">{{removeAssetAmount | number:"0.0-6"}}</span>
       <span *ngIf="!removeAssetAmount">-</span>
 
@@ -56,7 +56,7 @@
 
       <div class="flxr flxr--align-center">
         <!-- TODO this is reused in pool component -->
-        <div style="margin-right: 8px;" class="asset-icon-container flxr flxr--align-center">
+        <div *ngIf="rune" style="margin-right: 8px;" class="asset-icon-container flxr flxr--align-center">
           <img *ngIf="rune.iconPath" [src]="rune.iconPath" />
           <mat-icon *ngIf="!rune.iconPath">help_outline</mat-icon>
         </div>
@@ -67,7 +67,7 @@
 
   </div>
 
-  <div style="padding: 10px 20px;" class="prices">
+  <div *ngIf="asset" style="padding: 10px 20px;" class="prices">
     <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
       <span>Prices</span>
       <span>1 {{rune.ticker}} = {{assetBasePrice | number:"1.2-4"}} {{asset.ticker}}</span>

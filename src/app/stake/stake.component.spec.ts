@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { RouterTestingModule } from '@angular/router/testing';
 import { StakeComponent } from './stake.component';
+import { MatDialogModule } from '@angular/material/dialog';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('StakeComponent', () => {
   let component: StakeComponent;
@@ -8,7 +10,8 @@ describe('StakeComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ StakeComponent ]
+      declarations: [ StakeComponent ],
+      imports: [ MatDialogModule, RouterTestingModule, HttpClientTestingModule ]
     })
     .compileComponents();
   });
