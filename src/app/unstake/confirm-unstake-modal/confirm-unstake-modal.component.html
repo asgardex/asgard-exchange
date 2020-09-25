@@ -1,92 +1,97 @@
-<div *ngIf="txState == 'PENDING_CONFIRMATION'">
+<div *ngIf="data">
 
-  <div class="modal-head confirm-modal-head">
-    <h1 mat-dialog-title>Confirm Withdrawal</h1>
+  <div *ngIf="txState == 'PENDING_CONFIRMATION'">
 
-    <div class="flxr flxr--just-space-between transaction-detail">
+    <div class="modal-head confirm-modal-head">
+      <h1 mat-dialog-title>Confirm Withdrawal</h1>
 
-      <div class="flxr flxr--align-center">
-        <div style="margin-right: 12px;" class="asset-icon-container flxr flxr--align-center">
-          <img *ngIf="data.asset.iconPath" [src]="data.asset.iconPath" />
-          <mat-icon *ngIf="!data.asset.iconPath">help_outline</mat-icon>
+      <div class="flxr flxr--just-space-between transaction-detail">
+
+        <div class="flxr flxr--align-center">
+          <div style="margin-right: 12px;" class="asset-icon-container flxr flxr--align-center">
+            <img *ngIf="data.asset && data.asset.iconPath" [src]="data.asset.iconPath" />
+            <mat-icon *ngIf="!data.asset || !data.asset.iconPath">help_outline</mat-icon>
+          </div>
+          <span style="margin-right: 8px; font-size: 20px">{{data.assetAmount}}</span>
         </div>
-        <span style="margin-right: 8px; font-size: 20px">{{data.assetAmount}}</span>
+
+        <span>{{data.asset.ticker}}</span>
       </div>
 
-      <span>{{data.asset.ticker}}</span>
-    </div>
-
-    <div class="flxr">
-      <mat-icon style="margin-left: 4px; margin-bottom: 12px;" class="to-btn-icon disabled">add</mat-icon>
-    </div>
-
-    <div class="flxr flxr--just-space-between transaction-detail">
-
-      <div class="flxr flxr--align-center">
-        <div style="margin-right: 12px;" class="asset-icon-container flxr flxr--align-center">
-          <img *ngIf="data.rune.iconPath" [src]="data.rune.iconPath" />
-          <mat-icon *ngIf="!data.rune.iconPath">help_outline</mat-icon>
-        </div>
-        <span style="margin-right: 8px; font-size: 20px">{{data.runeAmount}}</span>
+      <div class="flxr">
+        <mat-icon style="margin-left: 4px; margin-bottom: 12px;" class="to-btn-icon disabled">add</mat-icon>
       </div>
 
+      <div class="flxr flxr--just-space-between transaction-detail">
 
-      <span>{{data.rune.ticker}}</span>
+        <div class="flxr flxr--align-center">
+          <div style="margin-right: 12px;" class="asset-icon-container flxr flxr--align-center">
+            <img *ngIf="data.rune && data.rune.iconPath" [src]="data.rune.iconPath" />
+            <mat-icon *ngIf="!data.rune || !data.rune.iconPath">help_outline</mat-icon>
+          </div>
+          <span style="margin-right: 8px; font-size: 20px">{{data.runeAmount}}</span>
+        </div>
+
+
+        <span *ngIf="data.rune">{{data.rune.ticker}}</span>
+
+      </div>
+
+      <span style="font-style: italic; font-size: 12px; color: rgb(195, 197, 203)">Output is estimated.</span>
 
     </div>
 
-    <span style="font-style: italic; font-size: 12px; color: rgb(195, 197, 203)">Output is estimated.</span>
+    <div>
+      <div mat-dialog-content class="confirm-modal-content">
+
+        <div>
+
+          <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
+            <span class="tx-detail-label">Rates</span>
+            <span>1 {{data.rune.ticker}} = {{data.assetBasePrice | number:"1.2-4"}} {{data.asset.ticker}}</span>
+          </div>
+
+          <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
+            <span class="tx-detail-label"></span>
+            <span>1 {{data.asset.ticker}} = {{data.runeBasePrice | number:"1.2-4"}} {{data.rune.ticker}}</span>
+          </div>
+
+          <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
+            <span class="tx-detail-label">BNB Fee</span>
+            <span>0.0003</span>
+          </div>
+
+          <!-- <div class="flxr flxr--just-space-between">
+            <span class="tx-detail-label">Slip</span>
+            <span>{{swapData | number:"0.04" | percent}}</span>
+          </div> -->
+        </div>
+
+        <button (click)="submitTransaction()" mat-flat-button color="primary" class="main-action-btn">Confirm Unstake</button>
+
+      </div>
+
+      <!-- close dialog -->
+      <div mat-dialog-actions class="dialog-actions">
+        <button mat-icon-button aria-label="Close Markets Dialog" (click)="closeDialog()" mat-dialog-close>
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    </div>
 
   </div>
 
-  <div>
-    <div mat-dialog-content class="confirm-modal-content">
+  <app-transaction-processing-modal
+    *ngIf="txState == 'SUBMITTING'"
+    transactionDetail="Staking {{data.assetAmount}} {{data.asset.ticker}} + {{data.runeAmount}} {{data.rune.ticker}}"
+    (closeDialog)="closeDialog()">
+  </app-transaction-processing-modal>
 
-      <div>
-
-        <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
-          <span class="tx-detail-label">Rates</span>
-          <span>1 {{data.rune.ticker}} = {{data.assetBasePrice | number:"1.2-4"}} {{data.asset.ticker}}</span>
-        </div>
-
-        <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
-          <span class="tx-detail-label"></span>
-          <span>1 {{data.asset.ticker}} = {{data.runeBasePrice | number:"1.2-4"}} {{data.rune.ticker}}</span>
-        </div>
-
-        <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
-          <span class="tx-detail-label">BNB Fee</span>
-          <span>0.0003</span>
-        </div>
-
-        <!-- <div class="flxr flxr--just-space-between">
-          <span class="tx-detail-label">Slip</span>
-          <span>{{swapData | number:"0.04" | percent}}</span>
-        </div> -->
-      </div>
-
-      <button (click)="submitTransaction()" mat-flat-button color="primary" class="main-action-btn">Confirm Unstake</button>
-
-    </div>
-
-    <!-- close dialog -->
-    <div mat-dialog-actions class="dialog-actions">
-      <button mat-icon-button aria-label="Close Markets Dialog" (click)="closeDialog()" mat-dialog-close>
-        <mat-icon>close</mat-icon>
-      </button>
-    </div>
-  </div>
+  <app-transaction-success-modal
+    *ngIf="txState === 'SUCCESS'"
+    [hash]="hash"
+    (closeDialog)="closeDialog(true)">
+  </app-transaction-success-modal>
 
 </div>
 
-<app-transaction-processing-modal
-  *ngIf="txState == 'SUBMITTING'"
-  transactionDetail="Staking {{data.assetAmount}} {{data.asset.ticker}} + {{data.runeAmount}} {{data.rune.ticker}}"
-  (closeDialog)="closeDialog()">
-</app-transaction-processing-modal>
-
-<app-transaction-success-modal
-  *ngIf="txState === 'SUCCESS'"
-  [hash]="hash"
-  (closeDialog)="closeDialog(true)">
-</app-transaction-success-modal>
