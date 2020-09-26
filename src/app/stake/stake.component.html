@@ -8,43 +8,67 @@
     <div style="width: 40px"></div>
   </div>
 
-  <app-asset-input
-    label="Input"
-    [(selectedAsset)]="asset"
-    [(assetUnit)]="assetAmount"
-    [balance]="assetBalance"
-    [disabledAssetSymbol]="rune.symbol">
-  </app-asset-input>
+  <div style="position: relative;">
 
-  <div class="flxr flxr--align-center flxr--just-center">
-    <button [disabled]="true">
-      <mat-icon [class.disabled]="true" class="to-btn-icon">add</mat-icon>
+
+    <app-asset-input
+      label="Input"
+      [(selectedAsset)]="asset"
+      [(assetUnit)]="assetAmount"
+      [balance]="assetBalance"
+      [disabledAssetSymbol]="rune.symbol">
+    </app-asset-input>
+
+    <div class="flxr flxr--align-center flxr--just-center">
+      <button [disabled]="true">
+        <mat-icon [class.disabled]="true" class="to-btn-icon">add</mat-icon>
+      </button>
+    </div>
+
+    <app-asset-input
+      label="Input"
+      [(selectedAsset)]="rune"
+      [(assetUnit)]="runeAmount"
+      [balance]="runeBalance"
+      [hideMax]="true"
+      [disableInput]="true"
+      [disabledAssetSymbol]="rune.symbol"
+      [disabledMarketSelect]="true">
+    </app-asset-input>
+
+    <button
+      (click)="openConfirmationDialog()"
+      class="main-action-btn"
+      mat-flat-button
+      color="primary"
+      [disabled]="!balances || !runeAmount || !assetAmount || (balances && (runeAmount > runeBalance || assetAmount > assetBalance))"
+    >
+      <span *ngIf="!balances">Please connect wallet</span>
+      <span *ngIf="balances && (!runeAmount || !assetAmount)">Enter an amount</span>
+      <span *ngIf="balances && (runeAmount > runeBalance || assetAmount > assetBalance)">Insufficient balance</span>
+      <span *ngIf="balances && runeAmount && assetAmount && (runeAmount <= runeBalance) && (assetAmount <= assetBalance)">Supply</span>
     </button>
+
+    <div class="tag" *ngIf="assetAmount">
+      <div class="tag-contents">
+        <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
+          <span class="tx-detail-label">Total Fee</span>
+          <span>0.000375 BNB</span>
+        </div>
+        <!-- <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
+          <span class="tx-detail-label"></span>
+          <span>{{runeTransactionFee}} Rune</span>
+        </div> -->
+        <!-- <div class="flxr flxr--just-space-between">
+          <span class="tx-detail-label">Slip</span>
+          <span>{{slip | percent:"0.0-2" }}</span>
+        </div> -->
+      </div>
+    </div>
+
+
   </div>
 
-  <app-asset-input
-    label="Input"
-    [(selectedAsset)]="rune"
-    [(assetUnit)]="runeAmount"
-    [balance]="runeBalance"
-    [hideMax]="true"
-    [disableInput]="true"
-    [disabledAssetSymbol]="rune.symbol"
-    [disabledMarketSelect]="true">
-  </app-asset-input>
-
-  <button
-    (click)="openConfirmationDialog()"
-    class="main-action-btn"
-    mat-flat-button
-    color="primary"
-    [disabled]="!balances || !runeAmount || !assetAmount || (balances && (runeAmount > runeBalance || assetAmount > assetBalance))"
-  >
-    <span *ngIf="!balances">Please connect wallet</span>
-    <span *ngIf="balances && (!runeAmount || !assetAmount)">Enter an amount</span>
-    <span *ngIf="balances && (runeAmount > runeBalance || assetAmount > assetBalance)">Insufficient balance</span>
-    <span *ngIf="balances && runeAmount && assetAmount && (runeAmount <= runeBalance) && (assetAmount <= assetBalance)">Supply</span>
-  </button>
 
 </div>
 

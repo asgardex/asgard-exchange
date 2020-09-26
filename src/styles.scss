@@ -390,7 +390,7 @@ main {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 45px 15px;
+  padding: 45px 15px 100px;
   min-height: calc(100vh - 98px);
 
   @media (min-width: 768px) {
@@ -405,6 +405,7 @@ main {
     max-width: 420px;
     display: flex;
     flex-flow: column;
+    position: relative;
     // width: 450px;
 
     @media (min-width: 768px) {
@@ -544,4 +545,18 @@ main {
 
 .mat-slider-min-value:not(.mat-slider-thumb-label-showing) .mat-slider-thumb {
   background-color: rgb(195, 197, 203);
+}
+
+.tag {
+  position: absolute;
+  width: 100%;
+  bottom: -130px;
+  font-size: 14px;
+
+  .tag-contents {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    padding: 1rem;
+  }
 }

@@ -234,6 +234,8 @@ export class SwapComponent implements OnInit, OnDestroy {
       ConfirmSwapModalComponent,
       {
         minWidth: '260px',
+        maxWidth: '420px',
+        width: '50vw',
         data: {
           sourceAsset: this.selectedSourceAsset,
           targetAsset: this.selectedTargetAsset,

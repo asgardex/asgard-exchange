@@ -53,8 +53,14 @@
 
           <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
             <span class="tx-detail-label">Total Fee</span>
-            <span>{{swapData.bnbFee | number:"0.0-6"}} BNB + {{swapData.runeFee}} Rune</span>
+            <span>{{swapData.bnbFee | number:"0.0-6"}} BNB</span>
           </div>
+
+          <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
+            <span class="tx-detail-label"></span>
+            <span>{{swapData.runeFee}} Rune</span>
+          </div>
+
           <div class="flxr flxr--just-space-between">
             <span class="tx-detail-label">Slip</span>
             <span>{{swapData.slip | percent:"0.0-4"}}</span>

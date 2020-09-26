@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { assetAmount, assetToBase, baseAmount, getValueOfAssetInRune, getValueOfRuneInAsset, PoolData } from '@thorchain/asgardex-util';
+import { assetAmount, assetToBase, baseAmount, getSlipOnStake, getValueOfAssetInRune, getValueOfRuneInAsset, PoolData, StakeData } from '@thorchain/asgardex-util';
 import { Subscription } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { Asset } from '../_classes/asset';
@@ -54,11 +54,6 @@ export class StakeComponent implements OnInit, OnDestroy {
 
     }
 
-    // if (this.router) {
-
-    // } else {
-    //   console.log('NO ROUTER');
-    // }
   }
   get asset() {
     return this._asset;
@@ -70,22 +65,17 @@ export class StakeComponent implements OnInit, OnDestroy {
   set assetAmount(val: number) {
 
     this._assetAmount = val;
-    // this._assetTokenValue = assetToBase(assetAmount(val));
 
     if (val) {
-      // this.updateSwapDetails();
       this.updateRuneAmount();
+      // this.calculateSlip();
     } else {
       this.runeAmount = null;
-      // this.targetAssetUnit = null;
-      // this.slip = 0;
     }
 
   }
   private _assetAmount: number;
-  // assetDetail: PoolDetail;
   assetPoolData: PoolData;
-  // private _assetTokenValue: BaseAmount;
 
   /**
    * Balances
@@ -111,15 +101,6 @@ export class StakeComponent implements OnInit, OnDestroy {
         this.balances = balances;
         this.runeBalance = this.updateBalance(this.rune);
         this.assetBalance = this.updateBalance(this.asset);
-
-        // if (this.selectedTargetAsset && this.selectedTargetAsset.symbol !== this.runeSymbol) {
-        //   this.getPoolDetails(this.selectedTargetAsset.symbol);
-        // }
-
-        // if (this.selectedSourceAsset && this.selectedSourceAsset.symbol !== this.runeSymbol) {
-        //   this.getPoolDetails(this.selectedSourceAsset.symbol);
-        // }
-
       }
     );
 
@@ -138,13 +119,9 @@ export class StakeComponent implements OnInit, OnDestroy {
       const asset = params.get('asset');
 
       if (asset) {
-        // this.getAsset(asset);
-
         this.asset = new Asset(asset);
-        console.log('the asset is: ', this.asset);
         this.getPoolDetail(asset);
         this.assetBalance = this.updateBalance(this.asset);
-
 
       }
 
@@ -161,6 +138,21 @@ export class StakeComponent implements OnInit, OnDestroy {
     this.runeAmount = runeAmount.amount().div(10 ** 8 ).toNumber();
 
   }
+
+  // calculateSlip() {
+
+  //   const stakeData: StakeData = {
+  //     asset: assetToBase(assetAmount(this.assetAmount)),
+  //     rune: assetToBase(assetAmount(this.runeAmount))
+  //   };
+
+  //   const slip = getSlipOnStake(stakeData, this.assetPoolData);
+
+  //   console.log('slip is: ', slip.toNumber());
+
+  //   this.slip = slip.toNumber();
+
+  // }
 
   getPoolDetail(asset: string) {
     this.midgardService.getPoolDetails([asset]).subscribe(
@@ -204,10 +196,9 @@ export class StakeComponent implements OnInit, OnDestroy {
     const dialogRef = this.dialog.open(
       ConfirmStakeModalComponent,
       {
-        // width: '50vw',
-        // maxWidth: '420px',
+        width: '50vw',
+        maxWidth: '420px',
         minWidth: '260px',
-        // width: '50vw',
         data: {
           asset: this.asset,
           rune: this.rune,
