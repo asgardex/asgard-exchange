@@ -89,7 +89,8 @@ export class ConnectComponent implements OnInit, OnDestroy {
       ConnectModal,
       {
         // width: '50vw',
-        // maxWidth: '420px'
+        maxWidth: '420px',
+        width: '50vw',
         minWidth: '260px'
       }
     );

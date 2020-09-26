@@ -67,7 +67,8 @@
 
     </div>
 
-    <div *ngIf="asset" style="padding: 10px 20px;" class="prices">
+    <div *ngIf="asset" style="padding: 10px 20px; font-size: 0.8rem;" class="prices">
+
       <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
         <span>Prices</span>
         <span>1 {{rune.ticker}} = {{assetBasePrice | number:"1.2-4"}} {{asset.ticker}}</span>

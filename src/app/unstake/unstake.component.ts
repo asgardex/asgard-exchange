@@ -189,8 +189,9 @@ export class UnstakeComponent implements OnInit {
       ConfirmUnstakeModalComponent,
       {
         // width: '50vw',
-        // maxWidth: '420px',
-        minWidth: '260px',
+        maxWidth: '420px',
+        width: '50vw',
+        minWidth: '310px',
         data: {
           asset: this.asset,
           rune: this.rune,
