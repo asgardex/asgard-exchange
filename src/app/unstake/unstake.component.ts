@@ -138,8 +138,12 @@ export class UnstakeComponent implements OnInit {
 
       const poolShare = getPoolShare(unitData, this.assetPoolData);
 
-      this.removeRuneAmount = poolShare.rune.amount().div(10 ** 8 ).multipliedBy(this.unstakePercent / 100).toNumber();
-      this.removeAssetAmount = poolShare.asset.amount().div(10 ** 8 ).multipliedBy(this.unstakePercent / 100).toNumber();
+      const runeAmountAfterFee = poolShare.rune.amount().div(10 ** 8 ).multipliedBy(this.unstakePercent / 100).minus(1).toNumber();
+      this.removeRuneAmount = (runeAmountAfterFee <= 0) ? 0 : runeAmountAfterFee;
+
+      const assetAmountAfterFee = poolShare.asset.amount()
+        .div(10 ** 8 ).multipliedBy(this.unstakePercent / 100).minus(this.assetBasePrice).toNumber();
+      this.removeAssetAmount = (assetAmountAfterFee <= 0) ? 0 : assetAmountAfterFee;
 
     }
 

@@ -70,14 +70,30 @@
     <div *ngIf="asset" style="padding: 10px 20px; font-size: 0.8rem;" class="prices">
 
       <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
-        <span>Prices</span>
+        <span class="tx-detail-label">Prices</span>
         <span>1 {{rune.ticker}} = {{assetBasePrice | number:"1.2-4"}} {{asset.ticker}}</span>
       </div>
 
       <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
-        <span class="tx-detail-label"></span>
+        <span></span>
         <span>1 {{asset.ticker}} = {{runeBasePrice | number:"1.2-4"}} {{rune.ticker}}</span>
       </div>
+
+      <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
+        <span class="tx-detail-label">TX Fees</span>
+        <span>1 RUNE</span>
+      </div>
+
+      <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
+        <span class="tx-detail-label"></span>
+        <span>{{assetBasePrice | number:"0.0-4"}} {{asset.ticker}}</span>
+      </div>
+
+      <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
+        <span class="tx-detail-label">Network Fee</span>
+        <span>0.0003 BNB</span>
+      </div>
+
     </div>
 
     <button
