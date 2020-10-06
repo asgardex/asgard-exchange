@@ -4,14 +4,14 @@ import { Asset } from 'src/app/_classes/asset';
 import { TransferResult } from '@thorchain/asgardex-binance';
 import { User } from 'src/app/_classes/user';
 import { MidgardService } from 'src/app/_services/midgard.service';
-import { WalletService } from 'src/app/_services/wallet.service';
 import { UserService } from 'src/app/_services/user.service';
 import { TransactionConfirmationState } from 'src/app/_const/transaction-confirmation-state';
 import { PoolAddressDTO } from 'src/app/_classes/pool-address';
-import base64js from 'base64-js';
 import { environment } from 'src/environments/environment';
 import { tokenAmount, tokenToBase } from '@thorchain/asgardex-token';
 import { Subscription } from 'rxjs';
+import { BinanceService } from 'src/app/_services/binance.service';
+import { WalletConnectService } from 'src/app/_services/wallet-connect.service';
 
 const bech32 = require('bech32');
 
@@ -45,7 +45,8 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
     @Inject(MAT_DIALOG_DATA) public swapData: SwapData,
     public dialogRef: MatDialogRef<ConfirmSwapModalComponent>,
     private midgardService: MidgardService,
-    private walletService: WalletService,
+    private walletConnectService: WalletConnectService,
+    private binanceService: BinanceService,
     private userService: UserService
   ) {
     this.txState = TransactionConfirmationState.PENDING_CONFIRMATION;
@@ -100,7 +101,8 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
   }
 
   async keystoreTransfer(matchingPool: PoolAddressDTO) {
-    await this.walletService.bncClient.initChain();
+
+    const bncClient = this.binanceService.bncClient;
 
     // Check of `validateSwap` before makes sure that we have a valid number here
     const amountNumber = this.swapData.inputValue;
@@ -108,7 +110,7 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
     // const limit = protectSlip && slipLimit ? slipLimit.amount().toString() : '';
     const memo = this.getSwapMemo(this.swapData.targetAsset.symbol, this.swapData.user.wallet);
 
-    this.walletService.bncClient
+    bncClient
       .transfer(this.swapData.user.wallet, matchingPool.address, amountNumber, this.swapData.sourceAsset.symbol, memo)
       .then((response: TransferResult) => {
         console.log('transfer response is: ', response);
@@ -134,15 +136,16 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
         .amount()
         .toNumber(),
     }];
-    const sendOrder = this.walletService.walletConnectGetSendOrderMsg({
+    const sendOrder = this.walletConnectService.walletConnectGetSendOrderMsg({
       fromAddress: this.swapData.user.wallet,
       toAddress: matchingPool.address,
       coins,
     });
     const memo = this.getSwapMemo(this.swapData.targetAsset.symbol, this.swapData.user.wallet);
 
-    // if (walletConnect && bncClient && sendOrder && walletAddress) {
-    this.walletService.bncClient
+    const bncClient = this.binanceService.bncClient;
+
+    bncClient
       .getAccount(this.swapData.user.wallet)
       .then( async (response) => {
 
@@ -161,7 +164,7 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
           memo,
         };
 
-        const res = await this.walletService.walletConnectSendTx(tx);
+        const res = await this.walletConnectService.walletConnectSendTx(tx, bncClient);
 
         if (res) {
           this.txState = TransactionConfirmationState.SUCCESS;

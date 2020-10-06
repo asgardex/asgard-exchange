@@ -64,8 +64,9 @@ export class AssetInputComponent implements OnInit {
     const dialogRef = this.dialog.open(
       MarketsModalComponent,
       {
-        minWidth: '300px',
-        maxHeight: '500px',
+        minWidth: '260px',
+        maxWidth: '420px',
+        width: '50vw',
         data: {
           disabledAssetSymbol: this.disabledAssetSymbol
         }

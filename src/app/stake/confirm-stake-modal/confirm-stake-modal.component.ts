@@ -7,9 +7,10 @@ import { Asset } from 'src/app/_classes/asset';
 import { PoolAddressDTO } from 'src/app/_classes/pool-address';
 import { User } from 'src/app/_classes/user';
 import { TransactionConfirmationState } from 'src/app/_const/transaction-confirmation-state';
+import { BinanceService } from 'src/app/_services/binance.service';
 import { MidgardService } from 'src/app/_services/midgard.service';
 import { UserService } from 'src/app/_services/user.service';
-import { WalletService } from 'src/app/_services/wallet.service';
+import { WalletConnectService } from 'src/app/_services/wallet-connect.service';
 import { environment } from 'src/environments/environment';
 
 export interface ConfirmStakeData {
@@ -36,9 +37,10 @@ export class ConfirmStakeModalComponent implements OnInit, OnDestroy {
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: ConfirmStakeData,
     public dialogRef: MatDialogRef<ConfirmStakeModalComponent>,
-    private walletService: WalletService,
+    private walletConnectService: WalletConnectService,
     private midgardService: MidgardService,
-    private userService: UserService
+    private userService: UserService,
+    private binanceService: BinanceService
   ) {
     this.txState = TransactionConfirmationState.PENDING_CONFIRMATION;
     const user$ = this.userService.user$.subscribe(
@@ -108,9 +110,10 @@ export class ConfirmStakeModalComponent implements OnInit, OnDestroy {
   }
 
   async keystoreTransaction(outputs: MultiTransfer[], memo: string) {
-    await this.walletService.bncClient.initChain();
 
-    this.walletService.bncClient
+    const bncClient = this.binanceService.bncClient;
+
+    bncClient
       .multiSend(this.data.user.wallet, outputs, memo)
       .then((response: TransferResult) => {
 
@@ -129,16 +132,18 @@ export class ConfirmStakeModalComponent implements OnInit, OnDestroy {
 
   walletConnectTransaction(outputs: MultiTransfer[], memo: string, matchingPool: PoolAddressDTO) {
 
-    const sendOrder = this.walletService.walletConnectGetSendOrderMsg({
+    const sendOrder = this.walletConnectService.walletConnectGetSendOrderMsg({
       fromAddress: this.data.user.wallet,
       toAddress: matchingPool.address,
       coins: outputs[0].coins
     });
 
+    const bncClient = this.binanceService.bncClient;
+
     /**
      * TODO: clean up, this is used in confirm-swap-modal as well
      */
-    this.walletService.bncClient
+    bncClient
       .getAccount(this.data.user.wallet)
       .then(async (response) => {
         if (!response) {
@@ -156,7 +161,7 @@ export class ConfirmStakeModalComponent implements OnInit, OnDestroy {
           memo,
         };
 
-        const res = await this.walletService.walletConnectSendTx(tx);
+        const res = await this.walletConnectService.walletConnectSendTx(tx, bncClient);
 
         if (res) {
           this.txState = TransactionConfirmationState.SUCCESS;

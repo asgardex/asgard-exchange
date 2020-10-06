@@ -9,6 +9,7 @@ import { FormsModule } from '@angular/forms';
 import { ConfirmUnstakeModalComponent } from './confirm-unstake-modal/confirm-unstake-modal.component';
 import { TransactionSuccessModalModule } from '../_components/transaction-success-modal/transaction-success-modal.module';
 import { TransactionProcessingModalModule } from '../_components/transaction-processing-modal/transaction-processing-modal.module';
+import { IconTickerModule } from '../_components/icon-ticker/icon-ticker.module';
 
 
 @NgModule({
@@ -21,6 +22,7 @@ import { TransactionProcessingModalModule } from '../_components/transaction-pro
     FormsModule,
     TransactionSuccessModalModule,
     TransactionProcessingModalModule,
+    IconTickerModule,
     RouterModule.forChild([
       {
         path: ':asset',

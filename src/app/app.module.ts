@@ -18,7 +18,7 @@ import { BinanceService } from './_services/binance.service';
 import { LastBlockService } from './_services/last-block.service';
 import { MidgardService } from './_services/midgard.service';
 import { UserService } from './_services/user.service';
-import { WalletService } from './_services/wallet.service';
+import { WalletConnectService } from './_services/wallet-connect.service';
 
 /** MATERIAL */
 import { MatButtonModule } from '@angular/material/button';
@@ -50,7 +50,7 @@ import { LastBlockIndicatorComponent } from './_components/last-block-indicator/
     MatProgressSpinnerModule,
     AppRoutingModule,
   ],
-  providers: [BinanceService, UserService, MidgardService, LastBlockService, WalletService],
+  providers: [BinanceService, UserService, MidgardService, LastBlockService, WalletConnectService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -54,7 +54,7 @@ export class MarketsModalComponent implements OnInit, OnDestroy {
 
         this.marketListItems = sortedByName.map( (poolName) => new Asset(poolName) );
         this.marketListItems.unshift(
-          new Asset(environment.network === 'chaosnet' ? 'RUNE-B1A' : 'RUNE-67C')
+          new Asset(environment.network === 'chaosnet' ? 'BNB.RUNE-B1A' : 'BNB.RUNE-67C')
         );
         this.filteredMarketListItems = this.marketListItems;
       },

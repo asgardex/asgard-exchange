@@ -1,8 +1,8 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { UserService } from 'src/app/_services/user.service';
 import { User } from 'src/app/_classes/user';
-import { WalletService } from 'src/app/_services/wallet.service';
 import { getAddressFromPrivateKey, getPrivateKeyFromKeyStore } from '@binance-chain/javascript-sdk/lib/crypto';
+import { BinanceService } from 'src/app/_services/binance.service';
 
 @Component({
   selector: 'app-keystore-connect',
@@ -20,7 +20,7 @@ export class KeystoreConnectComponent implements OnInit {
   @Output() back: EventEmitter<null>;
   @Output() closeModal: EventEmitter<null>;
 
-  constructor(private userService: UserService, private walletService: WalletService) {
+  constructor(private userService: UserService, private binanceService: BinanceService) {
     this.back = new EventEmitter<null>();
     this.closeModal = new EventEmitter<null>();
   }
@@ -85,9 +85,10 @@ export class KeystoreConnectComponent implements OnInit {
 
       const privateKey = getPrivateKeyFromKeyStore(this.keystore, this.keystorePassword);
 
-      await this.walletService.bncClient.setPrivateKey(privateKey);
+      await this.binanceService.bncClient.setPrivateKey(privateKey);
+      await this.binanceService.bncClient.initChain();
 
-      const prefix = this.walletService.asgardexBncClient.getPrefix();
+      const prefix = this.binanceService.getPrefix();
       const address = getAddressFromPrivateKey(privateKey, prefix);
       const user = new User({type: 'keystore', wallet: address, keystore: this.keystore});
 

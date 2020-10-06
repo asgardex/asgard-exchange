@@ -55,7 +55,7 @@ export class StakedPoolListItemComponent implements OnInit {
     if (this.stakeData && this.poolData) {
 
       const unitData: UnitData = {
-        stakeUnits: baseAmount(this.stakeData.stakeUnits),
+        stakeUnits: baseAmount(this.stakeData.units),
         totalUnits: baseAmount(this.poolData.poolUnits)
       };
 
@@ -66,9 +66,9 @@ export class StakedPoolListItemComponent implements OnInit {
 
       const poolShare = getPoolShare(unitData, poolData);
 
-      this.pooledRune = poolShare.rune.amount().div(10 ** 8 ).toNumber();
-      this.pooledAsset = poolShare.asset.amount().div(10 ** 8 ).toNumber();
-      this.poolShare = Number(this.stakeData.stakeUnits) / Number(this.poolData.poolUnits);
+      this.pooledRune = poolShare.rune.amount().div(10 ** 8).toNumber();
+      this.pooledAsset = poolShare.asset.amount().div(10 ** 8).toNumber();
+      this.poolShare = Number(this.stakeData.units) / Number(this.poolData.poolUnits);
 
     }
 

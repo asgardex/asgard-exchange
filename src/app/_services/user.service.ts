@@ -13,6 +13,7 @@ import { Market, MarketResponse } from '../_classes/market';
 import { bnOrZero, bn } from '@thorchain/asgardex-util';
 import { AssetBalance } from '../_classes/asset-balance';
 import { environment } from 'src/environments/environment';
+import { Asset } from '../_classes/asset';
 
 
 
@@ -51,6 +52,8 @@ export class UserService {
   setUser(user: User) {
     if (user) {
       this.getBalance(user.wallet);
+    } else {
+      this.userBalancesSource.next([]); // No user, reset balance to empty
     }
     this.userSource.next(user);
   }
@@ -123,6 +126,18 @@ export class UserService {
       return false;
     }
     return false;
+  }
+
+  findBalance(balances: AssetBalance[], asset: Asset) {
+    if (balances && asset) {
+      const match = balances.find( (balance) => balance.asset === asset.symbol );
+
+      if (match) {
+        return match.assetValue.amount().toNumber();
+      } else {
+        return 0.0;
+      }
+    }
   }
 
 

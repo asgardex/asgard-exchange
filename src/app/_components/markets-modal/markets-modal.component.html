@@ -30,7 +30,10 @@
               <mat-icon *ngIf="!item.iconPath">help_outline</mat-icon>
             </div>
 
-            <span class="market-list-item__symbol">{{item.ticker}}</span>
+            <div class="flxr flxr--flow-col">
+              <span class="market-list-item__symbol">{{item.ticker}}</span>
+              <span class="market-list-item__chain">{{item.chain}}</span>
+            </div>
           </li>
         </ul>
 

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { HttpClient } from '@angular/common/http';
-import { Fee, Fees, TransferFee, DexFees } from '@thorchain/asgardex-binance';
+import { Fee, Fees, TransferFee, DexFees, BinanceClient, Client as binanceClient, } from '@thorchain/asgardex-binance';
 import { Observable } from 'rxjs';
 import { TransferFees } from '../_classes/binance-fee';
 import { baseAmount } from '@thorchain/asgardex-token';
@@ -11,25 +11,44 @@ import { baseAmount } from '@thorchain/asgardex-token';
 })
 export class BinanceService {
 
-  baseUrl: string;
+  private _baseUrl: string;
+  private _asgardexBncClient: BinanceClient;
+
+  get bncClient() {
+    return this._asgardexBncClient.getBncClient();
+  }
 
   constructor(private http: HttpClient) {
 
-    this.baseUrl = (environment.network === 'testnet')
+    this._baseUrl = (environment.network === 'testnet')
       ? 'https://testnet-dex.binance.org/api/v1'
       : 'https://dex.binance.org/api/v1';
+
+    this._asgardexBncClient = new binanceClient({
+      network: environment.network === 'testnet' ? 'testnet' : 'mainnet',
+    });
+
+
+  }
+
+  getPrefix() {
+
+    if (this._asgardexBncClient) {
+      return this._asgardexBncClient.getPrefix();
+    } else {
+      console.error('this._asgardexBncClient not set');
+    }
 
   }
 
   getBinanceFees(): Observable<Fees> {
-    return this.http.get<Fees>(`${this.baseUrl}/fees`);
+    return this.http.get<Fees>(`${this._baseUrl}/fees`);
   }
 
   getTransferFees(feesData: Fees) {
 
     const fees = this.getTransferFeeds(feesData);
     if (fees) {
-      console.log('transfer feeds 1234567: ', fees);
       return fees;
     } else {
       return null;

@@ -7,6 +7,7 @@ import { MarketsModalModule } from '../markets-modal/markets-modal.module';
 /** MATERIAL */
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { IconTickerModule } from '../icon-ticker/icon-ticker.module';
 
 
 @NgModule({
@@ -16,6 +17,7 @@ import { MatIconModule } from '@angular/material/icon';
     FormsModule,
     MatButtonModule,
     MarketsModalModule,
+    IconTickerModule,
     MatIconModule
   ],
   exports: [AssetInputComponent]
