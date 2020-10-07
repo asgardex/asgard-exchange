@@ -132,7 +132,7 @@ export class UnstakeComponent implements OnInit {
     if (this.stakedPool && this.poolUnits) {
 
       const unitData: UnitData = {
-        stakeUnits: baseAmount(this.stakedPool.stakeUnits),
+        stakeUnits: baseAmount(this.stakedPool.units),
         totalUnits: baseAmount(this.poolUnits)
       };
 

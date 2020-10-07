@@ -27,8 +27,13 @@
   }
 
   &__symbol {
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-weight: 500;
+  }
+
+  &__chain {
+    font-size: 0.6rem;
+    color: lighten(#536960, 20%);
   }
 }
 

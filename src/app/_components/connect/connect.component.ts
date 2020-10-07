@@ -8,7 +8,7 @@ import { MidgardService } from 'src/app/_services/midgard.service';
 import { Subject, Subscription, of, timer } from 'rxjs';
 import { takeUntil, switchMap, catchError } from 'rxjs/operators';
 import { TransactionDTO } from 'src/app/_classes/transaction';
-import { WalletService } from 'src/app/_services/wallet.service';
+import { WalletConnectService } from 'src/app/_services/wallet-connect.service';
 
 @Component({
   selector: 'app-connect',
@@ -26,7 +26,7 @@ export class ConnectComponent implements OnInit, OnDestroy {
     private dialog: MatDialog,
     private userService: UserService,
     private midgardService: MidgardService,
-    private walletService: WalletService
+    private walletConnectService: WalletConnectService
   ) {
 
     this.pendingTxCount = 0;
@@ -47,7 +47,7 @@ export class ConnectComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.walletService.initWalletConnect();
+    this.walletConnectService.initWalletConnect();
   }
 
   pollTx(txId: string) {
@@ -121,7 +121,11 @@ export class ConnectModal implements OnDestroy {
   isTestnet: boolean;
   subs: Subscription[];
 
-  constructor(public dialogRef: MatDialogRef<ConnectModal>, private walletService: WalletService, private userService: UserService) {
+  constructor(
+    public dialogRef: MatDialogRef<ConnectModal>,
+    private walletConnectService: WalletConnectService,
+    private userService: UserService
+  ) {
     this.isTestnet = environment.network === 'testnet' ? true : false;
 
     const user$ = this.userService.user$.subscribe(
@@ -137,7 +141,7 @@ export class ConnectModal implements OnDestroy {
   }
 
   connectWalletConnect() {
-    this.walletService.connectWalletConnect();
+    this.walletConnectService.connectWalletConnect();
   }
 
   connectKeystore() {

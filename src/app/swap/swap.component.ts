@@ -6,7 +6,6 @@ import { environment } from 'src/environments/environment';
 import { Market } from '../_classes/market';
 import {
   bn,
-  getSwapOutput,
   getSwapOutputWithFee,
   getDoubleSwapOutput,
   getDoubleSwapOutputWithFee,
@@ -77,7 +76,7 @@ export class SwapComponent implements OnInit, OnDestroy {
       this.updateSwapDetails();
     }
 
-    this.sourceBalance = this.updateBalance(asset);
+    this.sourceBalance = this.userService.findBalance(this.balances, asset);
 
     /**
      * If input value is more than balance of newly selected asset
@@ -118,7 +117,7 @@ export class SwapComponent implements OnInit, OnDestroy {
       this.updateSwapDetails();
     }
 
-    this.targetBalance = this.updateBalance(asset);
+    this.targetBalance = this.userService.findBalance(this.balances, asset);
 
   }
   private _selectedTargetAsset: Asset;
@@ -154,8 +153,8 @@ export class SwapComponent implements OnInit, OnDestroy {
     const balances$ = this.userService.userBalances$.subscribe(
       (balances) => {
         this.balances = balances;
-        this.sourceBalance = this.updateBalance(this.selectedSourceAsset);
-        this.targetBalance = this.updateBalance(this.selectedTargetAsset);
+        this.sourceBalance = this.userService.findBalance(this.balances, this.selectedSourceAsset);
+        this.targetBalance = this.userService.findBalance(this.balances, this.selectedTargetAsset);
 
         if (this.selectedTargetAsset && this.selectedTargetAsset.symbol !== this.runeSymbol) {
           this.getPoolDetails(this.selectedTargetAsset.symbol);
@@ -180,23 +179,6 @@ export class SwapComponent implements OnInit, OnDestroy {
     this.getMarkets();
     this.getConstants();
     this.getBinanceFees();
-    this.getPoolAddresses();
-  }
-
-  /**
-   *
-   * TODO: refactor this is used in stake.component as well
-   */
-  updateBalance(asset: Asset): number {
-    if (this.balances && asset) {
-      const match = this.balances.find( (balance) => balance.asset === asset.symbol );
-
-      if (match) {
-        return match.assetValue.amount().toNumber();
-      } else {
-        return 0.0;
-      }
-    }
   }
 
   mainButtonText(): string {
@@ -219,14 +201,6 @@ export class SwapComponent implements OnInit, OnDestroy {
       console.log('error creating main button text');
     }
 
-  }
-
-  getPoolAddresses() {
-    this.midgardService.getProxiedPoolAddresses().subscribe(
-      (res) => {
-        console.log('POOL ADDRESSES ARE: ', res);
-      }
-    );
   }
 
   openConfirmationDialog() {

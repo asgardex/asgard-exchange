@@ -3,17 +3,7 @@
 
   <div class="flxr flxr--just-space-between flxr--align-center">
 
-    <div class="flxr">
-
-      <!--TODO: this is used in asset-input, should be refactored -->
-      <div style="margin-right: 8px;" class="asset-icon-container flxr flxr--align-center">
-        <img *ngIf="stakeData.asset.iconPath" [src]="stakeData.asset.iconPath" />
-        <mat-icon *ngIf="!stakeData.asset.iconPath">help_outline</mat-icon>
-      </div>
-      <span style="font-size: 20px">{{stakeData.asset.ticker}}</span>
-      <!-- end -->
-
-    </div>
+    <app-icon-ticker [iconPath]="stakeData.asset.iconPath" [ticker]="stakeData.asset.ticker"></app-icon-ticker>
 
     <button (click)="toggleExpanded()" style="color: white" mat-icon-button>
       <mat-icon>expand_more</mat-icon>
@@ -30,7 +20,7 @@
       <span>Pooled {{stakeData.asset.ticker}}</span>
       <span>{{pooledAsset | number:"0.0-6"}}</span>
     </div>
-    <div *ngIf="pooledAsset" class="flxr flxr--just-space-between pool-detail-row">
+    <div *ngIf="poolShare" class="flxr flxr--just-space-between pool-detail-row">
       <span>Pool Share</span>
       <span>{{poolShare | percent:"0.0-6"}}</span>
     </div>

@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { assetAmount, assetToBase, baseAmount, getSlipOnStake, getValueOfAssetInRune, getValueOfRuneInAsset, PoolData, StakeData } from '@thorchain/asgardex-util';
+import { assetAmount, assetToBase, baseAmount, getValueOfAssetInRune, getValueOfRuneInAsset, PoolData } from '@thorchain/asgardex-util';
 import { Subscription } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { Asset } from '../_classes/asset';
@@ -47,7 +47,7 @@ export class StakeComponent implements OnInit, OnDestroy {
         if (val.symbol !== this._asset.symbol) {
           this.router.navigate(['/', 'stake', val.symbol]);
           this._asset = val;
-          this.assetBalance = this.updateBalance(this.asset);
+          this.assetBalance = this.userService.findBalance(this.balances, this.asset);
         }
 
       }
@@ -68,7 +68,6 @@ export class StakeComponent implements OnInit, OnDestroy {
 
     if (val) {
       this.updateRuneAmount();
-      // this.calculateSlip();
     } else {
       this.runeAmount = null;
     }
@@ -99,8 +98,8 @@ export class StakeComponent implements OnInit, OnDestroy {
     const balances$ = this.userService.userBalances$.subscribe(
       (balances) => {
         this.balances = balances;
-        this.runeBalance = this.updateBalance(this.rune);
-        this.assetBalance = this.updateBalance(this.asset);
+        this.runeBalance = this.userService.findBalance(this.balances, this.rune);
+        this.assetBalance = this.userService.findBalance(this.balances, this.asset);
       }
     );
 
@@ -121,7 +120,7 @@ export class StakeComponent implements OnInit, OnDestroy {
       if (asset) {
         this.asset = new Asset(asset);
         this.getPoolDetail(asset);
-        this.assetBalance = this.updateBalance(this.asset);
+        this.assetBalance = this.userService.findBalance(this.balances, this.asset);
 
       }
 
@@ -139,21 +138,6 @@ export class StakeComponent implements OnInit, OnDestroy {
 
   }
 
-  // calculateSlip() {
-
-  //   const stakeData: StakeData = {
-  //     asset: assetToBase(assetAmount(this.assetAmount)),
-  //     rune: assetToBase(assetAmount(this.runeAmount))
-  //   };
-
-  //   const slip = getSlipOnStake(stakeData, this.assetPoolData);
-
-  //   console.log('slip is: ', slip.toNumber());
-
-  //   this.slip = slip.toNumber();
-
-  // }
-
   getPoolDetail(asset: string) {
     this.midgardService.getPoolDetails([asset]).subscribe(
       (res) => {
@@ -169,23 +153,6 @@ export class StakeComponent implements OnInit, OnDestroy {
       },
       (err) => console.error('error getting pool detail: ', err)
     );
-  }
-
-  /**
-   *
-   * TODO: refactor this is used in stake.component as well
-   */
-  updateBalance(asset: Asset): number {
-
-    if (this.balances && asset) {
-      const match = this.balances.find( (balance) => balance.asset === asset.symbol );
-
-      if (match) {
-        return match.assetValue.amount().toNumber();
-      } else {
-        return 0.0;
-      }
-    }
   }
 
   openConfirmationDialog() {

@@ -7,9 +7,10 @@ import { Asset } from 'src/app/_classes/asset';
 import { PoolAddressDTO } from 'src/app/_classes/pool-address';
 import { User } from 'src/app/_classes/user';
 import { TransactionConfirmationState } from 'src/app/_const/transaction-confirmation-state';
+import { BinanceService } from 'src/app/_services/binance.service';
 import { MidgardService } from 'src/app/_services/midgard.service';
 import { UserService } from 'src/app/_services/user.service';
-import { WalletService } from 'src/app/_services/wallet.service';
+import { WalletConnectService } from 'src/app/_services/wallet-connect.service';
 import { environment } from 'src/environments/environment';
 
 // TODO: this is the same as ConfirmStakeData in confirm stake modal
@@ -39,7 +40,8 @@ export class ConfirmUnstakeModalComponent implements OnInit, OnDestroy {
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: ConfirmUnstakeData,
     public dialogRef: MatDialogRef<ConfirmUnstakeModalComponent>,
-    private walletService: WalletService,
+    private walletConnectService: WalletConnectService,
+    private binanceService: BinanceService,
     private midgardService: MidgardService,
     private userService: UserService
   ) {
@@ -63,7 +65,6 @@ export class ConfirmUnstakeModalComponent implements OnInit, OnDestroy {
 
     this.midgardService.getProxiedPoolAddresses().subscribe(
       async (res) => {
-        console.log('POOL ADDRESSES ARE: ', res);
 
         const currentPools = res.current;
 
@@ -91,10 +92,10 @@ export class ConfirmUnstakeModalComponent implements OnInit, OnDestroy {
 
   async keystoreTransaction(matchingPool: PoolAddressDTO, memo: string) {
 
-    await this.walletService.bncClient.initChain();
+    const bncClient = this.binanceService.bncClient;
 
     const amount = 0.00000001;
-    this.walletService.bncClient
+    bncClient
       .transfer(this.data.user.wallet, matchingPool.address, amount, this.runeSymbol, memo)
       .then((response: TransferResult) => {
         this.txSuccess(response);
@@ -105,7 +106,7 @@ export class ConfirmUnstakeModalComponent implements OnInit, OnDestroy {
 
         console.log('not enough RUNE: ', unstakeErr1);
 
-        this.walletService.bncClient
+        bncClient
           .transfer(this.data.user.wallet, matchingPool.address, amount, 'BNB', memo)
           .then((response: TransferResult) => {
             this.txSuccess(response);
@@ -129,16 +130,18 @@ export class ConfirmUnstakeModalComponent implements OnInit, OnDestroy {
       },
     ];
 
-    const sendOrder = this.walletService.walletConnectGetSendOrderMsg({
+    const sendOrder = this.walletConnectService.walletConnectGetSendOrderMsg({
       fromAddress: this.data.user.wallet,
       toAddress: matchingPool.address,
       coins,
     });
 
+    const bncClient = this.binanceService.bncClient;
+
     /**
      * TODO: clean up, this is used in confirm-swap-modal as well
      */
-    this.walletService.bncClient
+    bncClient
       .getAccount(this.data.user.wallet)
       .then(async (response) => {
         if (!response) {
@@ -156,7 +159,7 @@ export class ConfirmUnstakeModalComponent implements OnInit, OnDestroy {
           memo,
         };
 
-        const res = await this.walletService.walletConnectSendTx(tx);
+        const res = await this.walletConnectService.walletConnectSendTx(tx, bncClient);
 
         if (res) {
           this.txState = TransactionConfirmationState.SUCCESS;

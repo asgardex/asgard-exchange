@@ -7,7 +7,7 @@ import { StakedPoolListItemComponent } from './staked-pool-list-item/staked-pool
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-
+import { IconTickerModule } from '../_components/icon-ticker/icon-ticker.module';
 
 
 @NgModule({
@@ -17,6 +17,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
+    IconTickerModule,
     RouterModule.forChild([
       {
         path: '',
