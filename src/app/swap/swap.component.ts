@@ -294,8 +294,6 @@ export class SwapComponent implements OnInit, OnDestroy {
 
         this.calculateDoubleSwap();
 
-      } else {
-        console.error('swap type is undefined: ', swapType);
       }
 
     }
