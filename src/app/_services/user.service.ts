@@ -105,7 +105,7 @@ export class UserService {
 
     } catch (error) {
       // yield put(actions.refreshBalanceFailed(error));
-      console.log('error getting balance: ', error);
+      console.error('error getting balance: ', error);
     }
 
   }

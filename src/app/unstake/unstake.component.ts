@@ -108,15 +108,10 @@ export class UnstakeComponent implements OnInit {
       this.midgardService.getStakerPoolData(this.user.wallet, [`${this.asset.chain}.${this.asset.symbol}`]).subscribe(
         (res) => {
 
-          console.log('get account staked res is: ', res);
-          // res[0].heightLastStaked
-
           if (res && res.length > 0) {
-            // this.stakedPool = res.map( (dto) => new StakerPoolData(dto) );
             this.stakedPool = new StakerPoolData(res[0]);
             this.heightLastStaked = res[0].heightLastStaked;
             this.getConstants();
-
           }
 
         },
@@ -154,7 +149,6 @@ export class UnstakeComponent implements OnInit {
       (res) => {
         this.lockBlocks = res.int_64_values.StakeLockUpBlocks;
         this.checkCooldown();
-        console.log('res is: ', res);
       },
       (err) => console.error('error fetching constants: ', err)
     );

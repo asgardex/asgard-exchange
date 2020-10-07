@@ -37,7 +37,6 @@ export class ConnectComponent implements OnInit, OnDestroy {
 
     const pendingTx$ = this.userService.pendingTransaction$.subscribe(
       (txId) => {
-        console.log('pending tx in connect is: ', txId);
         this.pollTx(txId);
         this.pendingTxCount++;
       }

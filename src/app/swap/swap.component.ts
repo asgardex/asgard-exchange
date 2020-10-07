@@ -198,7 +198,7 @@ export class SwapComponent implements OnInit, OnDestroy {
     else if (this.user && this.sourceAssetUnit && this.sourceAssetUnit <= this.sourceBalance && this.selectedTargetAsset) {
       return 'Swap';
     } else {
-      console.log('error creating main button text');
+      console.warn('error creating main button text');
     }
 
   }

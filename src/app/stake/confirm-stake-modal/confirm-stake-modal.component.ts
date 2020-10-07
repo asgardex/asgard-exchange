@@ -125,7 +125,7 @@ export class ConfirmStakeModalComponent implements OnInit, OnDestroy {
         }
       })
       .catch((error: Error) => {
-        console.log('error making transfer: ', error);
+        console.error('error making transfer: ', error);
         this.txState = TransactionConfirmationState.ERROR;
       });
   }
