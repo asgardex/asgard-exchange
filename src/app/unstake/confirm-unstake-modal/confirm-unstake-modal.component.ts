@@ -72,7 +72,6 @@ export class ConfirmUnstakeModalComponent implements OnInit, OnDestroy {
 
           const matchingPool = currentPools.find( (pool) => pool.chain === 'BNB' );
           const memo = `WITHDRAW:${this.data.asset.chain}.${this.data.asset.symbol}:${this.data.unstakePercent * 100}`;
-          console.log('this memo is: ', memo);
 
           if (matchingPool) {
 
@@ -104,7 +103,7 @@ export class ConfirmUnstakeModalComponent implements OnInit, OnDestroy {
       // another tx w/ same memo will be sent, but by using BNB now
       .catch((unstakeErr1: Error) => {
 
-        console.log('not enough RUNE: ', unstakeErr1);
+        console.warn('not enough RUNE: ', unstakeErr1);
 
         bncClient
           .transfer(this.data.user.wallet, matchingPool.address, amount, 'BNB', memo)
@@ -178,7 +177,7 @@ export class ConfirmUnstakeModalComponent implements OnInit, OnDestroy {
   }
 
   txSuccess(response: TransferResult) {
-    console.log('transfer response is: ', response);
+
     this.txState = TransactionConfirmationState.SUCCESS;
 
     if (response.result && response.result.length > 0) {

@@ -92,7 +92,6 @@ export class WalletConnectService {
       this.walletConnector
       .trustSignTransaction(NETWORK_ID, tx)
       .then((result) => {
-        console.log('Successfully signed stake tx msg:', result);
 
         bncClient
           .sendRawTransaction(result, true)
@@ -104,8 +103,7 @@ export class WalletConnectService {
           });
       })
       .catch((error) => {
-        console.log('trustSignTransaction error: ', error);
-
+        console.error('trustSignTransaction error: ', error);
         reject(error);
       });
     });

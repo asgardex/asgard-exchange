@@ -113,7 +113,6 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
     bncClient
       .transfer(this.swapData.user.wallet, matchingPool.address, amountNumber, this.swapData.sourceAsset.symbol, memo)
       .then((response: TransferResult) => {
-        console.log('transfer response is: ', response);
         this.txState = TransactionConfirmationState.SUCCESS;
 
         if (response.result && response.result.length > 0) {
@@ -123,7 +122,7 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
 
       })
       .catch((error: Error) => {
-        console.log('error making transfer: ', error);
+        console.error('error making transfer: ', error);
         this.txState = TransactionConfirmationState.ERROR;
       });
   }
