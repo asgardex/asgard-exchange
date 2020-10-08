@@ -77,7 +77,7 @@ export class PoolComponent implements OnInit, OnDestroy {
   }
 
   getPoolData(assets: string[]) {
-    this.midgardService.getPoolDetails(assets).subscribe(
+    this.midgardService.getPoolDetails(assets, 'simple').subscribe(
       (res) => {
 
         this.poolDetailIndex = {};

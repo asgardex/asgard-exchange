@@ -139,7 +139,7 @@ export class StakeComponent implements OnInit, OnDestroy {
   }
 
   getPoolDetail(asset: string) {
-    this.midgardService.getPoolDetails([asset]).subscribe(
+    this.midgardService.getPoolDetails([asset], 'simple').subscribe(
       (res) => {
 
         if (res && res.length > 0) {

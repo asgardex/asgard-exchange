@@ -86,7 +86,6 @@ export class KeystoreConnectComponent implements OnInit {
       const privateKey = getPrivateKeyFromKeyStore(this.keystore, this.keystorePassword);
 
       await this.binanceService.bncClient.setPrivateKey(privateKey);
-      await this.binanceService.bncClient.initChain();
 
       const prefix = this.binanceService.getPrefix();
       const address = getAddressFromPrivateKey(privateKey, prefix);

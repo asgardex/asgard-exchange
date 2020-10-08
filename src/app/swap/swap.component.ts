@@ -248,7 +248,7 @@ export class SwapComponent implements OnInit, OnDestroy {
     this.poolDetailTargetError = (type === 'target') ? false : this.poolDetailTargetError;
     this.poolDetailSourceError = (type === 'source') ? false : this.poolDetailSourceError;
 
-    this.midgardService.getPoolDetails([symbol]).subscribe(
+    this.midgardService.getPoolDetails([symbol], 'simple').subscribe(
       (res) => {
 
         if (res && res.length > 0) {

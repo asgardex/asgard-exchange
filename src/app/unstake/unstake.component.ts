@@ -213,7 +213,7 @@ export class UnstakeComponent implements OnInit {
   }
 
   getPoolDetail(asset: string) {
-    this.midgardService.getPoolDetails([asset]).subscribe(
+    this.midgardService.getPoolDetails([asset], 'simple').subscribe(
       (res) => {
 
         if (res && res.length > 0) {
