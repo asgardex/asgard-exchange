@@ -3,7 +3,6 @@ import { Asset } from '../_classes/asset';
 import { UserService } from '../_services/user.service';
 import { Subscription } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { Market } from '../_classes/market';
 import {
   bn,
   getSwapOutputWithFee,
@@ -68,10 +67,16 @@ export class SwapComponent implements OnInit, OnDestroy {
     return this._selectedSourceAsset;
   }
   set selectedSourceAsset(asset: Asset) {
+
+    if (this.selectedSourceAsset) {
+      this.targetAssetUnit = null;
+      this.calculatingTargetAsset = true;
+    }
+
     this._selectedSourceAsset = asset;
 
     if (this._selectedSourceAsset && this._selectedSourceAsset.symbol !== this.runeSymbol) {
-      this.getPoolDetails(this._selectedSourceAsset.symbol);
+      this.getPoolDetails(this._selectedSourceAsset.symbol, 'source');
     } else if (this._selectedSourceAsset && this._selectedSourceAsset.symbol === this.runeSymbol) {
       this.updateSwapDetails();
     }
@@ -111,8 +116,11 @@ export class SwapComponent implements OnInit, OnDestroy {
   set selectedTargetAsset(asset: Asset) {
     this._selectedTargetAsset = asset;
 
+    this.targetAssetUnit = null;
+    this.calculatingTargetAsset = true;
+
     if (this._selectedTargetAsset && this._selectedTargetAsset.symbol !== this.runeSymbol) {
-      this.getPoolDetails(this._selectedTargetAsset.symbol);
+      this.getPoolDetails(this._selectedTargetAsset.symbol, 'target');
     } else if (this._selectedTargetAsset && this._selectedTargetAsset.symbol === this.runeSymbol) {
       this.updateSwapDetails();
     }
@@ -126,7 +134,6 @@ export class SwapComponent implements OnInit, OnDestroy {
   poolDetailMap: {
     [key: string]: PoolDetail
   } = {};
-  markets: Market[];
   subs: Subscription[];
 
   slip: number;
@@ -141,6 +148,9 @@ export class SwapComponent implements OnInit, OnDestroy {
   sourceBalance: number;
   targetBalance: number;
 
+  calculatingTargetAsset: boolean;
+  poolDetailTargetError: boolean;
+  poolDetailSourceError: boolean;
 
   constructor(
     private dialog: MatDialog,
@@ -157,11 +167,11 @@ export class SwapComponent implements OnInit, OnDestroy {
         this.targetBalance = this.userService.findBalance(this.balances, this.selectedTargetAsset);
 
         if (this.selectedTargetAsset && this.selectedTargetAsset.symbol !== this.runeSymbol) {
-          this.getPoolDetails(this.selectedTargetAsset.symbol);
+          this.getPoolDetails(this.selectedTargetAsset.symbol, 'target');
         }
 
         if (this.selectedSourceAsset && this.selectedSourceAsset.symbol !== this.runeSymbol) {
-          this.getPoolDetails(this.selectedSourceAsset.symbol);
+          this.getPoolDetails(this.selectedSourceAsset.symbol, 'source');
         }
 
       }
@@ -176,7 +186,6 @@ export class SwapComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.getMarkets();
     this.getConstants();
     this.getBinanceFees();
   }
@@ -234,7 +243,11 @@ export class SwapComponent implements OnInit, OnDestroy {
     });
   }
 
-  getPoolDetails(symbol: string) {
+  getPoolDetails(symbol: string, type: 'source' | 'target') {
+
+    this.poolDetailTargetError = (type === 'target') ? false : this.poolDetailTargetError;
+    this.poolDetailSourceError = (type === 'source') ? false : this.poolDetailSourceError;
+
     this.midgardService.getPoolDetails([symbol]).subscribe(
       (res) => {
 
@@ -244,7 +257,11 @@ export class SwapComponent implements OnInit, OnDestroy {
         }
 
       },
-      (err) => console.error('error fetching pool details: ', err)
+      (err) => {
+        console.error('error fetching pool details: ', err);
+        this.poolDetailTargetError = (type === 'target') ? true : this.poolDetailTargetError;
+        this.poolDetailSourceError = (type === 'source') ? true : this.poolDetailSourceError;
+      }
     );
   }
 
@@ -268,13 +285,11 @@ export class SwapComponent implements OnInit, OnDestroy {
     );
   }
 
-  async getMarkets() {
-    this.markets = await this.userService.getMarkets();
-  }
-
   updateSwapDetails() {
     if (this.selectedSourceAsset && this.selectedTargetAsset) {
       this.calculateTargetUnits();
+    } else {
+      this.calculatingTargetAsset = false;
     }
   }
 
@@ -296,6 +311,8 @@ export class SwapComponent implements OnInit, OnDestroy {
 
       }
 
+    } else {
+      this.calculatingTargetAsset = false;
     }
 
   }
@@ -366,8 +383,15 @@ export class SwapComponent implements OnInit, OnDestroy {
        * Total output amount in target units minus 1 RUNE
        */
       const totalAmount = getSwapOutputWithFee(baseAmount(this._sourceAssetTokenValue.amount()), pool, toRune);
-      this.targetAssetUnit = (totalAmount.amount().isLessThan(0)) ? bn(0) : totalAmount.amount();
+
+      if (this.sourceAssetUnit) {
+        this.targetAssetUnit = (totalAmount.amount().isLessThan(0)) ? bn(0) : totalAmount.amount();
+      } else {
+        this.targetAssetUnit = (this.sourceAssetUnit) ? (totalAmount.amount().isLessThan(0)) ? bn(0) : totalAmount.amount() : null;
+      }
     }
+
+    this.calculatingTargetAsset = false;
 
   }
 
@@ -399,8 +423,15 @@ export class SwapComponent implements OnInit, OnDestroy {
 
       const total = getDoubleSwapOutputWithFee(this._sourceAssetTokenValue, pool1, pool2);
 
-      this.targetAssetUnit = (total.amount().isLessThan(0)) ? bn(0) : total.amount();
+      if (this.sourceAssetUnit) {
+        this.targetAssetUnit = (total.amount().isLessThan(0)) ? bn(0) : total.amount();
+      } else {
+        this.targetAssetUnit = null;
+      }
+
     }
+
+    this.calculatingTargetAsset = false;
 
   }
 
