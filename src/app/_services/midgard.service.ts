@@ -29,9 +29,9 @@ export class MidgardService {
     return this.http.get<string[]>(`${this.basePath}/pools`);
   }
 
-  getPoolDetails(assets: string[]): Observable<PoolDetail[]> {
+  getPoolDetails(assets: string[], view: 'balances' | 'simple' | 'full'): Observable<PoolDetail[]> {
 
-    const params = new HttpParams().set('asset', assets.join(','));
+    const params = new HttpParams().set('asset', assets.join(',')).set('view', view);
 
     return this.http.get<PoolDetail[]>(`${this.basePath}/pools/detail`, {params});
   }

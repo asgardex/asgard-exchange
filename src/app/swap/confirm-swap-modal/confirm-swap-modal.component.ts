@@ -103,6 +103,7 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
   async keystoreTransfer(matchingPool: PoolAddressDTO) {
 
     const bncClient = this.binanceService.bncClient;
+    await bncClient.initChain();
 
     // Check of `validateSwap` before makes sure that we have a valid number here
     const amountNumber = this.swapData.inputValue;

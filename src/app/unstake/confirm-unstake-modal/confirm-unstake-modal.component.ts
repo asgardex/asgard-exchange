@@ -92,6 +92,7 @@ export class ConfirmUnstakeModalComponent implements OnInit, OnDestroy {
   async keystoreTransaction(matchingPool: PoolAddressDTO, memo: string) {
 
     const bncClient = this.binanceService.bncClient;
+    await bncClient.initChain();
 
     const amount = 0.00000001;
     bncClient

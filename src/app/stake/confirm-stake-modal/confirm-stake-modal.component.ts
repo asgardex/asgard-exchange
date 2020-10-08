@@ -112,6 +112,7 @@ export class ConfirmStakeModalComponent implements OnInit, OnDestroy {
   async keystoreTransaction(outputs: MultiTransfer[], memo: string) {
 
     const bncClient = this.binanceService.bncClient;
+    await bncClient.initChain();
 
     bncClient
       .multiSend(this.data.user.wallet, outputs, memo)
