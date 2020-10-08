@@ -40,6 +40,8 @@ export class AssetInputComponent implements OnInit {
   @Input() hideMax: boolean;
 
   @Input() disabledMarketSelect: boolean;
+  @Input() loading: boolean;
+  @Input() error: boolean;
 
   constructor(private dialog: MatDialog) {
   }

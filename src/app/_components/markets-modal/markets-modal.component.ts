@@ -34,6 +34,7 @@ export class MarketsModalComponent implements OnInit, OnDestroy {
   marketListItems: Asset[];
   filteredMarketListItems: Asset[];
   subs: Subscription[];
+  loading: boolean;
 
   constructor(
     private midgardService: MidgardService,
@@ -47,6 +48,7 @@ export class MarketsModalComponent implements OnInit, OnDestroy {
   }
 
   getPools() {
+    this.loading = true;
     this.midgardService.getPools().subscribe(
       (res) => {
 
@@ -57,6 +59,7 @@ export class MarketsModalComponent implements OnInit, OnDestroy {
           new Asset(environment.network === 'chaosnet' ? 'BNB.RUNE-B1A' : 'BNB.RUNE-67C')
         );
         this.filteredMarketListItems = this.marketListItems;
+        this.loading = false;
       },
       (err) => console.error('error fetching pools: ', err)
     );

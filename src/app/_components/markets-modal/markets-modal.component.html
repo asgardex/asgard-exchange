@@ -12,15 +12,17 @@
   <div>
     <div mat-dialog-content>
 
-      <!-- Connect Options -->
-
       <div class="list-title">
         Token Name
       </div>
 
       <div class="market-list-container">
 
-        <ul class="market-list" *ngIf="filteredMarketListItems">
+        <div *ngIf="loading" class="flxr flxr--align-center flxr--just-center" style="height: 100%; width: 100%">
+          <mat-progress-spinner diameter="16" color="primary" mode="indeterminate"></mat-progress-spinner>
+        </div>
+
+        <ul *ngIf="!loading && filteredMarketListItems" class="market-list">
 
           <li class="market-list-item" *ngFor="let item of filteredMarketListItems" (click)="selectItem(item)" [class.disabled]="item.symbol == data.disabledAssetSymbol">
             <!-- BTCB-1DE -->

@@ -7,7 +7,18 @@
     </div>
 
     <div class="flxr flxr--just-space-between flxr--align-center">
+
+      <div *ngIf="loading" class="flxr flxr--align-center" style="height: 53px">
+        <mat-progress-spinner diameter="16" color="primary" mode="indeterminate"></mat-progress-spinner>
+      </div>
+
+      <div *ngIf="!loading && error" class="flxr flxr--align-center" style="height: 53px">
+        <mat-icon style="font-size: 1rem; height: 18px;">warning</mat-icon>
+        <span style="font-size: 0.8rem">Error fetching pool</span>
+      </div>
+
       <input
+        *ngIf="!loading && !error"
         style="font-size: 1.4rem"
         [ngModel]="assetUnit"
         (ngModelChange)="updateAssetUnits($event)"
