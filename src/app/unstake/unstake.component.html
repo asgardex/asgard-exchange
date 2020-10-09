@@ -90,7 +90,7 @@
       <span *ngIf="!user">Please connect wallet</span>
       <span *ngIf="user && remainingTime">Withdraw Enabled in {{remainingTime}}</span>
       <span *ngIf="user && !remainingTime && !removeAssetAmount || (removeAssetAmount && removeAssetAmount <= 0)">Enter an amount</span>
-      <span *ngIf="user && !remainingTime && removeAssetAmount && removeAssetAmount > 0">Unstake</span>
+      <span *ngIf="user && !remainingTime && removeAssetAmount && removeAssetAmount > 0">Withdraw</span>
     </button>
 
   </div>
