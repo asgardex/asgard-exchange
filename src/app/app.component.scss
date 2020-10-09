@@ -176,13 +176,13 @@ footer {
       margin-left: 12px;
 
       &--twitter {
-        -webkit-mask: url(http://localhost:4200/assets/icons/twitter-brands.svg) no-repeat center;
-        mask: url(http://localhost:4200/assets/icons/twitter-brands.svg) no-repeat center;
+        -webkit-mask: url(https://raw.githubusercontent.com/Pusher-Labs/asgard-exchange/master/src/assets/icons/twitter-brands.svg) no-repeat center;
+        mask: url(https://raw.githubusercontent.com/Pusher-Labs/asgard-exchange/master/src/assets/icons/twitter-brands.svg) no-repeat center;
       }
 
       &--github {
-        -webkit-mask: url(http://localhost:4200/assets/icons/github-alt-brands.svg) no-repeat center;
-        mask: url(http://localhost:4200/assets/icons/github-alt-brands.svg) no-repeat center;
+        -webkit-mask: url(https://raw.githubusercontent.com/Pusher-Labs/asgard-exchange/master/src/assets/icons/github-alt-brands.svg) no-repeat center;
+        mask: url(https://raw.githubusercontent.com/Pusher-Labs/asgard-exchange/master/src/assets/icons/github-alt-brands.svg) no-repeat center;
       }
 
     }
