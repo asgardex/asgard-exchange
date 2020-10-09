@@ -41,7 +41,10 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-
+    this.killPolling.next();
+    for (const sub of this.subs) {
+      sub.unsubscribe();
+    }
   }
 
 }

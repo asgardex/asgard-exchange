@@ -13,7 +13,10 @@
       </a>
     </div>
 
-    <span class="section-label">Your liquidity</span>
+    <div class="section-label flxr flxr--align-center">
+      <span style="margin-right: 6px;">Your liquidity</span>
+      <mat-progress-spinner *ngIf="loading" diameter="16" color="primary" mode="indeterminate"></mat-progress-spinner>
+    </div>
 
     <div *ngIf="!user" class="disabled-list">
       Connect wallet to view liquidity
