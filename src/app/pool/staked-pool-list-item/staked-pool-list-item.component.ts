@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges } from '@angular/core';
 import { getPoolShare, PoolData, UnitData, baseAmount } from '@thorchain/asgardex-util';
 import { PoolDetail } from 'src/app/_classes/pool-detail';
 import { StakerPoolData } from 'src/app/_classes/staker-pool-data';
@@ -8,7 +8,7 @@ import { StakerPoolData } from 'src/app/_classes/staker-pool-data';
   templateUrl: './staked-pool-list-item.component.html',
   styleUrls: ['./staked-pool-list-item.component.scss']
 })
-export class StakedPoolListItemComponent implements OnInit {
+export class StakedPoolListItemComponent implements OnChanges {
 
   expanded: boolean;
 
@@ -42,7 +42,7 @@ export class StakedPoolListItemComponent implements OnInit {
     this.expanded = false;
   }
 
-  ngOnInit(): void {
+  ngOnChanges() {
     this.getPoolShare();
   }
 
