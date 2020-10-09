@@ -5,21 +5,19 @@
 
 <main>
   <router-outlet></router-outlet>
-  <!-- <div class="container">
-    <nav>
-      <a [routerLink]="['/', 'swap']" routerLinkActive="active">Swap</a>
-      <a [routerLink]="['/', 'pool']" routerLinkActive="active">Pool</a>
-    </nav>
-    <router-outlet></router-outlet>
-  </div> -->
-
 </main>
 
 <footer>
-  <span>This product is in beta. Do not deposit or swap large amounts of funds.</span>
-  <div class="flxr thorchain-indicator">
-    <span style="margin-right: 6px">Powered by <a target="_blank" href="https://thorchain.org/">THORChain</a> </span>
-    <app-last-block-indicator></app-last-block-indicator>
+  <div class="footer-social flxr flxr--just-end">
+    <a class="footer-logo footer-logo--twitter" href="https://twitter.com/asgardex" target="_blank"></a>
+    <a class="footer-logo footer-logo--github" href="https://github.com/Pusher-Labs/asgard-exchange" target="_blank"></a>
+  </div>
+  <div class="footer-content">
+    <span>This product is in beta. Do not deposit or swap large amounts of funds.</span>
+    <div class="flxr thorchain-indicator">
+      <span style="margin-right: 6px">Powered by <a target="_blank" href="https://thorchain.org/">THORChain</a> </span>
+      <app-last-block-indicator></app-last-block-indicator>
+    </div>
   </div>
 </footer>
 
