@@ -131,14 +131,19 @@ footer {
   width: 100%;
   padding: 15px 15px;
   font-family: 'VT323', monospace;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  flex-flow: column;
 
-  @media (min-width: 768px) {
-    flex-flow: row;
-    align-items: flex-end;
+  .footer-content {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-flow: column;
+
+    @media (min-width: 768px) {
+      flex-flow: row;
+      align-items: flex-end;
+    }
+
   }
 
   a {
@@ -155,4 +160,33 @@ footer {
     }
 
   }
+
+  .footer-social {
+    padding-bottom: 15px;
+
+    // img {
+    //   width: 24px;
+    // }
+
+    .footer-logo {
+      background-color: #15a36f;
+      display: block;
+      width: 25px;
+      height: 25px;
+      margin-left: 12px;
+
+      &--twitter {
+        -webkit-mask: url(https://raw.githubusercontent.com/Pusher-Labs/asgard-exchange/master/src/assets/icons/twitter-brands.svg) no-repeat center;
+        mask: url(https://raw.githubusercontent.com/Pusher-Labs/asgard-exchange/master/src/assets/icons/twitter-brands.svg) no-repeat center;
+      }
+
+      &--github {
+        -webkit-mask: url(https://raw.githubusercontent.com/Pusher-Labs/asgard-exchange/master/src/assets/icons/github-alt-brands.svg) no-repeat center;
+        mask: url(https://raw.githubusercontent.com/Pusher-Labs/asgard-exchange/master/src/assets/icons/github-alt-brands.svg) no-repeat center;
+      }
+
+    }
+
+  }
+
 }
