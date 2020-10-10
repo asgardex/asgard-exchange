@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ConfirmUnstakeModalComponent } from './confirm-unstake-modal.component';
+import { ConfirmWithdrawModalComponent } from './confirm-withdraw-modal.component';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { User } from 'src/app/_classes/user';
-import { Asset } from 'src/app/_classes/asset';
+import { User } from '../../_classes/user';
+import { Asset } from '../../_classes/asset';
 
-describe('ConfirmUnstakeModalComponent', () => {
-  let component: ConfirmUnstakeModalComponent;
-  let fixture: ComponentFixture<ConfirmUnstakeModalComponent>;
+describe('ConfirmWithdrawModalComponent', () => {
+  let component: ConfirmWithdrawModalComponent;
+  let fixture: ComponentFixture<ConfirmWithdrawModalComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ConfirmUnstakeModalComponent ],
+      declarations: [ ConfirmWithdrawModalComponent ],
       providers: [
         { provide: MAT_DIALOG_DATA, useValue: {
             asset: new Asset('BNB'),
@@ -37,7 +37,7 @@ describe('ConfirmUnstakeModalComponent', () => {
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ConfirmUnstakeModalComponent);
+    fixture = TestBed.createComponent(ConfirmWithdrawModalComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

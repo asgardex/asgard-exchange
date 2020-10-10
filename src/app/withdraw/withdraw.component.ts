@@ -10,14 +10,14 @@ import { User } from '../_classes/user';
 import { LastBlockService } from '../_services/last-block.service';
 import { MidgardService } from '../_services/midgard.service';
 import { UserService } from '../_services/user.service';
-import { ConfirmUnstakeModalComponent } from './confirm-unstake-modal/confirm-unstake-modal.component';
+import { ConfirmWithdrawModalComponent } from './confirm-withdraw-modal/confirm-withdraw-modal.component';
 
 @Component({
-  selector: 'app-unstake',
-  templateUrl: './unstake.component.html',
-  styleUrls: ['./unstake.component.scss']
+  selector: 'app-withdraw',
+  templateUrl: './withdraw.component.html',
+  styleUrls: ['./withdraw.component.scss']
 })
-export class UnstakeComponent implements OnInit {
+export class WithdrawComponent implements OnInit {
 
   runeSymbol = environment.network === 'chaosnet' ? 'RUNE-B1A' : 'RUNE-67C';
 
@@ -184,7 +184,7 @@ export class UnstakeComponent implements OnInit {
     const assetBasePrice = getValueOfRuneInAsset(assetToBase(assetAmount(1)), this.assetPoolData).amount().div(10 ** 8).toNumber();
 
     const dialogRef = this.dialog.open(
-      ConfirmUnstakeModalComponent,
+      ConfirmWithdrawModalComponent,
       {
         // width: '50vw',
         maxWidth: '420px',
