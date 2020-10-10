@@ -45,7 +45,7 @@
         class="main-action-btn"
         mat-flat-button
         color="primary"
-        [disabled]="!sourceAssetUnit || !selectedSourceAsset || !selectedTargetAsset || !targetAssetUnit || sourceAssetUnit > sourceBalance || !user || !balances"
+        [disabled]="formInvalid()"
       >
         {{mainButtonText()}}
       </button>

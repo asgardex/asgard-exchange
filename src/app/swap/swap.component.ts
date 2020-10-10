@@ -201,15 +201,21 @@ export class SwapComponent implements OnInit, OnDestroy {
     else if (!this.sourceAssetUnit) {
       return 'Enter an amount';
     }
-    else if (this.sourceAssetUnit > this.sourceBalance) {
+    else if (this.sourceAssetUnit > this.userService.maximumSpendableBalance(this.selectedSourceAsset, this.sourceBalance)) {
       return 'Insufficient balance';
-    }
-    else if (this.user && this.sourceAssetUnit && this.sourceAssetUnit <= this.sourceBalance && this.selectedTargetAsset) {
+    } else if (this.user && this.sourceAssetUnit && this.sourceAssetUnit <= this.sourceBalance && this.selectedTargetAsset) {
       return 'Swap';
     } else {
       console.warn('error creating main button text');
     }
 
+  }
+
+  formInvalid(): boolean {
+    return !this.sourceAssetUnit || !this.selectedSourceAsset || !this.selectedTargetAsset || !this.targetAssetUnit
+      || (this.selectedSourceAsset && this.sourceBalance
+        && (this.sourceAssetUnit > this.userService.maximumSpendableBalance(this.selectedSourceAsset, this.sourceBalance)))
+      || !this.user || !this.balances;
   }
 
   openConfirmationDialog() {
@@ -330,9 +336,12 @@ export class SwapComponent implements OnInit, OnDestroy {
       this.selectedSourceAsset = target;
 
       if (targetBalance && targetInput) {
-        this.sourceAssetUnit = (targetBalance < targetInput.div(10 ** 8 ).toNumber())
-          ? targetBalance
-          : targetInput.div(10 ** 8 ).toNumber();
+
+        const max = this.userService.maximumSpendableBalance(target, targetBalance);
+
+        this.sourceAssetUnit = (targetBalance < targetInput.div(10 ** 8 ).toNumber()) // if target balance is less than target input
+          ? max // use balance
+          : targetInput.div(10 ** 8 ).toNumber(); // otherwise use input value
       } else {
         this.sourceAssetUnit = (targetInput) ? targetInput.div(10 ** 8 ).toNumber() : 0;
       }

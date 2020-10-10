@@ -38,12 +38,9 @@
       class="main-action-btn"
       mat-flat-button
       color="primary"
-      [disabled]="!balances || !runeAmount || !assetAmount || (balances && (runeAmount > runeBalance || assetAmount > assetBalance))"
+      [disabled]="formDisabled()"
     >
-      <span *ngIf="!balances">Please connect wallet</span>
-      <span *ngIf="balances && (!runeAmount || !assetAmount)">Enter an amount</span>
-      <span *ngIf="balances && (runeAmount > runeBalance || assetAmount > assetBalance)">Insufficient balance</span>
-      <span *ngIf="balances && runeAmount && assetAmount && (runeAmount <= runeBalance) && (assetAmount <= assetBalance)">Deposit</span>
+      {{mainButtonText()}}
     </button>
 
     <div class="tag" *ngIf="assetAmount">

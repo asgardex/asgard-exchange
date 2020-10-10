@@ -2,6 +2,7 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Asset } from 'src/app/_classes/asset';
 import { MarketsModalComponent } from '../markets-modal/markets-modal.component';
 import { MatDialog } from '@angular/material/dialog';
+import { UserService } from 'src/app/_services/user.service';
 
 @Component({
   selector: 'app-asset-input',
@@ -43,7 +44,7 @@ export class AssetInputComponent implements OnInit {
   @Input() loading: boolean;
   @Input() error: boolean;
 
-  constructor(private dialog: MatDialog) {
+  constructor(private dialog: MatDialog, private userService: UserService) {
   }
 
   ngOnInit(): void {
@@ -56,7 +57,8 @@ export class AssetInputComponent implements OnInit {
   setMax() {
 
     if (this.balance) {
-      this.assetUnitChange.emit(this.balance);
+      const max = this.userService.maximumSpendableBalance(this.selectedAsset, this.balance);
+      this.assetUnitChange.emit(max);
     }
 
   }
