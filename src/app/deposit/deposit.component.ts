@@ -155,6 +155,32 @@ export class DepositComponent implements OnInit, OnDestroy {
     );
   }
 
+  formDisabled(): boolean {
+
+    return !this.balances || !this.runeAmount || !this.assetAmount
+    || (this.balances
+      && (this.runeAmount > this.runeBalance || this.assetAmount > this.userService.maximumSpendableBalance(this.asset, this.assetBalance))
+    );
+  }
+
+  mainButtonText(): string {
+
+    if (!this.balances) {
+      return 'Please connect wallet';
+    } else if (this.balances && (!this.runeAmount || !this.assetAmount)) {
+      return 'Enter an amount';
+    } else if (this.balances && (this.runeAmount > this.runeBalance
+      || this.assetAmount > this.userService.maximumSpendableBalance(this.asset, this.assetBalance))) {
+      return 'Insufficient balance';
+    } else if (this.balances && this.runeAmount && this.assetAmount
+      && (this.runeAmount <= this.runeBalance) && (this.assetAmount <= this.assetBalance)) {
+      return 'Deposit';
+    } else {
+      console.warn('mismatch case for main button text');
+      return;
+    }
+  }
+
   openConfirmationDialog() {
 
     const runeBasePrice = getValueOfAssetInRune(assetToBase(assetAmount(1)), this.assetPoolData).amount().div(10 ** 8).toNumber();

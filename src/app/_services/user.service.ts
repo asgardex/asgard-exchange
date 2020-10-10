@@ -110,6 +110,17 @@ export class UserService {
 
   }
 
+  maximumSpendableBalance(asset: Asset, balance: number) {
+
+    if (asset.chain === 'BNB' && asset.symbol === 'BNB') {
+      const max = balance - 0.01 - 0.000375;
+      return (max >= 0) ? max : 0;
+    } else {
+      return balance;
+    }
+
+  }
+
   /** check if symbol is BEP-8 mini-BEP2 token
    * return true or false
    */

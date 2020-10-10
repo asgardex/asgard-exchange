@@ -201,13 +201,9 @@ export class SwapComponent implements OnInit, OnDestroy {
     else if (!this.sourceAssetUnit) {
       return 'Enter an amount';
     }
-    else if (this.sourceAssetUnit > this.sourceBalance) {
+    else if (this.sourceAssetUnit > this.userService.maximumSpendableBalance(this.selectedSourceAsset, this.sourceBalance)) {
       return 'Insufficient balance';
-    } else if ( (this.selectedSourceAsset.symbol === 'BNB' || this.selectedSourceAsset.symbol === 'BNB.BNB')
-      && this.sourceAssetUnit > this.sourceBalance - 0.01 - 0.000375) {
-      return 'Insufficient balance';
-    }
-    else if (this.user && this.sourceAssetUnit && this.sourceAssetUnit <= this.sourceBalance && this.selectedTargetAsset) {
+    } else if (this.user && this.sourceAssetUnit && this.sourceAssetUnit <= this.sourceBalance && this.selectedTargetAsset) {
       return 'Swap';
     } else {
       console.warn('error creating main button text');
@@ -217,9 +213,8 @@ export class SwapComponent implements OnInit, OnDestroy {
 
   formInvalid(): boolean {
     return !this.sourceAssetUnit || !this.selectedSourceAsset || !this.selectedTargetAsset || !this.targetAssetUnit
-      || this.sourceAssetUnit > this.sourceBalance
-      || (this.selectedSourceAsset.symbol === 'BNB'
-        || this.selectedSourceAsset.symbol === 'BNB.BNB') && this.sourceAssetUnit > this.sourceBalance - 0.01 - 0.000375
+      || (this.selectedSourceAsset && this.sourceBalance
+        && (this.sourceAssetUnit > this.userService.maximumSpendableBalance(this.selectedSourceAsset, this.sourceBalance)))
       || !this.user || !this.balances;
   }
 
@@ -342,9 +337,7 @@ export class SwapComponent implements OnInit, OnDestroy {
 
       if (targetBalance && targetInput) {
 
-        const max = (target.symbol === 'BNB')
-          ? (targetBalance - 0.01 - 0.000375) >= 0 ? targetBalance - 0.01 - 0.000375 : 0
-          : targetBalance;
+        const max = this.userService.maximumSpendableBalance(target, targetBalance);
 
         this.sourceAssetUnit = (targetBalance < targetInput.div(10 ** 8 ).toNumber()) // if target balance is less than target input
           ? max // use balance
