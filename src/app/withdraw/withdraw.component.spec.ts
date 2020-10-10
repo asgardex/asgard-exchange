@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
-import { UnstakeComponent } from './unstake.component';
+import { WithdrawComponent } from './withdraw.component';
 import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
-describe('UnstakeComponent', () => {
-  let component: UnstakeComponent;
-  let fixture: ComponentFixture<UnstakeComponent>;
+describe('WithdrawComponent', () => {
+  let component: WithdrawComponent;
+  let fixture: ComponentFixture<WithdrawComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ UnstakeComponent ],
+      declarations: [ WithdrawComponent ],
       providers: [
         { provide: MAT_DIALOG_DATA, useValue: {} },
       ],
@@ -20,7 +20,7 @@ describe('UnstakeComponent', () => {
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(UnstakeComponent);
+    fixture = TestBed.createComponent(WithdrawComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -3,18 +3,18 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { TransferResult } from '@thorchain/asgardex-binance';
 import { tokenAmount, tokenToBase } from '@thorchain/asgardex-token';
 import { Subscription } from 'rxjs';
-import { Asset } from 'src/app/_classes/asset';
-import { PoolAddressDTO } from 'src/app/_classes/pool-address';
-import { User } from 'src/app/_classes/user';
-import { TransactionConfirmationState } from 'src/app/_const/transaction-confirmation-state';
-import { BinanceService } from 'src/app/_services/binance.service';
-import { MidgardService } from 'src/app/_services/midgard.service';
-import { UserService } from 'src/app/_services/user.service';
-import { WalletConnectService } from 'src/app/_services/wallet-connect.service';
+import { PoolAddressDTO } from '../../_classes/pool-address';
+import { User } from '../../_classes/user';
+import { TransactionConfirmationState } from '../../_const/transaction-confirmation-state';
+import { BinanceService } from '../../_services/binance.service';
+import { MidgardService } from '../../_services/midgard.service';
+import { UserService } from '../../_services/user.service';
+import { WalletConnectService } from '../../_services/wallet-connect.service';
+import { Asset } from '../../_classes/asset';
 import { environment } from 'src/environments/environment';
 
 // TODO: this is the same as ConfirmStakeData in confirm stake modal
-export interface ConfirmUnstakeData {
+export interface ConfirmWithdrawData {
   asset: Asset;
   rune: Asset;
   assetAmount: number;
@@ -26,11 +26,11 @@ export interface ConfirmUnstakeData {
 }
 
 @Component({
-  selector: 'app-confirm-unstake-modal',
-  templateUrl: './confirm-unstake-modal.component.html',
-  styleUrls: ['./confirm-unstake-modal.component.scss']
+  selector: 'app-confirm-withdraw-modal',
+  templateUrl: './confirm-withdraw-modal.component.html',
+  styleUrls: ['./confirm-withdraw-modal.component.scss']
 })
-export class ConfirmUnstakeModalComponent implements OnInit, OnDestroy {
+export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
 
   runeSymbol = environment.network === 'chaosnet' ? 'RUNE-B1A' : 'RUNE-67C';
   txState: TransactionConfirmationState;
@@ -38,8 +38,8 @@ export class ConfirmUnstakeModalComponent implements OnInit, OnDestroy {
   subs: Subscription[];
 
   constructor(
-    @Inject(MAT_DIALOG_DATA) public data: ConfirmUnstakeData,
-    public dialogRef: MatDialogRef<ConfirmUnstakeModalComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: ConfirmWithdrawData,
+    public dialogRef: MatDialogRef<ConfirmWithdrawModalComponent>,
     private walletConnectService: WalletConnectService,
     private binanceService: BinanceService,
     private midgardService: MidgardService,

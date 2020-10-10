@@ -21,8 +21,8 @@ const routes: Routes = [
     loadChildren: () => import('./deposit/deposit.module').then(m => m.DepositModule),
   },
   {
-    path: 'unstake',
-    loadChildren: () => import('./unstake/unstake.module').then(m => m.UnstakeModule),
+    path: 'withdraw',
+    loadChildren: () => import('./withdraw/withdraw.module').then(m => m.WithdrawModule),
   },
 ];
 

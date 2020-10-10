@@ -21,7 +21,6 @@ export class MidgardService {
   constructor(private http: HttpClient) {
     this.basePath = (environment.network === 'testnet')
       ? 'https://midgard.bepswap.com/v1'
-      // ? 'http://168.119.21.60:8080/v1'
       : 'https://chaosnet-midgard.bepswap.com/v1';
   }
 
