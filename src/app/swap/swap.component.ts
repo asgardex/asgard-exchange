@@ -203,6 +203,9 @@ export class SwapComponent implements OnInit, OnDestroy {
     }
     else if (this.sourceAssetUnit > this.sourceBalance) {
       return 'Insufficient balance';
+    } else if ( (this.selectedSourceAsset.symbol === 'BNB' || this.selectedSourceAsset.symbol === 'BNB.BNB')
+      && this.sourceAssetUnit > this.sourceBalance - 0.01 - 0.000375) {
+      return 'Insufficient balance';
     }
     else if (this.user && this.sourceAssetUnit && this.sourceAssetUnit <= this.sourceBalance && this.selectedTargetAsset) {
       return 'Swap';
@@ -210,6 +213,14 @@ export class SwapComponent implements OnInit, OnDestroy {
       console.warn('error creating main button text');
     }
 
+  }
+
+  formInvalid(): boolean {
+    return !this.sourceAssetUnit || !this.selectedSourceAsset || !this.selectedTargetAsset || !this.targetAssetUnit
+      || this.sourceAssetUnit > this.sourceBalance
+      || (this.selectedSourceAsset.symbol === 'BNB'
+        || this.selectedSourceAsset.symbol === 'BNB.BNB') && this.sourceAssetUnit > this.sourceBalance - 0.01 - 0.000375
+      || !this.user || !this.balances;
   }
 
   openConfirmationDialog() {
@@ -330,9 +341,14 @@ export class SwapComponent implements OnInit, OnDestroy {
       this.selectedSourceAsset = target;
 
       if (targetBalance && targetInput) {
-        this.sourceAssetUnit = (targetBalance < targetInput.div(10 ** 8 ).toNumber())
-          ? targetBalance
-          : targetInput.div(10 ** 8 ).toNumber();
+
+        const max = (target.symbol === 'BNB')
+          ? (targetBalance - 0.01 - 0.000375) >= 0 ? targetBalance - 0.01 - 0.000375 : 0
+          : targetBalance;
+
+        this.sourceAssetUnit = (targetBalance < targetInput.div(10 ** 8 ).toNumber()) // if target balance is less than target input
+          ? max // use balance
+          : targetInput.div(10 ** 8 ).toNumber(); // otherwise use input value
       } else {
         this.sourceAssetUnit = (targetInput) ? targetInput.div(10 ** 8 ).toNumber() : 0;
       }

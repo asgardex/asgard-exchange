@@ -56,7 +56,12 @@ export class AssetInputComponent implements OnInit {
   setMax() {
 
     if (this.balance) {
-      this.assetUnitChange.emit(this.balance);
+
+      const max = (this.selectedAsset.chain === 'BNB' && this.selectedAsset.symbol === 'BNB')
+        ? (this.balance - 0.01 - 0.000375) >= 0 ? this.balance - 0.01 - 0.000375 : 0 // ensure there is enough BNB
+        : this.balance;
+
+      this.assetUnitChange.emit(max);
     }
 
   }
