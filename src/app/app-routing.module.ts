@@ -17,8 +17,8 @@ const routes: Routes = [
     loadChildren: () => import('./pool/pool.module').then(m => m.PoolModule),
   },
   {
-    path: 'stake',
-    loadChildren: () => import('./stake/stake.module').then(m => m.StakeModule),
+    path: 'deposit',
+    loadChildren: () => import('./deposit/deposit.module').then(m => m.DepositModule),
   },
   {
     path: 'unstake',

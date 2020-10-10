@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ConfirmStakeModalComponent } from './confirm-stake-modal.component';
+import { ConfirmDepositModalComponent } from './confirm-deposit-modal.component';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Asset } from 'src/app/_classes/asset';
 import { User } from 'src/app/_classes/user';
 
-describe('ConfirmStakeModalComponent', () => {
-  let component: ConfirmStakeModalComponent;
-  let fixture: ComponentFixture<ConfirmStakeModalComponent>;
+describe('ConfirmDepositModalComponent', () => {
+  let component: ConfirmDepositModalComponent;
+  let fixture: ComponentFixture<ConfirmDepositModalComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ConfirmStakeModalComponent ],
+      declarations: [ ConfirmDepositModalComponent ],
       providers: [
         { provide: MAT_DIALOG_DATA, useValue: {
             asset: new Asset('BNB'),
@@ -32,7 +32,7 @@ describe('ConfirmStakeModalComponent', () => {
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ConfirmStakeModalComponent);
+    fixture = TestBed.createComponent(ConfirmDepositModalComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
