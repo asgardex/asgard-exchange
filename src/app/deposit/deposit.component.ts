@@ -8,15 +8,15 @@ import { AssetBalance } from '../_classes/asset-balance';
 import { MidgardService } from '../_services/midgard.service';
 import { UserService } from '../_services/user.service';
 import { MatDialog } from '@angular/material/dialog';
-import { ConfirmStakeModalComponent } from './confirm-stake-modal/confirm-stake-modal.component';
+import { ConfirmDepositModalComponent } from './confirm-deposit-modal/confirm-deposit-modal.component';
 import { User } from '../_classes/user';
 
 @Component({
-  selector: 'app-stake',
-  templateUrl: './stake.component.html',
-  styleUrls: ['./stake.component.scss']
+  selector: 'app-deposit',
+  templateUrl: './deposit.component.html',
+  styleUrls: ['./deposit.component.scss']
 })
-export class StakeComponent implements OnInit, OnDestroy {
+export class DepositComponent implements OnInit, OnDestroy {
 
   runeSymbol = environment.network === 'chaosnet' ? 'RUNE-B1A' : 'RUNE-67C';
 
@@ -45,7 +45,7 @@ export class StakeComponent implements OnInit, OnDestroy {
       } else {
 
         if (val.symbol !== this._asset.symbol) {
-          this.router.navigate(['/', 'stake', val.symbol]);
+          this.router.navigate(['/', 'deposit', val.symbol]);
           this._asset = val;
           this.assetBalance = this.userService.findBalance(this.balances, this.asset);
         }
@@ -161,7 +161,7 @@ export class StakeComponent implements OnInit, OnDestroy {
     const assetBasePrice = getValueOfRuneInAsset(assetToBase(assetAmount(1)), this.assetPoolData).amount().div(10 ** 8).toNumber();
 
     const dialogRef = this.dialog.open(
-      ConfirmStakeModalComponent,
+      ConfirmDepositModalComponent,
       {
         width: '50vw',
         maxWidth: '420px',

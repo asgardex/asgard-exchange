@@ -1,18 +1,18 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { StakeComponent } from './stake.component';
+import { DepositComponent } from './deposit.component';
 import { RouterModule } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { AssetInputModule } from '../_components/asset-input/asset-input.module';
-import { ConfirmStakeModalComponent } from './confirm-stake-modal/confirm-stake-modal.component';
+import { ConfirmDepositModalComponent } from './confirm-deposit-modal/confirm-deposit-modal.component';
 import { TransactionProcessingModalModule } from '../_components/transaction-processing-modal/transaction-processing-modal.module';
 import { TransactionSuccessModalModule } from '../_components/transaction-success-modal/transaction-success-modal.module';
 
 
 
 @NgModule({
-  declarations: [StakeComponent, ConfirmStakeModalComponent],
+  declarations: [DepositComponent, ConfirmDepositModalComponent],
   imports: [
     CommonModule,
     MatButtonModule,
@@ -23,7 +23,7 @@ import { TransactionSuccessModalModule } from '../_components/transaction-succes
     RouterModule.forChild([
       {
         path: ':asset',
-        component: StakeComponent
+        component: DepositComponent
       },
       {
         path: '',
@@ -32,4 +32,4 @@ import { TransactionSuccessModalModule } from '../_components/transaction-succes
     ])
   ]
 })
-export class StakeModule { }
+export class DepositModule { }

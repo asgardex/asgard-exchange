@@ -13,7 +13,7 @@ import { UserService } from 'src/app/_services/user.service';
 import { WalletConnectService } from 'src/app/_services/wallet-connect.service';
 import { environment } from 'src/environments/environment';
 
-export interface ConfirmStakeData {
+export interface ConfirmDepositData {
   asset: Asset;
   rune: Asset;
   assetAmount: number;
@@ -24,19 +24,19 @@ export interface ConfirmStakeData {
 }
 
 @Component({
-  selector: 'app-confirm-stake-modal',
-  templateUrl: './confirm-stake-modal.component.html',
-  styleUrls: ['./confirm-stake-modal.component.scss']
+  selector: 'app-confirm-deposit-modal',
+  templateUrl: './confirm-deposit-modal.component.html',
+  styleUrls: ['./confirm-deposit-modal.component.scss']
 })
-export class ConfirmStakeModalComponent implements OnInit, OnDestroy {
+export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
 
   txState: TransactionConfirmationState;
   hash: string;
   subs: Subscription[];
 
   constructor(
-    @Inject(MAT_DIALOG_DATA) public data: ConfirmStakeData,
-    public dialogRef: MatDialogRef<ConfirmStakeModalComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: ConfirmDepositData,
+    public dialogRef: MatDialogRef<ConfirmDepositModalComponent>,
     private walletConnectService: WalletConnectService,
     private midgardService: MidgardService,
     private userService: UserService,
