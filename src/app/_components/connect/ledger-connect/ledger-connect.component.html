@@ -8,16 +8,10 @@
     <div style="width: 40px"></div>
   </div>
 
-
-  <!-- <div class="modal-head">
-  <button mat-flat-button style="color: rgb(33, 114, 229)" (click)="clearKeystore()">
-    Back
-  </button>
-  </div> -->
   <div class="dialog-content">
     <div mat-dialog-content>
 
-      <div *ngIf="!connected">
+      <div *ngIf="view === 'pendingConnect'">
 
         <ol id="ledger-instructions">
 
@@ -58,8 +52,24 @@
 
       </div>
 
-      <div *ngIf="connected && !confirmed">
+      <div *ngIf="view === 'selectAddress'">
+        <label id="select-address-group">Select an Address</label>
+        <mat-radio-group
+          aria-labelledby="select-address-group"
+          class="example-radio-group"
+          [(ngModel)]="selectedAddress">
+          <mat-radio-button class="example-radio-button" *ngFor="let address of addresses" [value]="address">
+            {{address}}
+          </mat-radio-button>
+        </mat-radio-group>
 
+        <button (click)="selectAddress()">Select</button>
+
+      </div>
+
+      <div *ngIf="view === 'pendingConfirmation'">
+        <p>... pending confirmation for</p>
+        <p>{{selectedAddress}}</p>
       </div>
 
     </div>

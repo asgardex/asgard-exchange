@@ -6,11 +6,13 @@ export class User {
   type: WalletType;
   wallet: string; // Address
   keystore?: any;
-  // ledger?: FixmeType;
-  // hdPath?: number [];
+
+  // for Ledger
+  ledger?: any;
+  hdPath?: number [];
   // walletConnector?: FixmeType;
 
-  constructor(user: {type: WalletType, wallet: string, keystore?: any}) {
+  constructor(user: {type: WalletType, wallet: string, keystore?: any, ledger?: any, hdPath?: number[]}) {
     this.type = user.type;
     this.wallet = user.wallet;
     this.keystore = user.keystore ?? null;

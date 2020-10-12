@@ -6,9 +6,12 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 /** COMPONENTS */
 import { AppComponent } from './app.component';
-import { HeaderComponent } from './_components/header/header.component';
 import { ConnectComponent, ConnectModal } from './_components/connect/connect.component';
+import { ConnectErrorComponent } from './_components/connect/connect-error/connect-error.component';
+import { HeaderComponent } from './_components/header/header.component';
 import { KeystoreConnectComponent } from './_components/connect/keystore-connect/keystore-connect.component';
+import { LastBlockIndicatorComponent } from './_components/last-block-indicator/last-block-indicator.component';
+import { LedgerConnectComponent } from './_components/connect/ledger-connect/ledger-connect.component';
 
 /** MODULES */
 import { AppRoutingModule } from './app-routing.module';
@@ -25,9 +28,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { ConnectErrorComponent } from './_components/connect/connect-error/connect-error.component';
-import { LastBlockIndicatorComponent } from './_components/last-block-indicator/last-block-indicator.component';
-import { LedgerConnectComponent } from './_components/connect/ledger-connect/ledger-connect.component';
+import { MatRadioModule } from '@angular/material/radio';
 
 
 @NgModule({
@@ -49,6 +50,7 @@ import { LedgerConnectComponent } from './_components/connect/ledger-connect/led
     MatButtonModule,
     MatIconModule,
     MatDialogModule,
+    MatRadioModule,
     MatProgressSpinnerModule,
     AppRoutingModule,
   ],
