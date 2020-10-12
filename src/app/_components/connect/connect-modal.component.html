@@ -9,12 +9,17 @@
       <!-- Connect Options -->
 
       <button class="connect-option" (click)="connectWalletConnect()" [disabled]="isTestnet">
-        <img src="assets/images/wallet-connect-icon.svg" />
+        <img class="connect-option__logo" src="assets/images/wallet-connect-icon.svg" />
         <span>Wallet Connect</span>
       </button>
 
+      <button class="connect-option" (click)="connectLedger()" [disabled]="isTestnet">
+        <img id="ledger-logo" class="connect-option__logo" src="assets/images/ledger/ledger-logo.png" />
+        <span>Ledger</span>
+      </button>
+
       <button class="connect-option" (click)="connectKeystore()">
-        <mat-icon>vpn_key</mat-icon>
+        <mat-icon class="connect-option__logo">vpn_key</mat-icon>
         <span>Keystore</span>
       </button>
 
@@ -31,5 +36,8 @@
 
 <!-- KEYSTORE -->
 <app-keystore-connect *ngIf="connectionMethod == 'KEYSTORE'" (back)="clearConnectionMethod()" (closeModal)="close()"></app-keystore-connect>
+
+<!-- Ledger -->
+<app-ledger-connect *ngIf="connectionMethod == 'LEDGER'" (back)="clearConnectionMethod()" (closeModal)="close()"></app-ledger-connect>
 
 <!-- <app-connect-error *ngIf="error" (back)="clearConnectionMethod()"></app-connect-error> -->

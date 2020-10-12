@@ -27,6 +27,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ConnectErrorComponent } from './_components/connect/connect-error/connect-error.component';
 import { LastBlockIndicatorComponent } from './_components/last-block-indicator/last-block-indicator.component';
+import { LedgerConnectComponent } from './_components/connect/ledger-connect/ledger-connect.component';
 
 
 @NgModule({
@@ -38,6 +39,7 @@ import { LastBlockIndicatorComponent } from './_components/last-block-indicator/
     KeystoreConnectComponent,
     ConnectErrorComponent,
     LastBlockIndicatorComponent,
+    LedgerConnectComponent,
   ],
   imports: [
     BrowserModule,

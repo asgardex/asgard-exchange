@@ -104,8 +104,9 @@ export class ConnectComponent implements OnInit, OnDestroy {
 }
 
 export enum ConnectionMethod {
+  LEDGER          = 'LEDGER',
+  KEYSTORE        = 'KEYSTORE',
   WALLET_CONNECT  = 'WALLET_CONNECT',
-  KEYSTORE        = 'KEYSTORE'
 }
 
 @Component({
@@ -145,6 +146,10 @@ export class ConnectModal implements OnDestroy {
 
   connectKeystore() {
     this.connectionMethod = ConnectionMethod.KEYSTORE;
+  }
+
+  connectLedger() {
+    this.connectionMethod = ConnectionMethod.LEDGER;
   }
 
   clearConnectionMethod() {

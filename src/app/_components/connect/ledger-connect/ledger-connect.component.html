@@ -1,0 +1,84 @@
+<div class="container">
+
+  <div style="padding: 1rem 1rem 0" class="section-head-container">
+    <button (click)="onBackClick()" mat-icon-button>
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1>Ledger Login</h1>
+    <div style="width: 40px"></div>
+  </div>
+
+
+  <!-- <div class="modal-head">
+  <button mat-flat-button style="color: rgb(33, 114, 229)" (click)="clearKeystore()">
+    Back
+  </button>
+  </div> -->
+  <div class="dialog-content">
+    <div mat-dialog-content>
+
+      <div *ngIf="!connected">
+
+        <ol id="ledger-instructions">
+
+          <li class="step">
+            <span>1. Enter Pin Code</span>
+            <img src="/assets/images/ledger/ledger-pin.svg" />
+          </li>
+
+          <li class="step">
+            <span>2. Open Binance Chain</span>
+            <img src="/assets/images/ledger/ledger-app.svg" />
+          </li>
+
+        </ol>
+
+        <span>“Binance Chain Ready” must be on-screen</span>
+
+        <a target="_blank" href="https://www.binance.org/static/guides/DEX-Ledger-Documentation.html">Installation and Usage Guide</a>
+        <a target="_blank" href="https://support.ledger.com/hc/en-us/articles/115005165269-Connection-issues-with-Windows-or-Linux">Connection Issues?</a>
+
+        <div>
+          <button (click)="connectLedger()">Connect Ledger</button>
+        </div>
+
+        <!-- <input #keystoreInput hidden="true" type="file" onclick="this.value=null" (change)="onKeystoreFileChange($event)" />
+        <button class="uni-input uni-input--file" (click)="keystoreInput.click()">
+          <span>Upload Keystore File</span>
+          <mat-icon *ngIf="!keystoreFileSelected">vpn_key</mat-icon>
+          <mat-icon *ngIf="keystoreFileSelected" [ngStyle]="{'color':'green'}">check</mat-icon>
+        </button>
+
+
+        <div class="uni-input">
+          <label>Password</label>
+          <input [(ngModel)]="keystorePassword" name="keystore-password" placeholder="Please Enter Password" type="password" />
+        </div> -->
+
+
+      </div>
+
+      <div *ngIf="connected && !confirmed">
+
+      </div>
+
+    </div>
+
+    <!-- <div class="flxr flxr--just-space-between flxr--align-center" style="height: 38px">
+      <div>
+        <span *ngIf="keystoreError" style="font-size: 0.8rem; color: #2172e5">Keystore Login Incorrect</span>
+      </div>
+      <div>
+        <button *ngIf="!keystoreConnecting" mat-flat-button color="accent" (click)="keystoreUnlockClicked()" [disabled]="keystoreConnecting">
+          <span>Unlock</span>
+        </button>
+        <mat-progress-spinner mode="indeterminate" diameter="30" *ngIf="keystoreConnecting"></mat-progress-spinner>
+
+      </div>
+    </div> -->
+
+  </div>
+
+</div>
+
+
