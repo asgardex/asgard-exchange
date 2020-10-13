@@ -96,7 +96,7 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
           const memo = `STAKE:BNB.${this.data.asset.symbol}`;
 
           if (matchingPool) {
-            if (this.data.user.type === 'keystore') {
+            if (this.data.user.type === 'keystore' || this.data.user.type === 'ledger') {
               this.keystoreTransaction(outputs, memo);
             } else if (this.data.user.type === 'walletconnect') {
               this.walletConnectTransaction(outputs, memo, matchingPool);
@@ -114,6 +114,9 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
     const bncClient = this.binanceService.bncClient;
 
     if (this.data.user.type === 'ledger') {
+
+      console.log('data user is: ', this.data.user);
+
       bncClient.useLedgerSigningDelegate(
         this.data.user.ledger,
         () => this.txState = TransactionConfirmationState.PENDING_LEDGER_CONFIRMATION,
