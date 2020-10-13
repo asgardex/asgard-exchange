@@ -351,6 +351,10 @@ input[type=number] {
     align-items: center;
   }
 
+  &--align-end {
+    align-items: end;
+  }
+
   &--flow-col {
     flex-flow: column;
   }
