@@ -26,19 +26,6 @@ export class LedgerConnectComponent {
     this.back = new EventEmitter<null>();
     this.closeModal = new EventEmitter<null>();
     this.view = 'pendingConnect';
-
-
-    // testing
-    this.addresses = [
-      'bnb1ylrt9zyreh35v6gyep78xwlpc90retfxega5uf',
-      'bnb1473pn6q7e8yljrr45m8wncp2keqvm4rngy8kt8',
-      'bnb1x4r6ax4msdgk2fjkc387awwjp0kpm2rk29zt8g',
-      'bnb1uv40shxhmdluejgk6c6r2ana76q9mzdyyjv6g4'
-    ];
-    this.view = 'pendingConfirmation';
-    this.selectedAddress = 'tb1q75z9ake8lr2aka5t4d4per3jel4n7dg3q7lefn';
-    // this.loading = true;
-
   }
 
   async connectLedger() {
