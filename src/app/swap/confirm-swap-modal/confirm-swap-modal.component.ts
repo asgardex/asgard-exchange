@@ -56,6 +56,7 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
         if (!user) {
           this.closeDialog();
         }
+        this.user = user;
       }
     );
 
@@ -85,7 +86,7 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
 
           if (matchingPool) {
 
-            if (this.swapData.user.type === 'keystore') {
+            if (this.swapData.user.type === 'keystore' || this.swapData.user.type === 'ledger') {
               this.keystoreTransfer(matchingPool);
             } else if (this.swapData.user.type === 'walletconnect') {
               this.walletConnectTransfer(matchingPool);
@@ -103,6 +104,17 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
   async keystoreTransfer(matchingPool: PoolAddressDTO) {
 
     const bncClient = this.binanceService.bncClient;
+
+    if (this.swapData.user.type === 'ledger') {
+      bncClient.useLedgerSigningDelegate(
+        this.user.ledger,
+        () => this.txState = TransactionConfirmationState.PENDING_LEDGER_CONFIRMATION,
+        () => this.txState = TransactionConfirmationState.SUBMITTING,
+        (err) => console.log('error: ', err),
+        this.user.hdPath
+      );
+    }
+
     await bncClient.initChain();
 
     // Check of `validateSwap` before makes sure that we have a valid number here

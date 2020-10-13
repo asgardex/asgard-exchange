@@ -16,6 +16,8 @@ export class User {
     this.type = user.type;
     this.wallet = user.wallet;
     this.keystore = user.keystore ?? null;
+    this.ledger = user.ledger ?? null;
+    this.hdPath = user.hdPath ?? null;
   }
 
 }

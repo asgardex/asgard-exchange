@@ -83,7 +83,7 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
                 },
                 {
                   denom: this.data.asset.symbol,
-                  amount: (this.data.user.type === 'keystore')
+                  amount: (this.data.user.type === 'keystore' || this.data.user.type === 'ledger')
                     ? this.data.assetAmount
                     : tokenToBase(tokenAmount(this.data.assetAmount))
                       .amount()
@@ -112,6 +112,17 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
   async keystoreTransaction(outputs: MultiTransfer[], memo: string) {
 
     const bncClient = this.binanceService.bncClient;
+
+    if (this.data.user.type === 'ledger') {
+      bncClient.useLedgerSigningDelegate(
+        this.data.user.ledger,
+        () => this.txState = TransactionConfirmationState.PENDING_LEDGER_CONFIRMATION,
+        () => this.txState = TransactionConfirmationState.SUBMITTING,
+        (err) => console.log('error: ', err),
+        this.data.user.hdPath
+      );
+    }
+
     await bncClient.initChain();
 
     bncClient

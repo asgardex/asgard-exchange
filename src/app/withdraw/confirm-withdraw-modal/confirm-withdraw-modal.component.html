@@ -87,6 +87,8 @@
 
   </div>
 
+  <app-transaction-ledger-confirm-modal *ngIf="txState == 'PENDING_LEDGER_CONFIRMATION'"></app-transaction-ledger-confirm-modal>
+
   <app-transaction-processing-modal
     *ngIf="txState == 'SUBMITTING'"
     transactionDetail="Unstaking {{data.assetAmount}} {{data.asset.ticker}} + {{data.runeAmount}} {{data.rune.ticker}}"
