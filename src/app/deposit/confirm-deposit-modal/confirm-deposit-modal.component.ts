@@ -33,6 +33,7 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
   txState: TransactionConfirmationState;
   hash: string;
   subs: Subscription[];
+  user: User;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: ConfirmDepositData,
@@ -48,6 +49,7 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
         if (!user) {
           this.closeDialog();
         }
+        this.user = user;
       }
     );
 
@@ -75,7 +77,7 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
               coins: [
                 {
                   denom: this.data.rune.symbol,
-                  amount: (this.data.user.type === 'keystore')
+                  amount: (this.data.user.type === 'keystore' || this.data.user.type === 'ledger')
                     ? this.data.runeAmount
                     : tokenToBase(tokenAmount(this.data.runeAmount))
                       .amount()
@@ -113,20 +115,27 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
 
     const bncClient = this.binanceService.bncClient;
 
-    if (this.data.user.type === 'ledger') {
+    await bncClient.initChain();
 
-      console.log('data user is: ', this.data.user);
+    if (this.user.type === 'ledger') {
+
+      console.log('data user is: ', this.user);
 
       bncClient.useLedgerSigningDelegate(
-        this.data.user.ledger,
+        this.user.ledger,
         () => this.txState = TransactionConfirmationState.PENDING_LEDGER_CONFIRMATION,
         () => this.txState = TransactionConfirmationState.SUBMITTING,
-        (err) => console.log('error: ', err),
-        this.data.user.hdPath
+        (err) => {
+          this.txState = TransactionConfirmationState.ERROR;
+          console.error('useLedgerSigningDelegate error: ', err);
+        },
+        this.user.hdPath
       );
     }
 
-    await bncClient.initChain();
+    console.log('wallet is: ', this.data.user.wallet);
+    console.log('outputs are: ', outputs);
+    console.log('memo is: ', memo);
 
     bncClient
       .multiSend(this.data.user.wallet, outputs, memo)
