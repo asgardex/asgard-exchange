@@ -41,20 +41,6 @@
           <mat-progress-spinner *ngIf="loading" diameter="16" color="primary" mode="indeterminate"></mat-progress-spinner>
         </div>
 
-        <!-- <input #keystoreInput hidden="true" type="file" onclick="this.value=null" (change)="onKeystoreFileChange($event)" />
-        <button class="uni-input uni-input--file" (click)="keystoreInput.click()">
-          <span>Upload Keystore File</span>
-          <mat-icon *ngIf="!keystoreFileSelected">vpn_key</mat-icon>
-          <mat-icon *ngIf="keystoreFileSelected" [ngStyle]="{'color':'green'}">check</mat-icon>
-        </button>
-
-
-        <div class="uni-input">
-          <label>Password</label>
-          <input [(ngModel)]="keystorePassword" name="keystore-password" placeholder="Please Enter Password" type="password" />
-        </div> -->
-
-
       </div>
 
       <div *ngIf="view === 'selectAddress'">
@@ -91,19 +77,6 @@
       </div>
 
     </div>
-
-    <!-- <div class="flxr flxr--just-space-between flxr--align-center" style="height: 38px">
-      <div>
-        <span *ngIf="keystoreError" style="font-size: 0.8rem; color: #2172e5">Keystore Login Incorrect</span>
-      </div>
-      <div>
-        <button *ngIf="!keystoreConnecting" mat-flat-button color="accent" (click)="keystoreUnlockClicked()" [disabled]="keystoreConnecting">
-          <span>Unlock</span>
-        </button>
-        <mat-progress-spinner mode="indeterminate" diameter="30" *ngIf="keystoreConnecting"></mat-progress-spinner>
-
-      </div>
-    </div> -->
 
   </div>
 

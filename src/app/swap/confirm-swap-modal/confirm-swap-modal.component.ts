@@ -38,7 +38,6 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
   transactionSubmitted: boolean;
   txState: TransactionConfirmationState;
   hash: string;
-  user: User;
   subs: Subscription[];
 
   constructor(
@@ -56,7 +55,6 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
         if (!user) {
           this.closeDialog();
         }
-        this.user = user;
       }
     );
 
@@ -107,11 +105,11 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
 
     if (this.swapData.user.type === 'ledger') {
       bncClient.useLedgerSigningDelegate(
-        this.user.ledger,
+        this.swapData.user.ledger,
         () => this.txState = TransactionConfirmationState.PENDING_LEDGER_CONFIRMATION,
         () => this.txState = TransactionConfirmationState.SUBMITTING,
         (err) => console.log('error: ', err),
-        this.user.hdPath
+        this.swapData.user.hdPath
       );
     }
 
