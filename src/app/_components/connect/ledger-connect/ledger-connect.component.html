@@ -16,24 +16,29 @@
         <ol id="ledger-instructions">
 
           <li class="step">
-            <span>1. Enter Pin Code</span>
+            <span style="margin-top: 15px;">1. Enter Pin Code</span>
             <img src="/assets/images/ledger/ledger-pin.svg" />
           </li>
 
           <li class="step">
             <span>2. Open Binance Chain</span>
-            <img src="/assets/images/ledger/ledger-app.svg" />
+            <img style="margin-top: 12px;" src="/assets/images/ledger/ledger-app.svg" />
           </li>
 
         </ol>
 
-        <span>“Binance Chain Ready” must be on-screen</span>
+        <div class="flxr flxr--flow-col ledger-help">
+          <span>“Binance Chain Ready” must be on-screen</span>
+          <a target="_blank" href="https://www.binance.org/static/guides/DEX-Ledger-Documentation.html">Installation and Usage Guide</a>
+          <a target="_blank" href="https://support.ledger.com/hc/en-us/articles/115005165269-Connection-issues-with-Windows-or-Linux">Connection Issues?</a>
+        </div>
 
-        <a target="_blank" href="https://www.binance.org/static/guides/DEX-Ledger-Documentation.html">Installation and Usage Guide</a>
-        <a target="_blank" href="https://support.ledger.com/hc/en-us/articles/115005165269-Connection-issues-with-Windows-or-Linux">Connection Issues?</a>
+        <br />
 
-        <div>
-          <button (click)="connectLedger()">Connect Ledger</button>
+
+        <div class="flxr flxr--just-end">
+          <button *ngIf="!loading" mat-button color="primary" (click)="connectLedger()">Connect Ledger</button>
+          <mat-progress-spinner *ngIf="loading" diameter="16" color="primary" mode="indeterminate"></mat-progress-spinner>
         </div>
 
         <!-- <input #keystoreInput hidden="true" type="file" onclick="this.value=null" (change)="onKeystoreFileChange($event)" />
@@ -53,23 +58,36 @@
       </div>
 
       <div *ngIf="view === 'selectAddress'">
-        <label id="select-address-group">Select an Address</label>
-        <mat-radio-group
-          aria-labelledby="select-address-group"
-          class="example-radio-group"
-          [(ngModel)]="selectedAddress">
-          <mat-radio-button class="example-radio-button" *ngFor="let address of addresses" [value]="address">
-            {{address}}
-          </mat-radio-button>
-        </mat-radio-group>
+        <div *ngIf="!loading">
+          <label id="select-address-group">Select an Address</label>
+          <mat-radio-group
+            aria-labelledby="select-address-group"
+            class="select-address-group"
+            [(ngModel)]="selectedAddress">
+            <mat-radio-button class="ledger-address-selection" *ngFor="let address of addresses" [value]="address">
+              {{address}}
+            </mat-radio-button>
+          </mat-radio-group>
 
-        <button (click)="selectAddress()">Select</button>
+          <div style="float: left; width: 100%;" class="flxr flxr--just-end">
+            <button mat-button color="primary" (click)="selectAddress()">Select</button>
+          </div>
+        </div>
+
+        <div *ngIf="loading" class="flxr flxr--align-center flxr--just-center" style="height: 100%; width: 100%; min-height: 261px;">
+          <mat-progress-spinner diameter="16" color="primary" mode="indeterminate"></mat-progress-spinner>
+        </div>
 
       </div>
 
-      <div *ngIf="view === 'pendingConfirmation'">
-        <p>... pending confirmation for</p>
+      <div class="pending-confirmation" *ngIf="view === 'pendingConfirmation'">
+        <div class="flxr flxr--just-center">
+          <img src="/assets/images/ledger/lock.svg" />
+        </div>
+        <p>For security purposes, please check:</p>
         <p>{{selectedAddress}}</p>
+        <p>Is the address shown on your Ledger screen.</p>
+        <p>Confirm on your device to continue.</p>
       </div>
 
     </div>
