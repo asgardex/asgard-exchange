@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { LedgerConnectComponent } from './ledger-connect.component';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('LedgerConnectComponent', () => {
   let component: LedgerConnectComponent;
@@ -8,7 +9,8 @@ describe('LedgerConnectComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ LedgerConnectComponent ]
+      declarations: [ LedgerConnectComponent ],
+      imports: [ HttpClientTestingModule ]
     })
     .compileComponents();
   });
