@@ -75,7 +75,7 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
               coins: [
                 {
                   denom: this.data.rune.symbol,
-                  amount: (this.data.user.type === 'keystore')
+                  amount: (this.data.user.type === 'keystore' || this.data.user.type === 'ledger')
                     ? this.data.runeAmount
                     : tokenToBase(tokenAmount(this.data.runeAmount))
                       .amount()
@@ -83,7 +83,7 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
                 },
                 {
                   denom: this.data.asset.symbol,
-                  amount: (this.data.user.type === 'keystore')
+                  amount: (this.data.user.type === 'keystore' || this.data.user.type === 'ledger')
                     ? this.data.assetAmount
                     : tokenToBase(tokenAmount(this.data.assetAmount))
                       .amount()
@@ -96,7 +96,7 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
           const memo = `STAKE:BNB.${this.data.asset.symbol}`;
 
           if (matchingPool) {
-            if (this.data.user.type === 'keystore') {
+            if (this.data.user.type === 'keystore' || this.data.user.type === 'ledger') {
               this.keystoreTransaction(outputs, memo);
             } else if (this.data.user.type === 'walletconnect') {
               this.walletConnectTransaction(outputs, memo, matchingPool);
@@ -112,7 +112,22 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
   async keystoreTransaction(outputs: MultiTransfer[], memo: string) {
 
     const bncClient = this.binanceService.bncClient;
+
     await bncClient.initChain();
+
+    if (this.data.user.type === 'ledger') {
+
+      bncClient.useLedgerSigningDelegate(
+        this.data.user.ledger,
+        () => this.txState = TransactionConfirmationState.PENDING_LEDGER_CONFIRMATION,
+        () => this.txState = TransactionConfirmationState.SUBMITTING,
+        (err) => {
+          this.txState = TransactionConfirmationState.ERROR;
+          console.error('useLedgerSigningDelegate error: ', err);
+        },
+        this.data.user.hdPath
+      );
+    }
 
     bncClient
       .multiSend(this.data.user.wallet, outputs, memo)

@@ -1,0 +1,47 @@
+#ledger-instructions {
+
+  .step {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+
+}
+
+.ledger-address-selection {
+  font-size: 0.8rem;
+  margin: 6px 0;
+}
+
+.ledger-help {
+  font-size: 0.7rem;
+
+   a {
+     color: lighten( rgba(21, 163, 111, 1), 5%);
+   }
+}
+
+.select-address-group {
+  float: left;
+  width: 100%;
+  margin: 6px 0;
+}
+
+.pending-confirmation {
+  display: flex;
+  flex-flow: column;
+  font-size: 0.8rem;
+
+  img {
+    width: 45px;
+    margin-bottom: 15px;
+  }
+
+  p {
+    margin: 0 0 15px;
+  }
+}
+
+
+

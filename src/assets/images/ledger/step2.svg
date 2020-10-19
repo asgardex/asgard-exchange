@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 55.2 (78181) - https://sketchapp.com -->
+    <title>step2</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <linearGradient x1="80.1300578%" y1="80.1300578%" x2="0%" y2="0%" id="linearGradient-1">
+            <stop stop-color="#FBDA3C" offset="0%"></stop>
+            <stop stop-color="#EFB80B" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="0%" y1="100%" x2="100%" y2="9.09203013%" id="linearGradient-2">
+            <stop stop-color="#33FF99" offset="0%"></stop>
+            <stop stop-color="#00CCFF" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="WEBSITE" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="THORCHAIN-COM-UNLOCK-Copy" transform="translate(-477.000000, -414.000000)">
+            <g id="step2" transform="translate(477.000000, 414.000000)">
+                <g id="Oval-3-Copy">
+                    <g id="path-2-link" fill="#50E3C2" fill-rule="nonzero">
+                        <circle id="path-2" cx="12" cy="12" r="12"></circle>
+                    </g>
+                    <g id="path-2-link" fill="url(#linearGradient-2)">
+                        <circle id="path-2" cx="12" cy="12" r="12"></circle>
+                    </g>
+                </g>
+                <path d="M15.794,17.924 L8,17.924 L8,15.818 L12.788,10.256 C13.256,9.698 13.454,9.302 13.454,8.708 C13.454,7.754 12.896,7.106 11.906,7.106 C11.132,7.106 10.34,7.502 10.34,8.744 L8,8.744 C8,6.404 9.71,5 11.906,5 C14.174,5 15.794,6.422 15.794,8.726 C15.794,9.968 15.308,10.634 14.426,11.66 L10.844,15.818 L15.794,15.818 L15.794,17.924 Z" id="Path" fill="#FFFFFF" fill-rule="nonzero"></path>
+            </g>
+        </g>
+    </g>
+</svg>

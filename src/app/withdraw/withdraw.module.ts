@@ -10,6 +10,7 @@ import { ConfirmWithdrawModalComponent } from './confirm-withdraw-modal/confirm-
 import { TransactionSuccessModalModule } from '../_components/transaction-success-modal/transaction-success-modal.module';
 import { TransactionProcessingModalModule } from '../_components/transaction-processing-modal/transaction-processing-modal.module';
 import { IconTickerModule } from '../_components/icon-ticker/icon-ticker.module';
+import { TransactionLedgerConfirmModalModule } from '../_components/transaction-ledger-confirm-modal/transaction-ledger-confirm-modal.module';
 
 
 @NgModule({
@@ -22,6 +23,7 @@ import { IconTickerModule } from '../_components/icon-ticker/icon-ticker.module'
     FormsModule,
     TransactionSuccessModalModule,
     TransactionProcessingModalModule,
+    TransactionLedgerConfirmModalModule,
     IconTickerModule,
     RouterModule.forChild([
       {

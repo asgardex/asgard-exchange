@@ -16,6 +16,7 @@ import { AssetInputModule } from '../_components/asset-input/asset-input.module'
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TransactionProcessingModalModule } from '../_components/transaction-processing-modal/transaction-processing-modal.module';
 import { TransactionSuccessModalModule } from '../_components/transaction-success-modal/transaction-success-modal.module';
+import { TransactionLedgerConfirmModalModule } from '../_components/transaction-ledger-confirm-modal/transaction-ledger-confirm-modal.module';
 
 @NgModule({
   declarations: [SwapComponent, ConfirmSwapModalComponent],
@@ -28,6 +29,7 @@ import { TransactionSuccessModalModule } from '../_components/transaction-succes
     MatProgressSpinnerModule,
     TransactionProcessingModalModule,
     TransactionSuccessModalModule,
+    TransactionLedgerConfirmModalModule,
     RouterModule.forChild([
       {
         path: '',

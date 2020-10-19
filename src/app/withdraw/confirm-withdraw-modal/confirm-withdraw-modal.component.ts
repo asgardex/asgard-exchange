@@ -75,7 +75,7 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
 
           if (matchingPool) {
 
-            if (this.data.user.type === 'keystore') {
+            if (this.data.user.type === 'keystore' || this.data.user.type === 'ledger') {
               this.keystoreTransaction(matchingPool, memo);
             } else if (this.data.user.type === 'walletconnect') {
               this.walletConnectTransaction(matchingPool, memo);
@@ -92,6 +92,17 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
   async keystoreTransaction(matchingPool: PoolAddressDTO, memo: string) {
 
     const bncClient = this.binanceService.bncClient;
+
+    if (this.data.user.type === 'ledger') {
+      bncClient.useLedgerSigningDelegate(
+        this.data.user.ledger,
+        () => this.txState = TransactionConfirmationState.PENDING_LEDGER_CONFIRMATION,
+        () => this.txState = TransactionConfirmationState.SUBMITTING,
+        (err) => console.log('error: ', err),
+        this.data.user.hdPath
+      );
+    }
+
     await bncClient.initChain();
 
     const amount = 0.00000001;
