@@ -102,7 +102,7 @@ export class ConnectComponent implements OnInit, OnDestroy {
 
         if (res.txs[0].status === 'Success') {
 
-          // await this.userService.getBalance(this.user.wallet);
+          await this.userService.fetchBalances(this.user);
 
           this.pendingTxCount--;
           if (this.pendingTxCount <= 0) {
