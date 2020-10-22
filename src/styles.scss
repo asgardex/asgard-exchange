@@ -192,7 +192,7 @@ button {
     color: #C7D0CB;
   }
 
-  input {
+  input, textarea {
     background-color: transparent;
     border: none;
     width: 100%;
@@ -217,6 +217,12 @@ button {
     &:focus {
       outline: none;
     }
+  }
+
+  textarea {
+    // word-wrap: normal;
+    white-space: normal;
+    resize: none;;
   }
 
   &--file {
@@ -303,6 +309,10 @@ input[type=number] {
 
   &--just-end {
     justify-content: flex-end;
+  }
+
+  &--align-start {
+    align-items: flex-start;
   }
 
   &--align-center {

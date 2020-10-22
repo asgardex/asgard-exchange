@@ -47,7 +47,7 @@ export class DepositComponent implements OnInit, OnDestroy {
         if (val.symbol !== this._asset.symbol) {
           this.router.navigate(['/', 'deposit', val.symbol]);
           this._asset = val;
-          this.assetBalance = this.userService.findBalance(this.balances, this.asset);
+          // this.assetBalance = this.userService.findBalance(this.balances, this.asset);
         }
 
       }
@@ -97,9 +97,9 @@ export class DepositComponent implements OnInit, OnDestroy {
 
     const balances$ = this.userService.userBalances$.subscribe(
       (balances) => {
-        this.balances = balances;
-        this.runeBalance = this.userService.findBalance(this.balances, this.rune);
-        this.assetBalance = this.userService.findBalance(this.balances, this.asset);
+        // this.balances = balances;
+        // this.runeBalance = this.userService.findBalance(this.balances, this.rune);
+        // this.assetBalance = this.userService.findBalance(this.balances, this.asset);
       }
     );
 
@@ -120,7 +120,7 @@ export class DepositComponent implements OnInit, OnDestroy {
       if (asset) {
         this.asset = new Asset(asset);
         this.getPoolDetail(asset);
-        this.assetBalance = this.userService.findBalance(this.balances, this.asset);
+        // this.assetBalance = this.userService.findBalance(this.balances, this.asset);
 
       }
 

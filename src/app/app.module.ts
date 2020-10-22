@@ -29,6 +29,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatRadioModule } from '@angular/material/radio';
+import { KeystoreCreateComponent } from './_components/connect/keystore-create/keystore-create.component';
 
 
 @NgModule({
@@ -41,6 +42,7 @@ import { MatRadioModule } from '@angular/material/radio';
     ConnectErrorComponent,
     LastBlockIndicatorComponent,
     LedgerConnectComponent,
+    KeystoreCreateComponent,
   ],
   imports: [
     BrowserModule,

@@ -9,6 +9,7 @@ import { Subject, Subscription, of, timer } from 'rxjs';
 import { takeUntil, switchMap, catchError } from 'rxjs/operators';
 import { TransactionDTO } from 'src/app/_classes/transaction';
 import { WalletConnectService } from 'src/app/_services/wallet-connect.service';
+import { KeystoreCreateComponent } from './keystore-create/keystore-create.component';
 
 @Component({
   selector: 'app-connect',
@@ -64,7 +65,7 @@ export class ConnectComponent implements OnInit, OnDestroy {
 
         if (res.txs[0].status === 'Success') {
 
-          await this.userService.getBalance(this.user.wallet);
+          // await this.userService.getBalance(this.user.wallet);
 
           this.pendingTxCount--;
           if (this.pendingTxCount <= 0) {
@@ -86,6 +87,18 @@ export class ConnectComponent implements OnInit, OnDestroy {
   openDialog() {
     this.dialog.open(
       ConnectModal,
+      {
+        // width: '50vw',
+        maxWidth: '420px',
+        width: '50vw',
+        minWidth: '260px'
+      }
+    );
+  }
+
+  openCreateKeystoreDialog() {
+    this.dialog.open(
+      KeystoreCreateComponent,
       {
         // width: '50vw',
         maxWidth: '420px',
@@ -120,6 +133,7 @@ export class ConnectModal implements OnDestroy {
   connectionMethod: ConnectionMethod;
   isTestnet: boolean;
   subs: Subscription[];
+  selectedChain: 'BNB' | 'BTC';
 
   constructor(
     public dialogRef: MatDialogRef<ConnectModal>,
@@ -138,6 +152,10 @@ export class ConnectModal implements OnDestroy {
 
     this.subs = [user$];
 
+  }
+
+  setSelectedChain(chain: 'BNB' | 'BTC') {
+    this.selectedChain = chain;
   }
 
   connectWalletConnect() {

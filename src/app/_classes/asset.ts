@@ -1,11 +1,5 @@
 import { CoinIconsFromTrustWallet } from 'src/app/_const/icon-list';
 
-// export interface Asset {
-//   chain: string;
-//   symbol: string;
-//   ticker: string;
-// }
-
 export class Asset {
 
   chain: string;

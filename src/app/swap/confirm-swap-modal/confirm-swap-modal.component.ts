@@ -1,6 +1,7 @@
 import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { Asset } from 'src/app/_classes/asset';
+// import { Asset } from 'src/app/_classes/asset';
+// import { Asset } from '@xchainjs/xchain-binance';
 import { TransferResult } from '@thorchain/asgardex-binance';
 import { User } from 'src/app/_classes/user';
 import { MidgardService } from 'src/app/_services/midgard.service';
@@ -12,12 +13,13 @@ import { tokenAmount, tokenToBase } from '@thorchain/asgardex-token';
 import { Subscription } from 'rxjs';
 import { BinanceService } from 'src/app/_services/binance.service';
 import { WalletConnectService } from 'src/app/_services/wallet-connect.service';
+import { baseAmount } from '@thorchain/asgardex-util';
 
-const bech32 = require('bech32');
+// const bech32 = require('bech32');
 
 export interface SwapData {
-  sourceAsset: Asset;
-  targetAsset: Asset;
+  sourceAsset;
+  targetAsset;
   runeFee: number;
   bnbFee: number;
   basePrice: number;
@@ -80,7 +82,9 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
 
         if (currentPools && currentPools.length > 0) {
 
-          const matchingPool = currentPools.find( (pool) => pool.chain === 'BNB' );
+          const matchingPool = currentPools.find( (pool) => pool.chain === this.swapData.sourceAsset.chain );
+
+          console.log('matching pool is: ', matchingPool);
 
           if (matchingPool) {
 
@@ -119,23 +123,49 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
     const amountNumber = this.swapData.inputValue;
 
     // const limit = protectSlip && slipLimit ? slipLimit.amount().toString() : '';
-    const memo = this.getSwapMemo(this.swapData.targetAsset.symbol, this.swapData.user.wallet);
+    const binanceClient = this.swapData.user.clients.binance;
+    const bitcoinClient = this.swapData.user.clients.bitcoin;
 
-    bncClient
-      .transfer(this.swapData.user.wallet, matchingPool.address, amountNumber, this.swapData.sourceAsset.symbol, memo)
-      .then((response: TransferResult) => {
-        this.txState = TransactionConfirmationState.SUCCESS;
+    const bitcoinAddress = await bitcoinClient.getAddress();
+    const binanceAddress = await binanceClient.getAddress();
+    const targetAddress = (this.swapData.targetAsset.chain === 'BTC')
+      ? bitcoinAddress
+      : binanceAddress;
 
-        if (response.result && response.result.length > 0) {
-          this.hash = response.result[0].hash;
-          this.userService.setPendingTransaction(this.hash);
-        }
+    console.log('target address is: ', targetAddress);
 
-      })
-      .catch((error: Error) => {
-        console.error('error making transfer: ', error);
-        this.txState = TransactionConfirmationState.ERROR;
+    const memo = this.getSwapMemo(this.swapData.targetAsset.chain, this.swapData.targetAsset.symbol, targetAddress);
+    console.log('memo is: ', memo);
+    console.log('amountNumber is: ', amountNumber);
+    console.log('baseamoutn is: ', baseAmount(amountNumber).amount().toNumber());
+
+    if (this.swapData.sourceAsset.chain === 'BNB') {
+      const res = await binanceClient.transfer({
+        asset: this.swapData.sourceAsset,
+        amount: baseAmount(amountNumber),
+        recipient: targetAddress,
+        memo
       });
+      console.log('res is: ', res);
+    } else if (this.swapData.sourceAsset.chain === 'BTC') {
+
+    }
+
+    // bncClient
+    //   .transfer(binanceAddress, matchingPool.address, amountNumber, this.swapData.sourceAsset.symbol, memo)
+    //   .then((response: TransferResult) => {
+    //     this.txState = TransactionConfirmationState.SUCCESS;
+
+    //     if (response.result && response.result.length > 0) {
+    //       this.hash = response.result[0].hash;
+    //       this.userService.setPendingTransaction(this.hash);
+    //     }
+
+    //   })
+    //   .catch((error: Error) => {
+    //     console.error('error making transfer: ', error);
+    //     this.txState = TransactionConfirmationState.ERROR;
+    //   });
   }
 
   walletConnectTransfer(matchingPool: PoolAddressDTO) {
@@ -151,7 +181,7 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
       toAddress: matchingPool.address,
       coins,
     });
-    const memo = this.getSwapMemo(this.swapData.targetAsset.symbol, this.swapData.user.wallet);
+    const memo = this.getSwapMemo(this.swapData.targetAsset.chain, this.swapData.targetAsset.symbol, this.swapData.user.wallet);
 
     const bncClient = this.binanceService.bncClient;
 
@@ -193,12 +223,9 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
 
   }
 
-  getSwapMemo(
-    symbol: string,
-    addr: string,
-    sliplimit = '',
-  ) {
-    return `SWAP:BNB.${symbol}:${addr}:${sliplimit}`;
+  getSwapMemo(chain: string, symbol: string, addr: string, sliplimit = '') {
+    // return `SWAP:${chain}.${symbol}:${addr}:${sliplimit}`;
+    return `SWAP:${chain}.${symbol}:${addr}`;
   }
 
   ngOnDestroy() {

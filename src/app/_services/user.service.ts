@@ -4,16 +4,17 @@ import { User } from '../_classes/user';
 import {
   Client as binanceClient,
   BinanceClient,
-  Balance,
 } from '@thorchain/asgardex-binance';
-import {
-  tokenAmount,
-} from '@thorchain/asgardex-token';
 import { Market, MarketResponse } from '../_classes/market';
-import { bnOrZero, bn } from '@thorchain/asgardex-util';
-import { AssetBalance } from '../_classes/asset-balance';
+import { assetAmount, baseToAsset } from '@thorchain/asgardex-util';
 import { environment } from 'src/environments/environment';
 import { Asset } from '../_classes/asset';
+import { Balances } from '@xchainjs/xchain-client';
+import { BncClient } from '@binance-chain/javascript-sdk/lib/client';
+import {
+  assetFromString,
+  assetToBase,
+} from '@thorchain/asgardex-util';
 
 
 
@@ -34,7 +35,7 @@ export class UserService {
   private marketsSource = new BehaviorSubject<Market[]>([]);
   markets$ = this.marketsSource.asObservable();
 
-  private userBalancesSource = new BehaviorSubject<AssetBalance[]>(null);
+  private userBalancesSource = new BehaviorSubject<Balances>(null);
   userBalances$ = this.userBalancesSource.asObservable();
 
   private pendingTransactionSource = new Subject<string>();
@@ -50,12 +51,10 @@ export class UserService {
   }
 
   setUser(user: User) {
-    if (user) {
-      this.getBalance(user.wallet);
-    } else {
-      this.userBalancesSource.next([]); // No user, reset balance to empty
-    }
     this.userSource.next(user);
+    if (user) {
+      this.fetchBalances(user);
+    }
   }
 
   setPendingTransaction(txId: string) {
@@ -78,35 +77,41 @@ export class UserService {
     }
   }
 
-  async getBalance(address: string) {
+  async fetchBalances(user: User): Promise<void> {
+    let balances: Balances = [];
 
-    try {
+    for (const [key, _value] of Object.entries(user.clients)) {
 
-      const balances = await this.asgardexBncClient.getBalance(address);
+      const client = user.clients[key];
+      let clientBalances;
 
-      const filteredBalance = balances.filter(
-        (balance: Balance) => !this.isBEP8Token(balance.symbol),
-      );
+      if (key === 'binance') {
+        // const clientBalances = await client.getBalance();
 
-      const markets = await this.getMarkets();
+        const bncClient: BncClient = await client.getBncClient();
+        const address = await client.getAddress();
+        const bncBalances = await bncClient.getBalance(address);
 
-      const coins = filteredBalance.map((coin: Balance) => {
-        const market = markets.find(
-          (m: Market) => m.baseAssetSymbol === coin.symbol,
-        );
-        return {
-          asset: coin.symbol,
-          assetValue: tokenAmount(coin.free),
-          price: market ? bnOrZero(market.listPrice) : bn(0),
-        } as AssetBalance;
-      });
+        clientBalances = bncBalances
+          .map((balance) => {
 
-      this.userBalancesSource.next(coins);
+            const asset = assetFromString(`BNB.${balance.symbol}`);
 
-    } catch (error) {
-      // yield put(actions.refreshBalanceFailed(error));
-      console.error('error getting balance: ', error);
+            return {
+              asset,
+              amount: assetToBase(assetAmount(balance.free, 8)),
+              frozenAmount: assetToBase(assetAmount(balance.frozen, 8)),
+            };
+          });
+          // .filter((balance) => !asset || balance.asset === asset)
+
+      } else {
+        clientBalances = await client.getBalance();
+      }
+      balances = [...balances, ...clientBalances];
     }
+
+    this.userBalancesSource.next(balances);
 
   }
 
@@ -121,30 +126,13 @@ export class UserService {
 
   }
 
-  /** check if symbol is BEP-8 mini-BEP2 token
-   * return true or false
-   */
-  private isBEP8Token(symbol: string): boolean {
-    if (symbol) {
-      const symbolSuffix = symbol.split('-')[1];
-      if (
-        symbolSuffix &&
-        symbolSuffix.length === 4 &&
-        symbolSuffix[symbolSuffix.length - 1] === 'M'
-      ) {
-        return true;
-      }
-      return false;
-    }
-    return false;
-  }
+  findBalance(balances: Balances, asset: Asset) {
 
-  findBalance(balances: AssetBalance[], asset: Asset) {
     if (balances && asset) {
-      const match = balances.find( (balance) => balance.asset === asset.symbol );
+      const match = balances.find( (balance) => `${balance.asset.chain}.${balance.asset.symbol}` === `${asset.chain}.${asset.symbol}` );
 
       if (match) {
-        return match.assetValue.amount().toNumber();
+        return baseToAsset(match.amount).amount().toNumber();
       } else {
         return 0.0;
       }

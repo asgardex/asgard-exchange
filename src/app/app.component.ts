@@ -4,6 +4,7 @@ import { catchError, switchMap, takeUntil } from 'rxjs/operators';
 import { LastBlock } from 'src/app/_classes/last-block';
 import { LastBlockService } from 'src/app/_services/last-block.service';
 import { MidgardService } from 'src/app/_services/midgard.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -14,9 +15,11 @@ export class AppComponent implements OnInit, OnDestroy {
 
   killPolling: Subject<void> = new Subject();
   subs: Subscription[];
+  isTestnet: boolean;
 
   constructor(private midgardService: MidgardService, private lastBlockService: LastBlockService) {
     this.subs = [];
+    this.isTestnet = (environment.network === 'testnet');
   }
 
   ngOnInit(): void {
