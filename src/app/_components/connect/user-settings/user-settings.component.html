@@ -1,0 +1,89 @@
+<div>
+
+  <div>
+    <div class="modal-head">
+      <h1 mat-dialog-title>User Settings</h1>
+    </div>
+    <div>
+      <div mat-dialog-content>
+
+        <!-- Connect Options -->
+
+        <!-- <button class="connect-option" (click)="connectWalletConnect()" [disabled]="true">
+          <img class="connect-option__logo" src="assets/images/wallet-connect-icon.svg" />
+          <span>Wallet Connect</span>
+        </button>
+
+        <button class="connect-option" (click)="connectLedger()" [disabled]="true">
+          <img id="ledger-logo" class="connect-option__logo" src="assets/images/ledger/ledger-logo.png" />
+          <span>Ledger</span>
+        </button> -->
+
+        <!-- <button class="connect-option" (click)="createKeystore()">
+          <mat-icon class="connect-option__logo">create</mat-icon>
+          <span>Create Keystore</span>
+        </button>
+
+        <button class="connect-option" (click)="connectKeystore()">
+          <mat-icon class="connect-option__logo">vpn_key</mat-icon>
+          <span>Connect Keystore</span>
+        </button> -->
+
+        <div *ngIf="loading" class="icon-container">
+
+            <mat-progress-spinner mode="indeterminate" diameter="60"></mat-progress-spinner>
+
+        </div>
+
+        <div *ngIf="!loading">
+          <div *ngIf="thorAddress" class="uni-input">
+            <label>THORChain Address</label>
+
+            <div class="flxr" style="width: 100%">
+              <input [value]="thorAddress" name="thor-address" [disabled]="true" />
+
+              <button matSuffix mat-icon-button aria-label="THORChain Address" (click)="copyToClipboard(thorAddress)">
+                <mat-icon (click)="copyToClipboard(thorAddress)">content_copy</mat-icon>
+              </button>
+
+            </div>
+          </div>
+
+          <div *ngIf="bitcoinAddress" class="uni-input">
+            <label>Bitcoin Address</label>
+
+            <div class="flxr" style="width: 100%">
+              <input [value]="bitcoinAddress" name="btc-address" [disabled]="true" />
+              <button matSuffix mat-icon-button aria-label="BTC Address" (click)="copyToClipboard(bitcoinAddress)">
+                <mat-icon matSuffix (click)="copyToClipboard(bitcoinAddress)">content_copy</mat-icon>
+              </button>
+            </div>
+
+          </div>
+
+          <div *ngIf="binanceAddress" class="uni-input">
+            <label>BNB Address</label>
+
+            <div class="flxr" style="width: 100%">
+              <input [value]="binanceAddress" name="binance-address" [disabled]="true" />
+              <button matSuffix mat-icon-button aria-label="BNB Address" (click)="copyToClipboard(binanceAddress)">
+                <mat-icon matSuffix (click)="copyToClipboard(binanceAddress)">content_copy</mat-icon>
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- close dialog -->
+      <div mat-dialog-actions class="dialog-actions">
+        <button mat-icon-button aria-label="Close Connect Wallet Dialog" mat-dialog-close>
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>

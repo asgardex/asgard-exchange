@@ -29,7 +29,7 @@
 
         <!-- Connect Options -->
 
-        <button class="connect-option" (click)="connectWalletConnect()" [disabled]="true">
+        <!-- <button class="connect-option" (click)="connectWalletConnect()" [disabled]="true">
           <img class="connect-option__logo" src="assets/images/wallet-connect-icon.svg" />
           <span>Wallet Connect</span>
         </button>
@@ -37,11 +37,16 @@
         <button class="connect-option" (click)="connectLedger()" [disabled]="true">
           <img id="ledger-logo" class="connect-option__logo" src="assets/images/ledger/ledger-logo.png" />
           <span>Ledger</span>
+        </button> -->
+
+        <button class="connect-option" (click)="createKeystore()">
+          <mat-icon class="connect-option__logo">create</mat-icon>
+          <span>Create Keystore</span>
         </button>
 
         <button class="connect-option" (click)="connectKeystore()">
           <mat-icon class="connect-option__logo">vpn_key</mat-icon>
-          <span>Keystore</span>
+          <span>Connect Keystore</span>
         </button>
 
       </div>
@@ -55,7 +60,11 @@
     </div>
   </div>
 
-  <!-- KEYSTORE -->
+
+  <!-- KEYSTORE CREATE -->
+  <app-keystore-create *ngIf="connectionMethod == 'KEYSTORE_CREATE'" (back)="clearConnectionMethod()" (closeModal)="close()"></app-keystore-create>
+
+  <!-- KEYSTORE CONNECT -->
   <app-keystore-connect *ngIf="connectionMethod == 'KEYSTORE'" (back)="clearConnectionMethod()" (closeModal)="close()"></app-keystore-connect>
 
   <!-- Ledger -->

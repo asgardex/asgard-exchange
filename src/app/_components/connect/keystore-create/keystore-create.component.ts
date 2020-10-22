@@ -1,6 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { MatDialogRef } from '@angular/material/dialog';
-import { generatePhrase, validatePhrase, encryptToKeyStore, decryptFromKeystore, Keystore, getAddress, getSeed } from '@thorchain/asgardex-crypto';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { generatePhrase, encryptToKeyStore } from '@thorchain/asgardex-crypto';
 
 @Component({
   selector: 'app-keystore-create',
@@ -9,15 +8,18 @@ import { generatePhrase, validatePhrase, encryptToKeyStore, decryptFromKeystore,
 })
 export class KeystoreCreateComponent implements OnInit {
 
+  @Output() back: EventEmitter<null>;
+  @Output() closeModal: EventEmitter<null>;
   password: string;
   phrase: string;
   loading: boolean;
   error: boolean;
 
-  constructor(public dialogRef: MatDialogRef<KeystoreCreateComponent>) {
+  constructor() {
     this.loading = false;
     this.phrase = generatePhrase();
-    console.log('phrase is: ', this.phrase);
+    this.back = new EventEmitter<null>();
+    this.closeModal = new EventEmitter<null>();
   }
 
   ngOnInit(): void {
@@ -38,11 +40,11 @@ export class KeystoreCreateComponent implements OnInit {
     a.innerHTML =
        'loading';
     a.click();
-    this.close();
+    this.back.emit();
   }
 
-  close() {
-    this.dialogRef.close();
-  }
+  // back() {
+  //   // this.dialogRef.close();
+  // }
 
 }

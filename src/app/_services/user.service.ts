@@ -38,7 +38,7 @@ export class UserService {
   private userBalancesSource = new BehaviorSubject<Balances>(null);
   userBalances$ = this.userBalancesSource.asObservable();
 
-  private pendingTransactionSource = new Subject<string>();
+  private pendingTransactionSource = new Subject<{chain: 'BTC' | 'BNB', hash: string}>();
   pendingTransaction$ = this.pendingTransactionSource.asObservable();
 
   asgardexBncClient: BinanceClient;
@@ -57,8 +57,8 @@ export class UserService {
     }
   }
 
-  setPendingTransaction(txId: string) {
-    this.pendingTransactionSource.next(txId);
+  setPendingTransaction(pendingTx: {chain: 'BTC' | 'BNB', hash: string}) {
+    this.pendingTransactionSource.next(pendingTx);
   }
 
   async setMarkets() {

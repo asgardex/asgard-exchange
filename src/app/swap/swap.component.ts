@@ -350,8 +350,8 @@ export class SwapComponent implements OnInit, OnDestroy {
       if (swapType === SwapType.SINGLE_SWAP) {
         this.calculateSingleSwap();
       } else if (swapType === SwapType.DOUBLE_SWAP
-          && this.poolDetailMap[this.selectedTargetAsset.symbol]
-          && this.poolDetailMap[this.selectedSourceAsset.symbol]) {
+          && this.poolDetailMap[`${this.selectedTargetAsset.chain}.${this.selectedTargetAsset.symbol}`]
+          && this.poolDetailMap[`${this.selectedSourceAsset.chain}.${this.selectedSourceAsset.symbol}`]) {
 
         this.calculateDoubleSwap();
 
@@ -451,8 +451,11 @@ export class SwapComponent implements OnInit, OnDestroy {
    */
   calculateDoubleSwap() {
 
-    const sourcePool = this.poolDetailMap[this.selectedSourceAsset.symbol];
-    const targetPool = this.poolDetailMap[this.selectedTargetAsset.symbol];
+    const sourcePool = this.poolDetailMap[`${this.selectedSourceAsset.chain}.${this.selectedSourceAsset.symbol}`];
+    const targetPool = this.poolDetailMap[`${this.selectedTargetAsset.chain}.${this.selectedTargetAsset.symbol}`];
+
+    console.log('source pool is: ', sourcePool);
+    console.log('target pool is: ', targetPool);
 
     if (sourcePool && targetPool) {
       const pool1: PoolData = {

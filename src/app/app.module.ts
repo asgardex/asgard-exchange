@@ -18,6 +18,7 @@ import { AppRoutingModule } from './app-routing.module';
 
 /** SERVICES */
 import { BinanceService } from './_services/binance.service';
+import { BlockchairService } from './_services/blockchair.service';
 import { LastBlockService } from './_services/last-block.service';
 import { MidgardService } from './_services/midgard.service';
 import { UserService } from './_services/user.service';
@@ -30,6 +31,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatRadioModule } from '@angular/material/radio';
 import { KeystoreCreateComponent } from './_components/connect/keystore-create/keystore-create.component';
+import { UserSettingsComponent } from './_components/connect/user-settings/user-settings.component';
 
 
 @NgModule({
@@ -43,6 +45,7 @@ import { KeystoreCreateComponent } from './_components/connect/keystore-create/k
     LastBlockIndicatorComponent,
     LedgerConnectComponent,
     KeystoreCreateComponent,
+    UserSettingsComponent,
   ],
   imports: [
     BrowserModule,
@@ -56,7 +59,7 @@ import { KeystoreCreateComponent } from './_components/connect/keystore-create/k
     MatProgressSpinnerModule,
     AppRoutingModule,
   ],
-  providers: [BinanceService, UserService, MidgardService, LastBlockService, WalletConnectService],
+  providers: [BinanceService, BlockchairService, UserService, MidgardService, LastBlockService, WalletConnectService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

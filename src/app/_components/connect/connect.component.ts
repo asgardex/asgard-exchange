@@ -9,7 +9,8 @@ import { Subject, Subscription, of, timer } from 'rxjs';
 import { takeUntil, switchMap, catchError } from 'rxjs/operators';
 import { TransactionDTO } from 'src/app/_classes/transaction';
 import { WalletConnectService } from 'src/app/_services/wallet-connect.service';
-import { KeystoreCreateComponent } from './keystore-create/keystore-create.component';
+import { BlockchairBtcTransactionDTO, BlockchairService } from 'src/app/_services/blockchair.service';
+import { UserSettingsComponent } from './user-settings/user-settings.component';
 
 @Component({
   selector: 'app-connect',
@@ -27,6 +28,7 @@ export class ConnectComponent implements OnInit, OnDestroy {
     private dialog: MatDialog,
     private userService: UserService,
     private midgardService: MidgardService,
+    private blockchairService: BlockchairService,
     private walletConnectService: WalletConnectService
   ) {
 
@@ -37,9 +39,20 @@ export class ConnectComponent implements OnInit, OnDestroy {
     );
 
     const pendingTx$ = this.userService.pendingTransaction$.subscribe(
-      (txId) => {
-        this.pollTx(txId);
-        this.pendingTxCount++;
+      (pendingTx) => {
+
+        if (pendingTx) {
+
+          if (pendingTx.chain === 'BNB') {
+            this.pollBnbTx(pendingTx.hash);
+            this.pendingTxCount++;
+          } else if (pendingTx.chain === 'BTC') {
+            this.pollBtcTx(pendingTx.hash);
+            this.pendingTxCount++;
+          }
+
+        }
+
       }
     );
 
@@ -50,7 +63,31 @@ export class ConnectComponent implements OnInit, OnDestroy {
     this.walletConnectService.initWalletConnect();
   }
 
-  pollTx(txId: string) {
+  pollBtcTx(hash: string) {
+    const refreshInterval$ = timer(0, 5000)
+    .pipe(
+      // This kills the request if the user closes the component
+      takeUntil(this.killTxPolling),
+      // switchMap cancels the last request, if no response have been received since last tick
+      switchMap(() => this.blockchairService.getBitcoinTransaction(hash)),
+      // catchError handles http throws
+      catchError(error => of(error))
+    ).subscribe( async (res: BlockchairBtcTransactionDTO) => {
+
+      if (res && res[hash] && res[hash].transaction && res[hash].transaction.block_id && res[hash].transaction.block_id > 0) {
+          await this.userService.fetchBalances(this.user);
+
+          this.pendingTxCount--;
+          if (this.pendingTxCount <= 0) {
+            this.killTxPolling.next();
+          }
+      }
+
+    });
+    this.subs.push(refreshInterval$);
+  }
+
+  pollBnbTx(txId: string) {
     const refreshInterval$ = timer(0, 5000)
     .pipe(
       // This kills the request if the user closes the component
@@ -80,15 +117,10 @@ export class ConnectComponent implements OnInit, OnDestroy {
     this.subs.push(refreshInterval$);
   }
 
-  getTransaction() {
-    // this.midgardService.getTransaction()
-  }
-
   openDialog() {
     this.dialog.open(
       ConnectModal,
       {
-        // width: '50vw',
         maxWidth: '420px',
         width: '50vw',
         minWidth: '260px'
@@ -96,11 +128,10 @@ export class ConnectComponent implements OnInit, OnDestroy {
     );
   }
 
-  openCreateKeystoreDialog() {
+  openUserSettings() {
     this.dialog.open(
-      KeystoreCreateComponent,
+      UserSettingsComponent,
       {
-        // width: '50vw',
         maxWidth: '420px',
         width: '50vw',
         minWidth: '260px'
@@ -119,6 +150,7 @@ export class ConnectComponent implements OnInit, OnDestroy {
 export enum ConnectionMethod {
   LEDGER          = 'LEDGER',
   KEYSTORE        = 'KEYSTORE',
+  KEYSTORE_CREATE = 'KEYSTORE_CREATE',
   WALLET_CONNECT  = 'WALLET_CONNECT',
 }
 
@@ -160,6 +192,10 @@ export class ConnectModal implements OnDestroy {
 
   connectWalletConnect() {
     this.walletConnectService.connectWalletConnect();
+  }
+
+  createKeystore() {
+    this.connectionMethod = ConnectionMethod.KEYSTORE_CREATE;
   }
 
   connectKeystore() {

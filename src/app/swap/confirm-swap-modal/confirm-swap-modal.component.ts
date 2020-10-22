@@ -13,7 +13,7 @@ import { tokenAmount, tokenToBase } from '@thorchain/asgardex-token';
 import { Subscription } from 'rxjs';
 import { BinanceService } from 'src/app/_services/binance.service';
 import { WalletConnectService } from 'src/app/_services/wallet-connect.service';
-import { baseAmount } from '@thorchain/asgardex-util';
+import { assetAmount, assetToBase, baseAmount } from '@thorchain/asgardex-util';
 
 // const bech32 = require('bech32');
 
@@ -105,19 +105,19 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
 
   async keystoreTransfer(matchingPool: PoolAddressDTO) {
 
-    const bncClient = this.binanceService.bncClient;
+    // const bncClient = this.binanceService.bncClient;
 
-    if (this.swapData.user.type === 'ledger') {
-      bncClient.useLedgerSigningDelegate(
-        this.swapData.user.ledger,
-        () => this.txState = TransactionConfirmationState.PENDING_LEDGER_CONFIRMATION,
-        () => this.txState = TransactionConfirmationState.SUBMITTING,
-        (err) => console.log('error: ', err),
-        this.swapData.user.hdPath
-      );
-    }
+    // if (this.swapData.user.type === 'ledger') {
+    //   bncClient.useLedgerSigningDelegate(
+    //     this.swapData.user.ledger,
+    //     () => this.txState = TransactionConfirmationState.PENDING_LEDGER_CONFIRMATION,
+    //     () => this.txState = TransactionConfirmationState.SUBMITTING,
+    //     (err) => console.log('error: ', err),
+    //     this.swapData.user.hdPath
+    //   );
+    // }
 
-    await bncClient.initChain();
+    // await bncClient.initChain();
 
     // Check of `validateSwap` before makes sure that we have a valid number here
     const amountNumber = this.swapData.inputValue;
@@ -136,36 +136,54 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
 
     const memo = this.getSwapMemo(this.swapData.targetAsset.chain, this.swapData.targetAsset.symbol, targetAddress);
     console.log('memo is: ', memo);
-    console.log('amountNumber is: ', amountNumber);
-    console.log('baseamoutn is: ', baseAmount(amountNumber).amount().toNumber());
 
     if (this.swapData.sourceAsset.chain === 'BNB') {
-      const res = await binanceClient.transfer({
-        asset: this.swapData.sourceAsset,
-        amount: baseAmount(amountNumber),
-        recipient: targetAddress,
-        memo
-      });
-      console.log('res is: ', res);
+
+      try {
+        const hash = await binanceClient.transfer({
+          asset: this.swapData.sourceAsset,
+          amount: assetToBase(assetAmount(amountNumber)),
+          recipient: matchingPool.address,
+          memo
+        });
+
+        console.log('hash is: ', hash);
+        this.hash = hash;
+        // this.userService.setPendingTransaction(this.hash);
+        this.userService.setPendingTransaction({chain: 'BNB', hash: this.hash});
+        this.txState = TransactionConfirmationState.SUCCESS;
+      } catch (error) {
+        console.error('error making transfer: ', error);
+        this.txState = TransactionConfirmationState.ERROR;
+      }
+
     } else if (this.swapData.sourceAsset.chain === 'BTC') {
+
+      try {
+
+        console.log('matching pool address is: ', matchingPool.address);
+
+        const hash = await bitcoinClient.transfer({
+          amount: assetToBase(assetAmount(amountNumber)),
+          recipient: matchingPool.address,
+          memo
+        });
+
+        console.log('hash is: ', hash);
+        this.hash = hash;
+        // this.userService.setPendingTransaction(this.hash);
+        this.userService.setPendingTransaction({chain: 'BTC', hash: this.hash});
+        this.txState = TransactionConfirmationState.SUCCESS;
+      } catch (error) {
+        console.error('error making transfer: ', error);
+        this.txState = TransactionConfirmationState.ERROR;
+      }
+
+      // 74eb095a0f7c67473da848c6826e74ec18694275fb3e04ea9b601512991e27d5
+
 
     }
 
-    // bncClient
-    //   .transfer(binanceAddress, matchingPool.address, amountNumber, this.swapData.sourceAsset.symbol, memo)
-    //   .then((response: TransferResult) => {
-    //     this.txState = TransactionConfirmationState.SUCCESS;
-
-    //     if (response.result && response.result.length > 0) {
-    //       this.hash = response.result[0].hash;
-    //       this.userService.setPendingTransaction(this.hash);
-    //     }
-
-    //   })
-    //   .catch((error: Error) => {
-    //     console.error('error making transfer: ', error);
-    //     this.txState = TransactionConfirmationState.ERROR;
-    //   });
   }
 
   walletConnectTransfer(matchingPool: PoolAddressDTO) {
@@ -211,7 +229,7 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
 
           if (res.result && res.result.length > 0) {
             this.hash = res.result[0].hash;
-            this.userService.setPendingTransaction(this.hash);
+            this.userService.setPendingTransaction({chain: 'BNB', hash: this.hash});
           }
         }
 
@@ -224,8 +242,7 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
   }
 
   getSwapMemo(chain: string, symbol: string, addr: string, sliplimit = '') {
-    // return `SWAP:${chain}.${symbol}:${addr}:${sliplimit}`;
-    return `SWAP:${chain}.${symbol}:${addr}`;
+    return `SWAP:${chain}.${symbol}:${addr}:${sliplimit}`;
   }
 
   ngOnDestroy() {

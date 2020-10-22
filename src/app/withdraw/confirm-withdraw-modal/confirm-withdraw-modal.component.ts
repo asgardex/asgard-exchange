@@ -177,7 +177,7 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
 
           if (res.result && res.result.length > 0) {
             this.hash = res.result[0].hash;
-            this.userService.setPendingTransaction(this.hash);
+            this.userService.setPendingTransaction({chain: 'BNB', hash: this.hash});
           }
         }
 
@@ -194,7 +194,7 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
 
     if (response.result && response.result.length > 0) {
       this.hash = response.result[0].hash;
-      this.userService.setPendingTransaction(this.hash);
+      this.userService.setPendingTransaction({chain: 'BNB', hash: this.hash});
     }
   }
 
