@@ -97,6 +97,7 @@
 
   <app-transaction-success-modal
     *ngIf="txState === 'SUCCESS'"
+    [chain]="data.asset.chain"
     [hash]="hash"
     (closeDialog)="closeDialog(true)">
   </app-transaction-success-modal>
