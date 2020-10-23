@@ -1,8 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { of, Subject, Subscription, timer } from 'rxjs';
-import { catchError, switchMap, takeUntil } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 import { PoolDetail } from '../_classes/pool-detail';
-import { StakerDTO } from '../_classes/staker';
 import { StakerPoolData } from '../_classes/staker-pool-data';
 import { User } from '../_classes/user';
 import { MidgardService } from '../_services/midgard.service';
@@ -22,7 +20,6 @@ export class PoolComponent implements OnInit, OnDestroy {
   };
   pools: string[];
   userPoolError: boolean;
-  killPolling: Subject<void> = new Subject();
   subs: Subscription[];
   loading: boolean;
 
@@ -31,14 +28,9 @@ export class PoolComponent implements OnInit, OnDestroy {
     this.subs = [];
 
     const user$ = this.userService.user$.subscribe(
-      (user) => {
+      async (user) => {
         this.user = user;
-        if (this.user) {
-          this.pollAccountPools();
-        } else {
-          this.killPolling.next();
-        }
-
+        this.getAccountPools();
       }
     );
 
@@ -58,45 +50,50 @@ export class PoolComponent implements OnInit, OnDestroy {
     );
   }
 
-  pollAccountPools(): void {
+  async getAccountPools() {
+    this.loading = true;
+    this.stakedPools = [];
 
-    const poll$ = timer(0, 15000)
-    .pipe(
-      // This kills the request if the user closes the component
-      takeUntil(this.killPolling),
-      // switchMap cancels the last request, if no response have been received since last tick
-      switchMap(() => {
-        this.loading = true;
-        return this.midgardService.getStaker(this.user.wallet);
-      }),
-      // catchError handles http throws
-      catchError(error => of(error))
-    ).subscribe( (res: StakerDTO) => {
+    if (this.user) {
 
-      this.userPoolError = false;
+      const clientLength = Object.keys(this.user.clients).length;
 
-      if (res.poolsArray && res.poolsArray.length > 0) {
-        this.getAccountStaked(res.poolsArray);
-        this.getPoolData(res.poolsArray);
-      } else {
-        this.stakedPools = [];
-        this.poolDetailIndex = {};
+      for (const [key, _value] of Object.entries(this.user.clients)) {
+
+        const client = this.user.clients[key];
+        const address = await client.getAddress();
+
+        this.midgardService.getStaker(address).subscribe(
+          (res) => {
+            this.userPoolError = false;
+
+            if (res.poolsArray && res.poolsArray.length > 0) {
+              this.getAccountStaked(res.poolsArray, address);
+              this.getPoolData(res.poolsArray);
+            } else {
+              this.stakedPools = [];
+              this.poolDetailIndex = {};
+            }
+
+            // for user to see that UI is auto refreshing
+            if (key === Object.keys(this.user.clients)[clientLength - 1]) {
+              this.loading = false;
+            }
+
+          },
+          (err) => {
+            this.userPoolError = true;
+            this.loading = false;
+            console.error('error fetching account pool: ', err);
+          }
+        );
+
+
       }
 
-      // for user to see that UI is auto refreshing
-      setTimeout(() => {
-        this.loading = false;
-      }, 1000);
+    }
 
-    },
-    (err) => {
-      this.userPoolError = true;
-      this.loading = false;
-      console.error('error fetching account pool: ', err);
-    });
-    this.subs.push(poll$);
   }
-
 
   getPoolData(assets: string[]) {
     this.midgardService.getPoolDetails(assets, 'simple').subscribe(
@@ -118,43 +115,14 @@ export class PoolComponent implements OnInit, OnDestroy {
     );
   }
 
-  getAccountStaked(assets: string[]) {
+  getAccountStaked(assets: string[], address: string) {
 
     if (this.user) {
 
-      this.midgardService.getStakerPoolData(this.user.wallet, assets).subscribe(
+      this.midgardService.getStakerPoolData(address, assets).subscribe(
         (res) => {
-
-          if (!this.stakedPools) {
-            this.stakedPools = [];
-          }
-
-          let remainingPoolData = res;
-          this.stakedPools = this.stakedPools.map( (pool) => {
-            const match = remainingPoolData.find( (resPool) => {
-              return `${pool.asset.chain}.${pool.asset.symbol}` === resPool.asset;
-            });
-
-            if (match) {
-              remainingPoolData = remainingPoolData.filter( (remainingPool) => remainingPool.asset !== match.asset );
-              pool.assetStaked = match.assetStaked;
-              pool.assetWithdrawn = match.assetWithdrawn;
-              pool.dateFirstStaked = match.dateFirstStaked;
-              pool.heightLastStaked = match.heightLastStaked;
-              pool.runeStaked = match.runeStaked;
-              pool.runeWithdrawn = match.runeWithdrawn;
-              pool.units = match.units;
-              return pool;
-            } else {
-              return null;
-            }
-
-          }).filter( (pool) => pool ); // filter out null (removed pools)
-
-          for (const remainingPool of remainingPoolData) {
-            this.stakedPools.push(new StakerPoolData(remainingPool));
-          }
-
+          const stakedPools = res.map( (poolDTO) => new StakerPoolData(poolDTO) );
+          this.stakedPools = [...this.stakedPools, ...stakedPools];
         },
         (err) => {
           console.error('error fetching pool staker data: ', err);
@@ -170,8 +138,6 @@ export class PoolComponent implements OnInit, OnDestroy {
     for (const sub of this.subs) {
       sub.unsubscribe();
     }
-
-    this.killPolling.next();
   }
 
 }

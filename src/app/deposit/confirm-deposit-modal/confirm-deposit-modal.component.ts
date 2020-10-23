@@ -1,9 +1,11 @@
 import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { MultiTransfer, TransferResult } from '@thorchain/asgardex-binance';
+// import { MultiTransfer, TransferResult } from '@thorchain/asgardex-binance';
+import { MultiTransfer } from '@xchainjs/xchain-binance';
 import { tokenAmount, tokenToBase } from '@thorchain/asgardex-token';
+import { assetAmount, assetToBase, baseAmount } from '@thorchain/asgardex-util';
 import { Subscription } from 'rxjs';
-import { Asset } from 'src/app/_classes/asset';
+// import { Asset } from 'src/app/_classes/asset';
 import { PoolAddressDTO } from 'src/app/_classes/pool-address';
 import { User } from 'src/app/_classes/user';
 import { TransactionConfirmationState } from 'src/app/_const/transaction-confirmation-state';
@@ -14,8 +16,8 @@ import { WalletConnectService } from 'src/app/_services/wallet-connect.service';
 import { environment } from 'src/environments/environment';
 
 export interface ConfirmDepositData {
-  asset: Asset;
-  rune: Asset;
+  asset;
+  rune;
   assetAmount: number;
   runeAmount: number;
   user: User;
@@ -67,40 +69,46 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
 
         if (currentPools && currentPools.length > 0) {
 
-          const matchingPool = currentPools.find( (pool) => pool.chain === 'BNB' );
+          const bnbPool = currentPools.find( (pool) => pool.chain === 'BNB' );
+          const btcPool = currentPools.find( (pool) => pool.chain === 'BTC' );
 
-          const outputs: MultiTransfer[] = [
-            {
-              to: matchingPool.address,
-              coins: [
-                {
-                  denom: this.data.rune.symbol,
-                  amount: (this.data.user.type === 'keystore' || this.data.user.type === 'ledger')
-                    ? this.data.runeAmount
-                    : tokenToBase(tokenAmount(this.data.runeAmount))
-                      .amount()
-                      .toNumber(),
-                },
-                {
-                  denom: this.data.asset.symbol,
-                  amount: (this.data.user.type === 'keystore' || this.data.user.type === 'ledger')
-                    ? this.data.assetAmount
-                    : tokenToBase(tokenAmount(this.data.assetAmount))
-                      .amount()
-                      .toNumber(),
-                },
-              ],
-            },
-          ];
+          if (this.data.asset.chain === 'BNB') {
 
-          const memo = `STAKE:BNB.${this.data.asset.symbol}`;
+            console.log('RUNE AMOUNT IS: ', assetToBase(assetAmount(this.data.runeAmount)).amount().toNumber());
+            console.log('ASSET AMOUNT IS: ', assetToBase(assetAmount(this.data.assetAmount)).amount().toNumber());
 
-          if (matchingPool) {
-            if (this.data.user.type === 'keystore' || this.data.user.type === 'ledger') {
-              this.keystoreTransaction(outputs, memo);
-            } else if (this.data.user.type === 'walletconnect') {
-              this.walletConnectTransaction(outputs, memo, matchingPool);
+            const outputs: MultiTransfer[] = [
+              {
+                to: bnbPool.address,
+                coins: [
+                  {
+                    asset: this.data.rune,
+                    amount: (this.data.user.type === 'keystore' || this.data.user.type === 'ledger')
+                      ? assetToBase(assetAmount(this.data.runeAmount))
+                      : assetToBase(assetAmount(this.data.runeAmount)),
+                  },
+                  {
+                    asset: this.data.asset,
+                    amount: (this.data.user.type === 'keystore' || this.data.user.type === 'ledger')
+                      ? assetToBase(assetAmount((this.data.assetAmount)))
+                      : assetToBase(assetAmount(this.data.assetAmount))
+                  },
+                ],
+              },
+            ];
+
+            const memo = `STAKE:BNB.${this.data.asset.symbol}`;
+
+            if (bnbPool) {
+              if (this.data.user.type === 'keystore' || this.data.user.type === 'ledger') {
+                this.singleChainBnbKeystoreTx(outputs, memo);
+              } else if (this.data.user.type === 'walletconnect') {
+                this.walletConnectTransaction(outputs, memo, bnbPool);
+              }
             }
+
+          } else if (this.data.asset.chain === 'BTC') {
+            this.multichainKeystoreTx(btcPool, bnbPool);
           }
 
         }
@@ -109,41 +117,130 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
     );
   }
 
-  async keystoreTransaction(outputs: MultiTransfer[], memo: string) {
+  async singleChainBnbKeystoreTx(outputs, memo: string) {
 
-    const bncClient = this.binanceService.bncClient;
+    // const bncClient = this.binanceService.bncClient;
 
-    await bncClient.initChain();
+    // await bncClient.initChain();
 
-    if (this.data.user.type === 'ledger') {
+    // if (this.data.user.type === 'ledger') {
 
-      bncClient.useLedgerSigningDelegate(
-        this.data.user.ledger,
-        () => this.txState = TransactionConfirmationState.PENDING_LEDGER_CONFIRMATION,
-        () => this.txState = TransactionConfirmationState.SUBMITTING,
-        (err) => {
-          this.txState = TransactionConfirmationState.ERROR;
-          console.error('useLedgerSigningDelegate error: ', err);
-        },
-        this.data.user.hdPath
-      );
-    }
+    //   bncClient.useLedgerSigningDelegate(
+    //     this.data.user.ledger,
+    //     () => this.txState = TransactionConfirmationState.PENDING_LEDGER_CONFIRMATION,
+    //     () => this.txState = TransactionConfirmationState.SUBMITTING,
+    //     (err) => {
+    //       this.txState = TransactionConfirmationState.ERROR;
+    //       console.error('useLedgerSigningDelegate error: ', err);
+    //     },
+    //     this.data.user.hdPath
+    //   );
+    // }
 
-    bncClient
-      .multiSend(this.data.user.wallet, outputs, memo)
-      .then((response: TransferResult) => {
+    const binanceClient = this.data.user.clients.binance;
+    if (binanceClient) {
 
+      // const
+
+      try {
+        const hash = await binanceClient.multiSend({transactions: outputs, memo});
         this.txState = TransactionConfirmationState.SUCCESS;
-
-        if (response.result && response.result.length > 0) {
-          this.hash = response.result[0].hash;
-          this.userService.setPendingTransaction({chain: 'BNB', hash: this.hash});
-        }
-      })
-      .catch((error: Error) => {
+        this.hash = hash;
+        this.userService.setPendingTransaction({chain: 'BNB', hash: this.hash});
+      } catch (error) {
         console.error('error making transfer: ', error);
         this.txState = TransactionConfirmationState.ERROR;
+      }
+
+
+      // bncClient
+      // .multiSend(this.data.user.wallet, outputs, memo)
+      // .then((response: TransferResult) => {
+
+      //   this.txState = TransactionConfirmationState.SUCCESS;
+
+      //   if (response.result && response.result.length > 0) {
+      //     this.hash = response.result[0].hash;
+      //     this.userService.setPendingTransaction({chain: 'BNB', hash: this.hash});
+      //   }
+      // })
+      // .catch((error: Error) => {
+      //   console.error('error making transfer: ', error);
+      //   this.txState = TransactionConfirmationState.ERROR;
+      // });
+
+
+
+    } else {
+      console.error('no binance client for user');
+    }
+
+  }
+
+  async multichainKeystoreTx(corePool: PoolAddressDTO, bnbPool: PoolAddressDTO) {
+    const binanceClient = this.data.user.clients.binance;
+    const bitcoinClient = this.data.user.clients.bitcoin;
+    const bitcoinAddress = await bitcoinClient.getAddress();
+    const binanceAddress = await binanceClient.getAddress();
+    const asset = this.data.asset;
+
+    const coreChainMemo = `STAKE:${asset.chain}.${asset.symbol}:${binanceAddress}`;
+    const bnbMemo = `STAKE:BNB.${this.data.rune.symbol}:${bitcoinAddress}`;
+
+    // console.log('bnb memo is: ', bnbMemo);
+    // console.log('coreChainMemo is: ', coreChainMemo);
+
+    // console.log('rune anmount is: ', this.data.runeAmount);
+    // console.log('base stuff magic is: ', assetToBase(assetAmount(this.data.runeAmount)).amount().toNumber());
+    // console.log('base amount is: ', baseAmount(this.data.runeAmount).amount().toNumber());
+
+    // send RUNE
+    try {
+      const hash = await binanceClient.transfer({
+        asset: this.data.rune,
+        // asset,
+        // amount: baseAmount(this.data.runeAmount),
+        amount: assetToBase(assetAmount(this.data.runeAmount)),
+        recipient: bnbPool.address,
+        memo: bnbMemo
       });
+
+      console.log('hash is: ', hash);
+      this.hash = hash;
+      this.userService.setPendingTransaction({chain: 'BNB', hash: this.hash});
+      // this.txState = TransactionConfirmationState.SUCCESS;
+    } catch (error) {
+      console.error('error making transfer: ', error);
+      this.txState = TransactionConfirmationState.ERROR;
+      return;
+    }
+
+    console.log('moving on to send BTC...');
+
+
+    // send BTC
+    try {
+
+      console.log('corePool pool address is: ', corePool.address);
+
+      const hash = await bitcoinClient.transfer({
+        amount: assetToBase(assetAmount(this.data.assetAmount)),
+        recipient: corePool.address,
+        memo: coreChainMemo
+      });
+
+      console.log('hash is: ', hash);
+      this.hash = hash;
+      // this.userService.setPendingTransaction(this.hash);
+      this.userService.setPendingTransaction({chain: 'BTC', hash: this.hash});
+      this.txState = TransactionConfirmationState.SUCCESS;
+    } catch (error) {
+      console.error('error making transfer: ', error);
+      this.txState = TransactionConfirmationState.ERROR;
+    }
+
+
+
   }
 
   walletConnectTransaction(outputs: MultiTransfer[], memo: string, matchingPool: PoolAddressDTO) {

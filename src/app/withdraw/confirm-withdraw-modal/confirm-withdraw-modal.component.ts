@@ -12,11 +12,12 @@ import { UserService } from '../../_services/user.service';
 import { WalletConnectService } from '../../_services/wallet-connect.service';
 import { Asset } from '../../_classes/asset';
 import { environment } from 'src/environments/environment';
+import { assetAmount, assetToBase } from '@thorchain/asgardex-util';
 
 // TODO: this is the same as ConfirmStakeData in confirm stake modal
 export interface ConfirmWithdrawData {
-  asset: Asset;
-  rune: Asset;
+  asset;
+  rune;
   assetAmount: number;
   runeAmount: number;
   user: User;
@@ -70,7 +71,8 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
 
         if (currentPools && currentPools.length > 0) {
 
-          const matchingPool = currentPools.find( (pool) => pool.chain === 'BNB' );
+          const matchingPool = currentPools.find( (pool) => pool.chain === this.data.asset.chain );
+
           const memo = `WITHDRAW:${this.data.asset.chain}.${this.data.asset.symbol}:${this.data.unstakePercent * 100}`;
 
           if (matchingPool) {
@@ -91,41 +93,69 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
 
   async keystoreTransaction(matchingPool: PoolAddressDTO, memo: string) {
 
-    const bncClient = this.binanceService.bncClient;
+    // const bncClient = this.binanceService.bncClient;
 
-    if (this.data.user.type === 'ledger') {
-      bncClient.useLedgerSigningDelegate(
-        this.data.user.ledger,
-        () => this.txState = TransactionConfirmationState.PENDING_LEDGER_CONFIRMATION,
-        () => this.txState = TransactionConfirmationState.SUBMITTING,
-        (err) => console.log('error: ', err),
-        this.data.user.hdPath
-      );
+    // if (this.data.user.type === 'ledger') {
+    //   bncClient.useLedgerSigningDelegate(
+    //     this.data.user.ledger,
+    //     () => this.txState = TransactionConfirmationState.PENDING_LEDGER_CONFIRMATION,
+    //     () => this.txState = TransactionConfirmationState.SUBMITTING,
+    //     (err) => console.log('error: ', err),
+    //     this.data.user.hdPath
+    //   );
+    // }
+
+    // await bncClient.initChain();
+
+    const amount = assetToBase(assetAmount(0.00000001));
+
+    if (this.data.asset.chain === 'BNB') {
+
+      const binanceClient = this.data.user.clients.binance;
+
+      try {
+        const hash = await binanceClient.transfer({asset: this.data.asset, amount, recipient: matchingPool.address, memo});
+        this.txSuccess(hash);
+      } catch (error) {
+        console.error('error unstaking: ', error);
+      }
+
+
+      // bncClient
+      //   .transfer(this.data.user.wallet, matchingPool.address, amount, this.runeSymbol, memo)
+      //   .then((response: TransferResult) => {
+      //     this.txSuccess(response);
+      //   })
+      //   // If first tx ^ fails (e.g. there is no RUNE available)
+      //   // another tx w/ same memo will be sent, but by using BNB now
+      //   .catch((unstakeErr1: Error) => {
+
+      //     console.warn('not enough RUNE: ', unstakeErr1);
+
+      //     bncClient
+      //       .transfer(this.data.user.wallet, matchingPool.address, amount, 'BNB', memo)
+      //       .then((response: TransferResult) => {
+      //         this.txSuccess(response);
+      //       })
+      //       .catch((unstakeErr2: Error) => {
+      //         console.error('error unstaking: ', unstakeErr2);
+      //       });
+      //   });
+
+    } else if (this.data.asset.chain === 'BTC') {
+
+      const bitcoinClient = this.data.user.clients.bitcoin;
+
+      try {
+        const hash = await bitcoinClient.transfer({asset: this.data.asset, amount, recipient: matchingPool.address, memo});
+        this.txSuccess(hash);
+      } catch (error) {
+        console.error('error unstaking: ', error);
+      }
+
+    } else {
+      console.error('no matching chain: ', this.data.asset.chain);
     }
-
-    await bncClient.initChain();
-
-    const amount = 0.00000001;
-    bncClient
-      .transfer(this.data.user.wallet, matchingPool.address, amount, this.runeSymbol, memo)
-      .then((response: TransferResult) => {
-        this.txSuccess(response);
-      })
-      // If first tx ^ fails (e.g. there is no RUNE available)
-      // another tx w/ same memo will be sent, but by using BNB now
-      .catch((unstakeErr1: Error) => {
-
-        console.warn('not enough RUNE: ', unstakeErr1);
-
-        bncClient
-          .transfer(this.data.user.wallet, matchingPool.address, amount, 'BNB', memo)
-          .then((response: TransferResult) => {
-            this.txSuccess(response);
-          })
-          .catch((unstakeErr2: Error) => {
-            console.error('error unstaking: ', unstakeErr2);
-          });
-      });
 
   }
 
@@ -188,14 +218,10 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
 
   }
 
-  txSuccess(response: TransferResult) {
-
+  txSuccess(hash: string) {
     this.txState = TransactionConfirmationState.SUCCESS;
-
-    if (response.result && response.result.length > 0) {
-      this.hash = response.result[0].hash;
-      this.userService.setPendingTransaction({chain: 'BNB', hash: this.hash});
-    }
+    this.hash = hash;
+    this.userService.setPendingTransaction({chain: 'BNB', hash: this.hash});
   }
 
   closeDialog(transactionSucess?: boolean) {

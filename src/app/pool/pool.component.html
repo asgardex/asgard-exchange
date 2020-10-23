@@ -7,19 +7,20 @@
 
   <div style="position: relative;">
 
-    <div class="flxr flxr--align-center flxr--just-center">
-      Multichain Pools Coming Soon
-    </div>
-
-    <!-- <div style="margin: -12px 0 24px; float: left; width: 100%;">
-      <a [routerLink]="['/', 'deposit', 'BNB.BNB']" class="main-action-btn" mat-flat-button color="primary">
+    <div style="margin: -12px 0 24px; float: left; width: 100%;">
+      <a [routerLink]="['/', 'deposit', 'BTC.BTC']" class="main-action-btn" mat-flat-button color="primary">
         Add Liquidity
       </a>
     </div>
 
-    <div class="section-label flxr flxr--align-center">
+    <div class="section-label flxr flxr--align-center flxr--just-space-between">
       <span style="margin-right: 6px;">Your liquidity</span>
-      <mat-progress-spinner *ngIf="loading" diameter="16" color="primary" mode="indeterminate"></mat-progress-spinner>
+      <button class="refresh-indicator" *ngIf="user && !loading" (click)="getAccountPools()" mat-icon-button aria-label="Refresh your liquidity">
+        <mat-icon style="font-size: 1.2rem;">refresh</mat-icon>
+      </button>
+      <div *ngIf="user && loading" class="refresh-indicator">
+        <mat-progress-spinner diameter="16" color="primary" mode="indeterminate"></mat-progress-spinner>
+      </div>
     </div>
 
     <div *ngIf="!user" class="disabled-list">
@@ -40,7 +41,7 @@
         </div>
 
 
-    </div> -->
+    </div>
 
   </div>
 

@@ -63,8 +63,8 @@ export class MidgardService {
     return this.http.get<TransactionDTO>(`${this.basePath}/txs`, {params});
   }
 
-  getStaker(accountId: string): Observable<StakerDTO> {
-    return this.http.get<StakerDTO>(`${this.basePath}/stakers/${accountId}`);
+  getStaker(address: string): Observable<StakerDTO> {
+    return this.http.get<StakerDTO>(`${this.basePath}/stakers/${address}`);
   }
 
   getStakerPoolData(accountId: string, assets: string[]): Observable<StakerPoolDataDTO[]> {

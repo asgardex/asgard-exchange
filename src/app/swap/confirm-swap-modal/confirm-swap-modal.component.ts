@@ -105,37 +105,16 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
 
   async keystoreTransfer(matchingPool: PoolAddressDTO) {
 
-    // const bncClient = this.binanceService.bncClient;
-
-    // if (this.swapData.user.type === 'ledger') {
-    //   bncClient.useLedgerSigningDelegate(
-    //     this.swapData.user.ledger,
-    //     () => this.txState = TransactionConfirmationState.PENDING_LEDGER_CONFIRMATION,
-    //     () => this.txState = TransactionConfirmationState.SUBMITTING,
-    //     (err) => console.log('error: ', err),
-    //     this.swapData.user.hdPath
-    //   );
-    // }
-
-    // await bncClient.initChain();
-
-    // Check of `validateSwap` before makes sure that we have a valid number here
     const amountNumber = this.swapData.inputValue;
-
-    // const limit = protectSlip && slipLimit ? slipLimit.amount().toString() : '';
     const binanceClient = this.swapData.user.clients.binance;
     const bitcoinClient = this.swapData.user.clients.bitcoin;
-
     const bitcoinAddress = await bitcoinClient.getAddress();
     const binanceAddress = await binanceClient.getAddress();
     const targetAddress = (this.swapData.targetAsset.chain === 'BTC')
       ? bitcoinAddress
       : binanceAddress;
 
-    console.log('target address is: ', targetAddress);
-
     const memo = this.getSwapMemo(this.swapData.targetAsset.chain, this.swapData.targetAsset.symbol, targetAddress);
-    console.log('memo is: ', memo);
 
     if (this.swapData.sourceAsset.chain === 'BNB') {
 

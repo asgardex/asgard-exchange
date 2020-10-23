@@ -101,11 +101,20 @@ export class WithdrawComponent implements OnInit {
 
   }
 
-  getAccountStaked() {
+  async getAccountStaked() {
 
     if (this.user && this.asset) {
 
-      this.midgardService.getStakerPoolData(this.user.wallet, [`${this.asset.chain}.${this.asset.symbol}`]).subscribe(
+      let address;
+      if (this.asset.chain === 'BNB') {
+        address = await this.user.clients.binance.getAddress();
+      } else if (this.asset.chain === 'BTC') {
+        address = await this.user.clients.bitcoin.getAddress();
+      } else {
+        console.error('mismatched chain: ', this.asset.chain);
+      }
+
+      this.midgardService.getStakerPoolData(address, [`${this.asset.chain}.${this.asset.symbol}`]).subscribe(
         (res) => {
 
           if (res && res.length > 0) {

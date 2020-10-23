@@ -21,8 +21,8 @@ export class TransactionSuccessModalComponent implements OnInit {
 
     this.binanceExplorerUrl = environment.network === 'testnet' ? 'https://testnet-explorer.binance.org/tx' : 'https://explorer.binance.org/tx';
     this.bitcoinExplorerUrl = environment.network === 'testnet'
-      ? 'https://www.blockchain.com/btc-testnet/tx'
-      : 'https://www.blockchain.com/btc/tx';
+      ? 'https://blockstream.info/testnet/tx'
+      : 'https://blockstream.info/tx';
 
   }
 
