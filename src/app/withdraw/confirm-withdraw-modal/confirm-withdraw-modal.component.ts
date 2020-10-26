@@ -72,15 +72,16 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
         if (currentPools && currentPools.length > 0) {
 
           const matchingPool = currentPools.find( (pool) => pool.chain === this.data.asset.chain );
+          const bnbPool = currentPools.find( (pool) => pool.chain === 'BNB' );
 
           const memo = `WITHDRAW:${this.data.asset.chain}.${this.data.asset.symbol}:${this.data.unstakePercent * 100}`;
 
-          if (matchingPool) {
+          if (bnbPool) {
 
             if (this.data.user.type === 'keystore' || this.data.user.type === 'ledger') {
-              this.keystoreTransaction(matchingPool, memo);
+              this.keystoreTransaction(bnbPool, memo);
             } else if (this.data.user.type === 'walletconnect') {
-              this.walletConnectTransaction(matchingPool, memo);
+              this.walletConnectTransaction(bnbPool, memo);
             }
 
           }
@@ -109,53 +110,32 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
 
     const amount = assetToBase(assetAmount(0.00000001));
 
-    if (this.data.asset.chain === 'BNB') {
+    // if (this.data.asset.chain === 'BNB') {
 
-      const binanceClient = this.data.user.clients.binance;
+    const binanceClient = this.data.user.clients.binance;
 
-      try {
-        const hash = await binanceClient.transfer({asset: this.data.asset, amount, recipient: matchingPool.address, memo});
-        this.txSuccess(hash);
-      } catch (error) {
-        console.error('error unstaking: ', error);
-      }
-
-
-      // bncClient
-      //   .transfer(this.data.user.wallet, matchingPool.address, amount, this.runeSymbol, memo)
-      //   .then((response: TransferResult) => {
-      //     this.txSuccess(response);
-      //   })
-      //   // If first tx ^ fails (e.g. there is no RUNE available)
-      //   // another tx w/ same memo will be sent, but by using BNB now
-      //   .catch((unstakeErr1: Error) => {
-
-      //     console.warn('not enough RUNE: ', unstakeErr1);
-
-      //     bncClient
-      //       .transfer(this.data.user.wallet, matchingPool.address, amount, 'BNB', memo)
-      //       .then((response: TransferResult) => {
-      //         this.txSuccess(response);
-      //       })
-      //       .catch((unstakeErr2: Error) => {
-      //         console.error('error unstaking: ', unstakeErr2);
-      //       });
-      //   });
-
-    } else if (this.data.asset.chain === 'BTC') {
-
-      const bitcoinClient = this.data.user.clients.bitcoin;
-
-      try {
-        const hash = await bitcoinClient.transfer({asset: this.data.asset, amount, recipient: matchingPool.address, memo});
-        this.txSuccess(hash);
-      } catch (error) {
-        console.error('error unstaking: ', error);
-      }
-
-    } else {
-      console.error('no matching chain: ', this.data.asset.chain);
+    try {
+      const hash = await binanceClient.transfer({asset: this.data.rune, amount, recipient: matchingPool.address, memo});
+      this.txSuccess(hash);
+    } catch (error) {
+      console.error('error unstaking: ', error);
     }
+
+    // }
+    // else if (this.data.asset.chain === 'BTC') {
+
+    //   const bitcoinClient = this.data.user.clients.bitcoin;
+
+    //   try {
+    //     const hash = await bitcoinClient.transfer({asset: this.data.asset, amount, recipient: matchingPool.address, memo});
+    //     this.txSuccess(hash);
+    //   } catch (error) {
+    //     console.error('error unstaking: ', error);
+    //   }
+
+    // } else {
+    //   console.error('no matching chain: ', this.data.asset.chain);
+    // }
 
   }
 
@@ -207,7 +187,7 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
 
           if (res.result && res.result.length > 0) {
             this.hash = res.result[0].hash;
-            this.userService.setPendingTransaction({chain: 'BNB', hash: this.hash});
+            this.userService.addPendingTransaction({chain: 'BNB', hash: this.hash});
           }
         }
 
@@ -221,7 +201,7 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
   txSuccess(hash: string) {
     this.txState = TransactionConfirmationState.SUCCESS;
     this.hash = hash;
-    this.userService.setPendingTransaction({chain: 'BNB', hash: this.hash});
+    this.userService.addPendingTransaction({chain: 'BNB', hash: this.hash});
   }
 
   closeDialog(transactionSucess?: boolean) {

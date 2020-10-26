@@ -17,7 +17,10 @@ export class AppComponent implements OnInit, OnDestroy {
   subs: Subscription[];
   isTestnet: boolean;
 
-  constructor(private midgardService: MidgardService, private lastBlockService: LastBlockService) {
+  constructor(
+    private midgardService: MidgardService,
+    private lastBlockService: LastBlockService,
+  ) {
     this.subs = [];
     this.isTestnet = (environment.network === 'testnet');
   }

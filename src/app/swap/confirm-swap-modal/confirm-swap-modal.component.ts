@@ -129,7 +129,7 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
         console.log('hash is: ', hash);
         this.hash = hash;
         // this.userService.setPendingTransaction(this.hash);
-        this.userService.setPendingTransaction({chain: 'BNB', hash: this.hash});
+        this.userService.addPendingTransaction({chain: 'BNB', hash: this.hash});
         this.txState = TransactionConfirmationState.SUCCESS;
       } catch (error) {
         console.error('error making transfer: ', error);
@@ -151,7 +151,7 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
         console.log('hash is: ', hash);
         this.hash = hash;
         // this.userService.setPendingTransaction(this.hash);
-        this.userService.setPendingTransaction({chain: 'BTC', hash: this.hash});
+        this.userService.addPendingTransaction({chain: 'BTC', hash: this.hash});
         this.txState = TransactionConfirmationState.SUCCESS;
       } catch (error) {
         console.error('error making transfer: ', error);
@@ -208,7 +208,7 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
 
           if (res.result && res.result.length > 0) {
             this.hash = res.result[0].hash;
-            this.userService.setPendingTransaction({chain: 'BNB', hash: this.hash});
+            this.userService.addPendingTransaction({chain: 'BNB', hash: this.hash});
           }
         }
 

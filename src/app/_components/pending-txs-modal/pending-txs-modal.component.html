@@ -1,0 +1,109 @@
+<div class="container">
+
+  <div style="padding: 1rem 1rem 0" class="section-head-container">
+
+    <h1>Pending Transactions</h1>
+    <div style="width: 40px"></div>
+  </div>
+
+  <div class="dialog-content">
+    <div mat-dialog-content>
+
+      <div>
+
+        <ul>
+          <li class="uni-input" *ngFor="let tx of completedBtcTxs">
+
+            <label>Bitcoin</label>
+
+            <div class="flxr" style="width: 100%">
+
+              <input [value]="tx.hash" name="thor-address" [disabled]="true" />
+
+              <button matSuffix mat-icon-button>
+                <mat-icon>check_circle</mat-icon>
+              </button>
+
+            </div>
+          </li>
+        </ul>
+        <ul>
+
+          <li class="uni-input" *ngFor="let tx of pendingBtcTxs">
+
+            <label>Bitcoin</label>
+
+            <div class="flxr" style="width: 100%">
+              <input [value]="tx.hash" name="thor-address" [disabled]="true" />
+
+              <button matSuffix mat-icon-button aria-label="THORChain Address" [disabled]="true">
+                <mat-progress-spinner diameter="16" color="primary" mode="indeterminate"></mat-progress-spinner>
+              </button>
+
+            </div>
+          </li>
+
+        </ul>
+      </div>
+
+      <div>
+
+        <ul>
+
+          <li *ngFor="let tx of completedBncTxs">
+
+            <a [href]="binanceExplorerUrl + '/' + tx.hash" target="_blank" class="uni-input">
+
+              <label>Binance Chain</label>
+
+              <div class="flxr" style="width: 100%">
+
+                <input [value]="tx.hash" name="thor-address" [disabled]="true" />
+
+                <button matSuffix mat-icon-button aria-label="THORChain Address" [disabled]="true">
+                  <mat-progress-spinner diameter="16" color="primary" mode="indeterminate"></mat-progress-spinner>
+                </button>
+
+              </div>
+            </a>
+
+          </li>
+
+        </ul>
+        <ul>
+
+          <li *ngFor="let tx of pendingBncTxs">
+
+            <a [href]="binanceExplorerUrl + '/' + tx.hash" target="_blank" class="uni-input">
+
+              <label>Binance Chain</label>
+
+              <div class="flxr" style="width: 100%">
+
+                <input [value]="tx.hash" name="thor-address" [disabled]="true" />
+
+                <button matSuffix mat-icon-button aria-label="THORChain Address" [disabled]="true">
+                  <mat-progress-spinner diameter="16" color="primary" mode="indeterminate"></mat-progress-spinner>
+                </button>
+
+              </div>
+            </a>
+
+          </li>
+
+        </ul>
+      </div>
+
+
+    </div>
+
+    <!-- close dialog -->
+    <div mat-dialog-actions class="dialog-actions">
+      <button mat-icon-button aria-label="Close Connect Wallet Dialog" mat-dialog-close>
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+  </div>
+
+</div>

@@ -146,7 +146,7 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
         const hash = await binanceClient.multiSend({transactions: outputs, memo});
         this.txState = TransactionConfirmationState.SUCCESS;
         this.hash = hash;
-        this.userService.setPendingTransaction({chain: 'BNB', hash: this.hash});
+        this.userService.addPendingTransaction({chain: 'BNB', hash: this.hash});
       } catch (error) {
         console.error('error making transfer: ', error);
         this.txState = TransactionConfirmationState.ERROR;
@@ -185,7 +185,7 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
     const asset = this.data.asset;
 
     const coreChainMemo = `STAKE:${asset.chain}.${asset.symbol}:${binanceAddress}`;
-    const bnbMemo = `STAKE:BNB.${this.data.rune.symbol}:${bitcoinAddress}`;
+    const bnbMemo = `STAKE:${asset.chain}.${asset.symbol}:${bitcoinAddress}`;
 
     // console.log('bnb memo is: ', bnbMemo);
     // console.log('coreChainMemo is: ', coreChainMemo);
@@ -207,7 +207,7 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
 
       console.log('hash is: ', hash);
       this.hash = hash;
-      this.userService.setPendingTransaction({chain: 'BNB', hash: this.hash});
+      this.userService.addPendingTransaction({chain: 'BNB', hash: this.hash});
       // this.txState = TransactionConfirmationState.SUCCESS;
     } catch (error) {
       console.error('error making transfer: ', error);
@@ -223,16 +223,20 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
 
       console.log('corePool pool address is: ', corePool.address);
 
+      const fee = await bitcoinClient.getFeesWithMemo(coreChainMemo);
+      console.log('fee is: ', fee.average.amount().toNumber());
+
       const hash = await bitcoinClient.transfer({
         amount: assetToBase(assetAmount(this.data.assetAmount)),
         recipient: corePool.address,
-        memo: coreChainMemo
+        memo: coreChainMemo,
+        feeRate: fee.average.amount().toNumber()
       });
 
       console.log('hash is: ', hash);
       this.hash = hash;
       // this.userService.setPendingTransaction(this.hash);
-      this.userService.setPendingTransaction({chain: 'BTC', hash: this.hash});
+      this.userService.addPendingTransaction({chain: 'BTC', hash: this.hash});
       this.txState = TransactionConfirmationState.SUCCESS;
     } catch (error) {
       console.error('error making transfer: ', error);
@@ -281,7 +285,7 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
 
           if (res.result && res.result.length > 0) {
             this.hash = res.result[0].hash;
-            this.userService.setPendingTransaction({chain: 'BNB', hash: this.hash});
+            this.userService.addPendingTransaction({chain: 'BNB', hash: this.hash});
           }
         }
 

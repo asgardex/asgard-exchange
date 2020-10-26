@@ -12,6 +12,9 @@ import { HeaderComponent } from './_components/header/header.component';
 import { KeystoreConnectComponent } from './_components/connect/keystore-connect/keystore-connect.component';
 import { LastBlockIndicatorComponent } from './_components/last-block-indicator/last-block-indicator.component';
 import { LedgerConnectComponent } from './_components/connect/ledger-connect/ledger-connect.component';
+import { KeystoreCreateComponent } from './_components/connect/keystore-create/keystore-create.component';
+import { UserSettingsComponent } from './_components/connect/user-settings/user-settings.component';
+import { PendingTxsModalComponent } from './_components/pending-txs-modal/pending-txs-modal.component';
 
 /** MODULES */
 import { AppRoutingModule } from './app-routing.module';
@@ -19,6 +22,7 @@ import { AppRoutingModule } from './app-routing.module';
 /** SERVICES */
 import { BinanceService } from './_services/binance.service';
 import { BlockchairService } from './_services/blockchair.service';
+import { ExplorerPathsService } from './_services/explorer-paths.service';
 import { LastBlockService } from './_services/last-block.service';
 import { MidgardService } from './_services/midgard.service';
 import { UserService } from './_services/user.service';
@@ -30,8 +34,6 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatRadioModule } from '@angular/material/radio';
-import { KeystoreCreateComponent } from './_components/connect/keystore-create/keystore-create.component';
-import { UserSettingsComponent } from './_components/connect/user-settings/user-settings.component';
 
 
 @NgModule({
@@ -46,6 +48,7 @@ import { UserSettingsComponent } from './_components/connect/user-settings/user-
     LedgerConnectComponent,
     KeystoreCreateComponent,
     UserSettingsComponent,
+    PendingTxsModalComponent,
   ],
   imports: [
     BrowserModule,
@@ -59,7 +62,7 @@ import { UserSettingsComponent } from './_components/connect/user-settings/user-
     MatProgressSpinnerModule,
     AppRoutingModule,
   ],
-  providers: [BinanceService, BlockchairService, UserService, MidgardService, LastBlockService, WalletConnectService],
+  providers: [BinanceService, BlockchairService, UserService, MidgardService, LastBlockService, WalletConnectService, ExplorerPathsService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
