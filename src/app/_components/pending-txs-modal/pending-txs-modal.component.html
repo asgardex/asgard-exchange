@@ -1,7 +1,9 @@
 <div class="container">
 
   <div style="padding: 1rem 1rem 0" class="section-head-container">
-
+    <button (click)="back.emit()" mat-icon-button>
+      <mat-icon>arrow_back</mat-icon>
+    </button>
     <h1>Pending Transactions</h1>
     <div style="width: 40px"></div>
   </div>
@@ -12,41 +14,74 @@
       <div>
 
         <ul>
-          <li class="uni-input" *ngFor="let tx of completedBtcTxs">
+          <li *ngFor="let tx of txs">
 
-            <label>Bitcoin</label>
+            <a [href]="((tx.chain === 'BTC') ? bitcoinExplorerUrl : binanceExplorerUrl) + '/' + tx.hash" target="_blank" class="uni-input">
 
-            <div class="flxr" style="width: 100%">
+              <label>{{tx.ticker}}</label>
 
-              <input [value]="tx.hash" name="thor-address" [disabled]="true" />
+              <div class="flxr" style="width: 100%">
 
-              <button matSuffix mat-icon-button>
-                <mat-icon>check_circle</mat-icon>
-              </button>
+                <input [value]="tx.hash" name="thor-address" [disabled]="true" />
 
-            </div>
+                <button matSuffix mat-icon-button>
+                  <mat-icon *ngIf="tx.status === 'COMPLETE'">check_circle</mat-icon>
+                  <mat-progress-spinner *ngIf="tx.status === 'PENDING'" diameter="16" color="primary" mode="indeterminate"></mat-progress-spinner>
+                </button>
+
+              </div>
+
+            </a>
+
           </li>
         </ul>
-        <ul>
 
-          <li class="uni-input" *ngFor="let tx of pendingBtcTxs">
+        <!-- <ul>
+          <li *ngFor="let tx of completedBtcTxs">
 
-            <label>Bitcoin</label>
+            <a [href]="bitcoinExplorerUrl + '/' + tx.hash" target="_blank" class="uni-input">
 
-            <div class="flxr" style="width: 100%">
-              <input [value]="tx.hash" name="thor-address" [disabled]="true" />
+              <label>Bitcoin</label>
 
-              <button matSuffix mat-icon-button aria-label="THORChain Address" [disabled]="true">
-                <mat-progress-spinner diameter="16" color="primary" mode="indeterminate"></mat-progress-spinner>
-              </button>
+              <div class="flxr" style="width: 100%">
 
-            </div>
+                <input [value]="tx.hash" name="thor-address" [disabled]="true" />
+
+                <button matSuffix mat-icon-button>
+                  <mat-icon>check_circle</mat-icon>
+                </button>
+
+              </div>
+
+            </a>
+
+          </li>
+        </ul> -->
+        <!-- <ul>
+
+          <li *ngFor="let tx of pendingBtcTxs">
+
+            <a [href]="bitcoinExplorerUrl + '/' + tx.hash" target="_blank" class="uni-input">
+
+              <label>Bitcoin</label>
+
+              <div class="flxr" style="width: 100%">
+                <input [value]="tx.hash" name="thor-address" [disabled]="true" />
+
+                <button matSuffix mat-icon-button aria-label="THORChain Address" [disabled]="true">
+                  <mat-progress-spinner diameter="16" color="primary" mode="indeterminate"></mat-progress-spinner>
+                </button>
+
+              </div>
+
+            </a>
+
           </li>
 
-        </ul>
+        </ul> -->
       </div>
 
-      <div>
+      <!-- <div>
 
         <ul>
 
@@ -92,7 +127,7 @@
           </li>
 
         </ul>
-      </div>
+      </div> -->
 
 
     </div>

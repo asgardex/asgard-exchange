@@ -2,7 +2,7 @@ import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 // import { Asset } from 'src/app/_classes/asset';
 // import { Asset } from '@xchainjs/xchain-binance';
-import { TransferResult } from '@thorchain/asgardex-binance';
+// import { TransferResult } from '@thorchain/asgardex-binance';
 import { User } from 'src/app/_classes/user';
 import { MidgardService } from 'src/app/_services/midgard.service';
 import { UserService } from 'src/app/_services/user.service';
@@ -13,7 +13,8 @@ import { tokenAmount, tokenToBase } from '@thorchain/asgardex-token';
 import { Subscription } from 'rxjs';
 import { BinanceService } from 'src/app/_services/binance.service';
 import { WalletConnectService } from 'src/app/_services/wallet-connect.service';
-import { assetAmount, assetToBase, baseAmount } from '@thorchain/asgardex-util';
+import { assetAmount, assetToBase } from '@thorchain/asgardex-util';
+import { TransactionStatusService, TxStatus } from 'src/app/_services/transaction-status.service';
 
 // const bech32 = require('bech32');
 
@@ -47,6 +48,7 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
     public dialogRef: MatDialogRef<ConfirmSwapModalComponent>,
     private midgardService: MidgardService,
     private walletConnectService: WalletConnectService,
+    private txStatusService: TransactionStatusService,
     private binanceService: BinanceService,
     private userService: UserService
   ) {
@@ -129,7 +131,13 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
         console.log('hash is: ', hash);
         this.hash = hash;
         // this.userService.setPendingTransaction(this.hash);
-        this.userService.addPendingTransaction({chain: 'BNB', hash: this.hash});
+        this.txStatusService.addTransaction({
+          chain: 'BNB',
+          hash: this.hash,
+          ticker: this.swapData.sourceAsset.ticker,
+          status: TxStatus.PENDING
+        });
+        this.txStatusService.pollTxOutputs(hash, 1);
         this.txState = TransactionConfirmationState.SUCCESS;
       } catch (error) {
         console.error('error making transfer: ', error);
@@ -150,8 +158,9 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
 
         console.log('hash is: ', hash);
         this.hash = hash;
-        // this.userService.setPendingTransaction(this.hash);
-        this.userService.addPendingTransaction({chain: 'BTC', hash: this.hash});
+
+        this.txStatusService.addTransaction({chain: 'BTC', hash: this.hash, ticker: 'BTC', status: TxStatus.PENDING});
+        this.txStatusService.pollTxOutputs(hash, 1);
         this.txState = TransactionConfirmationState.SUCCESS;
       } catch (error) {
         console.error('error making transfer: ', error);
@@ -208,7 +217,12 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
 
           if (res.result && res.result.length > 0) {
             this.hash = res.result[0].hash;
-            this.userService.addPendingTransaction({chain: 'BNB', hash: this.hash});
+            this.txStatusService.addTransaction({
+              chain: 'BNB',
+              hash: this.hash,
+              ticker: this.swapData.targetAsset.ticker,
+              status: TxStatus.PENDING
+            });
           }
         }
 

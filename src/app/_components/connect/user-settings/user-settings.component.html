@@ -1,41 +1,26 @@
-<div>
-
+<div *ngIf="mode === 'ADDRESSES'">
+  <div class="modal-head">
+    <h1 mat-dialog-title>User Settings</h1>
+  </div>
   <div>
-    <div class="modal-head">
-      <h1 mat-dialog-title>User Settings</h1>
-    </div>
-    <div>
-      <div mat-dialog-content>
+    <div mat-dialog-content>
 
-        <!-- Connect Options -->
-
-        <!-- <button class="connect-option" (click)="connectWalletConnect()" [disabled]="true">
-          <img class="connect-option__logo" src="assets/images/wallet-connect-icon.svg" />
-          <span>Wallet Connect</span>
-        </button>
-
-        <button class="connect-option" (click)="connectLedger()" [disabled]="true">
-          <img id="ledger-logo" class="connect-option__logo" src="assets/images/ledger/ledger-logo.png" />
-          <span>Ledger</span>
-        </button> -->
-
-        <!-- <button class="connect-option" (click)="createKeystore()">
-          <mat-icon class="connect-option__logo">create</mat-icon>
-          <span>Create Keystore</span>
-        </button>
-
-        <button class="connect-option" (click)="connectKeystore()">
-          <mat-icon class="connect-option__logo">vpn_key</mat-icon>
-          <span>Connect Keystore</span>
-        </button> -->
-
+      <div style="padding: 0 1rem 1rem">
         <div *ngIf="loading" class="icon-container">
 
-            <mat-progress-spinner mode="indeterminate" diameter="60"></mat-progress-spinner>
+          <mat-progress-spinner mode="indeterminate" diameter="60"></mat-progress-spinner>
 
         </div>
 
         <div *ngIf="!loading">
+
+          <div>
+            <button (click)="mode = 'TXS'" class="pending-tx-btn flxr flxr--align-center">
+              {{pendingTxCount}} Pending Transactions
+              <mat-icon>keyboard_arrow_right</mat-icon>
+            </button>
+          </div>
+
           <div *ngIf="thorAddress" class="uni-input">
             <label>THORChain Address</label>
 
@@ -77,13 +62,15 @@
 
       </div>
 
-      <!-- close dialog -->
-      <div mat-dialog-actions class="dialog-actions">
-        <button mat-icon-button aria-label="Close Connect Wallet Dialog" mat-dialog-close>
-          <mat-icon>close</mat-icon>
-        </button>
-      </div>
+    </div>
+
+    <!-- close dialog -->
+    <div mat-dialog-actions class="dialog-actions">
+      <button mat-icon-button aria-label="Close Connect Wallet Dialog" mat-dialog-close>
+        <mat-icon>close</mat-icon>
+      </button>
     </div>
   </div>
-
 </div>
+
+<app-pending-txs-modal *ngIf="mode === 'TXS'" (back)="mode = 'ADDRESSES'"></app-pending-txs-modal>

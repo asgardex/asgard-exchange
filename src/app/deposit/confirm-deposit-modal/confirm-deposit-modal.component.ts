@@ -1,11 +1,8 @@
 import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-// import { MultiTransfer, TransferResult } from '@thorchain/asgardex-binance';
 import { MultiTransfer } from '@xchainjs/xchain-binance';
-import { tokenAmount, tokenToBase } from '@thorchain/asgardex-token';
-import { assetAmount, assetToBase, baseAmount } from '@thorchain/asgardex-util';
+import { assetAmount, assetToBase } from '@thorchain/asgardex-util';
 import { Subscription } from 'rxjs';
-// import { Asset } from 'src/app/_classes/asset';
 import { PoolAddressDTO } from 'src/app/_classes/pool-address';
 import { User } from 'src/app/_classes/user';
 import { TransactionConfirmationState } from 'src/app/_const/transaction-confirmation-state';
@@ -14,6 +11,7 @@ import { MidgardService } from 'src/app/_services/midgard.service';
 import { UserService } from 'src/app/_services/user.service';
 import { WalletConnectService } from 'src/app/_services/wallet-connect.service';
 import { environment } from 'src/environments/environment';
+import { TransactionStatusService, TxStatus } from 'src/app/_services/transaction-status.service';
 
 export interface ConfirmDepositData {
   asset;
@@ -40,6 +38,7 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
     @Inject(MAT_DIALOG_DATA) public data: ConfirmDepositData,
     public dialogRef: MatDialogRef<ConfirmDepositModalComponent>,
     private walletConnectService: WalletConnectService,
+    private txStatusService: TransactionStatusService,
     private midgardService: MidgardService,
     private userService: UserService,
     private binanceService: BinanceService
@@ -146,7 +145,7 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
         const hash = await binanceClient.multiSend({transactions: outputs, memo});
         this.txState = TransactionConfirmationState.SUCCESS;
         this.hash = hash;
-        this.userService.addPendingTransaction({chain: 'BNB', hash: this.hash});
+        this.txStatusService.addTransaction({chain: 'BNB', hash: this.hash, ticker: this.data.asset.ticker, status: TxStatus.PENDING});
       } catch (error) {
         console.error('error making transfer: ', error);
         this.txState = TransactionConfirmationState.ERROR;
@@ -207,7 +206,7 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
 
       console.log('hash is: ', hash);
       this.hash = hash;
-      this.userService.addPendingTransaction({chain: 'BNB', hash: this.hash});
+      this.txStatusService.addTransaction({chain: 'BNB', hash: this.hash, ticker: 'RUNE', status: TxStatus.PENDING});
       // this.txState = TransactionConfirmationState.SUCCESS;
     } catch (error) {
       console.error('error making transfer: ', error);
@@ -215,35 +214,30 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
       return;
     }
 
-    console.log('moving on to send BTC...');
-
-
     // send BTC
     try {
 
       console.log('corePool pool address is: ', corePool.address);
 
-      const fee = await bitcoinClient.getFeesWithMemo(coreChainMemo);
-      console.log('fee is: ', fee.average.amount().toNumber());
+      // const fee = await bitcoinClient.getFeesWithMemo(coreChainMemo);
+      // console.log('fee is: ', fee.average.amount().div(10 ** 8).toNumber());
 
       const hash = await bitcoinClient.transfer({
         amount: assetToBase(assetAmount(this.data.assetAmount)),
         recipient: corePool.address,
         memo: coreChainMemo,
-        feeRate: fee.average.amount().toNumber()
+        // feeRate: fee.average.amount().div(10 ** 8).toNumber()
       });
 
       console.log('hash is: ', hash);
       this.hash = hash;
       // this.userService.setPendingTransaction(this.hash);
-      this.userService.addPendingTransaction({chain: 'BTC', hash: this.hash});
+      this.txStatusService.addTransaction({chain: 'BTC', hash: this.hash, ticker: 'BTC', status: TxStatus.PENDING});
       this.txState = TransactionConfirmationState.SUCCESS;
     } catch (error) {
       console.error('error making transfer: ', error);
       this.txState = TransactionConfirmationState.ERROR;
     }
-
-
 
   }
 
@@ -285,7 +279,7 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
 
           if (res.result && res.result.length > 0) {
             this.hash = res.result[0].hash;
-            this.userService.addPendingTransaction({chain: 'BNB', hash: this.hash});
+            this.txStatusService.addTransaction({chain: 'BNB', hash: this.hash, ticker: this.data.asset.ticker, status: TxStatus.PENDING});
           }
         }
 

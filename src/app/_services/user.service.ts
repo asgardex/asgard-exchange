@@ -16,11 +16,6 @@ import {
   assetToBase,
 } from '@thorchain/asgardex-util';
 
-export interface PendingTransaction {
-  chain: 'BTC' | 'BNB';
-  hash: string;
-}
-
 export interface MidgardData<T> {
   key: string;
   value: T;
@@ -32,6 +27,7 @@ export interface MidgardData<T> {
 })
 export class UserService {
 
+  private _user: User;
   private userSource = new BehaviorSubject<User>(null);
   user$ = this.userSource.asObservable();
 
@@ -41,9 +37,9 @@ export class UserService {
   private userBalancesSource = new BehaviorSubject<Balances>(null);
   userBalances$ = this.userBalancesSource.asObservable();
 
-  private _pendingTxs: PendingTransaction[];
-  private pendingTransactionSource = new BehaviorSubject<PendingTransaction[]>([]);
-  pendingTransaction$ = this.pendingTransactionSource.asObservable();
+  // private _pendingTxs: PendingTransaction[];
+  // private pendingTransactionSource = new BehaviorSubject<PendingTransaction[]>([]);
+  // pendingTransaction$ = this.pendingTransactionSource.asObservable();
 
   // private completedTransactionSource = new BehaviorSubject<PendingTransaction>(null);
   // completedTransaction$ = this.completedTransactionSource.asObservable();
@@ -51,7 +47,7 @@ export class UserService {
   asgardexBncClient: BinanceClient;
 
   constructor() {
-    this._pendingTxs = [];
+    // this._pendingTxs = [];
     this.asgardexBncClient = new binanceClient({
       network: (environment.network) === 'testnet' ? 'testnet' : 'mainnet',
     });
@@ -59,23 +55,24 @@ export class UserService {
   }
 
   setUser(user: User) {
+    this._user = user;
     this.userSource.next(user);
     if (user) {
-      this.fetchBalances(user);
+      this.fetchBalances();
     }
   }
 
-  addPendingTransaction(pendingTx: PendingTransaction) {
-    this._pendingTxs.push(pendingTx);
-    const pendingTxs = this._pendingTxs;
-    this.pendingTransactionSource.next(pendingTxs);
-  }
+  // addPendingTransaction(pendingTx: PendingTransaction) {
+  //   this._pendingTxs.push(pendingTx);
+  //   const pendingTxs = this._pendingTxs;
+  //   this.pendingTransactionSource.next(pendingTxs);
+  // }
 
-  removePendingTransaction(completedTx: PendingTransaction) {
-    const filtered = this._pendingTxs.filter( (tx) => tx.hash !== completedTx.hash );
-    this._pendingTxs = filtered;
-    this.pendingTransactionSource.next(filtered);
-  }
+  // removePendingTransaction(completedTx: PendingTransaction) {
+  //   const filtered = this._pendingTxs.filter( (tx) => tx.hash !== completedTx.hash );
+  //   this._pendingTxs = filtered;
+  //   this.pendingTransactionSource.next(filtered);
+  // }
 
   // setCompletedTransaction(pendingTx: PendingTransaction) {
   //   this.completedTransactionSource.next(pendingTx);
@@ -97,12 +94,12 @@ export class UserService {
     }
   }
 
-  async fetchBalances(user: User): Promise<void> {
+  async fetchBalances(): Promise<void> {
     let balances: Balances = [];
 
-    for (const [key, _value] of Object.entries(user.clients)) {
+    for (const [key, _value] of Object.entries(this._user.clients)) {
 
-      const client = user.clients[key];
+      const client = this._user.clients[key];
       let clientBalances;
 
       if (key === 'binance') {

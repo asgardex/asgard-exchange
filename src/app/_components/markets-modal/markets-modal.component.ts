@@ -151,7 +151,7 @@ export class MarketsModalComponent implements OnInit, OnDestroy {
           // // }
 
           // this.userBalances = balances;
-          this.userService.fetchBalances(this.user);
+          this.userService.fetchBalances();
 
         } else {
           this.userBalances = [];

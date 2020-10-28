@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { User } from 'src/app/_classes/user';
+import { TransactionStatusService } from 'src/app/_services/transaction-status.service';
 import { UserService } from 'src/app/_services/user.service';
 
 @Component({
@@ -16,8 +17,14 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
   bitcoinAddress: string;
   thorAddress: string;
   loading: boolean;
+  pendingTxCount: number;
+  mode: 'ADDRESSES' | 'TXS';
 
-  constructor(private userService: UserService) {
+  constructor(private userService: UserService, private txStatusService: TransactionStatusService) {
+
+    this.pendingTxCount = 0;
+    this.mode = 'ADDRESSES';
+
     const user$ = this.userService.user$.subscribe(
       async (user) => {
 
@@ -42,7 +49,12 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
 
       }
     );
-    this.subs = [user$];
+
+    const txs$ = this.txStatusService.txs$.subscribe( (_) => {
+      this.pendingTxCount = this.txStatusService.getPendingTxCount();
+    });
+
+    this.subs = [user$, txs$];
   }
 
   ngOnInit(): void {

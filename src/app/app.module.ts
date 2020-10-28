@@ -26,6 +26,7 @@ import { ExplorerPathsService } from './_services/explorer-paths.service';
 import { LastBlockService } from './_services/last-block.service';
 import { MidgardService } from './_services/midgard.service';
 import { UserService } from './_services/user.service';
+import { TransactionStatusService } from './_services/transaction-status.service';
 import { WalletConnectService } from './_services/wallet-connect.service';
 
 /** MATERIAL */
@@ -62,7 +63,16 @@ import { MatRadioModule } from '@angular/material/radio';
     MatProgressSpinnerModule,
     AppRoutingModule,
   ],
-  providers: [BinanceService, BlockchairService, UserService, MidgardService, LastBlockService, WalletConnectService, ExplorerPathsService],
+  providers: [
+    BinanceService,
+    BlockchairService,
+    UserService,
+    MidgardService,
+    LastBlockService,
+    WalletConnectService,
+    ExplorerPathsService,
+    TransactionStatusService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

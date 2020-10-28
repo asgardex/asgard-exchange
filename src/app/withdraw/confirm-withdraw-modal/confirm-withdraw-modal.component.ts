@@ -1,8 +1,7 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { TransferResult } from '@thorchain/asgardex-binance';
 import { tokenAmount, tokenToBase } from '@thorchain/asgardex-token';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { PoolAddressDTO } from '../../_classes/pool-address';
 import { User } from '../../_classes/user';
 import { TransactionConfirmationState } from '../../_const/transaction-confirmation-state';
@@ -10,9 +9,9 @@ import { BinanceService } from '../../_services/binance.service';
 import { MidgardService } from '../../_services/midgard.service';
 import { UserService } from '../../_services/user.service';
 import { WalletConnectService } from '../../_services/wallet-connect.service';
-import { Asset } from '../../_classes/asset';
 import { environment } from 'src/environments/environment';
 import { assetAmount, assetToBase } from '@thorchain/asgardex-util';
+import { TransactionStatusService, TxStatus } from 'src/app/_services/transaction-status.service';
 
 // TODO: this is the same as ConfirmStakeData in confirm stake modal
 export interface ConfirmWithdrawData {
@@ -37,11 +36,13 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
   txState: TransactionConfirmationState;
   hash: string;
   subs: Subscription[];
+  killPolling: Subject<void> = new Subject();
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: ConfirmWithdrawData,
     public dialogRef: MatDialogRef<ConfirmWithdrawModalComponent>,
     private walletConnectService: WalletConnectService,
+    private txStatusService: TransactionStatusService,
     private binanceService: BinanceService,
     private midgardService: MidgardService,
     private userService: UserService
@@ -117,6 +118,8 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
     try {
       const hash = await binanceClient.transfer({asset: this.data.rune, amount, recipient: matchingPool.address, memo});
       this.txSuccess(hash);
+      this.txStatusService.pollTxOutputs(hash, 2);
+      // this.fetchOutputs(hash);
     } catch (error) {
       console.error('error unstaking: ', error);
     }
@@ -138,6 +141,35 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
     // }
 
   }
+
+  // fetchOutputs(hash) {
+
+  //   const refreshInterval$ = timer(0, 15000)
+  //   .pipe(
+  //     // This kills the request if the user closes the component
+  //     takeUntil(this.killPolling),
+  //     // switchMap cancels the last request, if no response have been received since last tick
+  //     switchMap(() => this.midgardService.getTransaction(hash)),
+  //     // catchError handles http throws
+  //     catchError(error => of(error))
+  //   ).subscribe( (tx) => {
+
+  //     if (tx && tx.txs && tx.txs[0] && tx.txs[0].out && tx.txs[0].out.length >= 2) {
+
+  //       for (const output of tx.txs[0].out) {
+
+  //         this.userService.addPendingTransaction({chain: 'BNB', hash: output.txID});
+
+  //       }
+
+  //       this.killPolling.next();
+
+  //     }
+
+  //   });
+  //   this.subs.push(refreshInterval$);
+
+  // }
 
   walletConnectTransaction(matchingPool: PoolAddressDTO, memo: string) {
     const runeAmount = tokenToBase(tokenAmount(0.00000001))
@@ -187,7 +219,12 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
 
           if (res.result && res.result.length > 0) {
             this.hash = res.result[0].hash;
-            this.userService.addPendingTransaction({chain: 'BNB', hash: this.hash});
+            this.txStatusService.addTransaction({
+              chain: 'BNB',
+              hash: this.hash,
+              ticker: `${this.data.asset.ticker}-RUNE`,
+              status: TxStatus.PENDING
+            });
           }
         }
 
@@ -201,7 +238,12 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
   txSuccess(hash: string) {
     this.txState = TransactionConfirmationState.SUCCESS;
     this.hash = hash;
-    this.userService.addPendingTransaction({chain: 'BNB', hash: this.hash});
+    this.txStatusService.addTransaction({
+      chain: 'BNB',
+      hash: this.hash,
+      ticker: `${this.data.asset.ticker}-RUNE`,
+      status: TxStatus.PENDING
+    });
   }
 
   closeDialog(transactionSucess?: boolean) {
