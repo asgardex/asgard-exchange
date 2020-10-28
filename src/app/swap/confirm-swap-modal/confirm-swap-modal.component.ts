@@ -1,8 +1,5 @@
 import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-// import { Asset } from 'src/app/_classes/asset';
-// import { Asset } from '@xchainjs/xchain-binance';
-// import { TransferResult } from '@thorchain/asgardex-binance';
 import { User } from 'src/app/_classes/user';
 import { MidgardService } from 'src/app/_services/midgard.service';
 import { UserService } from 'src/app/_services/user.service';
@@ -128,9 +125,7 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
           memo
         });
 
-        console.log('hash is: ', hash);
         this.hash = hash;
-        // this.userService.setPendingTransaction(this.hash);
         this.txStatusService.addTransaction({
           chain: 'BNB',
           hash: this.hash,
@@ -156,9 +151,7 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
           memo
         });
 
-        console.log('hash is: ', hash);
         this.hash = hash;
-
         this.txStatusService.addTransaction({chain: 'BTC', hash: this.hash, ticker: 'BTC', status: TxStatus.PENDING});
         this.txStatusService.pollTxOutputs(hash, 1);
         this.txState = TransactionConfirmationState.SUCCESS;
@@ -166,9 +159,6 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
         console.error('error making transfer: ', error);
         this.txState = TransactionConfirmationState.ERROR;
       }
-
-      // 74eb095a0f7c67473da848c6826e74ec18694275fb3e04ea9b601512991e27d5
-
 
     }
 

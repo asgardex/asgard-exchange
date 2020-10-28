@@ -142,35 +142,6 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
 
   }
 
-  // fetchOutputs(hash) {
-
-  //   const refreshInterval$ = timer(0, 15000)
-  //   .pipe(
-  //     // This kills the request if the user closes the component
-  //     takeUntil(this.killPolling),
-  //     // switchMap cancels the last request, if no response have been received since last tick
-  //     switchMap(() => this.midgardService.getTransaction(hash)),
-  //     // catchError handles http throws
-  //     catchError(error => of(error))
-  //   ).subscribe( (tx) => {
-
-  //     if (tx && tx.txs && tx.txs[0] && tx.txs[0].out && tx.txs[0].out.length >= 2) {
-
-  //       for (const output of tx.txs[0].out) {
-
-  //         this.userService.addPendingTransaction({chain: 'BNB', hash: output.txID});
-
-  //       }
-
-  //       this.killPolling.next();
-
-  //     }
-
-  //   });
-  //   this.subs.push(refreshInterval$);
-
-  // }
-
   walletConnectTransaction(matchingPool: PoolAddressDTO, memo: string) {
     const runeAmount = tokenToBase(tokenAmount(0.00000001))
       .amount()

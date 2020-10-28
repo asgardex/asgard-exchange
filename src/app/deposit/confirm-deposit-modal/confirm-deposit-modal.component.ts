@@ -139,8 +139,6 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
     const binanceClient = this.data.user.clients.binance;
     if (binanceClient) {
 
-      // const
-
       try {
         const hash = await binanceClient.multiSend({transactions: outputs, memo});
         this.txState = TransactionConfirmationState.SUCCESS;
@@ -150,25 +148,6 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
         console.error('error making transfer: ', error);
         this.txState = TransactionConfirmationState.ERROR;
       }
-
-
-      // bncClient
-      // .multiSend(this.data.user.wallet, outputs, memo)
-      // .then((response: TransferResult) => {
-
-      //   this.txState = TransactionConfirmationState.SUCCESS;
-
-      //   if (response.result && response.result.length > 0) {
-      //     this.hash = response.result[0].hash;
-      //     this.userService.setPendingTransaction({chain: 'BNB', hash: this.hash});
-      //   }
-      // })
-      // .catch((error: Error) => {
-      //   console.error('error making transfer: ', error);
-      //   this.txState = TransactionConfirmationState.ERROR;
-      // });
-
-
 
     } else {
       console.error('no binance client for user');
@@ -186,28 +165,17 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
     const coreChainMemo = `STAKE:${asset.chain}.${asset.symbol}:${binanceAddress}`;
     const bnbMemo = `STAKE:${asset.chain}.${asset.symbol}:${bitcoinAddress}`;
 
-    // console.log('bnb memo is: ', bnbMemo);
-    // console.log('coreChainMemo is: ', coreChainMemo);
-
-    // console.log('rune anmount is: ', this.data.runeAmount);
-    // console.log('base stuff magic is: ', assetToBase(assetAmount(this.data.runeAmount)).amount().toNumber());
-    // console.log('base amount is: ', baseAmount(this.data.runeAmount).amount().toNumber());
-
     // send RUNE
     try {
       const hash = await binanceClient.transfer({
         asset: this.data.rune,
-        // asset,
-        // amount: baseAmount(this.data.runeAmount),
         amount: assetToBase(assetAmount(this.data.runeAmount)),
         recipient: bnbPool.address,
         memo: bnbMemo
       });
 
-      console.log('hash is: ', hash);
       this.hash = hash;
       this.txStatusService.addTransaction({chain: 'BNB', hash: this.hash, ticker: 'RUNE', status: TxStatus.PENDING});
-      // this.txState = TransactionConfirmationState.SUCCESS;
     } catch (error) {
       console.error('error making transfer: ', error);
       this.txState = TransactionConfirmationState.ERROR;
@@ -216,22 +184,13 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
 
     // send BTC
     try {
-
-      console.log('corePool pool address is: ', corePool.address);
-
-      // const fee = await bitcoinClient.getFeesWithMemo(coreChainMemo);
-      // console.log('fee is: ', fee.average.amount().div(10 ** 8).toNumber());
-
       const hash = await bitcoinClient.transfer({
         amount: assetToBase(assetAmount(this.data.assetAmount)),
         recipient: corePool.address,
         memo: coreChainMemo,
-        // feeRate: fee.average.amount().div(10 ** 8).toNumber()
       });
 
-      console.log('hash is: ', hash);
       this.hash = hash;
-      // this.userService.setPendingTransaction(this.hash);
       this.txStatusService.addTransaction({chain: 'BTC', hash: this.hash, ticker: 'BTC', status: TxStatus.PENDING});
       this.txState = TransactionConfirmationState.SUCCESS;
     } catch (error) {
