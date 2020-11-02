@@ -3,25 +3,14 @@ import { Market } from 'src/app/_classes/market';
 import { MidgardService } from 'src/app/_services/midgard.service';
 import { UserService } from 'src/app/_services/user.service';
 import { Asset } from '../../_classes/asset';
-import { AssetBalance } from '../../_classes/asset-balance';
 import { Subscription } from 'rxjs';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { environment } from 'src/environments/environment';
 import { User } from 'src/app/_classes/user';
 import { Balance, Balances } from '@xchainjs/xchain-client';
-// import { baseToToken, TokenAmount, tokenAmount } from '@thorchain/asgardex-token';
-import { assetAmount, AssetAmount, baseAmount, BaseAmount, baseToAsset } from '@thorchain/asgardex-util';
+import { baseToAsset } from '@thorchain/asgardex-util';
+import { AssetAndBalance } from 'src/app/_classes/asset-and-balance';
 
-type AssetAndBalance = {
-  asset: Asset,
-  // balance?: AssetBalance,
-  // balance?: {
-  //   asset: Asset;
-  //   amount: TokenAmount;
-  //   frozenAmount?: BaseAmount;
-  // }
-  balance?: AssetAmount;
-};
 
 @Component({
   selector: 'app-markets-modal',

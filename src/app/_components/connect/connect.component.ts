@@ -1,56 +1,25 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { User } from 'src/app/_classes/user';
 import { UserService } from 'src/app/_services/user.service';
 import { environment } from 'src/environments/environment';
-import { Subject, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { WalletConnectService } from 'src/app/_services/wallet-connect.service';
-import { UserSettingsComponent } from './user-settings/user-settings.component';
-import { PendingTxsModalComponent } from '../pending-txs-modal/pending-txs-modal.component';
-import { TransactionStatusService, Tx } from 'src/app/_services/transaction-status.service';
+
 
 @Component({
   selector: 'app-connect',
   templateUrl: './connect.component.html',
   styleUrls: ['./connect.component.scss']
 })
-export class ConnectComponent implements OnInit, OnDestroy {
+export class ConnectComponent implements OnInit {
 
-  user: User;
-  subs: Subscription[];
-  pendingTxs: Tx[];
-  pendingTxCount: number;
-  killTxPolling: {[key: string]: Subject<void>} = {};
   modalDimensions = {
     maxWidth: '420px',
     width: '50vw',
     minWidth: '260px'
   };
 
-  constructor(
-    private dialog: MatDialog,
-    private userService: UserService,
-    private txStatusService: TransactionStatusService,
-    private walletConnectService: WalletConnectService
-  ) {
-
-    this.pendingTxCount = 0;
-    this.pendingTxs = [];
-
-    const user$ = this.userService.user$.subscribe(
-      (user) => this.user = user
-    );
-
-    const pendingTx$ = this.txStatusService.txs$.subscribe(
-      (_txs) => {
-        this.pendingTxCount = this.txStatusService.getPendingTxCount();
-      }
-    );
-
-    // this.pendingTxCount = 2;
-
-    this.subs = [user$, pendingTx$];
-  }
+  constructor(private dialog: MatDialog, private walletConnectService: WalletConnectService) { }
 
   ngOnInit(): void {
     this.walletConnectService.initWalletConnect();
@@ -61,26 +30,6 @@ export class ConnectComponent implements OnInit, OnDestroy {
       ConnectModal,
       this.modalDimensions
     );
-  }
-
-  openUserSettings() {
-    this.dialog.open(
-      UserSettingsComponent,
-      this.modalDimensions
-    );
-  }
-
-  openPendingTxs() {
-    this.dialog.open(
-      PendingTxsModalComponent,
-      this.modalDimensions
-    );
-  }
-
-  ngOnDestroy() {
-    for (const sub of this.subs) {
-      sub.unsubscribe();
-    }
   }
 
 }

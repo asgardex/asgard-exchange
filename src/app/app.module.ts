@@ -13,11 +13,14 @@ import { KeystoreConnectComponent } from './_components/connect/keystore-connect
 import { LastBlockIndicatorComponent } from './_components/last-block-indicator/last-block-indicator.component';
 import { LedgerConnectComponent } from './_components/connect/ledger-connect/ledger-connect.component';
 import { KeystoreCreateComponent } from './_components/connect/keystore-create/keystore-create.component';
-import { UserSettingsComponent } from './_components/connect/user-settings/user-settings.component';
-import { PendingTxsModalComponent } from './_components/pending-txs-modal/pending-txs-modal.component';
+import { PendingTxsModalComponent } from './_components/user-settings/user-settings-dialog/pending-txs/pending-txs-modal.component';
+import { UserAddressComponent } from './_components/user-settings/user-settings-dialog/user-address/user-address.component';
+import { UserSettingsComponent } from './_components/user-settings/user-settings.component';
+import { UserSettingsDialogComponent } from './_components/user-settings/user-settings-dialog/user-settings-dialog.component';
 
 /** MODULES */
 import { AppRoutingModule } from './app-routing.module';
+import { AssetsListModule } from './_components/assets-list/assets-list.module';
 
 /** SERVICES */
 import { BinanceService } from './_services/binance.service';
@@ -49,9 +52,12 @@ import { MatRadioModule } from '@angular/material/radio';
     LedgerConnectComponent,
     KeystoreCreateComponent,
     UserSettingsComponent,
+    UserSettingsDialogComponent,
     PendingTxsModalComponent,
+    UserAddressComponent,
   ],
   imports: [
+    AssetsListModule,
     BrowserModule,
     BrowserAnimationsModule,
     FormsModule,

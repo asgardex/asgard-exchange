@@ -13,7 +13,7 @@
 
       <div>
 
-        <ul>
+        <ul *ngIf="txs && txs.length > 0">
           <li *ngFor="let tx of txs">
 
             <a [href]="((tx.chain === 'BTC') ? bitcoinExplorerUrl : binanceExplorerUrl) + '/' + tx.hash" target="_blank" class="uni-input">
@@ -35,6 +35,10 @@
 
           </li>
         </ul>
+
+        <div *ngIf="!txs || (txs && txs.length < 1)">
+          No transactions found
+        </div>
 
       </div>
 

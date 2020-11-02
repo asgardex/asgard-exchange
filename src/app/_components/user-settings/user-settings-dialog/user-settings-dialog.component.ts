@@ -1,15 +1,16 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { User } from 'src/app/_classes/user';
+import { AvailableChain } from 'src/app/_const/available-chain';
 import { TransactionStatusService } from 'src/app/_services/transaction-status.service';
 import { UserService } from 'src/app/_services/user.service';
 
 @Component({
-  selector: 'app-user-settings',
-  templateUrl: './user-settings.component.html',
-  styleUrls: ['./user-settings.component.scss']
+  selector: 'app-user-settings-dialog',
+  templateUrl: './user-settings-dialog.component.html',
+  styleUrls: ['./user-settings-dialog.component.scss']
 })
-export class UserSettingsComponent implements OnInit, OnDestroy {
+export class UserSettingsDialogComponent implements OnInit, OnDestroy {
 
   user: User;
   subs: Subscription[];
@@ -18,7 +19,9 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
   thorAddress: string;
   loading: boolean;
   pendingTxCount: number;
-  mode: 'ADDRESSES' | 'TXS';
+  mode: 'ADDRESSES' | 'ADDRESS' |'TXS';
+  selectedAddress: string;
+  selectedChain: AvailableChain;
 
   constructor(private userService: UserService, private txStatusService: TransactionStatusService) {
 
@@ -60,14 +63,17 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
   }
 
-  copyToClipboard(address: string) {
-    const listener = (ev) => {
-      ev.preventDefault();
-      ev.clipboardData.setData('text/plain', address);
-    };
-    document.addEventListener('copy', listener);
-    document.execCommand('copy');
-    document.removeEventListener('copy', listener);
+  selectAddress(address: string, chain: AvailableChain) {
+    console.log('chain is: ', chain);
+    this.selectedAddress = address;
+    this.selectedChain = chain;
+    this.mode = 'ADDRESS';
+  }
+
+  clearSelectedAddress() {
+    this.selectedAddress = null;
+    this.selectedChain = null;
+    this.mode = 'ADDRESSES';
   }
 
   ngOnDestroy(): void {

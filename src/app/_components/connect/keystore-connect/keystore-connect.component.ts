@@ -1,7 +1,7 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { UserService } from 'src/app/_services/user.service';
 import { User } from 'src/app/_classes/user';
-import { decryptFromKeystore } from '@thorchain/asgardex-crypto';
+import { decryptFromKeystore } from '@xchainjs/xchain-crypto';
 import { Client as binanceClient, } from '@xchainjs/xchain-binance';
 import { Client as bitcoinClient, } from '@xchainjs/xchain-bitcoin';
 import { environment } from 'src/environments/environment';
@@ -107,7 +107,7 @@ export class KeystoreConnectComponent implements OnInit {
 
     try {
 
-      const phrase = await decryptFromKeystore(this.keystore, this.keystorePassword); // this throws an error
+      const phrase = await decryptFromKeystore(this.keystore, this.keystorePassword);
       const network = environment.network === 'testnet' ? 'testnet' : 'mainnet';
       const blockchairUrl = (environment.network === 'testnet') ? 'https://api.blockchair.com/bitcoin/testnet' : 'https://api.blockchair.com/bitcoin';
 

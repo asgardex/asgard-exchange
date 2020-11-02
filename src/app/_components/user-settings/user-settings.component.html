@@ -1,0 +1,12 @@
+<button
+  *ngIf="user"
+  mat-flat-button
+  style="background-color: rgb(44, 47, 54); border: 1px solid rgb(64, 68, 79);"
+  (click)="openUserSettings()"
+>
+  <span *ngIf="pendingTxCount <= 0">{{user.wallet.substring(0, 6)}}...{{user.wallet.substring(user.wallet.length - 4, user.wallet.length)}}</span>
+  <div *ngIf="pendingTxCount > 0" class="flxr flxr--align-center">
+    <span style="margin-right: 8px">{{pendingTxCount}} Pending</span>
+    <mat-progress-spinner class="light-spinner" mode="indeterminate" diameter="16" color="accent"></mat-progress-spinner>
+  </div>
+</button>

@@ -21,39 +21,28 @@
             </button>
           </div>
 
-          <div *ngIf="thorAddress" class="uni-input">
+          <!-- <div *ngIf="thorAddress" class="uni-input user-address" (click)="selectAddress(thorAddress, 'THOR')">
             <label>THORChain Address</label>
 
             <div class="flxr" style="width: 100%">
               <input [value]="thorAddress" name="thor-address" [disabled]="true" />
 
-              <button matSuffix mat-icon-button aria-label="THORChain Address" (click)="copyToClipboard(thorAddress)">
-                <mat-icon (click)="copyToClipboard(thorAddress)">content_copy</mat-icon>
-              </button>
-
             </div>
-          </div>
+          </div> -->
 
-          <div *ngIf="bitcoinAddress" class="uni-input">
+          <div *ngIf="bitcoinAddress" class="uni-input user-address" (click)="selectAddress(bitcoinAddress, 'BTC')">
             <label>Bitcoin Address</label>
 
             <div class="flxr" style="width: 100%">
               <input [value]="bitcoinAddress" name="btc-address" [disabled]="true" />
-              <button matSuffix mat-icon-button aria-label="BTC Address" (click)="copyToClipboard(bitcoinAddress)">
-                <mat-icon matSuffix (click)="copyToClipboard(bitcoinAddress)">content_copy</mat-icon>
-              </button>
             </div>
-
           </div>
 
-          <div *ngIf="binanceAddress" class="uni-input">
+          <div *ngIf="binanceAddress" class="uni-input user-address" (click)="selectAddress(binanceAddress, 'BNB')">
             <label>BNB Address</label>
 
             <div class="flxr" style="width: 100%">
               <input [value]="binanceAddress" name="binance-address" [disabled]="true" />
-              <button matSuffix mat-icon-button aria-label="BNB Address" (click)="copyToClipboard(binanceAddress)">
-                <mat-icon matSuffix (click)="copyToClipboard(binanceAddress)">content_copy</mat-icon>
-              </button>
             </div>
 
           </div>
@@ -74,3 +63,5 @@
 </div>
 
 <app-pending-txs-modal *ngIf="mode === 'TXS'" (back)="mode = 'ADDRESSES'"></app-pending-txs-modal>
+
+<app-user-address *ngIf="mode === 'ADDRESS'" (back)="clearSelectedAddress()" [chain]="selectedChain" [address]="selectedAddress"></app-user-address>

@@ -1,5 +1,5 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
-import { generatePhrase, encryptToKeyStore } from '@thorchain/asgardex-crypto';
+import { generatePhrase, encryptToKeyStore } from '@xchainjs/xchain-crypto';
 
 @Component({
   selector: 'app-keystore-create',

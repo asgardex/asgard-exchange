@@ -1,0 +1,17 @@
+.pending-tx-btn {
+  color: rgb(21, 163, 111);
+  padding-bottom: 1rem;
+}
+
+.user-address {
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.02);
+
+  input {
+    cursor: pointer;
+  }
+
+  &:hover {
+    border: 1px solid white;
+  }
+}

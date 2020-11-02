@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MarketsModalComponent } from './markets-modal.component';
+import { AssetsListModule } from '../assets-list/assets-list.module';
 
 /**
  * Material
@@ -18,7 +19,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     MatIconModule,
     CommonModule,
     MatProgressSpinnerModule,
-    FormsModule
+    FormsModule,
+    AssetsListModule
   ],
   exports: [MarketsModalComponent]
 })
