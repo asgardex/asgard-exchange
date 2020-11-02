@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { baseToAsset } from '@thorchain/asgardex-util';
 import { Balances } from '@xchainjs/xchain-client';
 import { Subscription } from 'rxjs';
@@ -25,7 +26,7 @@ export class UserAddressComponent implements OnInit {
   assets: AssetAndBalance[];
   loading: boolean;
 
-  constructor(private userService: UserService) {
+  constructor(private userService: UserService, private _snackBar: MatSnackBar) {
     this.back = new EventEmitter<null>();
     this.loading = true;
   }
@@ -80,6 +81,11 @@ export class UserAddressComponent implements OnInit {
     document.addEventListener('copy', listener);
     document.execCommand('copy');
     document.removeEventListener('copy', listener);
+
+    this._snackBar.open('Copied to Clipboard', '', {
+      duration: 2000,
+    });
+
   }
 
 }

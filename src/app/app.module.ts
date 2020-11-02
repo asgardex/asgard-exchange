@@ -38,6 +38,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatRadioModule } from '@angular/material/radio';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 
 @NgModule({
@@ -67,6 +68,7 @@ import { MatRadioModule } from '@angular/material/radio';
     MatDialogModule,
     MatRadioModule,
     MatProgressSpinnerModule,
+    MatSnackBarModule,
     AppRoutingModule,
   ],
   providers: [
