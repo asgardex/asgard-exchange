@@ -26,5 +26,5 @@
 </div>
 
 <div mat-dialog-content>
-  <app-assets-list [assetListItems]="assets" [loading]="false" [disabledAssetSymbol]="''"></app-assets-list>
+  <app-assets-list [assetListItems]="assets" [loading]="false" [disabledAssetSymbol]="''" (selectAsset)="selectAsset($event)"></app-assets-list>
 </div>

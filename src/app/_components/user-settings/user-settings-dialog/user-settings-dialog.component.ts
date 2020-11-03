@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
+import { AssetAndBalance } from 'src/app/_classes/asset-and-balance';
 import { User } from 'src/app/_classes/user';
 import { AvailableChain } from 'src/app/_const/available-chain';
 import { TransactionStatusService } from 'src/app/_services/transaction-status.service';
@@ -19,9 +20,12 @@ export class UserSettingsDialogComponent implements OnInit, OnDestroy {
   thorAddress: string;
   loading: boolean;
   pendingTxCount: number;
-  mode: 'ADDRESSES' | 'ADDRESS' |'TXS';
+  mode: 'ADDRESSES' | 'ADDRESS' | 'PENDING_TXS' | 'ASSET' | 'SEND' | 'CONFIRM_SEND';
   selectedAddress: string;
   selectedChain: AvailableChain;
+  selectedAsset: AssetAndBalance;
+  amountToSend: number;
+  recipient: string;
 
   constructor(private userService: UserService, private txStatusService: TransactionStatusService) {
 
@@ -64,7 +68,6 @@ export class UserSettingsDialogComponent implements OnInit, OnDestroy {
   }
 
   selectAddress(address: string, chain: AvailableChain) {
-    console.log('chain is: ', chain);
     this.selectedAddress = address;
     this.selectedChain = chain;
     this.mode = 'ADDRESS';
@@ -74,6 +77,30 @@ export class UserSettingsDialogComponent implements OnInit, OnDestroy {
     this.selectedAddress = null;
     this.selectedChain = null;
     this.mode = 'ADDRESSES';
+  }
+
+  selectAsset(asset: AssetAndBalance) {
+    this.selectedAsset = asset;
+    this.mode = 'ASSET';
+  }
+
+  confirmSend(p: {amount: number, recipientAddress: string}) {
+    this.amountToSend = p.amount;
+    this.recipient = p.recipientAddress;
+    this.mode = 'CONFIRM_SEND';
+  }
+
+  clearSelectedAsset() {
+    this.selectedAsset = null;
+    this.mode = 'ADDRESS';
+  }
+
+  transactionSuccessful() {
+    this.mode = 'PENDING_TXS';
+    this.amountToSend = null;
+    this.recipient = null;
+    this.selectedAsset = null;
+    this.selectedAddress = null;
   }
 
   ngOnDestroy(): void {

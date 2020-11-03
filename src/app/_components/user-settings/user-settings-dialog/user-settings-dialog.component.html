@@ -15,7 +15,7 @@
         <div *ngIf="!loading">
 
           <div>
-            <button (click)="mode = 'TXS'" class="pending-tx-btn flxr flxr--align-center">
+            <button (click)="mode = 'PENDING_TXS'" class="pending-tx-btn flxr flxr--align-center">
               {{pendingTxCount}} Pending Transactions
               <mat-icon>keyboard_arrow_right</mat-icon>
             </button>
@@ -62,6 +62,36 @@
   </div>
 </div>
 
-<app-pending-txs-modal *ngIf="mode === 'TXS'" (back)="mode = 'ADDRESSES'"></app-pending-txs-modal>
+<app-pending-txs-modal *ngIf="mode === 'PENDING_TXS'" (back)="mode = 'ADDRESSES'"></app-pending-txs-modal>
 
-<app-user-address *ngIf="mode === 'ADDRESS'" (back)="clearSelectedAddress()" [chain]="selectedChain" [address]="selectedAddress"></app-user-address>
+<app-user-address
+  *ngIf="mode === 'ADDRESS'"
+  [chain]="selectedChain"
+  [address]="selectedAddress"
+  (back)="clearSelectedAddress()"
+  (navigateToAsset)="selectAsset($event)">
+</app-user-address>
+
+<app-user-asset
+  *ngIf="mode === 'ASSET'"
+  [asset]="selectedAsset"
+  [address]="selectedAddress"
+  (back)="clearSelectedAsset()"
+  (send)="mode = 'SEND'">
+</app-user-asset>
+
+<app-send-asset
+  *ngIf="mode === 'SEND'"
+  [asset]="selectedAsset"
+  (confirmSend)="confirmSend($event)"
+  (back)="mode = 'ASSET'">
+</app-send-asset>
+
+<app-confim-send
+  *ngIf="mode === 'CONFIRM_SEND'"
+  [amount]="amountToSend"
+  [recipientAddress]="recipient"
+  [asset]="selectedAsset"
+  (back)="mode = 'SEND'"
+  (transactionSuccessful)="transactionSuccessful()">
+</app-confim-send>

@@ -148,6 +148,8 @@ button {
   }
 
   .modal-head {
+    float: left;
+    width: 100%;
     padding: 1rem;
   }
 
@@ -256,7 +258,7 @@ input[type=number] {
   color: white !important;
  }
 
-.mat-button, .mat-raised-button, .mat-icon-button, .mat-stroked-button, .mat-flat-button, .mat-fab, .mat-mini-fab {
+.mat-button, .mat-raised-button, .mat-icon-button, .mat-stroked-button, .mat-flat-button, .mat-fab {
   font-size: 0.8rem;
   color: white;
   background-color: transparent;

@@ -39,6 +39,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { UserAssetComponent } from './_components/user-settings/user-settings-dialog/user-asset/user-asset.component';
+import { CoinGeckoService } from './_services/coin-gecko.service';
+import { CopyService } from './_services/copy.service';
+import { SendAssetComponent } from './_components/user-settings/user-settings-dialog/send-asset/send-asset.component';
+import { AssetInputModule } from './_components/asset-input/asset-input.module';
+import { ConfimSendComponent } from './_components/user-settings/user-settings-dialog/confim-send/confim-send.component';
+import { TransactionProcessingModalModule } from './_components/transaction-processing-modal/transaction-processing-modal.module';
 
 
 @NgModule({
@@ -56,8 +63,12 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     UserSettingsDialogComponent,
     PendingTxsModalComponent,
     UserAddressComponent,
+    UserAssetComponent,
+    SendAssetComponent,
+    ConfimSendComponent,
   ],
   imports: [
+    AssetInputModule,
     AssetsListModule,
     BrowserModule,
     BrowserAnimationsModule,
@@ -69,11 +80,14 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     MatRadioModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
+    TransactionProcessingModalModule,
     AppRoutingModule,
   ],
   providers: [
     BinanceService,
     BlockchairService,
+    CoinGeckoService,
+    CopyService,
     UserService,
     MidgardService,
     LastBlockService,

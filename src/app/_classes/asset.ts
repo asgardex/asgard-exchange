@@ -2,7 +2,7 @@ import { CoinIconsFromTrustWallet } from 'src/app/_const/icon-list';
 
 export class Asset {
 
-  chain: string;
+  chain: 'BNB' | 'BTC' | 'ETH' | 'THOR';
   symbol: string;
   ticker: string;
   iconPath: string;
@@ -38,17 +38,17 @@ export class Asset {
   }
 
   getAssetFromString(poolName: string): {
-    chain: string;
+    chain: 'BNB' | 'BTC' | 'ETH' | 'THOR';
     symbol: string;
     ticker: string;
   } {
-    let chain: string;
+    let chain: 'BNB' | 'BTC' | 'ETH' | 'THOR';
     let symbol: string;
     let ticker: string;
 
     const data = poolName.split('.');
     if (poolName.includes('.')) {
-      chain = data[0];
+      chain = data[0] as 'BNB' | 'BTC' | 'ETH' | 'THOR';
       symbol = data[1];
     } else {
       symbol = data[0];
