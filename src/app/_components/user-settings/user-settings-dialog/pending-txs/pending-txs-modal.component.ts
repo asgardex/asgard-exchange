@@ -26,8 +26,8 @@ export class PendingTxsModalComponent implements OnInit, OnDestroy {
     this.back = new EventEmitter<null>();
     this.txs = [];
 
-    this.binanceExplorerUrl = this.explorerPathsService.binanceExplorerUrl;
-    this.bitcoinExplorerUrl = this.explorerPathsService.bitcoinExplorerUrl;
+    this.binanceExplorerUrl = `${this.explorerPathsService.binanceExplorerUrl}/tx`;
+    this.bitcoinExplorerUrl = `${this.explorerPathsService.bitcoinExplorerUrl}/tx`;
 
     const pendingTxs$ = this.txStatusService.txs$.subscribe( (txs) => {
       this.txs = txs;

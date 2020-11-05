@@ -19,8 +19,8 @@ export class TransactionSuccessModalComponent implements OnInit {
 
   constructor(private explorerPathsService: ExplorerPathsService) {
     this.closeDialog = new EventEmitter<null>();
-    this.binanceExplorerUrl = this.explorerPathsService.binanceExplorerUrl;
-    this.bitcoinExplorerUrl = this.explorerPathsService.bitcoinExplorerUrl;
+    this.binanceExplorerUrl = `${this.explorerPathsService.binanceExplorerUrl}/tx`;
+    this.bitcoinExplorerUrl = `${this.explorerPathsService.bitcoinExplorerUrl}/tx`;
   }
 
   ngOnInit(): void {

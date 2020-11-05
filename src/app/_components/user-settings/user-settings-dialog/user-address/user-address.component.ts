@@ -7,6 +7,7 @@ import { AssetAndBalance } from 'src/app/_classes/asset-and-balance';
 import { User } from 'src/app/_classes/user';
 import { AvailableChain } from 'src/app/_const/available-chain';
 import { CopyService } from 'src/app/_services/copy.service';
+import { ExplorerPathsService } from 'src/app/_services/explorer-paths.service';
 import { UserService } from 'src/app/_services/user.service';
 
 @Component({
@@ -26,8 +27,9 @@ export class UserAddressComponent implements OnInit {
   subs: Subscription[];
   assets: AssetAndBalance[];
   loading: boolean;
+  explorerPath: string;
 
-  constructor(private userService: UserService, private copyService: CopyService) {
+  constructor(private userService: UserService, private copyService: CopyService, private explorerPathsService: ExplorerPathsService) {
     this.back = new EventEmitter<null>();
     this.navigateToAsset = new EventEmitter<AssetAndBalance>();
     this.loading = true;
@@ -61,9 +63,26 @@ export class UserAddressComponent implements OnInit {
       }
     );
 
+    this.setExplorerPath();
+
     this.subs = [balances$];
 
 
+  }
+
+  setExplorerPath() {
+    switch (this.chain) {
+      case 'BTC':
+        this.explorerPath = `${this.explorerPathsService.bitcoinExplorerUrl}/address/${this.address}`;
+        break;
+
+      case 'BNB':
+        this.explorerPath = `${this.explorerPathsService.binanceExplorerUrl}/address/${this.address}`;
+        break;
+
+      default:
+        break;
+    }
   }
 
   getIconPath(chain: AvailableChain): string {

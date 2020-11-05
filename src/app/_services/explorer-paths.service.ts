@@ -10,9 +10,11 @@ export class ExplorerPathsService {
   bitcoinExplorerUrl: string;
 
   constructor() {
-    this.binanceExplorerUrl = environment.network === 'testnet' ? 'https://testnet-explorer.binance.org/tx' : 'https://explorer.binance.org/tx';
+    this.binanceExplorerUrl = environment.network === 'testnet'
+      ? 'https://testnet-explorer.binance.org'
+      : 'https://explorer.binance.org';
     this.bitcoinExplorerUrl = environment.network === 'testnet'
-      ? 'https://blockstream.info/testnet/tx'
-      : 'https://blockstream.info/tx';
+      ? 'https://blockstream.info/testnet'
+      : 'https://blockstream.info';
   }
 }

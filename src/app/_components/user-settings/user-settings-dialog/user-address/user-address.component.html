@@ -13,7 +13,13 @@
 
 <div class="modal-head">
   <div *ngIf="address && chain" class="uni-input user-address">
-    <label>{{chain}} Address</label>
+    <label class="flxr flxr--align-center">
+      {{chain}} Address
+
+      <a class="explorer-link" [href]="explorerPath" target="_blank">
+        <mat-icon>open_in_new</mat-icon>
+      </a>
+    </label>
 
     <div class="flxr" style="width: 100%">
       <input [value]="address" name="address" [disabled]="true" />
