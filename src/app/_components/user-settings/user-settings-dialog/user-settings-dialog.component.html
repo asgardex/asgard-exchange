@@ -33,7 +33,10 @@
           <div *ngIf="bitcoinAddress" class="uni-input user-address" (click)="selectAddress(bitcoinAddress, 'BTC')">
             <label>Bitcoin Address</label>
 
-            <div class="flxr" style="width: 100%">
+            <div class="flxr flxr--align-center" style="width: 100%">
+              <div class="asset-icon-container">
+                <img class="asset-icon" src="assets/images/token-icons/bnb.png" />
+              </div>
               <input [value]="bitcoinAddress" name="btc-address" [disabled]="true" />
             </div>
           </div>
@@ -41,7 +44,10 @@
           <div *ngIf="binanceAddress" class="uni-input user-address" (click)="selectAddress(binanceAddress, 'BNB')">
             <label>BNB Address</label>
 
-            <div class="flxr" style="width: 100%">
+            <div class="flxr flxr--align-center" style="width: 100%">
+              <div class="asset-icon-container">
+                <img class="asset-icon" src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/BTCB-1DE/logo.png" />
+              </div>
               <input [value]="binanceAddress" name="binance-address" [disabled]="true" />
             </div>
 
