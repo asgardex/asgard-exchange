@@ -12,11 +12,19 @@ export const enum TxStatus {
   COMPLETE = 'COMPLETE'
 }
 
+export enum TxActions {
+  SWAP      = 'Swap',
+  DEPOSIT   = 'Deposit',
+  WITHDRAW  = 'Withdraw',
+  SEND      = 'Send'
+}
+
 export interface Tx {
   chain: 'BTC' | 'BNB';
   ticker: string;
   hash: string;
   status: TxStatus;
+  action: TxActions;
 }
 
 @Injectable({
@@ -73,7 +81,7 @@ export class TransactionStatusService {
 
   }
 
-  pollTxOutputs(hash: string, outputLength: number) {
+  pollTxOutputs(hash: string, outputLength: number, action: TxActions) {
 
     this.killOutputsPolling[hash] = new Subject();
 
@@ -95,7 +103,13 @@ export class TransactionStatusService {
 
           const asset = assetFromString(output.coins[0].asset);
 
-          this.addTransaction({chain: 'BNB', hash: output.txID, ticker: asset.ticker, status: TxStatus.PENDING});
+          this.addTransaction({
+            chain: 'BNB',
+            hash: output.txID,
+            ticker: asset.ticker,
+            status: TxStatus.PENDING,
+            action
+          });
         }
 
         this.killOutputsPolling[hash].next();

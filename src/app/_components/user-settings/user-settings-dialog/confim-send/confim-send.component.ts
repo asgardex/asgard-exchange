@@ -4,7 +4,7 @@ import { Subscription } from 'rxjs';
 import { AssetAndBalance } from 'src/app/_classes/asset-and-balance';
 import { User } from 'src/app/_classes/user';
 import { TransactionConfirmationState } from 'src/app/_const/transaction-confirmation-state';
-import { TransactionStatusService, TxStatus } from 'src/app/_services/transaction-status.service';
+import { TransactionStatusService, TxActions, TxStatus } from 'src/app/_services/transaction-status.service';
 import { UserService } from 'src/app/_services/user.service';
 
 @Component({
@@ -67,7 +67,8 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
           chain: 'BNB',
           hash,
           ticker: this.asset.asset.ticker,
-          status: TxStatus.COMPLETE
+          status: TxStatus.COMPLETE,
+          action: TxActions.SEND
         });
         this.transactionSuccessful.next();
       } catch (error) {
@@ -86,7 +87,13 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
           recipient: this.recipientAddress,
         });
 
-        this.txStatusService.addTransaction({chain: 'BTC', hash, ticker: 'BTC', status: TxStatus.PENDING});
+        this.txStatusService.addTransaction({
+          chain: 'BTC',
+          hash,
+          ticker: 'BTC',
+          status: TxStatus.PENDING,
+          action: TxActions.SEND
+        });
         this.transactionSuccessful.next();
       } catch (error) {
         console.error('error making transfer: ', error);

@@ -11,7 +11,7 @@ import { UserService } from '../../_services/user.service';
 import { WalletConnectService } from '../../_services/wallet-connect.service';
 import { environment } from 'src/environments/environment';
 import { assetAmount, assetToBase } from '@thorchain/asgardex-util';
-import { TransactionStatusService, TxStatus } from 'src/app/_services/transaction-status.service';
+import { TransactionStatusService, TxActions, TxStatus } from 'src/app/_services/transaction-status.service';
 
 // TODO: this is the same as ConfirmStakeData in confirm stake modal
 export interface ConfirmWithdrawData {
@@ -118,7 +118,7 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
     try {
       const hash = await binanceClient.transfer({asset: this.data.rune, amount, recipient: matchingPool.address, memo});
       this.txSuccess(hash);
-      this.txStatusService.pollTxOutputs(hash, 2);
+      this.txStatusService.pollTxOutputs(hash, 2, TxActions.WITHDRAW);
       // this.fetchOutputs(hash);
     } catch (error) {
       console.error('error unstaking: ', error);
@@ -194,7 +194,8 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
               chain: 'BNB',
               hash: this.hash,
               ticker: `${this.data.asset.ticker}-RUNE`,
-              status: TxStatus.PENDING
+              status: TxStatus.PENDING,
+              action: TxActions.WITHDRAW
             });
           }
         }
@@ -213,7 +214,8 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
       chain: 'BNB',
       hash: this.hash,
       ticker: `${this.data.asset.ticker}-RUNE`,
-      status: TxStatus.PENDING
+      status: TxStatus.PENDING,
+      action: TxActions.WITHDRAW
     });
   }
 

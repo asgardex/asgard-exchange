@@ -18,7 +18,10 @@
 
             <a [href]="((tx.chain === 'BTC') ? bitcoinExplorerUrl : binanceExplorerUrl) + '/' + tx.hash" target="_blank" class="uni-input">
 
-              <label>{{tx.ticker}}</label>
+              <label style="width: 100%" class="flxr flxr--just-space-between">
+                <span>{{tx.ticker}}</span>
+                <span>{{tx.action}}</span>
+              </label>
 
               <div class="flxr" style="width: 100%">
 

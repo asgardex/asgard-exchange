@@ -11,9 +11,8 @@ import { Subscription } from 'rxjs';
 import { BinanceService } from 'src/app/_services/binance.service';
 import { WalletConnectService } from 'src/app/_services/wallet-connect.service';
 import { assetAmount, assetToBase } from '@thorchain/asgardex-util';
-import { TransactionStatusService, TxStatus } from 'src/app/_services/transaction-status.service';
+import { TransactionStatusService, TxActions, TxStatus } from 'src/app/_services/transaction-status.service';
 
-// const bech32 = require('bech32');
 
 export interface SwapData {
   sourceAsset;
@@ -130,9 +129,10 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
           chain: 'BNB',
           hash: this.hash,
           ticker: this.swapData.sourceAsset.ticker,
-          status: TxStatus.PENDING
+          status: TxStatus.PENDING,
+          action: TxActions.SWAP
         });
-        this.txStatusService.pollTxOutputs(hash, 1);
+        this.txStatusService.pollTxOutputs(hash, 1, TxActions.SWAP);
         this.txState = TransactionConfirmationState.SUCCESS;
       } catch (error) {
         console.error('error making transfer: ', error);
@@ -152,8 +152,14 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
         });
 
         this.hash = hash;
-        this.txStatusService.addTransaction({chain: 'BTC', hash: this.hash, ticker: 'BTC', status: TxStatus.PENDING});
-        this.txStatusService.pollTxOutputs(hash, 1);
+        this.txStatusService.addTransaction({
+          chain: 'BTC',
+          hash: this.hash,
+          ticker: 'BTC',
+          status: TxStatus.PENDING,
+          action: TxActions.SWAP
+        });
+        this.txStatusService.pollTxOutputs(hash, 1, TxActions.SWAP);
         this.txState = TransactionConfirmationState.SUCCESS;
       } catch (error) {
         console.error('error making transfer: ', error);
@@ -211,7 +217,8 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
               chain: 'BNB',
               hash: this.hash,
               ticker: this.swapData.targetAsset.ticker,
-              status: TxStatus.PENDING
+              status: TxStatus.PENDING,
+              action: TxActions.SWAP
             });
           }
         }
