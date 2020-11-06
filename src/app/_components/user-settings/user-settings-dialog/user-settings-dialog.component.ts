@@ -1,4 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { MatDialogRef } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 import { AssetAndBalance } from 'src/app/_classes/asset-and-balance';
 import { User } from 'src/app/_classes/user';
@@ -27,7 +28,11 @@ export class UserSettingsDialogComponent implements OnInit, OnDestroy {
   amountToSend: number;
   recipient: string;
 
-  constructor(private userService: UserService, private txStatusService: TransactionStatusService) {
+  constructor(
+    private userService: UserService,
+    private txStatusService: TransactionStatusService,
+    public dialogRef: MatDialogRef<UserSettingsDialogComponent>
+  ) {
 
     this.pendingTxCount = 0;
     this.mode = 'ADDRESSES';
@@ -101,6 +106,11 @@ export class UserSettingsDialogComponent implements OnInit, OnDestroy {
     this.recipient = null;
     this.selectedAsset = null;
     this.selectedAddress = null;
+  }
+
+  disconnect() {
+    this.userService.setUser(null);
+    this.dialogRef.close();
   }
 
   ngOnDestroy(): void {
