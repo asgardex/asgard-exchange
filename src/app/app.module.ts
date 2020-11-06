@@ -46,6 +46,8 @@ import { SendAssetComponent } from './_components/user-settings/user-settings-di
 import { AssetInputModule } from './_components/asset-input/asset-input.module';
 import { ConfimSendComponent } from './_components/user-settings/user-settings-dialog/confim-send/confim-send.component';
 import { TransactionProcessingModalModule } from './_components/transaction-processing-modal/transaction-processing-modal.module';
+import { ReconnectDialogComponent } from './_components/reconnect-dialog/reconnect-dialog.component';
+import { KeystoreService } from './_services/keystore.service';
 
 
 @NgModule({
@@ -66,6 +68,7 @@ import { TransactionProcessingModalModule } from './_components/transaction-proc
     UserAssetComponent,
     SendAssetComponent,
     ConfimSendComponent,
+    ReconnectDialogComponent,
   ],
   imports: [
     AssetInputModule,
@@ -88,6 +91,7 @@ import { TransactionProcessingModalModule } from './_components/transaction-proc
     BlockchairService,
     CoinGeckoService,
     CopyService,
+    KeystoreService,
     UserService,
     MidgardService,
     LastBlockService,

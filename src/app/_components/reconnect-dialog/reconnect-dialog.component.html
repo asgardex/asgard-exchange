@@ -1,23 +1,17 @@
 <div class="container">
 
   <div style="padding: 1rem 1rem 0" class="section-head-container">
-    <button (click)="clearKeystore()" mat-icon-button>
-      <mat-icon>arrow_back</mat-icon>
-    </button>
-    <h1>Keystore Login</h1>
+    <h1>Keystore Connect</h1>
     <div style="width: 40px"></div>
   </div>
 
   <div class="dialog-content">
     <div mat-dialog-content>
 
-      <input #keystoreInput hidden="true" type="file" onclick="this.value=null" (change)="onKeystoreFileChange($event)" />
-      <button class="uni-input uni-input--file" (click)="keystoreInput.click()">
-        <span>Upload Keystore File</span>
-        <mat-icon *ngIf="!keystoreFileSelected">vpn_key</mat-icon>
-        <mat-icon *ngIf="keystoreFileSelected" [ngStyle]="{'color':'green'}">check</mat-icon>
+      <button class="uni-input uni-input--file">
+        <span>Keystore Found</span>
+        <mat-icon [ngStyle]="{'color':'green'}">check</mat-icon>
       </button>
-
 
       <div class="uni-input">
         <label>Password</label>
@@ -31,6 +25,9 @@
         <span *ngIf="keystoreError" style="font-size: 0.8rem; color: #2172e5">Keystore Login Incorrect</span>
       </div>
       <div>
+        <button style="margin-right: 6px" *ngIf="!keystoreConnecting" mat-flat-button (click)="forgetKeystore()" [disabled]="keystoreConnecting">
+          <span>Forget Keystore</span>
+        </button>
         <button *ngIf="!keystoreConnecting" mat-flat-button color="accent" (click)="keystoreUnlockClicked()" [disabled]="keystoreConnecting">
           <span>Unlock</span>
         </button>
@@ -42,5 +39,3 @@
   </div>
 
 </div>
-
-

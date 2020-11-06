@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Subject, BehaviorSubject } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { User } from '../_classes/user';
 import {
   Client as binanceClient,
@@ -37,21 +37,14 @@ export class UserService {
   private userBalancesSource = new BehaviorSubject<Balances>(null);
   userBalances$ = this.userBalancesSource.asObservable();
 
-  // private _pendingTxs: PendingTransaction[];
-  // private pendingTransactionSource = new BehaviorSubject<PendingTransaction[]>([]);
-  // pendingTransaction$ = this.pendingTransactionSource.asObservable();
-
-  // private completedTransactionSource = new BehaviorSubject<PendingTransaction>(null);
-  // completedTransaction$ = this.completedTransactionSource.asObservable();
-
   asgardexBncClient: BinanceClient;
 
   constructor() {
-    // this._pendingTxs = [];
+
     this.asgardexBncClient = new binanceClient({
       network: (environment.network) === 'testnet' ? 'testnet' : 'mainnet',
     });
-    // this.setMarkets();
+
   }
 
   setUser(user: User) {
@@ -61,22 +54,6 @@ export class UserService {
       this.fetchBalances();
     }
   }
-
-  // addPendingTransaction(pendingTx: PendingTransaction) {
-  //   this._pendingTxs.push(pendingTx);
-  //   const pendingTxs = this._pendingTxs;
-  //   this.pendingTransactionSource.next(pendingTxs);
-  // }
-
-  // removePendingTransaction(completedTx: PendingTransaction) {
-  //   const filtered = this._pendingTxs.filter( (tx) => tx.hash !== completedTx.hash );
-  //   this._pendingTxs = filtered;
-  //   this.pendingTransactionSource.next(filtered);
-  // }
-
-  // setCompletedTransaction(pendingTx: PendingTransaction) {
-  //   this.completedTransactionSource.next(pendingTx);
-  // }
 
   async setMarkets() {
     const res: MarketResponse = await this.asgardexBncClient.getMarkets({});

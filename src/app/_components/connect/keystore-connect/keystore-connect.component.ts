@@ -1,10 +1,6 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { UserService } from 'src/app/_services/user.service';
-import { User } from 'src/app/_classes/user';
-import { decryptFromKeystore } from '@xchainjs/xchain-crypto';
-import { Client as binanceClient, } from '@xchainjs/xchain-binance';
-import { Client as bitcoinClient, } from '@xchainjs/xchain-bitcoin';
-import { environment } from 'src/environments/environment';
+import { KeystoreService } from 'src/app/_services/keystore.service';
 
 export type Keystore = {
   address: string
@@ -44,7 +40,7 @@ export class KeystoreConnectComponent implements OnInit {
   @Output() back: EventEmitter<null>;
   @Output() closeModal: EventEmitter<null>;
 
-  constructor(private userService: UserService) {
+  constructor(private userService: UserService, private keystoreService: KeystoreService) {
     this.back = new EventEmitter<null>();
     this.closeModal = new EventEmitter<null>();
   }
@@ -106,26 +102,9 @@ export class KeystoreConnectComponent implements OnInit {
     this.keystoreError = false;
 
     try {
-
-      const phrase = await decryptFromKeystore(this.keystore, this.keystorePassword);
-      const network = environment.network === 'testnet' ? 'testnet' : 'mainnet';
-      const blockchairUrl = (environment.network === 'testnet') ? 'https://api.blockchair.com/bitcoin/testnet' : 'https://api.blockchair.com/bitcoin';
-
-      const userBinanceClient = new binanceClient({network, phrase});
-      const userBtcClient = new bitcoinClient({network, phrase, nodeUrl: blockchairUrl, nodeApiKey: 'A___QJPUZs1cbpbK2wkKeiQoixbFnxwg'});
-
-      const user = new User({
-        type: 'keystore',
-        wallet: this.keystore.address,
-        keystore: this.keystore,
-        clients: {
-          binance: userBinanceClient,
-          bitcoin: userBtcClient
-        }
-      });
-
+      localStorage.setItem('keystore', JSON.stringify(this.keystore));
+      const user = await this.keystoreService.unlockKeystore(this.keystore, this.keystorePassword);
       this.userService.setUser(user);
-
     } catch (error) {
       this.keystoreConnecting = false;
       this.keystoreError = true;
