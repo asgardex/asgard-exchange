@@ -1,15 +1,15 @@
 <div class="container">
 
   <div style="padding: 1rem 1rem 0" class="section-head-container">
-    <h1>Keystore Connect</h1>
+    <h1>Keystore Found</h1>
     <div style="width: 40px"></div>
   </div>
 
   <div class="dialog-content">
     <div mat-dialog-content>
 
-      <button class="uni-input uni-input--file">
-        <span>Keystore Found</span>
+      <button style="cursor: auto;" class="uni-input uni-input--file" [disabled]="true">
+        <span>Reconnect from previous session</span>
         <mat-icon [ngStyle]="{'color':'green'}">check</mat-icon>
       </button>
 

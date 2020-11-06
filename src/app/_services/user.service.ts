@@ -80,8 +80,6 @@ export class UserService {
       let clientBalances;
 
       if (key === 'binance') {
-        // const clientBalances = await client.getBalance();
-
         const bncClient: BncClient = await client.getBncClient();
         const address = await client.getAddress();
         const bncBalances = await bncClient.getBalance(address);

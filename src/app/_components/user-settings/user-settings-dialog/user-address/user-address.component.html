@@ -8,7 +8,11 @@
     </div>
     {{chain}} Wallet
   </h1>
-  <div style="width: 40px"></div>
+  <div style="width: 40px">
+    <button mat-icon-button (click)="refreshBalances()">
+      <mat-icon>refresh</mat-icon>
+    </button>
+  </div>
 </div>
 
 <div class="modal-head">
@@ -32,5 +36,5 @@
 </div>
 
 <div mat-dialog-content>
-  <app-assets-list [assetListItems]="assets" [loading]="false" [disabledAssetSymbol]="''" (selectAsset)="selectAsset($event)"></app-assets-list>
+  <app-assets-list [assetListItems]="assets" [loading]="loading" [disabledAssetSymbol]="''" (selectAsset)="selectAsset($event)"></app-assets-list>
 </div>

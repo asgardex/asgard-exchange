@@ -102,6 +102,12 @@ export class UserAddressComponent implements OnInit {
     this.copyService.copyToClipboard(address);
   }
 
+  async refreshBalances() {
+    this.loading = true;
+    await this.userService.fetchBalances();
+    this.loading = false;
+  }
+
   selectAsset(asset: Asset) {
     const match = this.assets.find( (assetAndBalance) => assetAndBalance.asset === asset );
     if (match) {
