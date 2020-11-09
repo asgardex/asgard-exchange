@@ -1,9 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
+import { Chain } from '@thorchain/asgardex-util';
 import { Subscription } from 'rxjs';
 import { AssetAndBalance } from 'src/app/_classes/asset-and-balance';
 import { User } from 'src/app/_classes/user';
-import { AvailableChain } from 'src/app/_const/available-chain';
 import { TransactionStatusService } from 'src/app/_services/transaction-status.service';
 import { UserService } from 'src/app/_services/user.service';
 
@@ -23,7 +23,7 @@ export class UserSettingsDialogComponent implements OnInit, OnDestroy {
   pendingTxCount: number;
   mode: 'ADDRESSES' | 'ADDRESS' | 'PENDING_TXS' | 'ASSET' | 'SEND' | 'CONFIRM_SEND';
   selectedAddress: string;
-  selectedChain: AvailableChain;
+  selectedChain: Chain;
   selectedAsset: AssetAndBalance;
   amountToSend: number;
   recipient: string;
@@ -72,7 +72,7 @@ export class UserSettingsDialogComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
   }
 
-  selectAddress(address: string, chain: AvailableChain) {
+  selectAddress(address: string, chain: Chain) {
     this.selectedAddress = address;
     this.selectedChain = chain;
     this.mode = 'ADDRESS';

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { assetFromString } from '@thorchain/asgardex-util';
+import { assetFromString, AssetChain } from '@thorchain/asgardex-util';
 import { BehaviorSubject, of, Subject, timer } from 'rxjs';
 import { catchError, switchMap, takeUntil } from 'rxjs/operators';
 import { TransactionDTO } from '../_classes/transaction';
@@ -20,7 +20,7 @@ export enum TxActions {
 }
 
 export interface Tx {
-  chain: 'BTC' | 'BNB';
+  chain: AssetChain;
   ticker: string;
   hash: string;
   status: TxStatus;
@@ -95,7 +95,6 @@ export class TransactionStatusService {
       catchError(error => of(error))
     ).subscribe( (tx: TransactionDTO) => {
 
-      console.log('tx res is: ', tx);
 
       if (tx && tx.txs && tx.txs[0] && tx.txs[0].out && tx.txs[0].out.length >= outputLength) {
 
@@ -104,7 +103,7 @@ export class TransactionStatusService {
           const asset = assetFromString(output.coins[0].asset);
 
           this.addTransaction({
-            chain: 'BNB',
+            chain: asset.chain,
             hash: output.txID,
             ticker: asset.ticker,
             status: TxStatus.PENDING,
@@ -170,7 +169,6 @@ export class TransactionStatusService {
       }
 
     });
-    // this.subs.push(refreshInterval$);
   }
 
   getPendingTxCount() {
@@ -184,11 +182,5 @@ export class TransactionStatusService {
 
     }, 0);
   }
-
-  // removePendingTransaction(completedTx: PendingTransaction) {
-  //   const filtered = this._pendingTxs.filter( (tx) => tx.hash !== completedTx.hash );
-  //   this._pendingTxs = filtered;
-  //   this.pendingTransactionSource.next(filtered);
-  // }
 
 }

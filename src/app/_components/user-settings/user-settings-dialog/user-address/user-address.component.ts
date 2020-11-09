@@ -1,11 +1,10 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { baseToAsset } from '@thorchain/asgardex-util';
+import { baseToAsset, Chain } from '@thorchain/asgardex-util';
 import { Balances } from '@xchainjs/xchain-client';
 import { Subscription } from 'rxjs';
 import { Asset } from 'src/app/_classes/asset';
 import { AssetAndBalance } from 'src/app/_classes/asset-and-balance';
 import { User } from 'src/app/_classes/user';
-import { AvailableChain } from 'src/app/_const/available-chain';
 import { CopyService } from 'src/app/_services/copy.service';
 import { ExplorerPathsService } from 'src/app/_services/explorer-paths.service';
 import { UserService } from 'src/app/_services/user.service';
@@ -18,7 +17,7 @@ import { UserService } from 'src/app/_services/user.service';
 export class UserAddressComponent implements OnInit {
 
   @Input() address: string;
-  @Input() chain: AvailableChain;
+  @Input() chain: Chain;
   @Output() back: EventEmitter<null>;
   @Output() navigateToAsset: EventEmitter<AssetAndBalance>;
   iconPath: string;
@@ -85,7 +84,7 @@ export class UserAddressComponent implements OnInit {
     }
   }
 
-  getIconPath(chain: AvailableChain): string {
+  getIconPath(chain: Chain): string {
     switch (chain) {
       case 'BNB':
         return 'assets/images/token-icons/bnb.png';
