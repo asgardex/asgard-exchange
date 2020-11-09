@@ -14,6 +14,7 @@ export class KeystoreCreateComponent implements OnInit {
   @Output() back: EventEmitter<null>;
   @Output() closeModal: EventEmitter<null>;
   password: string;
+  confirmPassword: string;
   phrase: string;
   loading: boolean;
   error: boolean;
