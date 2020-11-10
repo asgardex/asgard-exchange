@@ -31,6 +31,11 @@ export class AppComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.pollLastBlock();
 
+    console.log('checking env variables...');
+    console.log('network is: ', environment.network);
+    console.log('production is: ', environment.production);
+    console.log('testing key: ', environment.blockchairKey);
+
     const keystoreString = localStorage.getItem('keystore');
     const keystore = JSON.parse(keystoreString);
     if (keystore) {

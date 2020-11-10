@@ -18,7 +18,7 @@ export class KeystoreService {
     const blockchairUrl = (environment.network === 'testnet') ? 'https://api.blockchair.com/bitcoin/testnet' : 'https://api.blockchair.com/bitcoin';
 
     const userBinanceClient = new binanceClient({network, phrase});
-    const userBtcClient = new bitcoinClient({network, phrase, nodeUrl: blockchairUrl, nodeApiKey: 'A___QJPUZs1cbpbK2wkKeiQoixbFnxwg'});
+    const userBtcClient = new bitcoinClient({network, phrase, nodeUrl: blockchairUrl, nodeApiKey: environment.blockchairKey});
 
     return new User({
       type: 'keystore',

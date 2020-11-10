@@ -3,9 +3,10 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build --prod",
-    "build:testnet": "ng build --configuration testnet",
+    "config": "ts-node ./scripts/setenv.ts",
+    "start": "npm run config -- --environment=dev --configuration=testnet && ng serve",
+    "build": "npm run config -- --environment=prod --configuration=chaosnet && ng build --prod",
+    "build:testnet": "npm run config -- --environment=prod --configuration=testnet && ng build --configuration testnet",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"
@@ -45,6 +46,7 @@
     "rxjs": "~6.5.4",
     "stream-browserify": "^3.0.0",
     "tslib": "^2.0.0",
+    "yargs": "^13.3.2",
     "zone.js": "~0.10.2"
   },
   "devDependencies": {
@@ -57,6 +59,7 @@
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "^12.11.1",
     "codelyzer": "^5.1.2",
+    "dotenv": "^8.2.0",
     "jasmine-core": "~3.5.0",
     "jasmine-spec-reporter": "~5.0.0",
     "karma": "~5.0.0",
