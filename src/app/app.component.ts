@@ -6,6 +6,7 @@ import { LastBlock } from 'src/app/_classes/last-block';
 import { LastBlockService } from 'src/app/_services/last-block.service';
 import { MidgardService } from 'src/app/_services/midgard.service';
 import { ReconnectDialogComponent } from './_components/reconnect-dialog/reconnect-dialog.component';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-root',
