@@ -49,7 +49,8 @@ export class SendAssetComponent implements OnInit, OnDestroy {
   }
 
   checkSpendable(): void {
-    this.amountSpendable = (this.amount < this.userService.maximumSpendableBalance(this.asset.asset, this.balance));
+    const maximumSpendableBalance = this.userService.maximumSpendableBalance(this.asset.asset, this.balance);
+    this.amountSpendable = (this.amount <= maximumSpendableBalance);
   }
 
   ngOnDestroy() {

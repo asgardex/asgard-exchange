@@ -10,7 +10,7 @@ import { tokenAmount, tokenToBase } from '@thorchain/asgardex-token';
 import { Subscription } from 'rxjs';
 import { BinanceService } from 'src/app/_services/binance.service';
 import { WalletConnectService } from 'src/app/_services/wallet-connect.service';
-import { assetAmount, assetToBase } from '@thorchain/asgardex-util';
+import { assetAmount, assetToBase, baseAmount } from '@thorchain/asgardex-util';
 import { TransactionStatusService, TxActions, TxStatus } from 'src/app/_services/transaction-status.service';
 
 
@@ -38,6 +38,7 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
   txState: TransactionConfirmationState;
   hash: string;
   subs: Subscription[];
+  error: string;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public swapData: SwapData,
@@ -145,8 +146,12 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
 
         console.log('matching pool address is: ', matchingPool.address);
 
+        const fee = await bitcoinClient.getFeesWithMemo(memo);
+        const toBase = assetToBase(assetAmount(amountNumber));
+        const amount = toBase.amount().minus(fee.average.amount());
+
         const hash = await bitcoinClient.transfer({
-          amount: assetToBase(assetAmount(amountNumber)),
+          amount: baseAmount(amount),
           recipient: matchingPool.address,
           memo
         });
@@ -163,6 +168,7 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
         this.txState = TransactionConfirmationState.SUCCESS;
       } catch (error) {
         console.error('error making transfer: ', error);
+        this.error = error;
         this.txState = TransactionConfirmationState.ERROR;
       }
 
