@@ -5,7 +5,6 @@ import { catchError, switchMap, takeUntil } from 'rxjs/operators';
 import { LastBlock } from 'src/app/_classes/last-block';
 import { LastBlockService } from 'src/app/_services/last-block.service';
 import { MidgardService } from 'src/app/_services/midgard.service';
-import { environment } from 'src/environments/environment';
 import { ReconnectDialogComponent } from './_components/reconnect-dialog/reconnect-dialog.component';
 
 @Component({
@@ -30,11 +29,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.pollLastBlock();
-
-    console.log('checking env variables...');
-    console.log('network is: ', environment.network);
-    console.log('production is: ', environment.production);
-    console.log('testing key: ', environment.blockchairKey);
 
     const keystoreString = localStorage.getItem('keystore');
     const keystore = JSON.parse(keystoreString);
