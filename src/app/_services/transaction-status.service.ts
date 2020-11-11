@@ -135,11 +135,6 @@ export class TransactionStatusService {
 
         if (key.toUpperCase === tx.hash.toUpperCase) {
 
-          if (res.data[key] && res.data[key].transaction) {
-            console.log('tx block id is: ', res.data[key].transaction.block_id);
-            console.log('block id is greater than 0?', res.data[key].transaction.block_id > 0);
-          }
-
           if (res && res.data && res.data[key] && res.data[key].transaction
             && res.data[key].transaction.block_id && res.data[key].transaction.block_id > 0) {
 
