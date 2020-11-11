@@ -29,21 +29,6 @@ export class User {
     this.ledger = user.ledger ?? null;
     this.hdPath = user.hdPath ?? null;
     this.clients = user.clients;
-
-    // this.fetchBalances();
   }
-
-  // async fetchBalances(): Promise<void> {
-  //   let balances: Balances = [];
-
-  //   for (const [key, _value] of Object.entries(this.clients)) {
-  //     const client = this.clients[key];
-  //     const clientBalances = await client.getBalance();
-  //     balances = [...balances, ...clientBalances];
-  //   }
-
-  //   this.balances = balances;
-
-  // }
 
 }

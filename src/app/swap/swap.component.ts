@@ -153,6 +153,8 @@ export class SwapComponent implements OnInit, OnDestroy {
   poolDetailTargetError: boolean;
   poolDetailSourceError: boolean;
 
+  insufficientBnb: boolean;
+
   constructor(
     private dialog: MatDialog,
     private userService: UserService,
@@ -167,6 +169,9 @@ export class SwapComponent implements OnInit, OnDestroy {
         this.balances = balances;
         this.sourceBalance = this.userService.findBalance(this.balances, this.selectedSourceAsset);
         this.targetBalance = this.userService.findBalance(this.balances, this.selectedTargetAsset);
+
+        const bnbBalance = this.userService.findBalance(this.balances, new Asset('BNB.BNB'));
+        this.insufficientBnb = bnbBalance < 0.000375;
 
         if (this.selectedTargetAsset && this.selectedTargetAsset.symbol !== this.runeSymbol) {
           this.getPoolDetails(this.selectedTargetAsset.chain, this.selectedTargetAsset.symbol, 'target');
@@ -209,6 +214,8 @@ export class SwapComponent implements OnInit, OnDestroy {
     }
     else if (this.sourceAssetUnit > this.userService.maximumSpendableBalance(this.selectedSourceAsset, this.sourceBalance)) {
       return 'Insufficient balance';
+    } else if (this.selectedSourceAsset.chain === 'BNB' && this.insufficientBnb) {
+      return 'Insufficient BNB for Fee';
     } else if (this.user && this.sourceAssetUnit && this.sourceAssetUnit <= this.sourceBalance && this.selectedTargetAsset) {
       return 'Swap';
     } else {
@@ -218,10 +225,12 @@ export class SwapComponent implements OnInit, OnDestroy {
   }
 
   formInvalid(): boolean {
+
     return !this.sourceAssetUnit || !this.selectedSourceAsset || !this.selectedTargetAsset || !this.targetAssetUnit
       || (this.selectedSourceAsset && this.sourceBalance
         && (this.sourceAssetUnit > this.userService.maximumSpendableBalance(this.selectedSourceAsset, this.sourceBalance)))
-      || !this.user || !this.balances;
+      || !this.user || !this.balances
+      || (this.selectedSourceAsset.chain === 'BNB' && this.insufficientBnb); // source is BNB and not enough funds to cover fee
   }
 
   openConfirmationDialog() {
