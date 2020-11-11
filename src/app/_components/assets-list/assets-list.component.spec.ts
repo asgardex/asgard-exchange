@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatIconModule } from '@angular/material/icon';
 
 import { AssetsListComponent } from './assets-list.component';
 
@@ -8,7 +9,8 @@ describe('AssetsListComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ AssetsListComponent ]
+      declarations: [ AssetsListComponent ],
+      imports: [MatIconModule]
     })
     .compileComponents();
   });

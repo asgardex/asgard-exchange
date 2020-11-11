@@ -1,4 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
+import { AssetInputModule } from 'src/app/_components/asset-input/asset-input.module';
 
 import { SendAssetComponent } from './send-asset.component';
 
@@ -8,7 +11,8 @@ describe('SendAssetComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ SendAssetComponent ]
+      declarations: [ SendAssetComponent ],
+      imports: [ AssetInputModule, MatIconModule, MatDialogModule ]
     })
     .compileComponents();
   });

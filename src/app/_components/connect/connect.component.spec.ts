@@ -3,6 +3,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { ConnectComponent } from './connect.component';
 import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { MatIconModule } from '@angular/material/icon';
 
 describe('ConnectComponent', () => {
   let component: ConnectComponent;
@@ -14,7 +15,7 @@ describe('ConnectComponent', () => {
       providers: [
         { provide: MAT_DIALOG_DATA, useValue: {} },
       ],
-      imports: [ MatDialogModule, HttpClientTestingModule ]
+      imports: [ MatDialogModule, HttpClientTestingModule, MatIconModule ]
     })
     .compileComponents();
   }));

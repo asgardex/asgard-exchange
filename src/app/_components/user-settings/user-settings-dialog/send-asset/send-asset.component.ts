@@ -38,13 +38,17 @@ export class SendAssetComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
 
-    const balances$ = this.userService.userBalances$.subscribe(
-      (balances) => {
-        this.balance = this.userService.findBalance(balances, this.asset.asset);
-      }
-    );
+    if (this.asset) {
 
-    this.subs = [balances$];
+      const balances$ = this.userService.userBalances$.subscribe(
+        (balances) => {
+          this.balance = this.userService.findBalance(balances, this.asset.asset);
+        }
+      );
+
+      this.subs = [balances$];
+
+    }
 
   }
 

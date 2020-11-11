@@ -5,6 +5,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Asset } from 'src/app/_classes/asset';
 import { User } from 'src/app/_classes/user';
+import { MatIconModule } from '@angular/material/icon';
 
 describe('ConfirmSwapModalComponent', () => {
   let component: ConfirmSwapModalComponent;
@@ -28,7 +29,7 @@ describe('ConfirmSwapModalComponent', () => {
         },
         { provide: MatDialogRef, useValue: { close: (dialogResult: any) => { } } }
       ],
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule, MatIconModule]
     })
     .compileComponents();
   });

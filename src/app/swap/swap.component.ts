@@ -83,7 +83,6 @@ export class SwapComponent implements OnInit, OnDestroy {
     }
 
     this.sourceBalance = this.userService.findBalance(this.balances, asset);
-    console.log('source balance 222 is: ', this.sourceBalance);
 
     /**
      * If input value is more than balance of newly selected asset
@@ -185,39 +184,6 @@ export class SwapComponent implements OnInit, OnDestroy {
     const user$ = this.userService.user$.subscribe(
       async (user) => {
         this.user = user;
-        console.log('USER UPDATED: ', user);
-        // if (this.user && this.user.clients) {
-
-        //   // todo -> this is used also in markets-modal
-        //   // let balances: Balances = [];
-
-        //   // for (const [key, _value] of Object.entries(this.user.clients)) {
-        //   //   const client = this.user.clients[key];
-        //   //   const clientBalances = await client.getBalance();
-        //   //   balances = [...balances, ...clientBalances];
-        //   // }
-
-        //   this.balances = user.balances;
-
-        //   console.log('swap balances are: ', this.balances);
-
-        //   this.sourceBalance = this.userService.findBalance(this.balances, this.selectedSourceAsset);
-
-        //   console.log('source balance is: ', this.sourceBalance);
-
-        //   this.targetBalance = this.userService.findBalance(this.balances, this.selectedTargetAsset);
-
-        //   console.log('target balance is: ', this.targetBalance);
-
-        //   if (this.selectedTargetAsset && this.selectedTargetAsset.symbol !== this.runeSymbol) {
-        //     this.getPoolDetails(this.selectedTargetAsset.symbol, 'target');
-        //   }
-
-        //   if (this.selectedSourceAsset && this.selectedSourceAsset.symbol !== this.runeSymbol) {
-        //     this.getPoolDetails(this.selectedSourceAsset.symbol, 'source');
-        //   }
-
-        // }
       }
     );
 

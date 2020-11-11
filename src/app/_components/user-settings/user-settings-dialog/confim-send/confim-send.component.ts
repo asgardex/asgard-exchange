@@ -52,58 +52,63 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
 
   async submitKeystoreTransaction() {
 
-    if (this.asset.asset.chain === 'BNB') {
+    if (this.asset && this.asset.asset) {
 
-      const binanceClient = this.user.clients.binance;
+      if (this.asset.asset.chain === 'BNB') {
 
-      try {
-        const hash = await binanceClient.transfer({
-          asset: this.asset.asset,
-          amount: assetToBase(assetAmount(this.amount)),
-          recipient: this.recipientAddress,
-        });
+        const binanceClient = this.user.clients.binance;
 
-        this.txStatusService.addTransaction({
-          chain: 'BNB',
-          hash,
-          ticker: this.asset.asset.ticker,
-          status: TxStatus.COMPLETE,
-          action: TxActions.SEND
-        });
-        this.transactionSuccessful.next();
-      } catch (error) {
-        console.error('error making transfer: ', error);
-        this.txState = TransactionConfirmationState.ERROR;
-      }
+        try {
+          const hash = await binanceClient.transfer({
+            asset: this.asset.asset,
+            amount: assetToBase(assetAmount(this.amount)),
+            recipient: this.recipientAddress,
+          });
 
-    } else if (this.asset.asset.chain === 'BTC') {
+          this.txStatusService.addTransaction({
+            chain: 'BNB',
+            hash,
+            ticker: this.asset.asset.ticker,
+            status: TxStatus.COMPLETE,
+            action: TxActions.SEND
+          });
+          this.transactionSuccessful.next();
+        } catch (error) {
+          console.error('error making transfer: ', error);
+          this.txState = TransactionConfirmationState.ERROR;
+        }
 
-      const bitcoinClient = this.user.clients.bitcoin;
+      } else if (this.asset.asset.chain === 'BTC') {
 
-      try {
+        const bitcoinClient = this.user.clients.bitcoin;
 
-        const feeRates = await bitcoinClient.getFeeRates();
+        try {
 
-        const hash = await bitcoinClient.transfer({
-          amount: assetToBase(assetAmount(this.amount)),
-          recipient: this.recipientAddress,
-          feeRate: feeRates.average
-        });
+          const feeRates = await bitcoinClient.getFeeRates();
 
-        this.txStatusService.addTransaction({
-          chain: 'BTC',
-          hash,
-          ticker: 'BTC',
-          status: TxStatus.PENDING,
-          action: TxActions.SEND
-        });
-        this.transactionSuccessful.next();
-      } catch (error) {
-        console.error('error making transfer: ', error);
-        this.txState = TransactionConfirmationState.ERROR;
+          const hash = await bitcoinClient.transfer({
+            amount: assetToBase(assetAmount(this.amount)),
+            recipient: this.recipientAddress,
+            feeRate: feeRates.average
+          });
+
+          this.txStatusService.addTransaction({
+            chain: 'BTC',
+            hash,
+            ticker: 'BTC',
+            status: TxStatus.PENDING,
+            action: TxActions.SEND
+          });
+          this.transactionSuccessful.next();
+        } catch (error) {
+          console.error('error making transfer: ', error);
+          this.txState = TransactionConfirmationState.ERROR;
+        }
+
       }
 
     }
+
   }
 
   ngOnDestroy() {

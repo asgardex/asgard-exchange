@@ -3,6 +3,10 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { WithdrawComponent } from './withdraw.component';
 import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { AssetInputModule } from '../_components/asset-input/asset-input.module';
+import { MatSliderModule } from '@angular/material/slider';
+import { IconTickerModule } from '../_components/icon-ticker/icon-ticker.module';
+import { MatIconModule } from '@angular/material/icon';
 
 describe('WithdrawComponent', () => {
   let component: WithdrawComponent;
@@ -14,7 +18,9 @@ describe('WithdrawComponent', () => {
       providers: [
         { provide: MAT_DIALOG_DATA, useValue: {} },
       ],
-      imports: [ MatDialogModule, RouterTestingModule, HttpClientTestingModule ]
+      imports: [
+        MatDialogModule, RouterTestingModule, HttpClientTestingModule, AssetInputModule, MatSliderModule, IconTickerModule, MatIconModule
+      ]
     })
     .compileComponents();
   });

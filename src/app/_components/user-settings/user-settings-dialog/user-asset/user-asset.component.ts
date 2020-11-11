@@ -29,24 +29,32 @@ export class UserAssetComponent implements OnInit {
   }
 
   getCoinGeckoCoinList() {
-    this.cgService.getCoinList().subscribe( (res) => {
-      console.log('symbol is: ', this.asset.asset.ticker);
-      const id = this.cgService.getCoinIdBySymbol(this.asset.asset.ticker, res);
-      this.getUsdPrice(id);
-    });
+
+    if (this.asset && this.asset.asset) {
+      this.cgService.getCoinList().subscribe( (res) => {
+        console.log('symbol is: ', this.asset.asset.ticker);
+        const id = this.cgService.getCoinIdBySymbol(this.asset.asset.ticker, res);
+        this.getUsdPrice(id);
+      });
+    }
+
   }
 
   getUsdPrice(id: string) {
-    this.cgService.getCurrencyConversion(id).subscribe(
-      (res) => {
-        console.log('res is: ', res);
 
-        for (const [key, value] of Object.entries(res)) {
-          console.log(key + ':' + value.usd);
-          this.usdValue = this.asset.balance.amount().multipliedBy(value.usd).toNumber();
+    if (this.asset) {
+      this.cgService.getCurrencyConversion(id).subscribe(
+        (res) => {
+          console.log('res is: ', res);
+
+          for (const [key, value] of Object.entries(res)) {
+            console.log(key + ':' + value.usd);
+            this.usdValue = this.asset.balance.amount().multipliedBy(value.usd).toNumber();
+          }
         }
-      }
-    );
+      );
+    }
+
   }
 
   copyToClipboard() {

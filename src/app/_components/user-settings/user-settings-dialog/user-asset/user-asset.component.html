@@ -10,7 +10,7 @@
     <div style="width: 40px">
       <img *ngIf="asset && asset.asset && asset.asset.iconPath" class="asset-icon" [src]="asset && asset.asset && asset.asset.iconPath" style="max-width: 100%;" />
     </div>
-    <span class="asset-balance">{{asset.balance.amount().toNumber()}} {{asset.asset.ticker}}</span>
+    <span *ngIf="asset" class="asset-balance">{{asset.balance.amount().toNumber()}} {{asset.asset.ticker}}</span>
     <div style="height: 17px">
       <span class="usd-value" *ngIf="usdValue">≈ ${{usdValue | number:"0.0-2"}}</span>
     </div>
