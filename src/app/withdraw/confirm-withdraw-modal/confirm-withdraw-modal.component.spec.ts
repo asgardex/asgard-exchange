@@ -20,7 +20,7 @@ describe('ConfirmWithdrawModalComponent', () => {
             rune: new Asset('RUNE-B1A'),
             assetAmount: 100,
             runeAmount: 100,
-            user: new User({type: 'keystore', wallet: ''}),
+            user: new User({type: 'keystore', wallet: '', clients: {}}),
             runeBasePrice: 10000000,
             assetBasePrice: 11000000,
             unstakePercent: 0

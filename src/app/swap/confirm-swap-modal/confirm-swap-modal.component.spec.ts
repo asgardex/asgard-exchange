@@ -22,7 +22,7 @@ describe('ConfirmSwapModalComponent', () => {
             basePrice: 100000000,
             inputValue: 1000000000,
             outputValue: 1100000000,
-            user: new User({type: 'keystore', wallet: ''}),
+            user: new User({type: 'keystore', wallet: '', clients: {}}),
             slip: .03
           }
         },
