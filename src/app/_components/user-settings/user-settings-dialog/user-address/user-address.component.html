@@ -1,0 +1,40 @@
+<div style="padding: 1rem 1rem 0" class="section-head-container">
+  <button (click)="back.emit()" mat-icon-button>
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+  <h1 class="flxr">
+    <div class="asset-icon-container">
+      <img *ngIf="iconPath" class="asset-icon" [src]="iconPath" />
+    </div>
+    {{chain}} Wallet
+  </h1>
+  <div style="width: 40px">
+    <button mat-icon-button (click)="refreshBalances()">
+      <mat-icon>refresh</mat-icon>
+    </button>
+  </div>
+</div>
+
+<div class="modal-head">
+  <div *ngIf="address && chain" class="uni-input user-address">
+    <label class="flxr flxr--align-center">
+      {{chain}} Address
+
+      <a class="explorer-link" [href]="explorerPath" target="_blank">
+        <mat-icon>open_in_new</mat-icon>
+      </a>
+    </label>
+
+    <div class="flxr" style="width: 100%">
+      <input [value]="address" name="address" [disabled]="true" />
+      <button matSuffix mat-icon-button aria-label="BNB Address" (click)="copyToClipboard(address)">
+        <mat-icon matSuffix (click)="copyToClipboard(address)">content_copy</mat-icon>
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<div mat-dialog-content>
+  <app-assets-list [assetListItems]="assets" [loading]="loading" [disabledAssetSymbol]="''" (selectAsset)="selectAsset($event)"></app-assets-list>
+</div>

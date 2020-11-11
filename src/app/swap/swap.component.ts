@@ -26,6 +26,7 @@ import { BinanceService } from '../_services/binance.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmSwapModalComponent } from './confirm-swap-modal/confirm-swap-modal.component';
 import { User } from '../_classes/user';
+import { Balances } from '@xchainjs/xchain-client';
 
 export enum SwapType {
   DOUBLE_SWAP = 'double_swap',
@@ -76,7 +77,7 @@ export class SwapComponent implements OnInit, OnDestroy {
     this._selectedSourceAsset = asset;
 
     if (this._selectedSourceAsset && this._selectedSourceAsset.symbol !== this.runeSymbol) {
-      this.getPoolDetails(this._selectedSourceAsset.symbol, 'source');
+      this.getPoolDetails(this._selectedSourceAsset.chain, this._selectedSourceAsset.symbol, 'source');
     } else if (this._selectedSourceAsset && this._selectedSourceAsset.symbol === this.runeSymbol) {
       this.updateSwapDetails();
     }
@@ -120,7 +121,7 @@ export class SwapComponent implements OnInit, OnDestroy {
     this.calculatingTargetAsset = true;
 
     if (this._selectedTargetAsset && this._selectedTargetAsset.symbol !== this.runeSymbol) {
-      this.getPoolDetails(this._selectedTargetAsset.symbol, 'target');
+      this.getPoolDetails(this._selectedTargetAsset.chain, this._selectedTargetAsset.symbol, 'target');
     } else if (this._selectedTargetAsset && this._selectedTargetAsset.symbol === this.runeSymbol) {
       this.updateSwapDetails();
     }
@@ -144,7 +145,7 @@ export class SwapComponent implements OnInit, OnDestroy {
   binanceTransferFee: BigNumber;
   binanceTransferFeeDisplay: number;
 
-  balances: AssetBalance[];
+  balances: Balances;
   sourceBalance: number;
   targetBalance: number;
 
@@ -158,7 +159,8 @@ export class SwapComponent implements OnInit, OnDestroy {
     private midgardService: MidgardService,
     private binanceService: BinanceService) {
 
-    this.selectedSourceAsset = new Asset(this.runeSymbol);
+    this.selectedSourceAsset = new Asset(`BNB.${this.runeSymbol}`);
+
 
     const balances$ = this.userService.userBalances$.subscribe(
       (balances) => {
@@ -167,18 +169,22 @@ export class SwapComponent implements OnInit, OnDestroy {
         this.targetBalance = this.userService.findBalance(this.balances, this.selectedTargetAsset);
 
         if (this.selectedTargetAsset && this.selectedTargetAsset.symbol !== this.runeSymbol) {
-          this.getPoolDetails(this.selectedTargetAsset.symbol, 'target');
+          this.getPoolDetails(this.selectedTargetAsset.chain, this.selectedTargetAsset.symbol, 'target');
         }
 
         if (this.selectedSourceAsset && this.selectedSourceAsset.symbol !== this.runeSymbol) {
-          this.getPoolDetails(this.selectedSourceAsset.symbol, 'source');
+          console.log('SOURCE IS: ', this.selectedSourceAsset);
+
+          this.getPoolDetails(this.selectedSourceAsset.chain, this.selectedSourceAsset.symbol, 'source');
         }
 
       }
     );
 
     const user$ = this.userService.user$.subscribe(
-      (user) => this.user = user
+      async (user) => {
+        this.user = user;
+      }
     );
 
     this.subs = [balances$, user$];
@@ -249,16 +255,16 @@ export class SwapComponent implements OnInit, OnDestroy {
     });
   }
 
-  getPoolDetails(symbol: string, type: 'source' | 'target') {
+  getPoolDetails(chain: string, symbol: string, type: 'source' | 'target') {
 
     this.poolDetailTargetError = (type === 'target') ? false : this.poolDetailTargetError;
     this.poolDetailSourceError = (type === 'source') ? false : this.poolDetailSourceError;
 
-    this.midgardService.getPoolDetails([symbol], 'simple').subscribe(
+    this.midgardService.getPoolDetails([`${chain}.${symbol}`], 'simple').subscribe(
       (res) => {
 
         if (res && res.length > 0) {
-          this.poolDetailMap[symbol] = res[0];
+          this.poolDetailMap[`${chain}.${symbol}`] = res[0];
           this.updateSwapDetails();
         }
 
@@ -310,8 +316,8 @@ export class SwapComponent implements OnInit, OnDestroy {
       if (swapType === SwapType.SINGLE_SWAP) {
         this.calculateSingleSwap();
       } else if (swapType === SwapType.DOUBLE_SWAP
-          && this.poolDetailMap[this.selectedTargetAsset.symbol]
-          && this.poolDetailMap[this.selectedSourceAsset.symbol]) {
+          && this.poolDetailMap[`${this.selectedTargetAsset.chain}.${this.selectedTargetAsset.symbol}`]
+          && this.poolDetailMap[`${this.selectedSourceAsset.chain}.${this.selectedSourceAsset.symbol}`]) {
 
         this.calculateDoubleSwap();
 
@@ -361,8 +367,8 @@ export class SwapComponent implements OnInit, OnDestroy {
       : false;
 
     const poolDetail = (toRune)
-      ? this.poolDetailMap[this.selectedSourceAsset.symbol]
-      : this.poolDetailMap[this.selectedTargetAsset.symbol];
+      ? this.poolDetailMap[`${this.selectedSourceAsset.chain}.${this.selectedSourceAsset.symbol}`]
+      : this.poolDetailMap[`${this.selectedTargetAsset.chain}.${this.selectedTargetAsset.symbol}`];
 
     if (poolDetail) {
       const pool: PoolData = {
@@ -411,8 +417,11 @@ export class SwapComponent implements OnInit, OnDestroy {
    */
   calculateDoubleSwap() {
 
-    const sourcePool = this.poolDetailMap[this.selectedSourceAsset.symbol];
-    const targetPool = this.poolDetailMap[this.selectedTargetAsset.symbol];
+    const sourcePool = this.poolDetailMap[`${this.selectedSourceAsset.chain}.${this.selectedSourceAsset.symbol}`];
+    const targetPool = this.poolDetailMap[`${this.selectedTargetAsset.chain}.${this.selectedTargetAsset.symbol}`];
+
+    console.log('source pool is: ', sourcePool);
+    console.log('target pool is: ', targetPool);
 
     if (sourcePool && targetPool) {
       const pool1: PoolData = {

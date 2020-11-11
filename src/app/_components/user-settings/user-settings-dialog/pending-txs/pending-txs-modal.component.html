@@ -1,0 +1,59 @@
+<div class="container">
+
+  <div style="padding: 1rem 1rem 0" class="section-head-container">
+    <button (click)="back.emit()" mat-icon-button>
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1>Pending Transactions</h1>
+    <div style="width: 40px"></div>
+  </div>
+
+  <div class="dialog-content">
+    <div mat-dialog-content>
+
+      <div>
+
+        <ul *ngIf="txs && txs.length > 0">
+          <li *ngFor="let tx of txs">
+
+            <a [href]="((tx.chain === 'BTC') ? bitcoinExplorerUrl : binanceExplorerUrl) + '/' + tx.hash" target="_blank" class="uni-input">
+
+              <label style="width: 100%" class="flxr flxr--just-space-between">
+                <span>{{tx.ticker}}</span>
+                <span>{{tx.action}}</span>
+              </label>
+
+              <div class="flxr" style="width: 100%">
+
+                <input [value]="tx.hash" name="thor-address" [disabled]="true" />
+
+                <button matSuffix mat-icon-button>
+                  <mat-icon *ngIf="tx.status === 'COMPLETE'">check_circle</mat-icon>
+                  <mat-progress-spinner *ngIf="tx.status === 'PENDING'" diameter="16" color="primary" mode="indeterminate"></mat-progress-spinner>
+                </button>
+
+              </div>
+
+            </a>
+
+          </li>
+        </ul>
+
+        <div *ngIf="!txs || (txs && txs.length < 1)">
+          No transactions found
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- close dialog -->
+    <div mat-dialog-actions class="dialog-actions">
+      <button mat-icon-button aria-label="Close Connect Wallet Dialog" mat-dialog-close>
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+  </div>
+
+</div>

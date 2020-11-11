@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of, Subject, timer } from 'rxjs';
 import { PoolDetail } from '../_classes/pool-detail';
 import { MidgardAsset } from '../_classes/midgard-asset';
 import { MidgardConstants } from '../_classes/midgard-constants';
@@ -10,6 +10,8 @@ import { TransactionDTO } from '../_classes/transaction';
 import { StakerDTO } from '../_classes/staker';
 import { StakerPoolDataDTO } from '../_classes/staker-pool-data';
 import { LastBlock } from '../_classes/last-block';
+import { catchError, switchMap, takeUntil } from 'rxjs/operators';
+import { UserService } from './user.service';
 
 @Injectable({
   providedIn: 'root'
@@ -18,9 +20,10 @@ export class MidgardService {
 
   private basePath: string;
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private userService: UserService) {
     this.basePath = (environment.network === 'testnet')
-      ? 'https://midgard.bepswap.com/v1'
+      ? 'https://testnet.multichain.midgard.thorchain.info/v1'
+      // ? 'http://18.158.236.117:8080/v1'
       : 'https://chaosnet-midgard.bepswap.com/v1';
   }
 
@@ -62,8 +65,8 @@ export class MidgardService {
     return this.http.get<TransactionDTO>(`${this.basePath}/txs`, {params});
   }
 
-  getStaker(accountId: string): Observable<StakerDTO> {
-    return this.http.get<StakerDTO>(`${this.basePath}/stakers/${accountId}`);
+  getStaker(address: string): Observable<StakerDTO> {
+    return this.http.get<StakerDTO>(`${this.basePath}/stakers/${address}`);
   }
 
   getStakerPoolData(accountId: string, assets: string[]): Observable<StakerPoolDataDTO[]> {

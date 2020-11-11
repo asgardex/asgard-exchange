@@ -1,9 +1,12 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { Subject, timer, of, Subscription } from 'rxjs';
 import { catchError, switchMap, takeUntil } from 'rxjs/operators';
 import { LastBlock } from 'src/app/_classes/last-block';
 import { LastBlockService } from 'src/app/_services/last-block.service';
 import { MidgardService } from 'src/app/_services/midgard.service';
+import { ReconnectDialogComponent } from './_components/reconnect-dialog/reconnect-dialog.component';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -14,13 +17,39 @@ export class AppComponent implements OnInit, OnDestroy {
 
   killPolling: Subject<void> = new Subject();
   subs: Subscription[];
+  isTestnet: boolean;
 
-  constructor(private midgardService: MidgardService, private lastBlockService: LastBlockService) {
+  constructor(
+    private dialog: MatDialog,
+    private midgardService: MidgardService,
+    private lastBlockService: LastBlockService,
+  ) {
     this.subs = [];
+    this.isTestnet = (environment.network === 'testnet');
   }
 
   ngOnInit(): void {
     this.pollLastBlock();
+
+    const keystoreString = localStorage.getItem('keystore');
+    const keystore = JSON.parse(keystoreString);
+    if (keystore) {
+      this.openReconnectDialog(keystore);
+    }
+  }
+
+  openReconnectDialog(keystore) {
+    this.dialog.open(
+      ReconnectDialogComponent,
+      {
+        maxWidth: '420px',
+        width: '50vw',
+        minWidth: '260px',
+        data: {
+          keystore
+        }
+      }
+    );
   }
 
   pollLastBlock(): void {

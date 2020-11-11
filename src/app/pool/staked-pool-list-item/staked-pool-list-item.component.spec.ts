@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatIconModule } from '@angular/material/icon';
+import { IconTickerModule } from 'src/app/_components/icon-ticker/icon-ticker.module';
 
 import { StakedPoolListItemComponent } from './staked-pool-list-item.component';
 
@@ -8,7 +10,8 @@ describe('StakedPoolListItemComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ StakedPoolListItemComponent ]
+      declarations: [ StakedPoolListItemComponent ],
+      imports: [ IconTickerModule, MatIconModule ]
     })
     .compileComponents();
   });

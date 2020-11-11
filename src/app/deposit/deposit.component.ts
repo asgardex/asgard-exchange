@@ -4,12 +4,13 @@ import { assetAmount, assetToBase, baseAmount, getValueOfAssetInRune, getValueOf
 import { Subscription } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { Asset } from '../_classes/asset';
-import { AssetBalance } from '../_classes/asset-balance';
+// import { AssetBalance } from '../_classes/asset-balance';
 import { MidgardService } from '../_services/midgard.service';
 import { UserService } from '../_services/user.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDepositModalComponent } from './confirm-deposit-modal/confirm-deposit-modal.component';
 import { User } from '../_classes/user';
+import { Balances } from '@xchainjs/xchain-client';
 
 @Component({
   selector: 'app-deposit',
@@ -45,7 +46,7 @@ export class DepositComponent implements OnInit, OnDestroy {
       } else {
 
         if (val.symbol !== this._asset.symbol) {
-          this.router.navigate(['/', 'deposit', val.symbol]);
+          this.router.navigate(['/', 'deposit', `${val.chain}.${val.symbol}`]);
           this._asset = val;
           this.assetBalance = this.userService.findBalance(this.balances, this.asset);
         }
@@ -79,7 +80,7 @@ export class DepositComponent implements OnInit, OnDestroy {
   /**
    * Balances
    */
-  balances: AssetBalance[];
+  balances: Balances;
   runeBalance: number;
   assetBalance: number;
 
@@ -93,12 +94,15 @@ export class DepositComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private midgardService: MidgardService
   ) {
-    this.rune = new Asset(this.runeSymbol);
+    this.rune = new Asset(`BNB.${this.runeSymbol}`);
 
     const balances$ = this.userService.userBalances$.subscribe(
       (balances) => {
+        console.log('balances are: ', balances);
         this.balances = balances;
+        console.log('this rune is: ', this.rune);
         this.runeBalance = this.userService.findBalance(this.balances, this.rune);
+        console.log('rune balance is: ', this.runeBalance);
         this.assetBalance = this.userService.findBalance(this.balances, this.asset);
       }
     );

@@ -12,42 +12,12 @@
   <div>
     <div mat-dialog-content>
 
-      <div class="heading-container flxr flxr--just-space-between flxr--align-end" >
-        <div class="list-title">
-          Token Name
-        </div>
-        <span class="heading-balance__label">Balance</span>
-      </div>
-
-      <div class="market-list-container">
-
-        <div *ngIf="loading" class="flxr flxr--align-center flxr--just-center" style="height: 100%; width: 100%">
-          <mat-progress-spinner diameter="16" color="primary" mode="indeterminate"></mat-progress-spinner>
-        </div>
-
-        <ul *ngIf="!loading && filteredMarketListItems" class="market-list">
-
-          <li class="market-list-item" *ngFor="let item of filteredMarketListItems" (click)="selectItem(item.asset)" [class.disabled]="item.asset.symbol == data.disabledAssetSymbol">
-            <!-- BTCB-1DE -->
-
-            <div class="asset-icon-container">
-              <img *ngIf="item.asset.iconPath" class="asset-icon" [src]="item.asset.iconPath" />
-              <mat-icon *ngIf="!item.asset.iconPath">help_outline</mat-icon>
-            </div>
-
-            <div class="flxr flxr--just-space-between" style="width:100%;">
-              <div class="flxr flxr--flow-col">
-                <span class="market-list-item__symbol">{{item.asset.ticker}}</span>
-                <span class="market-list-item__chain">{{item.asset.chain}}</span>
-              </div>
-              <div *ngIf="item.balance" class="flxr flxr--flow-col flxr--just-end" style="text-align: right;">
-                <span class="market-list-item__balance">{{item.balance.assetValue.amount().toNumber()}}</span>
-              </div>
-            </div>
-          </li>
-        </ul>
-
-      </div>
+      <app-assets-list
+        [loading]="loading"
+        [assetListItems]="filteredMarketListItems"
+        [disabledAssetSymbol]="data.disabledAssetSymbol"
+        (selectAsset)="selectItem($event)">
+      </app-assets-list>
 
     </div>
 

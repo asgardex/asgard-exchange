@@ -18,6 +18,8 @@ export class BinanceService {
     return this._asgardexBncClient.getBncClient();
   }
 
+  // binanceClient: BinanceClient;
+
   constructor(private http: HttpClient) {
 
     this._baseUrl = (environment.network === 'testnet')
@@ -28,7 +30,14 @@ export class BinanceService {
       network: environment.network === 'testnet' ? 'testnet' : 'mainnet',
     });
 
+  }
 
+  setBinanceClient(phrase: string) {
+    // this.binanceClient = new binanceClient()
+    this._asgardexBncClient = new binanceClient({
+      network: environment.network === 'testnet' ? 'testnet' : 'mainnet',
+      phrase
+    });
   }
 
   getPrefix() {

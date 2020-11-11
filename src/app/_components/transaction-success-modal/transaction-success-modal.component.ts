@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ExplorerPathsService } from 'src/app/_services/explorer-paths.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -8,17 +9,18 @@ import { environment } from 'src/environments/environment';
 })
 export class TransactionSuccessModalComponent implements OnInit {
 
+  @Input() chain: 'BTC' | 'BNB';
   @Input() hash: string;
   @Input() label: string;
   @Output() closeDialog: EventEmitter<null>;
 
   binanceExplorerUrl: string;
+  bitcoinExplorerUrl: string;
 
-  constructor() {
+  constructor(private explorerPathsService: ExplorerPathsService) {
     this.closeDialog = new EventEmitter<null>();
-
-    this.binanceExplorerUrl = environment.network === 'testnet' ? 'https://testnet-explorer.binance.org/tx' : 'https://explorer.binance.org/tx';
-
+    this.binanceExplorerUrl = `${this.explorerPathsService.binanceExplorerUrl}/tx`;
+    this.bitcoinExplorerUrl = `${this.explorerPathsService.bitcoinExplorerUrl}/tx`;
   }
 
   ngOnInit(): void {

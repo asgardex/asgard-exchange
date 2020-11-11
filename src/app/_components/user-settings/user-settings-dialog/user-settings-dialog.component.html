@@ -1,0 +1,107 @@
+<div *ngIf="mode === 'ADDRESSES'">
+  <div class="modal-head">
+    <h1 mat-dialog-title>User Settings</h1>
+  </div>
+  <div>
+    <div mat-dialog-content>
+
+      <div style="padding: 0 1rem 1rem">
+        <div *ngIf="loading" class="icon-container">
+
+          <mat-progress-spinner mode="indeterminate" diameter="60"></mat-progress-spinner>
+
+        </div>
+
+        <div *ngIf="!loading">
+
+          <div>
+            <button (click)="mode = 'PENDING_TXS'" class="pending-tx-btn flxr flxr--align-center">
+              {{pendingTxCount}} Pending Transactions
+              <mat-icon>keyboard_arrow_right</mat-icon>
+            </button>
+          </div>
+
+          <!-- <div *ngIf="thorAddress" class="uni-input user-address" (click)="selectAddress(thorAddress, 'THOR')">
+            <label>THORChain Address</label>
+
+            <div class="flxr" style="width: 100%">
+              <input [value]="thorAddress" name="thor-address" [disabled]="true" />
+
+            </div>
+          </div> -->
+
+          <div *ngIf="bitcoinAddress" class="uni-input user-address" (click)="selectAddress(bitcoinAddress, 'BTC')">
+            <label>Bitcoin Address</label>
+
+            <div class="flxr flxr--align-center" style="width: 100%">
+              <div class="asset-icon-container">
+                <img class="asset-icon" src="assets/images/token-icons/bnb.png" />
+              </div>
+              <input [value]="bitcoinAddress" name="btc-address" [disabled]="true" />
+            </div>
+          </div>
+
+          <div *ngIf="binanceAddress" class="uni-input user-address" (click)="selectAddress(binanceAddress, 'BNB')">
+            <label>BNB Address</label>
+
+            <div class="flxr flxr--align-center" style="width: 100%">
+              <div class="asset-icon-container">
+                <img class="asset-icon" src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/BTCB-1DE/logo.png" />
+              </div>
+              <input [value]="binanceAddress" name="binance-address" [disabled]="true" />
+            </div>
+
+          </div>
+
+          <div class="flxr flxr--just-end">
+            <button (click)="disconnect()" mat-flat-button color="primary">Disconnect</button>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- close dialog -->
+    <div mat-dialog-actions class="dialog-actions">
+      <button mat-icon-button aria-label="Close Connect Wallet Dialog" mat-dialog-close>
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+</div>
+
+<app-pending-txs-modal *ngIf="mode === 'PENDING_TXS'" (back)="mode = 'ADDRESSES'"></app-pending-txs-modal>
+
+<app-user-address
+  *ngIf="mode === 'ADDRESS'"
+  [chain]="selectedChain"
+  [address]="selectedAddress"
+  (back)="clearSelectedAddress()"
+  (navigateToAsset)="selectAsset($event)">
+</app-user-address>
+
+<app-user-asset
+  *ngIf="mode === 'ASSET'"
+  [asset]="selectedAsset"
+  [address]="selectedAddress"
+  (back)="clearSelectedAsset()"
+  (send)="mode = 'SEND'">
+</app-user-asset>
+
+<app-send-asset
+  *ngIf="mode === 'SEND'"
+  [asset]="selectedAsset"
+  (confirmSend)="confirmSend($event)"
+  (back)="mode = 'ASSET'">
+</app-send-asset>
+
+<app-confim-send
+  *ngIf="mode === 'CONFIRM_SEND'"
+  [amount]="amountToSend"
+  [recipientAddress]="recipient"
+  [asset]="selectedAsset"
+  (back)="mode = 'SEND'"
+  (transactionSuccessful)="transactionSuccessful()">
+</app-confim-send>

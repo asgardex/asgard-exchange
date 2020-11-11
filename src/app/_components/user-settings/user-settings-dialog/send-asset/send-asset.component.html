@@ -1,0 +1,39 @@
+<div style="padding: 1rem 1rem 0; margin-bottom: 0;" class="section-head-container">
+  <button (click)="back.next()" mat-icon-button>
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+  <h1 *ngIf="asset && asset.asset && asset.asset.ticker" class="flxr">
+    Send {{asset.asset.ticker}}
+  </h1>
+  <div style="width: 40px"></div>
+</div>
+
+<div mat-dialog-content *ngIf="asset">
+
+  <div style="padding: 1rem">
+    <app-asset-input
+      label="Input"
+      [(selectedAsset)]="asset.asset"
+      [(assetUnit)]="amount"
+      [balance]="asset.balance.amount().toNumber()"
+      [disabledAssetSymbol]="asset.asset.symbol"
+      [disabledMarketSelect]="true">
+    </app-asset-input>
+
+    <div class="uni-input">
+      <label>Recipient Address</label>
+      <input [(ngModel)]="recipientAddress" name="recipient-address" placeholder="Enter Recipient {{asset.asset.ticker}} Address" />
+    </div>
+
+    <div class="flxr flxr--just-end flxr--align-center" style="height: 38px">
+      <div>
+        <button mat-flat-button color="accent" [disabled]="!amountSpendable || recipientAddress.length < 12" (click)="confirmSend.next({amount: amount, recipientAddress: recipientAddress})">
+          <span>Next</span>
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+

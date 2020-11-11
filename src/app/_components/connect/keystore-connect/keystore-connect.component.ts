@@ -1,8 +1,28 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { UserService } from 'src/app/_services/user.service';
-import { User } from 'src/app/_classes/user';
-import { getAddressFromPrivateKey, getPrivateKeyFromKeyStore } from '@binance-chain/javascript-sdk/lib/crypto';
-import { BinanceService } from 'src/app/_services/binance.service';
+import { KeystoreService } from 'src/app/_services/keystore.service';
+
+export type Keystore = {
+  address: string
+  crypto: {
+    cipher: string
+    ciphertext: string
+    cipherparams: {
+      iv: string
+    }
+    kdf: string
+    kdfparams: {
+      prf: string
+      dklen: number
+      salt: string
+      c: number
+    }
+    mac: string
+  }
+  id: string
+  version: number
+  meta: string
+};
 
 @Component({
   selector: 'app-keystore-connect',
@@ -20,7 +40,7 @@ export class KeystoreConnectComponent implements OnInit {
   @Output() back: EventEmitter<null>;
   @Output() closeModal: EventEmitter<null>;
 
-  constructor(private userService: UserService, private binanceService: BinanceService) {
+  constructor(private userService: UserService, private keystoreService: KeystoreService) {
     this.back = new EventEmitter<null>();
     this.closeModal = new EventEmitter<null>();
   }
@@ -82,17 +102,9 @@ export class KeystoreConnectComponent implements OnInit {
     this.keystoreError = false;
 
     try {
-
-      const privateKey = getPrivateKeyFromKeyStore(this.keystore, this.keystorePassword);
-
-      await this.binanceService.bncClient.setPrivateKey(privateKey);
-
-      const prefix = this.binanceService.getPrefix();
-      const address = getAddressFromPrivateKey(privateKey, prefix);
-      const user = new User({type: 'keystore', wallet: address, keystore: this.keystore});
-
+      localStorage.setItem('keystore', JSON.stringify(this.keystore));
+      const user = await this.keystoreService.unlockKeystore(this.keystore, this.keystorePassword);
       this.userService.setUser(user);
-
     } catch (error) {
       this.keystoreConnecting = false;
       this.keystoreError = true;

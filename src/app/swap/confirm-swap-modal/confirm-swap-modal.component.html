@@ -91,12 +91,19 @@
 
   <app-transaction-success-modal
     *ngIf="txState === 'SUCCESS'"
+    [chain]="swapData.sourceAsset.chain"
     [hash]="hash"
     (closeDialog)="closeDialog(true)">
   </app-transaction-success-modal>
 
 
-  <div *ngIf="txState === 'ERROR'"></div>
+
+  <div style="font-size: 0.8rem; padding: 2rem 0" class="flxr flxr--flow-col flxr--align-center" *ngIf="txState === 'ERROR'">
+    <mat-icon>warning</mat-icon>
+    {{error}}
+  </div>
+
+
 
 </div>
 

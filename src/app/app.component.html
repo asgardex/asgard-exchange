@@ -3,8 +3,14 @@
 
 <app-header></app-header>
 
-<main>
+<main *ngIf="isTestnet">
   <router-outlet></router-outlet>
+</main>
+
+<main *ngIf="!isTestnet">
+  <div>
+    Multichain Coming Soon.
+  </div>
 </main>
 
 <footer>

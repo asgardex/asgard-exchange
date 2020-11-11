@@ -7,6 +7,7 @@
   </h1>
   <div>
     <span id="testnet-indicator" *ngIf="isTestnet">Testnet</span>
-    <app-connect></app-connect>
+    <app-connect *ngIf="!user"></app-connect>
+    <app-user-settings *ngIf="user" [user]="user"></app-user-settings>
   </div>
 </header>

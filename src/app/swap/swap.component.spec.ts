@@ -3,6 +3,8 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { SwapComponent } from './swap.component';
 import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { AssetInputModule } from '../_components/asset-input/asset-input.module';
+import { MatIconModule } from '@angular/material/icon';
 
 describe('SwapComponent', () => {
   let component: SwapComponent;
@@ -14,7 +16,7 @@ describe('SwapComponent', () => {
       providers: [
         { provide: MAT_DIALOG_DATA, useValue: {} },
       ],
-      imports: [ MatDialogModule, HttpClientTestingModule ]
+      imports: [ MatDialogModule, HttpClientTestingModule, AssetInputModule, MatIconModule ]
     })
     .compileComponents();
   }));

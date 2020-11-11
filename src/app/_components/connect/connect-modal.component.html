@@ -1,43 +1,76 @@
 
-<div *ngIf="!connectionMethod">
+<!-- <div *ngIf="!selectedChain">
   <div class="modal-head">
-    <h1 mat-dialog-title>Connect to a wallet</h1>
+    <h1 mat-dialog-title>Select Chain</h1>
   </div>
   <div>
     <div mat-dialog-content>
-
-      <!-- Connect Options -->
-
-      <button class="connect-option" (click)="connectWalletConnect()" [disabled]="isTestnet">
-        <img class="connect-option__logo" src="assets/images/wallet-connect-icon.svg" />
-        <span>Wallet Connect</span>
+      <button class="connect-option" (click)="setSelectedChain('BNB')">
+        <img class="connect-option__logo" src="http://localhost:4200/assets/images/token-icons/bnb.png" />
+        <span>Binance Chain</span>
       </button>
-
-      <button class="connect-option" (click)="connectLedger()">
-        <img id="ledger-logo" class="connect-option__logo" src="assets/images/ledger/ledger-logo.png" />
-        <span>Ledger</span>
-      </button>
-
-      <button class="connect-option" (click)="connectKeystore()">
-        <mat-icon class="connect-option__logo">vpn_key</mat-icon>
-        <span>Keystore</span>
-      </button>
-
-    </div>
-
-    <!-- close dialog -->
-    <div mat-dialog-actions class="dialog-actions">
-      <button mat-icon-button aria-label="Close Connect Wallet Dialog" mat-dialog-close>
-        <mat-icon>close</mat-icon>
+      <button class="connect-option" (click)="setSelectedChain('BTC')" [disabled]="!isTestnet">
+        <img class="connect-option__logo" src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/BTCB-1DE/logo.png" />
+        <span>Bitcoin</span>
       </button>
     </div>
   </div>
 </div>
 
-<!-- KEYSTORE -->
-<app-keystore-connect *ngIf="connectionMethod == 'KEYSTORE'" (back)="clearConnectionMethod()" (closeModal)="close()"></app-keystore-connect>
+<div *ngIf="selectedChain"> -->
+<div>
 
-<!-- Ledger -->
-<app-ledger-connect *ngIf="connectionMethod == 'LEDGER'" (back)="clearConnectionMethod()" (closeModal)="close()"></app-ledger-connect>
+  <div *ngIf="!connectionMethod">
+    <div class="modal-head">
+      <h1 mat-dialog-title>Connect to a wallet</h1>
+    </div>
+    <div>
+      <div mat-dialog-content>
 
-<!-- <app-connect-error *ngIf="error" (back)="clearConnectionMethod()"></app-connect-error> -->
+        <!-- Connect Options -->
+
+        <!-- <button class="connect-option" (click)="connectWalletConnect()" [disabled]="true">
+          <img class="connect-option__logo" src="assets/images/wallet-connect-icon.svg" />
+          <span>Wallet Connect</span>
+        </button>
+
+        <button class="connect-option" (click)="connectLedger()" [disabled]="true">
+          <img id="ledger-logo" class="connect-option__logo" src="assets/images/ledger/ledger-logo.png" />
+          <span>Ledger</span>
+        </button> -->
+
+        <button class="connect-option" (click)="createKeystore()">
+          <mat-icon class="connect-option__logo">add</mat-icon>
+          <span>Create Keystore</span>
+        </button>
+
+        <button class="connect-option" (click)="connectKeystore()">
+          <mat-icon class="connect-option__logo">vpn_key</mat-icon>
+          <span>Connect Keystore</span>
+        </button>
+
+      </div>
+
+      <!-- close dialog -->
+      <div mat-dialog-actions class="dialog-actions">
+        <button mat-icon-button aria-label="Close Connect Wallet Dialog" mat-dialog-close>
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- KEYSTORE CREATE -->
+  <app-keystore-create *ngIf="connectionMethod == 'KEYSTORE_CREATE'" (back)="clearConnectionMethod()" (closeModal)="close()"></app-keystore-create>
+
+  <!-- KEYSTORE CONNECT -->
+  <app-keystore-connect *ngIf="connectionMethod == 'KEYSTORE'" (back)="clearConnectionMethod()" (closeModal)="close()"></app-keystore-connect>
+
+  <!-- Ledger -->
+  <app-ledger-connect *ngIf="connectionMethod == 'LEDGER'" [chain]="selectedChain" (back)="clearConnectionMethod()" (closeModal)="close()"></app-ledger-connect>
+
+  <!-- <app-connect-error *ngIf="error" (back)="clearConnectionMethod()"></app-connect-error> -->
+
+</div>
+

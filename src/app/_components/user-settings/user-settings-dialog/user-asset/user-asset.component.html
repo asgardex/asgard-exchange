@@ -1,0 +1,43 @@
+<div style="padding: 1rem 1rem 0; margin-bottom: 0;" class="section-head-container">
+  <button (click)="back.emit()" mat-icon-button>
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+</div>
+
+<div class="modal-head" style="padding-top: 0">
+
+  <div class="flxr flxr--flow-col flxr--just-center flxr--align-center">
+    <div style="width: 40px">
+      <img *ngIf="asset && asset.asset && asset.asset.iconPath" class="asset-icon" [src]="asset && asset.asset && asset.asset.iconPath" style="max-width: 100%;" />
+    </div>
+    <span *ngIf="asset" class="asset-balance">{{asset.balance.amount().toNumber()}} {{asset.asset.ticker}}</span>
+    <div style="height: 17px">
+      <span class="usd-value" *ngIf="usdValue">≈ ${{usdValue | number:"0.0-2"}}</span>
+    </div>
+  </div>
+
+  <ul class="actions flxr flxr--just-center">
+    <li class="action flxr flxr--flow-col">
+      <button mat-mini-fab color="primary" aria-label="Send" (click)="send.emit()">
+        <mat-icon>upgrade</mat-icon>
+      </button>
+      Send
+    </li>
+
+    <!-- <li class="action">
+      Receive
+    </li> -->
+
+    <li class="action flxr flxr--flow-col flxr--align-center">
+      <button mat-mini-fab color="primary" aria-label="Copy" (click)="copyToClipboard()">
+        <mat-icon>content_copy</mat-icon>
+      </button>
+      Copy
+    </li>
+  </ul>
+
+</div>
+
+<!-- <div mat-dialog-content>
+  <p>txs here</p>
+</div> -->

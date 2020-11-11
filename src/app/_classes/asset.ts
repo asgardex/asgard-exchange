@@ -1,14 +1,8 @@
 import { CoinIconsFromTrustWallet } from 'src/app/_const/icon-list';
 
-// export interface Asset {
-//   chain: string;
-//   symbol: string;
-//   ticker: string;
-// }
-
 export class Asset {
 
-  chain: string;
+  chain: 'BNB' | 'BTC' | 'ETH' | 'THOR';
   symbol: string;
   ticker: string;
   iconPath: string;
@@ -23,12 +17,17 @@ export class Asset {
 
     if (trustWalletMatch) {
       this.iconPath = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/${trustWalletMatch}/logo.png`;
-    }else{
+    } else {
       // Override token icons when not found in trustwallet
       switch (poolName){
         case 'BNB.BNB':
-          this.iconPath =  'assets/images/token-icons/bnb.png';
+          this.iconPath = 'assets/images/token-icons/bnb.png';
           break;
+
+        case 'BTC.BTC':
+          this.iconPath = 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/BTCB-1DE/logo.png';
+          break;
+
         default:
           console.warn(`Icon not available for poolName ${poolName}. Add override in src\\app\\_classes\\asset.ts`);
           this.iconPath = 'assets/images/token-icons/unknown.png';
@@ -39,17 +38,17 @@ export class Asset {
   }
 
   getAssetFromString(poolName: string): {
-    chain: string;
+    chain: 'BNB' | 'BTC' | 'ETH' | 'THOR';
     symbol: string;
     ticker: string;
   } {
-    let chain: string;
+    let chain: 'BNB' | 'BTC' | 'ETH' | 'THOR';
     let symbol: string;
     let ticker: string;
 
     const data = poolName.split('.');
     if (poolName.includes('.')) {
-      chain = data[0];
+      chain = data[0] as 'BNB' | 'BTC' | 'ETH' | 'THOR';
       symbol = data[1];
     } else {
       symbol = data[0];
