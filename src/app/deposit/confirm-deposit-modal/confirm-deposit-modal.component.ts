@@ -196,10 +196,14 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
 
     // send BTC
     try {
+
+      const feeRates = await bitcoinClient.getFeeRates();
+
       const hash = await bitcoinClient.transfer({
         amount: assetToBase(assetAmount(this.data.assetAmount)),
         recipient: corePool.address,
         memo: coreChainMemo,
+        feeRate: feeRates.average
       });
 
       this.hash = hash;

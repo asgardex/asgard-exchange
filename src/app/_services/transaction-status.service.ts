@@ -121,7 +121,7 @@ export class TransactionStatusService {
   }
 
   pollBtcTx(tx: Tx) {
-    const refreshInterval$ = timer(0, 5000)
+    const refreshInterval$ = timer(0, 15000)
     .pipe(
       // This kills the request if the user closes the component
       takeUntil(this.killTxPolling[tx.hash]),
@@ -131,12 +131,25 @@ export class TransactionStatusService {
       catchError(error => of(error))
     ).subscribe( async (res: BlockchairBtcTransactionDTO) => {
 
+      for (const key in res.data) {
 
-      if (res && res.data && res.data[tx.hash] && res.data[tx.hash].transaction
-        && res.data[tx.hash].transaction.block_id && res.data[tx.hash].transaction.block_id > 0) {
-          this.updateTxStatus(tx.hash, TxStatus.COMPLETE);
-          this.userService.fetchBalances();
-          this.killTxPolling[tx.hash].next();
+        if (key.toUpperCase === tx.hash.toUpperCase) {
+
+          if (res.data[key] && res.data[key].transaction) {
+            console.log('tx block id is: ', res.data[key].transaction.block_id);
+            console.log('block id is greater than 0?', res.data[key].transaction.block_id > 0);
+          }
+
+          if (res && res.data && res.data[key] && res.data[key].transaction
+            && res.data[key].transaction.block_id && res.data[key].transaction.block_id > 0) {
+
+              this.updateTxStatus(tx.hash, TxStatus.COMPLETE);
+              this.userService.fetchBalances();
+              this.killTxPolling[tx.hash].next();
+          }
+
+        }
+
       }
 
     });

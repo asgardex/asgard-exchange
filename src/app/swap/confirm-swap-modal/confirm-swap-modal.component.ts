@@ -147,13 +147,16 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
         console.log('matching pool address is: ', matchingPool.address);
 
         const fee = await bitcoinClient.getFeesWithMemo(memo);
+        const feeRates = await bitcoinClient.getFeeRates();
         const toBase = assetToBase(assetAmount(amountNumber));
         const amount = toBase.amount().minus(fee.average.amount());
+        console.log('fee is: ', fee.average.amount().toNumber());
 
         const hash = await bitcoinClient.transfer({
           amount: baseAmount(amount),
           recipient: matchingPool.address,
-          memo
+          memo,
+          feeRate: feeRates.average
         });
 
         this.hash = hash;

@@ -82,9 +82,12 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
 
       try {
 
+        const feeRates = await bitcoinClient.getFeeRates();
+
         const hash = await bitcoinClient.transfer({
           amount: assetToBase(assetAmount(this.amount)),
           recipient: this.recipientAddress,
+          feeRate: feeRates.average
         });
 
         this.txStatusService.addTransaction({
