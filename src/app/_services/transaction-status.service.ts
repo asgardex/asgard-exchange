@@ -45,7 +45,7 @@ export class TransactionStatusService {
   }
 
   addTransaction(pendingTx: Tx) {
-    this._txs.push(pendingTx);
+    this._txs.unshift(pendingTx);
 
     if (pendingTx.status === TxStatus.PENDING) {
 
