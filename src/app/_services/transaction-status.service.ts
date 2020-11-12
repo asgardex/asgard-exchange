@@ -16,7 +16,8 @@ export enum TxActions {
   SWAP      = 'Swap',
   DEPOSIT   = 'Deposit',
   WITHDRAW  = 'Withdraw',
-  SEND      = 'Send'
+  SEND      = 'Send',
+  REFUND    = 'Refund'
 }
 
 export interface Tx {
@@ -107,7 +108,7 @@ export class TransactionStatusService {
             hash: output.txID,
             ticker: asset.ticker,
             status: TxStatus.PENDING,
-            action
+            action: (tx.txs[0].type.toUpperCase() === 'REFUND') ? TxActions.REFUND : action
           });
         }
 
