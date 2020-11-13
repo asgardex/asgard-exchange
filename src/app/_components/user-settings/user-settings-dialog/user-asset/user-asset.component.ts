@@ -45,10 +45,7 @@ export class UserAssetComponent implements OnInit {
     if (this.asset) {
       this.cgService.getCurrencyConversion(id).subscribe(
         (res) => {
-          console.log('res is: ', res);
-
           for (const [key, value] of Object.entries(res)) {
-            console.log(key + ':' + value.usd);
             this.usdValue = this.asset.balance.amount().multipliedBy(value.usd).toNumber();
           }
         }

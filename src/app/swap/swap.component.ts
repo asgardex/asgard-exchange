@@ -21,12 +21,12 @@ import {
 import BigNumber from 'bignumber.js';
 import { PoolDetail } from '../_classes/pool-detail';
 import { MidgardService } from '../_services/midgard.service';
-import { AssetBalance } from '../_classes/asset-balance';
 import { BinanceService } from '../_services/binance.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmSwapModalComponent } from './confirm-swap-modal/confirm-swap-modal.component';
 import { User } from '../_classes/user';
 import { Balances } from '@xchainjs/xchain-client';
+import { CGCoinListItem, CoinGeckoService } from '../_services/coin-gecko.service';
 
 export enum SwapType {
   DOUBLE_SWAP = 'double_swap',
@@ -154,12 +154,14 @@ export class SwapComponent implements OnInit, OnDestroy {
   poolDetailSourceError: boolean;
 
   insufficientBnb: boolean;
+  coinGeckoList: CGCoinListItem[];
 
   constructor(
     private dialog: MatDialog,
     private userService: UserService,
     private midgardService: MidgardService,
-    private binanceService: BinanceService) {
+    private binanceService: BinanceService,
+    private cgService: CoinGeckoService) {
 
     this.selectedSourceAsset = new Asset(`BNB.${this.runeSymbol}`);
 
@@ -199,6 +201,7 @@ export class SwapComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.getConstants();
     this.getBinanceFees();
+    this.getCoinGeckoCoinList();
   }
 
   mainButtonText(): string {
@@ -221,6 +224,14 @@ export class SwapComponent implements OnInit, OnDestroy {
     } else {
       console.warn('error creating main button text');
     }
+
+  }
+
+  getCoinGeckoCoinList() {
+
+    this.cgService.getCoinList().subscribe( (res) => {
+      this.coinGeckoList = res;
+    });
 
   }
 
