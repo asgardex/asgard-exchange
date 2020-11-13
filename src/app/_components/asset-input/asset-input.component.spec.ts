@@ -4,6 +4,7 @@ import { AssetInputComponent } from './asset-input.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { IconTickerModule } from '../icon-ticker/icon-ticker.module';
 import { MatIconModule } from '@angular/material/icon';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('AssetInputComponent', () => {
   let component: AssetInputComponent;
@@ -12,7 +13,7 @@ describe('AssetInputComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [ AssetInputComponent ],
-      imports: [ MatDialogModule, IconTickerModule, MatIconModule ]
+      imports: [ MatDialogModule, IconTickerModule, MatIconModule, HttpClientTestingModule ]
     })
     .compileComponents();
   });
