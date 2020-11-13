@@ -50,6 +50,8 @@ export class WithdrawComponent implements OnInit {
   runeBasePrice: number;
   assetBasePrice: number;
 
+  insufficientBnb: boolean;
+
   constructor(
     private dialog: MatDialog,
     private route: ActivatedRoute,
@@ -72,12 +74,20 @@ export class WithdrawComponent implements OnInit {
       }
     );
 
+    const balances$ = this.userService.userBalances$.subscribe(
+      (balances) => {
+        // allows us to ensure enough bnb balance
+        const bnbBalance = this.userService.findBalance(balances, new Asset('BNB.BNB'));
+        this.insufficientBnb = bnbBalance < 0.000375;
+      }
+    );
+
     const lastBlock$ = this.lastBlockService.lastBlock$.subscribe( (block) => {
       this.lastBlock = block;
       this.checkCooldown();
     });
 
-    this.subs = [user$, lastBlock$];
+    this.subs = [user$, lastBlock$, balances$];
   }
 
   ngOnInit(): void {

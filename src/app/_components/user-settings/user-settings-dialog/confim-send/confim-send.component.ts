@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
-import { assetAmount, assetToBase } from '@thorchain/asgardex-util';
+import { assetAmount, assetToBase, baseAmount } from '@thorchain/asgardex-util';
 import { Subscription } from 'rxjs';
 import { AssetAndBalance } from 'src/app/_classes/asset-and-balance';
 import { User } from 'src/app/_classes/user';
@@ -85,9 +85,12 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
         try {
 
           const feeRates = await bitcoinClient.getFeeRates();
+          const fees = await bitcoinClient.getFees();
+          const toBase = assetToBase(assetAmount(this.amount));
+          const amount = toBase.amount().minus(fees.average.amount());
 
           const hash = await bitcoinClient.transfer({
-            amount: assetToBase(assetAmount(this.amount)),
+            amount: baseAmount(amount),
             recipient: this.recipientAddress,
             feeRate: feeRates.average
           });
