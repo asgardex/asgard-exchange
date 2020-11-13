@@ -86,6 +86,7 @@ export class DepositComponent implements OnInit, OnDestroy {
 
   user: User;
   coinGeckoList: CGCoinListItem[];
+  insufficientBnb: boolean;
   subs: Subscription[];
 
   constructor(
@@ -100,12 +101,13 @@ export class DepositComponent implements OnInit, OnDestroy {
 
     const balances$ = this.userService.userBalances$.subscribe(
       (balances) => {
-        console.log('balances are: ', balances);
         this.balances = balances;
-        console.log('this rune is: ', this.rune);
         this.runeBalance = this.userService.findBalance(this.balances, this.rune);
-        console.log('rune balance is: ', this.runeBalance);
         this.assetBalance = this.userService.findBalance(this.balances, this.asset);
+
+        // allows us to ensure enough bnb balance
+        const bnbBalance = this.userService.findBalance(this.balances, new Asset('BNB.BNB'));
+        this.insufficientBnb = bnbBalance < 0.000375;
       }
     );
 
@@ -173,7 +175,7 @@ export class DepositComponent implements OnInit, OnDestroy {
 
   formDisabled(): boolean {
 
-    return !this.balances || !this.runeAmount || !this.assetAmount
+    return !this.balances || !this.runeAmount || !this.assetAmount || this.insufficientBnb
     || (this.balances
       && (this.runeAmount > this.runeBalance || this.assetAmount > this.userService.maximumSpendableBalance(this.asset, this.assetBalance))
     );
@@ -188,6 +190,8 @@ export class DepositComponent implements OnInit, OnDestroy {
     } else if (this.balances && (this.runeAmount > this.runeBalance
       || this.assetAmount > this.userService.maximumSpendableBalance(this.asset, this.assetBalance))) {
       return 'Insufficient balance';
+    } else if (this.insufficientBnb) {
+      return 'Insufficient BNB for Fee';
     } else if (this.balances && this.runeAmount && this.assetAmount
       && (this.runeAmount <= this.runeBalance) && (this.assetAmount <= this.assetBalance)) {
       return 'Deposit';

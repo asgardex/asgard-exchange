@@ -85,12 +85,13 @@
       class="main-action-btn"
       mat-flat-button
       color="primary"
-      [disabled]="!user || !removeAssetAmount || (removeAssetAmount && removeAssetAmount <= 0 || remainingTime)"
+      [disabled]="!user || !removeAssetAmount || insufficientBnb || (removeAssetAmount && removeAssetAmount <= 0 || remainingTime)"
     >
       <span *ngIf="!user">Please connect wallet</span>
       <span *ngIf="user && remainingTime">Withdraw Enabled in {{remainingTime}}</span>
-      <span *ngIf="user && !remainingTime && !removeAssetAmount || (removeAssetAmount && removeAssetAmount <= 0)">Enter an amount</span>
-      <span *ngIf="user && !remainingTime && removeAssetAmount && removeAssetAmount > 0">Withdraw</span>
+      <span *ngIf="user && !remainingTime && insufficientBnb">Insufficient BNB for Fee</span>
+      <span *ngIf="user && !remainingTime && !removeAssetAmount && !insufficientBnb || (removeAssetAmount && removeAssetAmount <= 0)">Enter an amount</span>
+      <span *ngIf="user && !remainingTime && removeAssetAmount && !insufficientBnb && removeAssetAmount > 0">Withdraw</span>
     </button>
 
   </div>
