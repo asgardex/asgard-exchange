@@ -4,13 +4,13 @@ import { assetAmount, assetToBase, baseAmount, getValueOfAssetInRune, getValueOf
 import { Subscription } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { Asset } from '../_classes/asset';
-// import { AssetBalance } from '../_classes/asset-balance';
 import { MidgardService } from '../_services/midgard.service';
 import { UserService } from '../_services/user.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDepositModalComponent } from './confirm-deposit-modal/confirm-deposit-modal.component';
 import { User } from '../_classes/user';
 import { Balances } from '@xchainjs/xchain-client';
+import { CGCoinListItem, CoinGeckoService } from '../_services/coin-gecko.service';
 
 @Component({
   selector: 'app-deposit',
@@ -85,6 +85,7 @@ export class DepositComponent implements OnInit, OnDestroy {
   assetBalance: number;
 
   user: User;
+  coinGeckoList: CGCoinListItem[];
   subs: Subscription[];
 
   constructor(
@@ -92,7 +93,8 @@ export class DepositComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private router: Router,
     private route: ActivatedRoute,
-    private midgardService: MidgardService
+    private midgardService: MidgardService,
+    private cgService: CoinGeckoService
   ) {
     this.rune = new Asset(`BNB.${this.runeSymbol}`);
 
@@ -130,7 +132,17 @@ export class DepositComponent implements OnInit, OnDestroy {
 
     });
 
+    this.getCoinGeckoCoinList();
+
     this.subs.push(params$);
+
+  }
+
+  getCoinGeckoCoinList() {
+
+    this.cgService.getCoinList().subscribe( (res) => {
+      this.coinGeckoList = res;
+    });
 
   }
 

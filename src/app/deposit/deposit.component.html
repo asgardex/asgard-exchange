@@ -15,7 +15,8 @@
       [(selectedAsset)]="asset"
       [(assetUnit)]="assetAmount"
       [balance]="assetBalance"
-      [disabledAssetSymbol]="rune.symbol">
+      [disabledAssetSymbol]="rune.symbol"
+      [coinGeckoList]="coinGeckoList">
     </app-asset-input>
 
     <div class="flxr flxr--align-center flxr--just-center">
@@ -30,7 +31,8 @@
       [hideMax]="true"
       [disableInput]="true"
       [disabledAssetSymbol]="rune.symbol"
-      [disabledMarketSelect]="true">
+      [disabledMarketSelect]="true"
+      [coinGeckoList]="coinGeckoList">
     </app-asset-input>
 
     <button

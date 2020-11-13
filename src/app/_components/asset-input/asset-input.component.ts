@@ -3,6 +3,7 @@ import { Asset } from 'src/app/_classes/asset';
 import { MarketsModalComponent } from '../markets-modal/markets-modal.component';
 import { MatDialog } from '@angular/material/dialog';
 import { UserService } from 'src/app/_services/user.service';
+import { CGCoinListItem, CoinGeckoService } from 'src/app/_services/coin-gecko.service';
 
 @Component({
   selector: 'app-asset-input',
@@ -16,6 +17,7 @@ export class AssetInputComponent implements OnInit {
    */
   @Input() set selectedAsset(asset: Asset) {
     this._selectedAsset = asset;
+    this.checkUsdBalance();
   }
   get selectedAsset() {
     return this._selectedAsset;
@@ -36,18 +38,56 @@ export class AssetInputComponent implements OnInit {
   /**
    * Wallet balance
    */
-  @Input() balance: number;
+  @Input() set balance(bal: number) {
+    this._balance = bal;
+    this.checkUsdBalance();
+  }
+  get balance() {
+    return this._balance;
+  }
+  _balance: number;
 
   @Input() hideMax: boolean;
 
   @Input() disabledMarketSelect: boolean;
   @Input() loading: boolean;
   @Input() error: boolean;
+  @Input() set coinGeckoList(list: CGCoinListItem[]) {
+    this._coinGeckoList = list;
+    if (this._coinGeckoList) {
+      this.checkUsdBalance();
+    }
+  }
+  get coinGeckoList() {
+    return this._coinGeckoList;
+  }
+  _coinGeckoList: CGCoinListItem[];
 
-  constructor(private dialog: MatDialog, private userService: UserService) {
+  usdValue: number;
+
+  constructor(private dialog: MatDialog, private userService: UserService, private cgService: CoinGeckoService) {
   }
 
   ngOnInit(): void {
+  }
+
+  checkUsdBalance() {
+
+    if (this.selectedAsset && this.balance && this.coinGeckoList) {
+      const id = this.cgService.getCoinIdBySymbol(this.selectedAsset.ticker, this.coinGeckoList);
+
+      if (id) {
+
+        this.cgService.getCurrencyConversion(id).subscribe(
+          (res) => {
+            for (const [_key, value] of Object.entries(res)) {
+              this.usdValue = this.balance * value.usd;
+            }
+          }
+        );
+
+      }
+    }
   }
 
   updateAssetUnits(val) {

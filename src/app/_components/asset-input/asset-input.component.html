@@ -3,8 +3,13 @@
   <div style="width: 100%;">
     <div class="flxr flxr--just-space-between">
       <label for="{{label}}Input">{{label}}</label>
-      <label *ngIf="selectedAsset && balance">Balance: {{balance | number:"1.0-8"}}</label>
+      <label *ngIf="selectedAsset && balance">
+        Balance: {{balance | number:"1.0-8"}} <br />
+        <span style="float: right; font-size: 0.6rem" *ngIf="usdValue">(<i>≈${{usdValue | number:"1.0-0"}}</i>)</span>
+      </label>
     </div>
+
+    <!-- <span *ngIf="usdValue">{{usdValue}}</span> -->
 
     <div class="flxr flxr--just-space-between flxr--align-center">
 
