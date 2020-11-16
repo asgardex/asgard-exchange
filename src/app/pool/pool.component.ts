@@ -56,40 +56,31 @@ export class PoolComponent implements OnInit, OnDestroy {
 
     if (this.user) {
 
-      const clientLength = Object.keys(this.user.clients).length;
+      const client = this.user.clients.binance; // only need to query binance bc all pools are balanced by RUNE
+      const address = await client.getAddress();
 
-      for (const [key, _value] of Object.entries(this.user.clients)) {
+      this.midgardService.getStaker(address).subscribe(
+        (res) => {
+          this.userPoolError = false;
 
-        const client = this.user.clients[key];
-        const address = await client.getAddress();
-
-        this.midgardService.getStaker(address).subscribe(
-          (res) => {
-            this.userPoolError = false;
-
-            if (res.poolsArray && res.poolsArray.length > 0) {
-              this.getAccountStaked(res.poolsArray, address);
-              this.getPoolData(res.poolsArray);
-            } else {
-              this.stakedPools = [];
-              this.poolDetailIndex = {};
-            }
-
-            // for user to see that UI is auto refreshing
-            if (key === Object.keys(this.user.clients)[clientLength - 1]) {
-              this.loading = false;
-            }
-
-          },
-          (err) => {
-            this.userPoolError = true;
-            this.loading = false;
-            console.error('error fetching account pool: ', err);
+          if (res.poolsArray && res.poolsArray.length > 0) {
+            this.getAccountStaked(res.poolsArray, address);
+            this.getPoolData(res.poolsArray);
+          } else {
+            this.stakedPools = [];
+            this.poolDetailIndex = {};
           }
-        );
 
+          this.loading = false;
 
-      }
+        },
+        (err) => {
+          this.userPoolError = true;
+          this.loading = false;
+          console.error('error fetching account pool: ', err);
+        }
+      );
+
 
     }
 
