@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
+import Transaction from '@binance-chain/javascript-sdk/lib/tx';
 import { assetFromString, AssetChain } from '@thorchain/asgardex-util';
 import { BehaviorSubject, of, Subject, timer } from 'rxjs';
 import { catchError, switchMap, takeUntil } from 'rxjs/operators';
 import { TransactionDTO } from '../_classes/transaction';
+import { BinanceService } from './binance.service';
 import { BlockchairBtcTransactionDTO, BlockchairService } from './blockchair.service';
 import { MidgardService } from './midgard.service';
 import { UserService } from './user.service';
@@ -41,7 +43,12 @@ export class TransactionStatusService {
 
   killTxPolling: {[key: string]: Subject<void>} = {};
 
-  constructor(private blockchairService: BlockchairService, private userService: UserService, private midgardService: MidgardService) {
+  constructor(
+    private blockchairService: BlockchairService,
+    private userService: UserService,
+    private midgardService: MidgardService,
+    private binanceService: BinanceService
+  ) {
     this._txs = [];
   }
 
@@ -154,27 +161,21 @@ export class TransactionStatusService {
 
   pollBnbTx(tx: Tx) {
 
-    const refreshInterval$ = timer(0, 5000)
+    const refreshInterval$ = timer(5000, 15000)
     .pipe(
       // This kills the request if the user closes the component
       takeUntil(this.killTxPolling[tx.hash]),
       // switchMap cancels the last request, if no response have been received since last tick
-      switchMap(() => this.midgardService.getTransaction(tx.hash)),
+      // switchMap(() => this.midgardService.getTransaction(tx.hash)),
+      switchMap(() => this.binanceService.getTx(tx.hash)),
       // catchError handles http throws
       catchError(error => of(error))
-    ).subscribe( async (res: TransactionDTO) => {
+    ).subscribe( async (res) => {
 
-      if (res && res.txs && res.txs.length > 0) {
-
-        if (res.txs[0].status === 'Success') {
-          this.updateTxStatus(tx.hash, TxStatus.COMPLETE);
-          this.userService.fetchBalances();
-          this.killTxPolling[tx.hash].next();
-
-          // this.pendingTxs = this.pendingTxs.filter( (pending) => pending !== tx );
-
-        }
-
+      if (+res.code === 0) {
+        this.updateTxStatus(tx.hash, TxStatus.COMPLETE);
+        this.userService.fetchBalances();
+        this.killTxPolling[tx.hash].next();
       }
 
     });

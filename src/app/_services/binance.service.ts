@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Fee, Fees, TransferFee, DexFees, BinanceClient, Client as binanceClient, } from '@thorchain/asgardex-binance';
 import { Observable } from 'rxjs';
 import { TransferFees } from '../_classes/binance-fee';
 import { baseAmount } from '@thorchain/asgardex-token';
+import Transaction from '@binance-chain/javascript-sdk/lib/tx';
 
 @Injectable({
   providedIn: 'root'
@@ -94,6 +95,11 @@ export class BinanceService {
       }
       return acc;
     }, null);
+  }
+
+  getTx(hash: string) {
+    const params = new HttpParams().set('format', 'json');
+    return this.http.get(`${this._baseUrl}/tx/${hash}`, { params });
   }
 
 }
