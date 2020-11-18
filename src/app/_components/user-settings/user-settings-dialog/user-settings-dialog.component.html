@@ -14,8 +14,10 @@
 
         <div *ngIf="!loading">
 
+          <app-slippage-tolerance></app-slippage-tolerance>
+
           <div>
-            <button (click)="mode = 'PENDING_TXS'" class="pending-tx-btn flxr flxr--align-center">
+            <button (click)="mode = 'PENDING_TXS'" class="pending-tx-btn flxr flxr--align-center" style="padding-left: 0;">
               Transactions ({{pendingTxCount}} Pending)
               <mat-icon>keyboard_arrow_right</mat-icon>
             </button>

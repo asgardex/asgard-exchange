@@ -1,0 +1,32 @@
+
+
+button, #custom-tolerance {
+  color: white;
+  background-color: rgba(255, 255, 255, 0.02);
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.02);
+  margin-right: 8px;
+
+  &.active {
+    background-color: rgba(21, 163, 111, 0.44)
+  }
+}
+
+#custom-tolerance {
+  width: 70px;
+  background-color: transparent;
+  padding-right: 20px;
+
+  #custom-tolerance-input {
+    max-width: 100%;
+    color: white;
+    background-color: transparent;
+    border: none;
+    text-align: right;
+
+    &:focus {
+      outline: none;
+    }
+  }
+}
