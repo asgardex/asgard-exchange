@@ -12,6 +12,7 @@ import { BinanceService } from 'src/app/_services/binance.service';
 import { WalletConnectService } from 'src/app/_services/wallet-connect.service';
 import { assetAmount, assetToBase, baseAmount } from '@thorchain/asgardex-util';
 import { TransactionStatusService, TxActions, TxStatus } from 'src/app/_services/transaction-status.service';
+import { SlippageToleranceService } from 'src/app/_services/slippage-tolerance.service';
 
 
 export interface SwapData {
@@ -47,7 +48,8 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
     private walletConnectService: WalletConnectService,
     private txStatusService: TransactionStatusService,
     private binanceService: BinanceService,
-    private userService: UserService
+    private userService: UserService,
+    private slipLimitService: SlippageToleranceService,
   ) {
     this.txState = TransactionConfirmationState.PENDING_CONFIRMATION;
 
@@ -112,8 +114,14 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
     const targetAddress = (this.swapData.targetAsset.chain === 'BTC')
       ? bitcoinAddress
       : binanceAddress;
+    const floor = this.slipLimitService.getSlipLimitFromAmount(this.swapData.outputValue);
 
-    const memo = this.getSwapMemo(this.swapData.targetAsset.chain, this.swapData.targetAsset.symbol, targetAddress);
+    const memo = this.getSwapMemo(
+      this.swapData.targetAsset.chain,
+      this.swapData.targetAsset.symbol,
+      targetAddress,
+      Math.floor(floor.toNumber())
+    );
 
     if (this.swapData.sourceAsset.chain === 'BNB') {
 
@@ -192,7 +200,15 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
       toAddress: matchingPool.address,
       coins,
     });
-    const memo = this.getSwapMemo(this.swapData.targetAsset.chain, this.swapData.targetAsset.symbol, this.swapData.user.wallet);
+
+    const floor = this.slipLimitService.getSlipLimitFromAmount(this.swapData.outputValue);
+
+    const memo = this.getSwapMemo(
+      this.swapData.targetAsset.chain,
+      this.swapData.targetAsset.symbol,
+      this.swapData.user.wallet,
+      Math.floor(floor.toNumber())
+    );
 
     const bncClient = this.binanceService.bncClient;
 
@@ -240,7 +256,7 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
 
   }
 
-  getSwapMemo(chain: string, symbol: string, addr: string, sliplimit = '') {
+  getSwapMemo(chain: string, symbol: string, addr: string, sliplimit: number) {
     return `SWAP:${chain}.${symbol}:${addr}:${sliplimit}`;
   }
 

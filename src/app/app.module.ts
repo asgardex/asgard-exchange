@@ -48,6 +48,8 @@ import { ConfimSendComponent } from './_components/user-settings/user-settings-d
 import { TransactionProcessingModalModule } from './_components/transaction-processing-modal/transaction-processing-modal.module';
 import { ReconnectDialogComponent } from './_components/reconnect-dialog/reconnect-dialog.component';
 import { KeystoreService } from './_services/keystore.service';
+import { SlippageToleranceService } from './_services/slippage-tolerance.service';
+import { SlippageToleranceComponent } from './_components/slippage-tolerance/slippage-tolerance.component';
 
 
 @NgModule({
@@ -69,6 +71,7 @@ import { KeystoreService } from './_services/keystore.service';
     SendAssetComponent,
     ConfimSendComponent,
     ReconnectDialogComponent,
+    SlippageToleranceComponent,
   ],
   imports: [
     AssetInputModule,
@@ -97,6 +100,7 @@ import { KeystoreService } from './_services/keystore.service';
     LastBlockService,
     WalletConnectService,
     ExplorerPathsService,
+    SlippageToleranceService,
     TransactionStatusService
   ],
   bootstrap: [AppComponent]

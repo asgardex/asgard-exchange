@@ -1,0 +1,16 @@
+<div style="margin-bottom: 1rem;">
+  <span style="font-size: 0.8rem; color: #C7D0CB;">
+    Slippage Tolerance
+  </span>
+
+  <div style="margin-top: 8px;" class="flxr">
+    <button [class.active]="tolerance === 0.1 && !customTolerance" (click)="selectSlippage(0.1)">0.1%</button>
+    <button [class.active]="tolerance === 0.5 && !customTolerance" (click)="selectSlippage(0.5)">0.5%</button>
+    <button [class.active]="tolerance === 1.0 && !customTolerance" (click)="selectSlippage(1.0)">1.0%</button>
+
+    <div id="custom-tolerance" class="flxr" [class.active]="customTolerance">
+      <input id="custom-tolerance-input" [(ngModel)]="customTolerance" [placeholder]="tolerance" name="custom-tolerance" /> %
+    </div>
+  </div>
+
+</div>
