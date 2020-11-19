@@ -7,9 +7,15 @@
 <div class="modal-head" style="padding-top: 0">
 
   <div class="flxr flxr--flow-col flxr--just-center flxr--align-center">
-    <div style="width: 40px">
+    <div style="width: 40px; margin-bottom: 1rem;">
       <img *ngIf="asset && asset.asset && asset.asset.iconPath" class="asset-icon" [src]="asset && asset.asset && asset.asset.iconPath" style="max-width: 100%;" />
     </div>
+
+    <div *ngIf="address" style="text-align: center">
+      <qrcode [qrdata]="address" [width]="256" [errorCorrectionLevel]="'M'" [elementType]="'svg'"></qrcode>
+      <span style="font-size: 0.8rem">{{address}}</span>
+    </div>
+
     <span *ngIf="asset" class="asset-balance">{{asset.balance.amount().toNumber()}} {{asset.asset.ticker}}</span>
     <div style="height: 17px">
       <span class="usd-value" *ngIf="usdValue">≈ ${{usdValue | number:"0.0-2"}}</span>
@@ -24,10 +30,6 @@
       </button>
       Send
     </li>
-
-    <!-- <li class="action">
-      Receive
-    </li> -->
 
     <li class="action flxr flxr--flow-col flxr--align-center">
       <button mat-mini-fab color="primary" aria-label="Copy" (click)="copyToClipboard()">
