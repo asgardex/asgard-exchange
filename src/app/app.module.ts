@@ -50,6 +50,7 @@ import { ReconnectDialogComponent } from './_components/reconnect-dialog/reconne
 import { KeystoreService } from './_services/keystore.service';
 import { SlippageToleranceService } from './_services/slippage-tolerance.service';
 import { SlippageToleranceComponent } from './_components/slippage-tolerance/slippage-tolerance.component';
+import { TestnetWarningComponent } from './_components/testnet-warning/testnet-warning.component';
 
 
 @NgModule({
@@ -72,6 +73,7 @@ import { SlippageToleranceComponent } from './_components/slippage-tolerance/sli
     ConfimSendComponent,
     ReconnectDialogComponent,
     SlippageToleranceComponent,
+    TestnetWarningComponent,
   ],
   imports: [
     AssetInputModule,
