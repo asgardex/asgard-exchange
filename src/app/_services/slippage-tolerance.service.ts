@@ -8,18 +8,17 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class SlippageToleranceService {
 
-  private slippageToleranceSource = new BehaviorSubject<number>(0.5);
+  private slippageToleranceSource = new BehaviorSubject<number>(3);
   slippageTolerance$ = this.slippageToleranceSource.asObservable();
   private _slippageTolerance: number;
 
   constructor() {
-    this._slippageTolerance = 0.5;
+    this._slippageTolerance = 3;
   }
 
   setSlippageTolerance(percent: number) {
-    const tolerance = percent > 30 ? 30 : percent;
-    this._slippageTolerance = tolerance;
-    this.slippageToleranceSource.next(tolerance);
+    this._slippageTolerance = percent;
+    this.slippageToleranceSource.next(percent);
   }
 
   getSlipLimitFromAmount(amount: number): BigNumber {

@@ -14,7 +14,7 @@ export class SlippageToleranceComponent implements OnInit, OnDestroy {
 
   set customTolerance(num: number) {
     this._customTolerance = num;
-    const tolerance = (num) ? num : 0.5;
+    const tolerance = (num) ? num : 3;
     this.setSlippageTolerance(tolerance);
 
   }
@@ -27,7 +27,7 @@ export class SlippageToleranceComponent implements OnInit, OnDestroy {
     this.slippageTolerance$ = this.slippageToleranceService.slippageTolerance$.subscribe(
       (percent: number) => {
         this.tolerance = percent;
-        if (!this.customTolerance && percent !== 0.1 && percent !== 0.5 && percent !== 1.0) {
+        if (!this.customTolerance && percent !== 3 && percent !== 5 && percent !== 10) {
           this.customTolerance = percent;
         }
       }
