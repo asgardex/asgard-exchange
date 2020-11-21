@@ -16,13 +16,13 @@ export class KeystoreService {
     const phrase = await decryptFromKeystore(keystore, password);
     const network = environment.network === 'testnet' ? 'testnet' : 'mainnet';
     const blockchairUrl = (environment.network === 'testnet') ? 'https://api.blockchair.com/bitcoin/testnet' : 'https://api.blockchair.com/bitcoin';
-
     const userBinanceClient = new binanceClient({network, phrase});
     const userBtcClient = new bitcoinClient({network, phrase, nodeUrl: blockchairUrl, nodeApiKey: environment.blockchairKey});
+    const bnbAddress = await userBinanceClient.getAddress();
 
     return new User({
       type: 'keystore',
-      wallet: keystore.address,
+      wallet: bnbAddress,
       keystore,
       clients: {
         binance: userBinanceClient,

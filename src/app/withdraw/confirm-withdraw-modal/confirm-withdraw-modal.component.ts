@@ -121,7 +121,7 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
       this.txStatusService.pollTxOutputs(hash, 2, TxActions.WITHDRAW);
       // this.fetchOutputs(hash);
     } catch (error) {
-      console.error('error unstaking: ', error);
+      console.error('error withdrawing: ', error);
     }
 
     // }
@@ -133,7 +133,7 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
     //     const hash = await bitcoinClient.transfer({asset: this.data.asset, amount, recipient: matchingPool.address, memo});
     //     this.txSuccess(hash);
     //   } catch (error) {
-    //     console.error('error unstaking: ', error);
+    //     console.error('error withdrawing: ', error);
     //   }
 
     // } else {

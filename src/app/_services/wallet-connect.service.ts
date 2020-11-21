@@ -4,7 +4,7 @@ import { TransferResult } from '@thorchain/asgardex-binance';
 import QRCodeModal from '@walletconnect/qrcode-modal';
 import { User } from '../_classes/user';
 import { UserService } from './user.service';
-import base64js from 'base64-js';
+const base64js = require('base64-js');
 const bech32 = require('bech32');
 
 @Injectable({
