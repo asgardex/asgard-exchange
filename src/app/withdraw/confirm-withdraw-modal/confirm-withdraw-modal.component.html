@@ -91,7 +91,7 @@
 
   <app-transaction-processing-modal
     *ngIf="txState == 'SUBMITTING'"
-    transactionDetail="Unstaking {{data.assetAmount}} {{data.asset.ticker}} + {{data.runeAmount}} {{data.rune.ticker}}"
+    transactionDetail="Withdrawing {{data.assetAmount}} {{data.asset.ticker}} + {{data.runeAmount}} {{data.rune.ticker}}"
     (closeDialog)="closeDialog()">
   </app-transaction-processing-modal>
 
