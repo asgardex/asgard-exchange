@@ -234,6 +234,7 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
 
     if (this.pools && this.balances) {
 
+      // TODO: consolidate this is also used in pool.component
       this.selectableMarkets = this.balances.filter( (balance) => {
         const asset = balance.asset;
         return !this.pools.find((pool) => pool === `${asset.chain}.${asset.symbol}`)

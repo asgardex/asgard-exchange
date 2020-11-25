@@ -73,7 +73,6 @@ export class PoolComponent implements OnInit, OnDestroy {
         return !this.pools.find((pool) => pool === `${asset.chain}.${asset.symbol}`)
           && asset.symbol !== runeSymbol;
       }).map( (balance) => `${balance.asset.chain}.${balance.asset.symbol}` );
-      console.log('createable is: ', this.createablePools);
 
     }
 
