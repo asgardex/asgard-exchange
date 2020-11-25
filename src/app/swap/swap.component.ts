@@ -27,6 +27,7 @@ import { ConfirmSwapModalComponent } from './confirm-swap-modal/confirm-swap-mod
 import { User } from '../_classes/user';
 import { Balances } from '@xchainjs/xchain-client';
 import { CGCoinListItem, CoinGeckoService } from '../_services/coin-gecko.service';
+import { AssetAndBalance } from '../_classes/asset-and-balance';
 
 export enum SwapType {
   DOUBLE_SWAP = 'double_swap',
@@ -156,6 +157,8 @@ export class SwapComponent implements OnInit, OnDestroy {
   insufficientBnb: boolean;
   coinGeckoList: CGCoinListItem[];
 
+  selectableMarkets: AssetAndBalance[];
+
   constructor(
     private dialog: MatDialog,
     private userService: UserService,
@@ -202,6 +205,7 @@ export class SwapComponent implements OnInit, OnDestroy {
     this.getConstants();
     this.getBinanceFees();
     this.getCoinGeckoCoinList();
+    this.getPools();
   }
 
   mainButtonText(): string {
@@ -225,6 +229,25 @@ export class SwapComponent implements OnInit, OnDestroy {
       console.warn('error creating main button text');
     }
 
+  }
+
+  getPools() {
+    this.midgardService.getPools().subscribe(
+      (res) => {
+        const sortedByName = res.sort();
+        this.selectableMarkets = sortedByName.map((poolName) => ({
+          asset: new Asset(poolName),
+        }));
+
+        // Keeping RUNE at top by default
+        this.selectableMarkets.unshift({
+          asset: new Asset(
+            environment.network === 'chaosnet' ? 'BNB.RUNE-B1A' : 'BNB.RUNE-67C'
+          ),
+        });
+      },
+      (err) => console.error('error fetching pools:', err)
+    );
   }
 
   getCoinGeckoCoinList() {
