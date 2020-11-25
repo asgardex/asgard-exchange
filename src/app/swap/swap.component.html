@@ -13,7 +13,8 @@
       [(assetUnit)]="sourceAssetUnit"
       [balance]="sourceBalance"
       [disabledAssetSymbol]="selectedTargetAsset ? selectedTargetAsset.symbol : null"
-      [coinGeckoList]="coinGeckoList">
+      [coinGeckoList]="coinGeckoList"
+      [selectableMarkets]="selectableMarkets">
     </app-asset-input>
 
     <div class="flxr flxr--align-center flxr--just-center">
@@ -33,7 +34,8 @@
       [loading]="calculatingTargetAsset"
       [hideMax]="true"
       [error]="poolDetailTargetError || poolDetailSourceError"
-      [coinGeckoList]="coinGeckoList">
+      [coinGeckoList]="coinGeckoList"
+      [selectableMarkets]="selectableMarkets">
     </app-asset-input>
 
     <div *ngIf="basePrice && selectedTargetAsset && selectedSourceAsset" class="flxr flxr--just-space-between base-price">

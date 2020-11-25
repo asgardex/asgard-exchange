@@ -1,24 +1,22 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { assetAmount, assetToBase, baseAmount, getValueOfAssetInRune, getValueOfRuneInAsset, PoolData } from '@thorchain/asgardex-util';
 import { Subscription } from 'rxjs';
-import { environment } from 'src/environments/environment';
-import { Asset } from '../_classes/asset';
-import { MidgardService } from '../_services/midgard.service';
-import { UserService } from '../_services/user.service';
-import { MatDialog } from '@angular/material/dialog';
-import { ConfirmDepositModalComponent } from './confirm-deposit-modal/confirm-deposit-modal.component';
-import { User } from '../_classes/user';
-import { Balances } from '@xchainjs/xchain-client';
 import { CGCoinListItem, CoinGeckoService } from '../_services/coin-gecko.service';
+import { MidgardService } from '../_services/midgard.service';
+import { Asset } from '../_classes/asset';
+import { environment } from 'src/environments/environment';
+import { UserService } from '../_services/user.service';
+import { Balances } from '@xchainjs/xchain-client';
 import { AssetAndBalance } from '../_classes/asset-and-balance';
+import { ConfirmPoolCreateComponent } from './confirm-pool-create/confirm-pool-create.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
-  selector: 'app-deposit',
-  templateUrl: './deposit.component.html',
-  styleUrls: ['./deposit.component.scss']
+  selector: 'app-pool-create',
+  templateUrl: './pool-create.component.html',
+  styleUrls: ['./pool-create.component.scss']
 })
-export class DepositComponent implements OnInit, OnDestroy {
+export class PoolCreateComponent implements OnInit, OnDestroy {
 
   runeSymbol = environment.network === 'chaosnet' ? 'RUNE-B1A' : 'RUNE-67C';
 
@@ -76,28 +74,25 @@ export class DepositComponent implements OnInit, OnDestroy {
 
   }
   private _assetAmount: number;
-  assetPoolData: PoolData;
 
-  /**
-   * Balances
-   */
+  assetUsdValue: number;
+  runeUsdValue: number;
   balances: Balances;
-  runeBalance: number;
-  assetBalance: number;
-
-  user: User;
+  subs: Subscription[];
   coinGeckoList: CGCoinListItem[];
   insufficientBnb: boolean;
-  subs: Subscription[];
+  runeBalance: number;
+  assetBalance: number;
+  pools: string[];
   selectableMarkets: AssetAndBalance[];
 
   constructor(
     private dialog: MatDialog,
-    private userService: UserService,
-    private router: Router,
     private route: ActivatedRoute,
+    private router: Router,
     private midgardService: MidgardService,
-    private cgService: CoinGeckoService
+    private cgService: CoinGeckoService,
+    private userService: UserService,
   ) {
     this.rune = new Asset(`BNB.${this.runeSymbol}`);
 
@@ -105,96 +100,107 @@ export class DepositComponent implements OnInit, OnDestroy {
       (balances) => {
         this.balances = balances;
         this.runeBalance = this.userService.findBalance(this.balances, this.rune);
-        this.assetBalance = this.userService.findBalance(this.balances, this.asset);
+        if (this.asset) {
+          this.assetBalance = this.userService.findBalance(this.balances, this.asset);
+        }
 
         // allows us to ensure enough bnb balance
         const bnbBalance = this.userService.findBalance(this.balances, new Asset('BNB.BNB'));
         this.insufficientBnb = bnbBalance < 0.000375;
+        this.checkCreateableMarkets();
       }
     );
 
-    const user$ = this.userService.user$.subscribe(
-      (user) => this.user = user
-    );
-
-    this.subs = [balances$, user$];
+    this.subs = [balances$];
 
   }
 
   ngOnInit(): void {
 
-    const params$ = this.route.paramMap.subscribe( (params) => {
+    const params$ = this.route.queryParamMap.subscribe( (params) => {
 
-      const asset = params.get('asset');
+      const pool = params.get('pool');
 
-      if (asset) {
-        this.asset = new Asset(asset);
-        this.getPoolDetail(asset);
-        this.assetBalance = this.userService.findBalance(this.balances, this.asset);
+      if (pool) {
+        this.asset = new Asset(pool);
+        this.checkExisting(pool);
+        this.getUsdValue();
+        if (this.balances) {
+          this.assetBalance = this.userService.findBalance(this.balances, this.asset);
+        }
+      } else {
+        this.router.navigate(['/', 'pool']);
       }
 
     });
 
     this.getCoinGeckoCoinList();
-    this.getPools();
 
     this.subs.push(params$);
 
   }
 
+  checkExisting(currentPool: string) {
+    this.midgardService.getPools().subscribe(
+      (res) => {
+        this.pools = res;
+        if (res.includes(currentPool)) {
+          this.router.navigate(['/', 'deposit', currentPool]);
+        }
+        this.checkCreateableMarkets();
+      }
+    );
+  }
+
   getCoinGeckoCoinList() {
     this.cgService.getCoinList().subscribe( (res) => {
       this.coinGeckoList = res;
+      this.getUsdValue();
+      this.getRuneValue();
     });
   }
 
+  getUsdValue() {
+    if (this.asset?.ticker && this.coinGeckoList) {
+      const id = this.cgService.getCoinIdBySymbol(this.asset.ticker, this.coinGeckoList);
+      if (id) {
+        this.cgService.getCurrencyConversion(id).subscribe(
+          (res) => {
+            for (const [_key, value] of Object.entries(res)) {
+              this.assetUsdValue = value.usd;
+            }
+          }
+        );
+      }
+    }
+  }
+
+  getRuneValue() {
+    if (this.coinGeckoList) {
+      const id = this.cgService.getCoinIdBySymbol('RUNE', this.coinGeckoList);
+      if (id) {
+        this.cgService.getCurrencyConversion(id).subscribe(
+          (res) => {
+            console.log('rune val is: ', res);
+            for (const [_key, value] of Object.entries(res)) {
+              this.runeUsdValue = value.usd;
+            }
+          }
+        );
+      }
+    }
+  }
+
   updateRuneAmount() {
-
-    const runeAmount = getValueOfAssetInRune(assetToBase(assetAmount(this.assetAmount)), this.assetPoolData);
-
-    this.runeAmount = runeAmount.amount().div(10 ** 8 ).toNumber();
-
-  }
-
-  getPoolDetail(asset: string) {
-    this.midgardService.getPoolDetails([asset], 'simple').subscribe(
-      (res) => {
-
-        if (res && res.length > 0) {
-
-          this.assetPoolData = {
-            assetBalance: baseAmount(res[0].assetDepth),
-            runeBalance: baseAmount(res[0].runeDepth),
-          };
-
-        }
-      },
-      (err) => console.error('error getting pool detail: ', err)
-    );
-  }
-
-  getPools() {
-    this.midgardService.getPools().subscribe(
-      (res) => {
-        const sortedByName = res.sort();
-        this.selectableMarkets = sortedByName.map((poolName) => ({
-          asset: new Asset(poolName),
-        }));
-
-        // Keeping RUNE at top by default
-        // this.selectableMarkets.unshift({
-        //   asset: new Asset(
-        //     environment.network === 'chaosnet' ? 'BNB.RUNE-B1A' : 'BNB.RUNE-67C'
-        //   ),
-        // });
-      },
-      (err) => console.error('error fetching pools:', err)
-    );
+    if (this.assetUsdValue && this.runeUsdValue) {
+      const totalAssetValue = this.assetAmount * this.assetUsdValue;
+      this.runeAmount = totalAssetValue / this.runeUsdValue;
+    }
   }
 
   formDisabled(): boolean {
 
-    return !this.balances || !this.runeAmount || !this.assetAmount || this.insufficientBnb
+    return !this.balances || !this.runeAmount || !this.assetAmount || this.insufficientBnb || this.runeAmount < 1000
     || (this.balances
       && (this.runeAmount > this.runeBalance || this.assetAmount > this.userService.maximumSpendableBalance(this.asset, this.assetBalance))
     );
@@ -211,22 +217,39 @@ export class DepositComponent implements OnInit, OnDestroy {
       return 'Insufficient balance';
     } else if (this.insufficientBnb) {
       return 'Insufficient BNB for Fee';
+    } else if (this.runeAmount < 1000) {
+      return 'Not enough RUNE to create pool';
     } else if (this.balances && this.runeAmount && this.assetAmount
       && (this.runeAmount <= this.runeBalance) && (this.assetAmount <= this.assetBalance)) {
-      return 'Deposit';
+      return 'Create Pool';
     } else {
       console.warn('mismatch case for main button text');
       return;
     }
   }
 
+  checkCreateableMarkets() {
+
+    const runeSymbol = environment.network === 'chaosnet' ? 'RUNE-B1A' : 'RUNE-67C';
+
+    if (this.pools && this.balances) {
+
+      this.selectableMarkets = this.balances.filter( (balance) => {
+        const asset = balance.asset;
+        return !this.pools.find((pool) => pool === `${asset.chain}.${asset.symbol}`)
+          && asset.symbol !== runeSymbol;
+      }).map( (balance) => {
+        return {asset: new Asset(`${balance.asset.chain}.${balance.asset.symbol}`)};
+      });
+
+    }
+
+  }
+
   openConfirmationDialog() {
 
-    const runeBasePrice = getValueOfAssetInRune(assetToBase(assetAmount(1)), this.assetPoolData).amount().div(10 ** 8).toNumber();
-    const assetBasePrice = getValueOfRuneInAsset(assetToBase(assetAmount(1)), this.assetPoolData).amount().div(10 ** 8).toNumber();
-
     const dialogRef = this.dialog.open(
-      ConfirmDepositModalComponent,
+      ConfirmPoolCreateComponent,
       {
         width: '50vw',
         maxWidth: '420px',
@@ -236,9 +259,6 @@ export class DepositComponent implements OnInit, OnDestroy {
           rune: this.rune,
           assetAmount: this.assetAmount,
           runeAmount: this.runeAmount,
-          user: this.user,
-          runeBasePrice,
-          assetBasePrice
         }
       }
     );

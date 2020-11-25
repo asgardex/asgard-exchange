@@ -17,6 +17,10 @@ const routes: Routes = [
     loadChildren: () => import('./pool/pool.module').then(m => m.PoolModule),
   },
   {
+    path: 'create-pool',
+    loadChildren: () => import('./pool-create/pool-create.module').then(m => m.PoolCreateModule),
+  },
+  {
     path: 'deposit',
     loadChildren: () => import('./deposit/deposit.module').then(m => m.DepositModule),
   },

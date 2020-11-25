@@ -4,6 +4,7 @@ import { MarketsModalComponent } from '../markets-modal/markets-modal.component'
 import { MatDialog } from '@angular/material/dialog';
 import { UserService } from 'src/app/_services/user.service';
 import { CGCoinListItem, CoinGeckoService } from 'src/app/_services/coin-gecko.service';
+import { AssetAndBalance } from 'src/app/_classes/asset-and-balance';
 
 @Component({
   selector: 'app-asset-input',
@@ -63,6 +64,8 @@ export class AssetInputComponent implements OnInit {
   }
   _coinGeckoList: CGCoinListItem[];
 
+  @Input() selectableMarkets: AssetAndBalance[];
+
   usdValue: number;
 
   constructor(private dialog: MatDialog, private userService: UserService, private cgService: CoinGeckoService) {
@@ -112,7 +115,8 @@ export class AssetInputComponent implements OnInit {
         maxWidth: '420px',
         width: '50vw',
         data: {
-          disabledAssetSymbol: this.disabledAssetSymbol
+          disabledAssetSymbol: this.disabledAssetSymbol,
+          selectableMarkets: this.selectableMarkets
         }
       }
     );

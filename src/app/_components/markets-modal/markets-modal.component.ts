@@ -1,11 +1,9 @@
 import { Component, OnInit, OnDestroy, Inject } from '@angular/core';
 import { Market } from 'src/app/_classes/market';
-import { MidgardService } from 'src/app/_services/midgard.service';
 import { UserService } from 'src/app/_services/user.service';
 import { Asset } from '../../_classes/asset';
 import { Subscription } from 'rxjs';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { environment } from 'src/environments/environment';
 import { User } from 'src/app/_classes/user';
 import { Balance, Balances } from '@xchainjs/xchain-client';
 import { baseToAsset } from '@thorchain/asgardex-util';
@@ -45,10 +43,11 @@ export class MarketsModalComponent implements OnInit, OnDestroy {
 
   constructor(
     private userService: UserService,
-    private midgardService: MidgardService,
-    @Inject(MAT_DIALOG_DATA) public data: { disabledAssetSymbol: string },
+    @Inject(MAT_DIALOG_DATA) public data: { disabledAssetSymbol: string, selectableMarkets: AssetAndBalance[] },
     public dialogRef: MatDialogRef<MarketsModalComponent>
   ) {
+
+    this.marketListItems = this.data.selectableMarkets;
 
     const user$ = this.userService.user$.subscribe(
       (user) => {
@@ -67,21 +66,17 @@ export class MarketsModalComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.getPools();
+    this.initList();
   }
 
   sortMarketsByUserBalance(): void {
     // Sort first by user balances
-    if (this.userBalances) {
-
-      console.log('user balances is: ', this.userBalances);
+    if (this.userBalances && this.marketListItems) {
 
       const balMap: {[key: string]: Balance} = {};
       this.userBalances.forEach((item) => {
         balMap[`${item.asset.chain}.${item.asset.symbol}`] = item;
       });
-
-      console.log('balMap is: ', balMap);
 
       this.marketListItems = this.marketListItems.map((mItem) => {
 
@@ -111,47 +106,19 @@ export class MarketsModalComponent implements OnInit, OnDestroy {
     }
   }
 
-  getPools() {
-    this.loading = true;
-    this.midgardService.getPools().subscribe(
-      async (res) => {
-        const sortedByName = res.sort();
 
-        this.marketListItems = sortedByName.map((poolName) => ({
-          asset: new Asset(poolName),
-        }));
+  initList() {
 
-        // Keeping RUNE at top by default
-        this.marketListItems.unshift({
-          asset: new Asset(
-            environment.network === 'chaosnet' ? 'BNB.RUNE-B1A' : 'BNB.RUNE-67C'
-          ),
-        });
-        this.filteredMarketListItems = this.marketListItems;
+    this.filteredMarketListItems = this.marketListItems;
 
-        if (this.user && this.user.clients) {
+    if (this.user && this.user.clients) {
+      this.userService.fetchBalances();
+    } else {
+      this.userBalances = [];
+    }
 
-          // let balances: Balances = [];
+    this.sortMarketsByUserBalance();
 
-          // // for (const [key, _value] of Object.entries(this.user.clients)) {
-          // //   const client = this.user.clients[key];
-          // //   const clientBalances = await client.getBalance();
-          // //   balances = [...balances, ...clientBalances];
-          // // }
-
-          // this.userBalances = balances;
-          this.userService.fetchBalances();
-
-        } else {
-          this.userBalances = [];
-        }
-
-        this.sortMarketsByUserBalance();
-        this.loading = false;
-
-      },
-      (err) => console.error('error fetching pools: ', err)
-    );
   }
 
   ngOnDestroy() {

@@ -11,6 +11,14 @@
       <a [routerLink]="['/', 'deposit', 'BTC.BTC']" class="main-action-btn" mat-flat-button color="primary">
         Add Liquidity
       </a>
+      <a
+        *ngIf="createablePools && createablePools.length > 0"
+        [routerLink]="['/', 'create-pool']"
+        [queryParams]="{pool: createablePools[0]}"
+        style="float: right; text-decoration: none; color: white; font-size: 0.8rem; margin-top: 8px;"
+      >
+        Create Pool
+      </a>
     </div>
 
     <div class="section-label flxr flxr--align-center flxr--just-space-between">

@@ -1,10 +1,12 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Balances } from '@xchainjs/xchain-client';
 import { Subscription } from 'rxjs';
 import { PoolDetail } from '../_classes/pool-detail';
 import { StakerPoolData } from '../_classes/staker-pool-data';
 import { User } from '../_classes/user';
 import { MidgardService } from '../_services/midgard.service';
 import { UserService } from '../_services/user.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-pool',
@@ -22,19 +24,28 @@ export class PoolComponent implements OnInit, OnDestroy {
   userPoolError: boolean;
   subs: Subscription[];
   loading: boolean;
+  balances: Balances;
+  createablePools: string[];
 
   constructor(private userService: UserService, private midgardService: MidgardService) {
 
     this.subs = [];
 
     const user$ = this.userService.user$.subscribe(
-      async (user) => {
+      (user) => {
         this.user = user;
         this.getAccountPools();
       }
     );
 
-    this.subs.push(user$);
+    const balances$ = this.userService.userBalances$.subscribe(
+      (balances) => {
+        this.balances = balances;
+        this.checkCreateableMarkets();
+      }
+    );
+
+    this.subs.push(user$, balances$);
 
   }
 
@@ -46,8 +57,26 @@ export class PoolComponent implements OnInit, OnDestroy {
     this.midgardService.getPools().subscribe(
       (res) => {
         this.pools = res;
+        this.checkCreateableMarkets();
       }
     );
+  }
+
+  checkCreateableMarkets() {
+
+    const runeSymbol = environment.network === 'chaosnet' ? 'RUNE-B1A' : 'RUNE-67C';
+
+    if (this.pools && this.balances) {
+
+      this.createablePools = this.balances.filter( (balance) => {
+        const asset = balance.asset;
+        return !this.pools.find((pool) => pool === `${asset.chain}.${asset.symbol}`)
+          && asset.symbol !== runeSymbol;
+      }).map( (balance) => `${balance.asset.chain}.${balance.asset.symbol}` );
+      console.log('createable is: ', this.createablePools);
+
+    }
+
   }
 
   async getAccountPools() {
