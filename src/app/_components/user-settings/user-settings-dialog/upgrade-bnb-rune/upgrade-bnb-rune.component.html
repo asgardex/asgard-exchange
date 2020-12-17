@@ -1,0 +1,42 @@
+<div style="padding: 1rem 1rem 0; margin-bottom: 0;" class="section-head-container">
+  <button (click)="back.next()" mat-icon-button>
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+  <h1 *ngIf="asset && asset.asset && asset.asset.ticker" class="flxr">
+    Upgrade to Native RUNE
+  </h1>
+  <div style="width: 40px"></div>
+</div>
+
+<div mat-dialog-content *ngIf="asset">
+
+  <div style="padding: 1rem">
+    <app-asset-input
+      label="Input"
+      [(selectedAsset)]="asset.asset"
+      [(assetUnit)]="amount"
+      [balance]="asset.balance.amount().toNumber()"
+      [disabledAssetSymbol]="asset.asset.symbol"
+      [disabledMarketSelect]="true">
+    </app-asset-input>
+
+    <small>
+      This RUNE is currently a BNB token. <br />
+      You can upgrade it to Native RUNE, which will show up in your RUNE wallet in user settings.
+    </small>
+
+    <div class="flxr flxr--just-end flxr--align-center" style="height: 38px; margin-top: 1rem;">
+      <div>
+        <button
+          mat-flat-button
+          color="accent"
+          [disabled]="!amountSpendable"
+          (click)="confirmUpgrade.next({amount: amount})">
+            <span>Next</span>
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+</div>

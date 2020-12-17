@@ -143,8 +143,9 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
   checkExisting(currentPool: string) {
     this.midgardService.getPools().subscribe(
       (res) => {
-        this.pools = res;
-        if (res.includes(currentPool)) {
+        const poolNames = res.map( (pool) => pool.asset );
+        this.pools = poolNames;
+        if (this.pools.includes(currentPool)) {
           this.router.navigate(['/', 'deposit', currentPool]);
         }
         this.checkCreateableMarkets();

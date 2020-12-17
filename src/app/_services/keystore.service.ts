@@ -4,6 +4,7 @@ import { decryptFromKeystore } from '@xchainjs/xchain-crypto';
 import { User } from '../_classes/user';
 import { Client as binanceClient, } from '@xchainjs/xchain-binance';
 import { Client as bitcoinClient, } from '@xchainjs/xchain-bitcoin';
+import { Client as thorchainClient, } from '@xchainjs/xchain-thorchain';
 
 @Injectable({
   providedIn: 'root'
@@ -18,15 +19,17 @@ export class KeystoreService {
     const blockchairUrl = (environment.network === 'testnet') ? 'https://api.blockchair.com/bitcoin/testnet' : 'https://api.blockchair.com/bitcoin';
     const userBinanceClient = new binanceClient({network, phrase});
     const userBtcClient = new bitcoinClient({network, phrase, nodeUrl: blockchairUrl, nodeApiKey: environment.blockchairKey});
-    const bnbAddress = await userBinanceClient.getAddress();
+    const userThorchainClient = new thorchainClient({network, phrase});
+    const thorAddress = await userThorchainClient.getAddress();
 
     return new User({
       type: 'keystore',
-      wallet: bnbAddress,
+      wallet: thorAddress,
       keystore,
       clients: {
         binance: userBinanceClient,
-        bitcoin: userBtcClient
+        bitcoin: userBtcClient,
+        thorchain: userThorchainClient
       }
     });
   }

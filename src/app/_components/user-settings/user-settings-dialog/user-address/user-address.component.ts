@@ -46,7 +46,11 @@ export class UserAddressComponent implements OnInit {
           this.balances = balances.filter( (balance) => balance.asset.chain === this.chain );
           this.assets = this.balances.reduce( (list, balance) => {
 
+            console.log('balance is: ', balance);
+            console.log('list is: ', list);
+
             const asset = new Asset(`${balance.asset.chain}.${balance.asset.symbol}`);
+            console.log('asset is: ', asset);
             const assetBalance = {
               asset,
               balance: baseToAsset(balance.amount)

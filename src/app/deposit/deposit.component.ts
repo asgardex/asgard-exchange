@@ -157,16 +157,28 @@ export class DepositComponent implements OnInit, OnDestroy {
   }
 
   getPoolDetail(asset: string) {
-    this.midgardService.getPoolDetails([asset], 'simple').subscribe(
+    // this.midgardService.getPoolDetails([asset], 'simple').subscribe(
+    //   (res) => {
+
+    //     if (res && res.length > 0) {
+
+    //       this.assetPoolData = {
+    //         assetBalance: baseAmount(res[0].assetDepth),
+    //         runeBalance: baseAmount(res[0].runeDepth),
+    //       };
+
+    //     }
+    //   },
+    //   (err) => console.error('error getting pool detail: ', err)
+    // );
+
+    this.midgardService.getPool(asset).subscribe(
       (res) => {
-
-        if (res && res.length > 0) {
-
+        if (res) {
           this.assetPoolData = {
-            assetBalance: baseAmount(res[0].assetDepth),
-            runeBalance: baseAmount(res[0].runeDepth),
+            assetBalance: baseAmount(res.assetDepth),
+            runeBalance: baseAmount(res.runeDepth),
           };
-
         }
       },
       (err) => console.error('error getting pool detail: ', err)
@@ -176,7 +188,8 @@ export class DepositComponent implements OnInit, OnDestroy {
   getPools() {
     this.midgardService.getPools().subscribe(
       (res) => {
-        const sortedByName = res.sort();
+        const poolNames = res.map( (pool) => pool.asset );
+        const sortedByName = poolNames.sort();
         this.selectableMarkets = sortedByName.map((poolName) => ({
           asset: new Asset(poolName),
         }));

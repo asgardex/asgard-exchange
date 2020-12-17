@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Asset } from '../_classes/asset';
 import { UserService } from '../_services/user.service';
 import { Subscription } from 'rxjs';
-import { environment } from 'src/environments/environment';
+// import { environment } from 'src/environments/environment';
 import {
   bn,
   getSwapOutputWithFee,
@@ -28,6 +28,7 @@ import { User } from '../_classes/user';
 import { Balances } from '@xchainjs/xchain-client';
 import { CGCoinListItem, CoinGeckoService } from '../_services/coin-gecko.service';
 import { AssetAndBalance } from '../_classes/asset-and-balance';
+import { PoolDTO } from '../_classes/pool';
 
 export enum SwapType {
   DOUBLE_SWAP = 'double_swap',
@@ -41,7 +42,7 @@ export enum SwapType {
 })
 export class SwapComponent implements OnInit, OnDestroy {
 
-  runeSymbol = environment.network === 'chaosnet' ? 'RUNE-B1A' : 'RUNE-67C';
+  // runeSymbol = environment.network === 'chaosnet' ? 'RUNE-B1A' : 'RUNE-67C';
 
   /**
    * From
@@ -77,9 +78,9 @@ export class SwapComponent implements OnInit, OnDestroy {
 
     this._selectedSourceAsset = asset;
 
-    if (this._selectedSourceAsset && this._selectedSourceAsset.symbol !== this.runeSymbol) {
+    if (!this.isRune(this._selectedSourceAsset)) {
       this.getPoolDetails(this._selectedSourceAsset.chain, this._selectedSourceAsset.symbol, 'source');
-    } else if (this._selectedSourceAsset && this._selectedSourceAsset.symbol === this.runeSymbol) {
+    } else if (this._selectedSourceAsset && this.isRune(this._selectedSourceAsset)) {
       this.updateSwapDetails();
     }
 
@@ -121,9 +122,10 @@ export class SwapComponent implements OnInit, OnDestroy {
     this.targetAssetUnit = null;
     this.calculatingTargetAsset = true;
 
-    if (this._selectedTargetAsset && this._selectedTargetAsset.symbol !== this.runeSymbol) {
+    // if (this._selectedTargetAsset && this._selectedTargetAsset.symbol !== this.runeSymbol) {
+    if (this._selectedTargetAsset && !this.isRune(this._selectedTargetAsset)) {
       this.getPoolDetails(this._selectedTargetAsset.chain, this._selectedTargetAsset.symbol, 'target');
-    } else if (this._selectedTargetAsset && this._selectedTargetAsset.symbol === this.runeSymbol) {
+    } else if (this._selectedTargetAsset && this.isRune(this._selectedTargetAsset)) {
       this.updateSwapDetails();
     }
 
@@ -134,7 +136,7 @@ export class SwapComponent implements OnInit, OnDestroy {
   targetPoolDetail: PoolDetail;
 
   poolDetailMap: {
-    [key: string]: PoolDetail
+    [key: string]: PoolDTO
   } = {};
   subs: Subscription[];
 
@@ -166,8 +168,7 @@ export class SwapComponent implements OnInit, OnDestroy {
     private binanceService: BinanceService,
     private cgService: CoinGeckoService) {
 
-    this.selectedSourceAsset = new Asset(`BNB.${this.runeSymbol}`);
-
+    this.selectedSourceAsset = new Asset('THOR.RUNE');
 
     const balances$ = this.userService.userBalances$.subscribe(
       (balances) => {
@@ -178,13 +179,13 @@ export class SwapComponent implements OnInit, OnDestroy {
         const bnbBalance = this.userService.findBalance(this.balances, new Asset('BNB.BNB'));
         this.insufficientBnb = bnbBalance < 0.000375;
 
-        if (this.selectedTargetAsset && this.selectedTargetAsset.symbol !== this.runeSymbol) {
+        // if (this.selectedTargetAsset && this.selectedTargetAsset.symbol !== this.runeSymbol) {
+        if (this.selectedTargetAsset && !this.isRune(this.selectedTargetAsset)) {
           this.getPoolDetails(this.selectedTargetAsset.chain, this.selectedTargetAsset.symbol, 'target');
         }
 
-        if (this.selectedSourceAsset && this.selectedSourceAsset.symbol !== this.runeSymbol) {
-          console.log('SOURCE IS: ', this.selectedSourceAsset);
-
+        // if (this.selectedSourceAsset && this.selectedSourceAsset.symbol !== this.runeSymbol) {
+        if (this.selectedSourceAsset && !this.isRune(this.selectedSourceAsset)) {
           this.getPoolDetails(this.selectedSourceAsset.chain, this.selectedSourceAsset.symbol, 'source');
         }
 
@@ -206,6 +207,10 @@ export class SwapComponent implements OnInit, OnDestroy {
     this.getBinanceFees();
     this.getCoinGeckoCoinList();
     this.getPools();
+  }
+
+  isRune(asset: Asset): boolean {
+    return asset && asset.ticker === 'RUNE'; // covers BNB and native
   }
 
   mainButtonText(): string {
@@ -234,16 +239,23 @@ export class SwapComponent implements OnInit, OnDestroy {
   getPools() {
     this.midgardService.getPools().subscribe(
       (res) => {
-        const sortedByName = res.sort();
+
+        console.log('POOLS are: ', res);
+
+        const poolNames = res.map( (pool) => pool.asset );
+        const sortedByName = poolNames.sort();
         this.selectableMarkets = sortedByName.map((poolName) => ({
           asset: new Asset(poolName),
         }));
 
         // Keeping RUNE at top by default
+        // this.selectableMarkets.unshift({
+        //   asset: new Asset(
+        //     environment.network === 'chaosnet' ? 'BNB.RUNE-B1A' : 'BNB.RUNE-67C'
+        //   ),
+        // });
         this.selectableMarkets.unshift({
-          asset: new Asset(
-            environment.network === 'chaosnet' ? 'BNB.RUNE-B1A' : 'BNB.RUNE-67C'
-          ),
+          asset: new Asset('THOR.RUNE'),
         });
       },
       (err) => console.error('error fetching pools:', err)
@@ -303,14 +315,28 @@ export class SwapComponent implements OnInit, OnDestroy {
     this.poolDetailTargetError = (type === 'target') ? false : this.poolDetailTargetError;
     this.poolDetailSourceError = (type === 'source') ? false : this.poolDetailSourceError;
 
-    this.midgardService.getPoolDetails([`${chain}.${symbol}`], 'simple').subscribe(
-      (res) => {
+    // this.midgardService.getPoolDetails([`${chain}.${symbol}`], 'simple').subscribe(
+    //   (res) => {
 
-        if (res && res.length > 0) {
-          this.poolDetailMap[`${chain}.${symbol}`] = res[0];
+    //     if (res && res.length > 0) {
+    //       this.poolDetailMap[`${chain}.${symbol}`] = res[0];
+    //       this.updateSwapDetails();
+    //     }
+
+    //   },
+    //   (err) => {
+    //     console.error('error fetching pool details: ', err);
+    //     this.poolDetailTargetError = (type === 'target') ? true : this.poolDetailTargetError;
+    //     this.poolDetailSourceError = (type === 'source') ? true : this.poolDetailSourceError;
+    //   }
+    // );
+
+    this.midgardService.getPool(`${chain}.${symbol}`).subscribe(
+      (res) => {
+        if (res) {
+          this.poolDetailMap[`${chain}.${symbol}`] = res;
           this.updateSwapDetails();
         }
-
       },
       (err) => {
         console.error('error fetching pool details: ', err);
@@ -318,6 +344,7 @@ export class SwapComponent implements OnInit, OnDestroy {
         this.poolDetailSourceError = (type === 'source') ? true : this.poolDetailSourceError;
       }
     );
+
   }
 
   getConstants() {
@@ -352,7 +379,8 @@ export class SwapComponent implements OnInit, OnDestroy {
 
     if (this._sourceAssetTokenValue) {
 
-      const swapType = this.selectedSourceAsset.symbol === this.runeSymbol || this.selectedTargetAsset.symbol === this.runeSymbol
+      // const swapType = this.selectedSourceAsset.symbol === this.runeSymbol || this.selectedTargetAsset.symbol === this.runeSymbol
+      const swapType = this.isRune(this.selectedSourceAsset) || this.isRune(this.selectedTargetAsset)
         ? SwapType.SINGLE_SWAP
         : SwapType.DOUBLE_SWAP;
 
@@ -405,7 +433,7 @@ export class SwapComponent implements OnInit, OnDestroy {
    */
   calculateSingleSwap() {
 
-    const toRune = this.selectedTargetAsset.symbol === this.runeSymbol
+    const toRune = this.isRune(this.selectedTargetAsset)
       ? true
       : false;
 

@@ -13,7 +13,7 @@
 
       <span>Amount</span>
 
-      <span class="unstake-percent">{{unstakePercent}}%</span>
+      <span class="unstake-percent">{{withdrawPercent}}%</span>
 
       <mat-slider
         class="slider"
@@ -22,7 +22,7 @@
         [min]="0"
         step="1"
         [tickInterval]="25"
-        [(ngModel)]="unstakePercent">
+        [(ngModel)]="withdrawPercent">
       </mat-slider>
 
     </div>

@@ -14,12 +14,14 @@ export class UserAssetComponent implements OnInit {
   @Input() address: string;
   @Output() back: EventEmitter<null>;
   @Output() send: EventEmitter<null>;
+  @Output() upgradeRune: EventEmitter<null>;
 
   usdValue: number;
 
   constructor(private cgService: CoinGeckoService, private copyService: CopyService) {
     this.back = new EventEmitter<null>();
     this.send = new EventEmitter<null>();
+    this.upgradeRune = new EventEmitter<null>();
   }
 
   ngOnInit(): void {
@@ -32,7 +34,6 @@ export class UserAssetComponent implements OnInit {
 
     if (this.asset && this.asset.asset) {
       this.cgService.getCoinList().subscribe( (res) => {
-        console.log('symbol is: ', this.asset.asset.ticker);
         const id = this.cgService.getCoinIdBySymbol(this.asset.asset.ticker, res);
         this.getUsdPrice(id);
       });

@@ -32,6 +32,17 @@
             </div>
           </div> -->
 
+          <div *ngIf="thorAddress" class="uni-input user-address" (click)="selectAddress(thorAddress, 'THOR')">
+            <label>RUNE Address</label>
+
+            <div class="flxr flxr--align-center" style="width: 100%">
+              <div class="asset-icon-container">
+                <img class="asset-icon" src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/RUNE-B1A/logo.png" />
+              </div>
+              <input [value]="thorAddress" name="rune-address" [disabled]="true" />
+            </div>
+          </div>
+
           <div *ngIf="bitcoinAddress" class="uni-input user-address" (click)="selectAddress(bitcoinAddress, 'BTC')">
             <label>Bitcoin Address</label>
 
@@ -89,7 +100,8 @@
   [asset]="selectedAsset"
   [address]="selectedAddress"
   (back)="clearSelectedAsset()"
-  (send)="mode = 'SEND'">
+  (send)="mode = 'SEND'"
+  (upgradeRune)="mode = 'UPGRADE_RUNE'">
 </app-user-asset>
 
 <app-send-asset
@@ -107,3 +119,17 @@
   (back)="mode = 'SEND'"
   (transactionSuccessful)="transactionSuccessful()">
 </app-confim-send>
+
+<app-upgrade-bnb-rune
+  *ngIf="mode === 'UPGRADE_RUNE'"
+  [asset]="selectedAsset"
+  (confirmUpgrade)="confirmUpgradeRune($event)">
+</app-upgrade-bnb-rune>
+
+<app-upgrade-bnb-rune-confirm
+  *ngIf="mode === 'CONFIRM_UPGRADE_RUNE'"
+  [asset]="selectedAsset"
+  [amount]="amountToSend"
+  (back)="mode = 'UPGRADE_RUNE'"
+  (transactionSuccessful)="transactionSuccessful()">
+</app-upgrade-bnb-rune-confirm>

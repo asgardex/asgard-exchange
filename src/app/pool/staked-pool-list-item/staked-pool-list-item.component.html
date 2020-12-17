@@ -1,9 +1,9 @@
 
-<div *ngIf="stakeData" class="pool-list-item">
+<div *ngIf="memberPoolData && asset" class="pool-list-item">
 
   <div class="flxr flxr--just-space-between flxr--align-center">
 
-    <app-icon-ticker [iconPath]="stakeData.asset.iconPath" [ticker]="stakeData.asset.ticker"></app-icon-ticker>
+    <app-icon-ticker [iconPath]="asset.iconPath" [ticker]="asset.ticker"></app-icon-ticker>
 
     <button (click)="toggleExpanded()" style="color: white" mat-icon-button>
       <mat-icon>expand_more</mat-icon>
@@ -17,7 +17,7 @@
       <span>{{pooledRune | number:"0.0-6"}}</span>
     </div>
     <div *ngIf="pooledAsset" class="flxr flxr--just-space-between pool-detail-row">
-      <span>Pooled {{stakeData.asset.ticker}}</span>
+      <span>Pooled {{asset.ticker}}</span>
       <span>{{pooledAsset | number:"0.0-6"}}</span>
     </div>
     <div *ngIf="poolShare" class="flxr flxr--just-space-between pool-detail-row">
@@ -27,8 +27,8 @@
 
 
     <div class="flxr flxr--just-space-between">
-      <a mat-flat-button style="width: 50%; margin-right: 5px" color="primary" [routerLink]="['/', 'deposit', stakeData.asset.chain + '.' + stakeData.asset.symbol]">Deposit</a>
-      <a mat-flat-button style="width: 50%; margin-left: 5px" color="primary" [routerLink]="['/', 'withdraw', stakeData.asset.chain + '.' +  stakeData.asset.symbol]">Withdraw</a>
+      <a mat-flat-button style="width: 50%; margin-right: 5px" color="primary" [routerLink]="['/', 'deposit', asset.chain + '.' + asset.symbol]">Deposit</a>
+      <a mat-flat-button style="width: 50%; margin-left: 5px" color="primary" [routerLink]="['/', 'withdraw', asset.chain + '.' +  asset.symbol]">Withdraw</a>
     </div>
   </div>
 

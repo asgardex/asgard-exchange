@@ -1,3 +1,6 @@
+/**
+ * Deprecating in favor of member.ts
+ */
 export class Staker {
   poolsArray: string[];
   totalEarned: number;

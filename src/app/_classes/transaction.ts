@@ -13,6 +13,11 @@ export interface TransactionDetail {
   memo: string;
   address: string;
   coins: AssetAmount[];
+  options: {
+    priceTarget: string;
+    withdrawBasisPoints: string;
+    asymmetry: string;
+  };
 }
 
 export class Transaction {
@@ -23,12 +28,6 @@ export class Transaction {
   in: TransactionDetail;
   out: TransactionDetail[];
   date: number;
-  gas: AssetAmount;
-  options: {
-    priceTarget: string;
-    withdrawBasisPoints: string;
-    asymmetry: string;
-  };
   height: string;
   events: {
     fee: string;

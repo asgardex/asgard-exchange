@@ -54,6 +54,8 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 /** EXTERNAL */
 import { QRCodeModule } from 'angularx-qrcode';
+import { UpgradeBnbRuneComponent } from './_components/user-settings/user-settings-dialog/upgrade-bnb-rune/upgrade-bnb-rune.component';
+import { UpgradeBnbRuneConfirmComponent } from './_components/user-settings/user-settings-dialog/upgrade-bnb-rune-confirm/upgrade-bnb-rune-confirm.component';
 
 
 @NgModule({
@@ -77,6 +79,8 @@ import { QRCodeModule } from 'angularx-qrcode';
     ReconnectDialogComponent,
     SlippageToleranceComponent,
     TestnetWarningComponent,
+    UpgradeBnbRuneComponent,
+    UpgradeBnbRuneConfirmComponent,
   ],
   imports: [
     AssetInputModule,

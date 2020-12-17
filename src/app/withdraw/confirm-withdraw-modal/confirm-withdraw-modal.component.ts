@@ -65,7 +65,7 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
   submitTransaction(): void {
     this.txState = TransactionConfirmationState.SUBMITTING;
 
-    this.midgardService.getProxiedPoolAddresses().subscribe(
+    this.midgardService.getInboundAddresses().subscribe(
       async (res) => {
 
         const currentPools = res.current;

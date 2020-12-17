@@ -1,7 +1,7 @@
-<div *ngIf="!stakedPools || (stakedPools && stakedPools.length < 1)" class="disabled-list">
+<div *ngIf="!memberPools || (memberPools && memberPools.length < 1)" class="disabled-list">
   No deposited pools found
 </div>
 
-<div style="clear: both;" class="flxr flxr--flow-col" *ngIf="stakedPools && stakedPools.length > 0 && poolsData">
-  <app-staked-pool-list-item *ngFor="let stakeData of stakedPools" [stakeData]="stakeData" [poolData]="poolsData[stakeData.asset.chain + '.' + stakeData.asset.symbol]"></app-staked-pool-list-item>
+<div style="clear: both;" class="flxr flxr--flow-col" *ngIf="mappedPools && mappedPools.length > 0">
+  <app-staked-pool-list-item *ngFor="let pool of mappedPools" [memberPoolData]="pool.memberData" [poolData]="pool.poolData"></app-staked-pool-list-item>
 </div>
