@@ -1,8 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { MemberPool } from 'src/app/_classes/member';
 import { PoolDTO } from 'src/app/_classes/pool';
-import { PoolDetail } from 'src/app/_classes/pool-detail';
-import { StakerPoolData } from 'src/app/_classes/staker-pool-data';
 
 @Component({
   selector: 'app-staked-pools-list',
@@ -11,10 +9,6 @@ import { StakerPoolData } from 'src/app/_classes/staker-pool-data';
 })
 export class StakedPoolsListComponent implements OnInit {
 
-  // @Input() stakedPools: StakerPoolData[];
-  // @Input() poolsData: {
-  //   [key: string]: PoolDetail
-  // };
 
   @Input() set pools(pools: PoolDTO[]) {
     this._pools = pools;

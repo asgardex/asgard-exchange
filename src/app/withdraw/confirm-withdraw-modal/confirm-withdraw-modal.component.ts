@@ -62,35 +62,66 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
   }
 
-  submitTransaction(): void {
+  async submitTransaction(): Promise<void> {
     this.txState = TransactionConfirmationState.SUBMITTING;
 
-    this.midgardService.getInboundAddresses().subscribe(
-      async (res) => {
+    const thorClient = this.data.user.clients.thorchain;
+    if (!thorClient) {
+      console.error('no thor client found!');
+      return;
+    }
 
-        const currentPools = res.current;
+    const memo = `WITHDRAW:${this.data.asset.chain}.${this.data.asset.symbol}:${this.data.unstakePercent * 100}`;
 
-        if (currentPools && currentPools.length > 0) {
+    // withdraw RUNE
+    try {
+      const hash = await thorClient.deposit({
+        amount: assetToBase(assetAmount(this.data.runeAmount)),
+        memo,
+      });
 
-          const matchingPool = currentPools.find( (pool) => pool.chain === this.data.asset.chain );
-          const bnbPool = currentPools.find( (pool) => pool.chain === 'BNB' );
+      this.hash = hash;
+      this.txStatusService.addTransaction({
+        chain: 'THOR',
+        hash: this.hash,
+        ticker: 'RUNE',
+        status: TxStatus.PENDING,
+        action: TxActions.WITHDRAW
+      });
 
-          const memo = `WITHDRAW:${this.data.asset.chain}.${this.data.asset.symbol}:${this.data.unstakePercent * 100}`;
+      this.txSuccess(hash);
+      this.txStatusService.pollTxOutputs(hash, 2, TxActions.WITHDRAW);
+    } catch (error) {
+      console.error('error making RUNE withdraw: ', error);
+      this.txState = TransactionConfirmationState.ERROR;
+    }
 
-          if (bnbPool) {
+    // this.midgardService.getInboundAddresses().subscribe(
+    //   async (res) => {
 
-            if (this.data.user.type === 'keystore' || this.data.user.type === 'ledger') {
-              this.keystoreTransaction(bnbPool, memo);
-            } else if (this.data.user.type === 'walletconnect') {
-              this.walletConnectTransaction(bnbPool, memo);
-            }
+    //     const currentPools = res.current;
 
-          }
+    //     if (currentPools && currentPools.length > 0) {
 
-        }
+    //       const matchingPool = currentPools.find( (pool) => pool.chain === this.data.asset.chain );
+    //       const bnbPool = currentPools.find( (pool) => pool.chain === 'BNB' );
 
-      }
-    );
+    //       const memo = `WITHDRAW:${this.data.asset.chain}.${this.data.asset.symbol}:${this.data.unstakePercent * 100}`;
+
+    //       if (bnbPool) {
+
+    //         if (this.data.user.type === 'keystore' || this.data.user.type === 'ledger') {
+    //           this.keystoreTransaction(bnbPool, memo);
+    //         } else if (this.data.user.type === 'walletconnect') {
+    //           this.walletConnectTransaction(bnbPool, memo);
+    //         }
+
+    //       }
+
+    //     }
+
+    //   }
+    // );
   }
 
   async keystoreTransaction(matchingPool: PoolAddressDTO, memo: string) {

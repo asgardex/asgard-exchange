@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
 import { User } from '../_classes/user';
 import {
   Client as binanceClient,
@@ -15,6 +14,8 @@ import {
   assetFromString,
   assetToBase,
 } from '@thorchain/asgardex-util';
+import { BehaviorSubject, of, Subject, timer } from 'rxjs';
+import { catchError, switchMap, takeUntil } from 'rxjs/operators';
 
 export interface MidgardData<T> {
   key: string;
@@ -36,6 +37,8 @@ export class UserService {
 
   private userBalancesSource = new BehaviorSubject<Balances>(null);
   userBalances$ = this.userBalancesSource.asObservable();
+
+  private killRunePolling: Subject<void> = new Subject();
 
   asgardexBncClient: BinanceClient;
 
@@ -104,6 +107,40 @@ export class UserService {
     }
 
     this.userBalancesSource.next(balances);
+
+  }
+
+  /**
+   * Midgard has no way to tell when BNB has been successfully upgraded to RUNE
+   * so we poll the native RUNE balance to check for a difference
+   */
+  pollNativeRuneBalance(currentBalance: number) {
+
+    if (this._user && this._user.clients && this._user.clients.thorchain) {
+
+      timer(5000, 15000)
+      .pipe(
+        // This kills the request if the user closes the component
+        takeUntil(this.killRunePolling),
+        // switchMap cancels the last request, if no response have been received since last tick
+        // switchMap(() => this.midgardService.getTransaction(tx.hash)),
+        switchMap(() => this._user.clients.thorchain.getBalance()),
+        // catchError handles http throws
+        catchError(error => of(error))
+      ).subscribe( async (res: Balances) => {
+
+        const runeBalance = this.findBalance(res, new Asset('THOR.RUNE'));
+        if (runeBalance && currentBalance < runeBalance) {
+          console.log('increased!');
+          this.fetchBalances();
+          this.killRunePolling.next();
+        }
+
+      });
+
+    } else {
+      console.error('no thorchain client found');
+    }
 
   }
 

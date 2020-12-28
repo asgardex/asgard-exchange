@@ -28,8 +28,8 @@ export class MidgardService {
     return this.http.get<MidgardConstants>(`${this.v2BasePath}/thorchain/constants`);
   }
 
-  getLastBlock(): Observable<LastBlock> {
-    return this.http.get<LastBlock>(`${this.v2BasePath}/thorchain/lastblock`);
+  getLastBlock(): Observable<LastBlock[]> {
+    return this.http.get<LastBlock[]>(`${this.v2BasePath}/thorchain/lastblock`);
   }
 
 

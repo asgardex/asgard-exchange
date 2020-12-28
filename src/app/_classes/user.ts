@@ -6,7 +6,7 @@ import { Client as bitcoinClient } from '@xchainjs/xchain-bitcoin';
 import { Client as thorchainClient } from '@xchainjs/xchain-thorchain';
 import { Balances } from '@xchainjs/xchain-client';
 
-interface AvailableClients {
+export interface AvailableClients {
   binance?: binanceClient;
   bitcoin?: bitcoinClient;
   thorchain?: thorchainClient;

@@ -20,7 +20,6 @@ import { AssetAndBalance } from '../_classes/asset-and-balance';
 })
 export class DepositComponent implements OnInit, OnDestroy {
 
-  runeSymbol = environment.network === 'chaosnet' ? 'RUNE-B1A' : 'RUNE-67C';
 
   /**
    * Rune
@@ -99,7 +98,7 @@ export class DepositComponent implements OnInit, OnDestroy {
     private midgardService: MidgardService,
     private cgService: CoinGeckoService
   ) {
-    this.rune = new Asset(`BNB.${this.runeSymbol}`);
+    this.rune = new Asset('THOR.RUNE');
 
     const balances$ = this.userService.userBalances$.subscribe(
       (balances) => {

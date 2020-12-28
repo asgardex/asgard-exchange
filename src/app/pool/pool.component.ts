@@ -122,6 +122,7 @@ export class PoolComponent implements OnInit, OnDestroy {
       this.midgardService.getMember(address).subscribe(
         (res) => {
           this.memberPools = res.pools;
+          this.loading = false;
           // this.userPools = res.pools.map( (memberPool) => {
           //   return {
           //     poolData: this.pools.find( (pool) => pool.asset === memberPool.pool ),

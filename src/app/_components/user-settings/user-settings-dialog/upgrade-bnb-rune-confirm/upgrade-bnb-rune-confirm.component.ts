@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { assetAmount, assetToBase } from '@thorchain/asgardex-util';
 import { Subscription } from 'rxjs';
+import { Asset } from 'src/app/_classes/asset';
 import { AssetAndBalance } from 'src/app/_classes/asset-and-balance';
 import { PoolAddressDTO } from 'src/app/_classes/pool-address';
 import { User } from 'src/app/_classes/user';
@@ -24,6 +25,7 @@ export class UpgradeBnbRuneConfirmComponent implements OnInit, OnDestroy {
   user: User;
   subs: Subscription[];
   hash: string;
+  runeBalance: number;
 
   constructor(
     private midgardService: MidgardService,
@@ -38,7 +40,16 @@ export class UpgradeBnbRuneConfirmComponent implements OnInit, OnDestroy {
       (user) => this.user = user
     );
 
-    this.subs = [user$];
+    const balances$ = this.userService.userBalances$.subscribe(
+      (balances) => {
+        const runeBalance = this.userService.findBalance(balances, new Asset('THOR.RUNE'));
+        if (runeBalance) {
+          this.runeBalance = runeBalance;
+        }
+      }
+    );
+
+    this.subs = [user$, balances$];
 
   }
 
@@ -94,8 +105,6 @@ export class UpgradeBnbRuneConfirmComponent implements OnInit, OnDestroy {
           memo
         });
 
-        console.log('hash is: ', hash);
-
         this.hash = hash;
         this.txStatusService.addTransaction({
           chain: 'BNB',
@@ -104,7 +113,9 @@ export class UpgradeBnbRuneConfirmComponent implements OnInit, OnDestroy {
           status: TxStatus.PENDING,
           action: TxActions.SWAP
         });
-        this.txStatusService.pollTxOutputs(hash, 1, TxActions.SWAP);
+
+        this.userService.pollNativeRuneBalance(this.runeBalance ?? 0);
+
         this.transactionSuccessful.next();
       } else {
         this.txState = TransactionConfirmationState.ERROR;

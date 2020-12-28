@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
+import { Component, Inject, OnDestroy } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { User } from 'src/app/_classes/user';
 import { MidgardService } from 'src/app/_services/midgard.service';
@@ -32,7 +32,7 @@ export interface SwapData {
   templateUrl: './confirm-swap-modal.component.html',
   styleUrls: ['./confirm-swap-modal.component.scss']
 })
-export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
+export class ConfirmSwapModalComponent implements OnDestroy {
 
   confirmationPending: boolean;
   transactionSubmitted: boolean;
@@ -65,8 +65,6 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
 
   }
 
-  ngOnInit(): void {
-  }
 
   closeDialog(transactionSucess?: boolean) {
     this.dialogRef.close(transactionSucess);
@@ -119,9 +117,24 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
     const thorClient = this.swapData.user.clients.thorchain;
     const bitcoinAddress = await bitcoinClient.getAddress();
     const binanceAddress = await binanceClient.getAddress();
-    const targetAddress = (this.swapData.targetAsset.chain === 'BTC')
-      ? bitcoinAddress
-      : binanceAddress;
+    const runeAddress = await thorClient.getAddress();
+
+    let targetAddress = '';
+
+    switch (this.swapData.targetAsset.chain) {
+      case 'BTC':
+        targetAddress = bitcoinAddress;
+        break;
+
+      case 'BNB':
+        targetAddress = binanceAddress;
+        break;
+
+      case 'THOR':
+        targetAddress = runeAddress;
+        break;
+    }
+
     const floor = this.slipLimitService.getSlipLimitFromAmount(this.swapData.outputValue);
 
     const memo = this.getSwapMemo(
@@ -188,6 +201,7 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
         const toBase = assetToBase(assetAmount(amountNumber));
         const amount = toBase.amount().minus(fee.average.amount());
         console.log('fee is: ', fee.average.amount().toNumber());
+        console.log('memo is: ', memo);
 
         const hash = await bitcoinClient.transfer({
           amount: baseAmount(amount),
@@ -286,7 +300,7 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
   }
 
   getSwapMemo(chain: string, symbol: string, addr: string, sliplimit: number): string {
-    return `SWAP:${chain}.${symbol}:${addr}:${sliplimit}`;
+    return `=:${chain}.${symbol}:${addr}:${sliplimit}`;
   }
 
   ngOnDestroy(): void {

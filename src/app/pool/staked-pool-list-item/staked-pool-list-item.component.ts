@@ -31,6 +31,7 @@ export class StakedPoolListItemComponent implements OnChanges {
    */
   @Input() set poolData(data: PoolDTO) {
     this._poolData = data;
+    this.setAsset();
   }
   get poolData() {
     return this._poolData;
