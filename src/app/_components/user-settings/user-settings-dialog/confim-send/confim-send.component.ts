@@ -64,8 +64,13 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
 
         try {
 
+          const fees = await client.getFees();
+          // const amount = this.amount - fees.average.amount().toNumber();
+          const test = assetToBase(assetAmount(this.amount)).amount().toNumber();
+
           const hash = await client.transfer({
-            amount: assetToBase(assetAmount(this.amount)),
+            // amount: assetToBase(assetAmount(amount)),
+            amount: baseAmount(test - fees.average.amount().toNumber()),
             recipient: this.recipientAddress,
           });
 

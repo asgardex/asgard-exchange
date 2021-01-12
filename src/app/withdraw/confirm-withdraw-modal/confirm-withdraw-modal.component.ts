@@ -242,7 +242,7 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
     this.txState = TransactionConfirmationState.SUCCESS;
     this.hash = hash;
     this.txStatusService.addTransaction({
-      chain: 'BNB',
+      chain: 'THOR',
       hash: this.hash,
       ticker: `${this.data.asset.ticker}-RUNE`,
       status: TxStatus.PENDING,
