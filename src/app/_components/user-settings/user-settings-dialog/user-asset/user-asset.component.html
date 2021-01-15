@@ -1,29 +1,52 @@
-<div style="padding: 1rem 1rem 0; margin-bottom: 0;" class="section-head-container">
+<!-- <div style="padding: 1rem 1rem 0; margin-bottom: 0;" class="section-head-container">
   <button (click)="back.emit()" mat-icon-button>
     <mat-icon>arrow_back</mat-icon>
   </button>
+</div> -->
+
+<div class="modal-head">
+  <div *ngIf="address" class="uni-input user-address">
+    <label class="flxr flxr--align-center">
+      {{asset.asset.ticker}} Address
+
+      
+    </label>
+
+    <div class="flxr" style="width: 100%; align-items: center;">
+      <input class="wallet-address" [value]="address" name="address" [disabled]="true" style="padding: 0;" />
+      <button matSuffix mat-icon-button aria-label="BNB Address" (click)="copyToClipboard()">
+        <mat-icon matSuffix (click)="copyToClipboard()">content_copy</mat-icon>
+      </button>
+      <a class="explorer-link" target="_blank">
+        <mat-icon style="font-size: 20px;">link</mat-icon>
+      </a>
+    </div>
+
+    <!-- <app-testnet-warning></app-testnet-warning> -->
+
+  </div>
 </div>
 
-<div class="modal-head" style="padding-top: 0">
+<div mat-dialog-content>
 
   <div class="flxr flxr--flow-col flxr--just-center flxr--align-center">
-    <div style="width: 40px; margin-bottom: 1rem;">
+    <!-- <div style="width: 40px; margin-bottom: 1rem;">
       <img *ngIf="asset && asset.asset && asset.asset.iconPath" class="asset-icon" [src]="asset && asset.asset && asset.asset.iconPath" style="max-width: 100%;" />
-    </div>
+    </div> -->
 
     <div *ngIf="address" style="text-align: center">
-      <qrcode [qrdata]="address" [width]="256" [errorCorrectionLevel]="'M'" [elementType]="'svg'"></qrcode>
-      <span style="font-size: 0.8rem">{{address}}</span>
+      <qrcode [qrdata]="address" [width]="365" [errorCorrectionLevel]="'M'" [elementType]="'svg'"></qrcode>
+      <!-- <span style="font-size: 0.8rem">{{address}}</span> -->
     </div>
 
-    <span *ngIf="asset" class="asset-balance">{{asset.balance.amount().toNumber()}} {{asset.asset.ticker}}</span>
+    <!-- <span *ngIf="asset" class="asset-balance">{{asset.balance.amount().toNumber()}} {{asset.asset.ticker}}</span>
     <div style="height: 17px">
       <span class="usd-value" *ngIf="usdValue">≈ ${{usdValue | number:"0.0-2"}}</span>
-    </div>
+    </div> -->
 
   </div>
 
-  <ul class="actions flxr flxr--just-center">
+  <!-- <ul class="actions flxr flxr--just-center">
     <li class="action flxr flxr--flow-col">
       <button mat-mini-fab color="primary" aria-label="Send" (click)="send.emit()">
         <mat-icon>upgrade</mat-icon>
@@ -37,12 +60,29 @@
       </button>
       Copy
     </li>
-  </ul>
+  </ul> -->
 
-  <app-testnet-warning></app-testnet-warning>
+  <!-- <app-testnet-warning></app-testnet-warning> -->
 
 </div>
 
 <!-- <div mat-dialog-content>
   <p>txs here</p>
 </div> -->
+
+<div class="bottom-actions" style="display: flex; margin-top: 30px;">
+  <div style="width: 50%;">
+    <div style="margin-right: 6px;">
+      <button class="close-btn" (click)="back.emit()">
+        <span>back</span>
+      </button>
+    </div>
+  </div>
+  <div style="width: 50%;">
+    <div style="margin-left: 6px;">
+      <button class="next-btn" aria-label="Close Connect Wallet Dialog" (click)="send.emit()">
+        <span>send</span>
+      </button>
+    </div>
+  </div>
+</div>

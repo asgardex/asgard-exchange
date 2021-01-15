@@ -1,38 +1,41 @@
 <div class="container">
 
-  <div style="padding: 1rem 1rem 0" class="section-head-container">
+  <div class="outline-btn" style="margin-bottom: 32px;">
     <h1>Keystore Found</h1>
-    <div style="width: 40px"></div>
+    <!-- <div style="width: 40px"></div> -->
   </div>
 
   <div class="dialog-content">
     <div mat-dialog-content>
 
-      <button style="cursor: auto;" class="uni-input uni-input--file" [disabled]="true">
+      <button style="cursor: auto; text-transform: uppercase;" class="uni-input uni-input--file" [disabled]="true">
         <span>Reconnect from previous session</span>
-        <mat-icon [ngStyle]="{'color':'green'}">check</mat-icon>
+        <!-- <mat-icon [ngStyle]="{'color':'green'}">check</mat-icon> -->
       </button>
 
       <div class="uni-input">
         <label>Password</label>
-        <input [(ngModel)]="keystorePassword" name="keystore-password" placeholder="Please Enter Password" type="password" />
+        <input class="password" [(ngModel)]="keystorePassword" name="keystore-password" placeholder="__________________________" type="password" />
       </div>
 
     </div>
 
-    <div class="flxr flxr--just-space-between flxr--align-center" style="height: 38px">
-      <div>
-        <span *ngIf="keystoreError" style="font-size: 0.8rem; color: #2172e5">Keystore Login Incorrect</span>
-      </div>
-      <div>
-        <button style="margin-right: 6px" *ngIf="!keystoreConnecting" mat-flat-button (click)="forgetKeystore()" [disabled]="keystoreConnecting">
+    <div class="bottom-actions" style="margin: 205px 0 0 0; display: flex;">
+      <div style="width: 50%;">
+        <button class="close-btn" style="margin-right: 6px;" *ngIf="!keystoreConnecting" (click)="forgetKeystore()" [disabled]="keystoreConnecting">
           <span>Forget Keystore</span>
         </button>
-        <button *ngIf="!keystoreConnecting" mat-flat-button color="accent" (click)="keystoreUnlockClicked()" [disabled]="keystoreConnecting">
-          <span>Unlock</span>
-        </button>
+      </div>
+      <div style="width: 50%;">
+        <div>
+          <span *ngIf="keystoreError" style="font-size: 0.8rem; color: #2172e5">Keystore Login Incorrect</span>
+        </div>
+        <div style="margin-left: 12px;">
+          <button class="next-btn" *ngIf="!keystoreConnecting" (click)="keystoreUnlockClicked()" [disabled]="keystoreConnecting || !keystorePassword">
+            <span>Unlock</span>
+          </button>
+        </div>
         <mat-progress-spinner mode="indeterminate" diameter="30" *ngIf="keystoreConnecting"></mat-progress-spinner>
-
       </div>
     </div>
 

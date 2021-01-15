@@ -1,7 +1,8 @@
 header {
   position: relative;
   display: flex;
-  width: 100%;
+  width: 1120px;
+  margin: auto;
   justify-content: space-between;
   padding: 1rem 1rem 0px;
   z-index: 1;
@@ -9,28 +10,92 @@ header {
   h1 {
     margin: 0;
     letter-spacing: 1px;
-    font-size: 1.2rem;
-    // font-family: 'Cormorant Garamond', serif;
-    font-family: 'VT323', monospace;
+    font-size: 22.5px;
+    font-family: 'Exo 2', monospace;
+    text-transform: uppercase;
+    letter-spacing: 3.7px;
+    line-height: 27px;
+    font-weight: 300;
 
     a {
       color: white;
       text-decoration: none;;
     }
+
+    .title {
+      position: relative;
+    }
+
+    .testnet {
+      position: absolute;
+      right: 0;
+      top: -10px;
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 13.2px;
+      text-align: right;
+      color: #F3BA2F;
+    }
+  }
+
+  .header-right {
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
   #testnet-indicator {
+    display: flex;
+    align-items: center;
     box-sizing: border-box;
     margin: 0px;
     min-width: 0px;
     width: 100%;
-    background-color: rgba(243, 132, 30, 0.3);
-    border: 1px solid rgba(243, 132, 30, 0.3);
-    color: #f3841e;
+    border: 1px solid #33FF99;
+    color: #33FF99;
     font-weight: 500;
     border-radius: 8px;
-    padding: 8px 12px;
-    margin-right: 8px;
+    padding: 0 12px;
+    height: 40px;
+    margin-right: 20px;
     font-size: 0.8rem;
   }
+}
+
+.header-social {
+  padding-bottom: 15px;
+  justify-content: space-between;
+  padding-bottom: 5px;
+
+  .header-logo {
+    background-color: white;
+    display: block;
+    width: 20px;
+    height: 20px;
+    // margin-left: 12px;
+    transition: background-color 0.2s;
+    
+    &:hover {
+      background-color: #33FF99;
+    }
+
+    &--twitter {
+      -webkit-mask: url(./../../../assets/icons/twitter-brands.svg) no-repeat center;
+      mask: url(./../../../assets/icons/twitter-brands.svg) no-repeat center;
+
+    }
+
+    &--telegram {
+      margin-left: 0;
+      -webkit-mask: url(./../../../assets/icons/social-telegram-icon.svg) no-repeat center;
+      mask: url(./../../../assets/icons/social-telegram-icon.svg) no-repeat center;
+    }
+
+    &--github {
+      -webkit-mask: url(https://raw.githubusercontent.com/Pusher-Labs/asgard-exchange/master/src/assets/icons/github-alt-brands.svg) no-repeat center;
+      mask: url(https://raw.githubusercontent.com/Pusher-Labs/asgard-exchange/master/src/assets/icons/github-alt-brands.svg) no-repeat center;
+    }
+
+  }
+
 }

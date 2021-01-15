@@ -18,7 +18,7 @@ export class PendingTxsModalComponent implements OnInit, OnDestroy {
   @Output() back: EventEmitter<null>;
 
   constructor(
-    public dialogRef: MatDialogRef<PendingTxsModalComponent>,
+    // public dialogRef: MatDialogRef<PendingTxsModalComponent>,
     private explorerPathsService: ExplorerPathsService,
     private txStatusService: TransactionStatusService
   ) {
@@ -42,7 +42,7 @@ export class PendingTxsModalComponent implements OnInit, OnDestroy {
   }
 
   close() {
-    this.dialogRef.close();
+    // this.dialogRef.close();
   }
 
   ngOnDestroy() {

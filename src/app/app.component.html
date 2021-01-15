@@ -1,32 +1,32 @@
-<div class="background-container"></div>
-<div class="noise-background"></div>
+<div class="background-container">
+  <app-header [(overlay)]="showUserSetting"></app-header>
+  
+  <main *ngIf="isTestnet && !showReconnect && !showUserSetting">
+    <router-outlet></router-outlet>
+  </main>
 
-<app-header></app-header>
-
-<main *ngIf="isTestnet">
-  <router-outlet></router-outlet>
-</main>
-
-<main *ngIf="!isTestnet">
-  <div>
-    Multichain Coming Soon.
-  </div>
-</main>
-
-<footer>
-  <div class="footer-social flxr flxr--just-end">
-    <a class="footer-logo footer-logo--discord" href="https://discord.gg/uNvu8sxEsY" target="_blank"></a>
-    <a class="footer-logo footer-logo--twitter" href="https://twitter.com/asgardex" target="_blank"></a>
-    <a class="footer-logo footer-logo--github" href="https://github.com/Pusher-Labs/asgard-exchange" target="_blank"></a>
-  </div>
-  <div class="footer-content">
-    <span>This product is in beta. Do not deposit or swap large amounts of funds.</span>
-    <div class="flxr thorchain-indicator">
-      <span style="margin-right: 6px">Powered by <a target="_blank" href="https://thorchain.org/">THORChain</a> </span>
-      <app-last-block-indicator></app-last-block-indicator>
+  <main *ngIf="!isTestnet">
+    <div>
+      Multichain Coming Soon.
     </div>
-  </div>
-</footer>
+  </main>
+
+  <main *ngIf="showUserSetting">
+    <app-user-settings-dialog [(userSetting)]="showUserSetting"></app-user-settings-dialog>
+  </main>
+
+  <main *ngIf="showReconnect">
+    <app-reconnect-dialog [(reconnect)]="showReconnect" [keystore]="keystore"></app-reconnect-dialog>
+  </main>
+  
+  <footer>
+    
+    <div class="footer-content">
+      <span>Powered by THORChain. Everyone can participate, no one can manipulate. Support the initiative by tipping our THOR address: thor93fs8afye893jaljfw73hk6thgkbfh62hs</span>
+    </div>
+  </footer>
+</div>
+
 
 
 

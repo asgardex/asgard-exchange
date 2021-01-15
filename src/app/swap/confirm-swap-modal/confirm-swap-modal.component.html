@@ -1,109 +1,166 @@
+<div class="container" style="padding: 0 52px;" *ngIf="swapData" [ngClass]="{'pending': txState === 'PENDING_CONFIRMATION', 'success': txState === 'SUCCESS', 'submit': txState === 'SUBMITTING'}">
 
-<div *ngIf="swapData">
+  <div>
 
-  <div *ngIf="txState === 'PENDING_CONFIRMATION'">
-
-    <div class="modal-head confirm-modal-head">
-      <h1 mat-dialog-title>Confirm Swap</h1>
-
-      <div class="flxr flxr--just-space-between transaction-detail">
-
-        <div class="flxr flxr--align-center">
-          <div style="margin-right: 12px;" class="asset-icon-container flxr flxr--align-center">
-            <img *ngIf="swapData.sourceAsset.iconPath" [src]="swapData.sourceAsset.iconPath" />
-            <mat-icon *ngIf="!swapData.sourceAsset.iconPath">help_outline</mat-icon>
-          </div>
-          <span style="margin-right: 8px; font-size: 20px">{{swapData.inputValue}}</span>
-        </div>
-
-        <span>{{swapData.sourceAsset.ticker}}</span>
+    <div class="modal-head">
+      <div *ngIf="txState === 'PENDING_CONFIRMATION'" class="outline-btn" style="border-color: #F3BA2F; color: #F3BA2F;">
+        <h1>Confirm Swap</h1>
       </div>
-
-      <div class="flxr">
-        <mat-icon style="margin-left: 4px; margin-bottom: 12px;" class="to-btn-icon disabled">arrow_downward</mat-icon>
+      <div *ngIf="txState === 'SUBMITTING'" class="outline-btn" style="border-color: #00CCFF; color: #00CCFF; width: 223px;">
+        <h1>TRANSACTION PROCESSING</h1>
       </div>
-
-      <div class="flxr flxr--just-space-between transaction-detail">
-
-        <div class="flxr flxr--align-center">
-          <div style="margin-right: 12px;" class="asset-icon-container flxr flxr--align-center">
-            <img *ngIf="swapData.targetAsset.iconPath" [src]="swapData.targetAsset.iconPath" />
-            <mat-icon *ngIf="!swapData.targetAsset.iconPath">help_outline</mat-icon>
-          </div>
-          <span style="margin-right: 8px; font-size: 20px">{{swapData.outputValue}}</span>
-        </div>
-
-        <span>{{swapData.targetAsset.ticker}}</span>
-
+      <div *ngIf="txState === 'SUCCESS'" class="outline-btn" style="border-color: #fff; color: #fff; width: 259px;">
+        <h1>TRANSACTION PROCESSING</h1>
       </div>
-
-      <span style="font-style: italic; font-size: 12px; color: rgb(195, 197, 203)">Output is estimated</span>
-
     </div>
 
-    <div>
-      <div mat-dialog-content class="confirm-modal-content">
+    <div class="flxr flxr--just-centertransaction-detail" style="margin-bottom: 32px;">
 
-        <div>
+      <div class="flxr flxr--just-space-between flxr--align-center" style="position: relative;">
 
-          <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
-            <span class="tx-detail-label">Price</span>
-            <span>{{swapData.basePrice | number:"1.2-4"}} {{swapData.sourceAsset.ticker}} per {{swapData.targetAsset.ticker}}</span>
-          </div>
-
-          <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
-            <span class="tx-detail-label">Total Fee</span>
-            <span>{{swapData.bnbFee | number:"0.0-6"}} BNB</span>
-          </div>
-
-          <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
-            <span class="tx-detail-label"></span>
-            <span>{{swapData.runeFee}} Rune</span>
-          </div>
-
-          <div class="flxr flxr--just-space-between">
-            <span class="tx-detail-label">Slip</span>
-            <span>{{swapData.slip | percent:"0.2-4"}}</span>
-          </div>
+        <!-- <div *ngIf="loading" class="flxr flxr--align-center" style="height: 53px">
+          <mat-progress-spinner diameter="16" color="primary" mode="indeterminate"></mat-progress-spinner>
         </div>
+  
+        <div *ngIf="!loading && error" class="flxr flxr--align-center" style="height: 53px">
+          <mat-icon style="font-size: 1rem; height: 18px;">warning</mat-icon>
+          <span style="font-size: 0.8rem">Error fetching pool</span>
+        </div> -->
+        <div class="swap-input uni-input">
+          <input class="priceInput"
+            style="font-size: 22px; font-weight: 500; font-family: 'Roboto Mono'; color: #32FA96;"
+            [ngModel]="swapData.inputValue" placeholder="0.0" type="number" [disabled]="true" />
+          <!-- <span class="usd-est" *ngIf="true">${{swapData.basePrice | number:"1.0-0"}} USD</span> -->
 
-        <button (click)="submitTransaction()" mat-flat-button color="primary" class="main-action-btn">Confirm Swap</button>
+          <button class="launch-markets-btn" [disabled]="true">
+            <div class="flxr flxr--align-center asset-selector">
+              <app-icon-ticker [iconPath]="swapData.sourceAsset.iconPath" [ticker]="swapData.sourceAsset.ticker">
+              </app-icon-ticker>
+              <!-- <mat-icon *ngIf="!disabledMarketSelect" style="font-size: 30px; height: 28px; color: #30F091">expand_more</mat-icon> -->
+            </div>
+          </button>
+        </div>
 
       </div>
 
-      <!-- close dialog -->
-      <div mat-dialog-actions class="dialog-actions">
-        <button mat-icon-button aria-label="Close Markets Dialog" (click)="closeDialog()" mat-dialog-close>
-          <mat-icon>close</mat-icon>
+      <!-- <div class="flxr flxr--align-center">
+        <div style="margin-right: 12px;" class="asset-icon-container flxr flxr--align-center">
+          <img *ngIf="swapData.sourceAsset.iconPath" [src]="swapData.sourceAsset.iconPath" />
+          <mat-icon *ngIf="!swapData.sourceAsset.iconPath">help_outline</mat-icon>
+        </div>
+        <span style="margin-right: 8px; font-size: 20px">{{swapData.inputValue}}</span>
+      </div>
+
+      <span>{{swapData.sourceAsset.ticker}}</span> -->
+    </div>
+
+    <!-- <div class="flxr">
+      <mat-icon style="margin-left: 4px; margin-bottom: 12px;" class="to-btn-icon disabled">arrow_downward</mat-icon>
+    </div> -->
+
+    <div class="flxr flxr--just-center transaction-detail">
+
+      <div class="flxr flxr--align-center">
+        <!-- <div style="margin-right: 12px;" class="asset-icon-container flxr flxr--align-center">
+          <img *ngIf="swapData.targetAsset.iconPath" [src]="swapData.targetAsset.iconPath" />
+          <mat-icon *ngIf="!swapData.targetAsset.iconPath">help_outline</mat-icon>
+        </div>
+        <span style="margin-right: 8px; font-size: 20px">{{swapData.outputValue}}</span> -->
+        <div class="swap-input uni-input">
+          <input class="priceInput"
+            style="font-size: 22px; font-weight: 500; font-family: 'Roboto Mono'; color: #32FA96;"
+            [ngModel]="swapData.outputValue" placeholder="0.0" type="number" [disabled]="true" />
+          <!-- <span class="usd-est" *ngIf="true">${{swapData.basePrice | number:"1.0-0"}} USD</span> -->
+
+          <button class="launch-markets-btn" [disabled]="true">
+            <div class="flxr flxr--align-center asset-selector">
+              <app-icon-ticker [iconPath]="swapData.targetAsset.iconPath" [ticker]="swapData.targetAsset.ticker">
+              </app-icon-ticker>
+              <!-- <mat-icon *ngIf="!disabledMarketSelect" style="font-size: 30px; height: 28px; color: #30F091">expand_more</mat-icon> -->
+            </div>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- <span>{{swapData.targetAsset.ticker}}</span> -->
+
+  </div>
+
+  <!-- <span style="font-style: italic; font-size: 12px; color: rgb(195, 197, 203)">Output is estimated</span> -->
+
+  <div>
+    <div mat-dialog-content class="confirm-modal-content">
+
+      <div class="swap-details">
+
+        <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
+          <span class="tx-detail-label">Price</span>
+          <span>{{swapData.basePrice | number:"1.2-4"}} {{swapData.sourceAsset.ticker}} per
+            {{swapData.targetAsset.ticker}}</span>
+        </div>
+
+        <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
+          <span class="tx-detail-label">Total Fee</span>
+          <span>{{swapData.bnbFee | number:"0.0-6"}} BNB + {{swapData.runeFee}} Rune</span>
+        </div>
+
+        <div class="flxr flxr--just-space-between">
+          <span class="tx-detail-label">Slip</span>
+          <span>{{swapData.slip | percent:"0.2-4"}}</span>
+        </div>
+        <span style="display: block; color: #FF4954; font-size: 14px; margin-top: 5px;">Disclaimer: I’m a BETA product. Don’t swap/deposit large</span>
+
+      </div>
+    </div>
+
+    <div *ngIf="txState === 'PENDING_CONFIRMATION'" class="bottom-actions" style="display: flex; margin-top: 23px;">
+      <div style="width: 50%;">
+        <button style="margin-right: 6px;" class="close-btn" aria-label="Close Markets Dialog" (click)="closeDialog()">
+          <span>close</span>
+        </button>
+      </div>
+      <div style="width: 50%;">
+        <button style="background-color: #F3BA2F !important; margin-left: 6px;" (click)="submitTransaction()" class="next-btn">
+          <span>confirm</span>
         </button>
       </div>
     </div>
 
-  </div>
-
-  <app-transaction-ledger-confirm-modal *ngIf="txState === 'PENDING_LEDGER_CONFIRMATION'"></app-transaction-ledger-confirm-modal>
-
-  <app-transaction-processing-modal
-    *ngIf="txState === 'SUBMITTING'"
-    (closeDialog)="closeDialog()"
-    transactionDetail="Swapping {{swapData.inputValue}} {{swapData.sourceAsset.ticker}} for {{swapData.outputValue}} {{swapData.targetAsset.ticker}}">
-  </app-transaction-processing-modal>
-
-  <app-transaction-success-modal
-    *ngIf="txState === 'SUCCESS'"
-    [chain]="swapData.sourceAsset.chain"
-    [hash]="hash"
-    (closeDialog)="closeDialog(true)">
-  </app-transaction-success-modal>
-
-
-
-  <div style="font-size: 0.8rem; padding: 2rem 0" class="flxr flxr--flow-col flxr--align-center" *ngIf="txState === 'ERROR'">
-    <mat-icon>warning</mat-icon>
-    {{error}}
-  </div>
-
-
+    <div class="bottom-actions" *ngIf="txState === 'SUBMITTING'">
+      <div style="width: 100%;">
+        <button style="background-color: #00CCFF !important;" class="next-btn" aria-label="TRANSACTION PROCESSING…">
+          <span>TRANSACTION PROCESSING…</span>
+        </button>
+      </div>
+    </div>
+    
+    <div class="bottom-actions" *ngIf="txState === 'SUCCESS'">
+      <div style="width: 100%;">
+        <button class="close-btn" aria-label="TRANSACTION PROCESSING…" (click)="closeDialog()">
+          <span>close</span>
+        </button>
+      </div>
+    </div>
 
 </div>
 
+<!-- <app-transaction-ledger-confirm-modal *ngIf="txState === 'PENDING_LEDGER_CONFIRMATION'">
+</app-transaction-ledger-confirm-modal> -->
+
+<!-- <app-transaction-processing-modal *ngIf="txState === 'SUBMITTING'" (closeDialog)="closeDialog()"
+  transactionDetail="Swapping {{swapData.inputValue}} {{swapData.sourceAsset.ticker}} for {{swapData.outputValue}} {{swapData.targetAsset.ticker}}">
+</app-transaction-processing-modal> -->
+
+<!-- <app-transaction-success-modal *ngIf="txState === 'SUCCESS'" [chain]="swapData.sourceAsset.chain" [hash]="hash"
+  (closeDialog)="closeDialog(true)">
+</app-transaction-success-modal> -->
+
+
+
+<div style="font-size: 0.8rem; padding: 2rem 0" class="flxr flxr--flow-col flxr--align-center"
+  *ngIf="txState === 'ERROR'">
+  <mat-icon>warning</mat-icon>
+  {{error}}
+</div>

@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { Chain } from '@thorchain/asgardex-util';
 import { Subscription } from 'rxjs';
@@ -21,17 +21,20 @@ export class UserSettingsDialogComponent implements OnInit, OnDestroy {
   thorAddress: string;
   loading: boolean;
   pendingTxCount: number;
-  mode: 'ADDRESSES' | 'ADDRESS' | 'PENDING_TXS' | 'ASSET' | 'SEND' | 'CONFIRM_SEND';
+  mode: 'ADDRESSES' | 'ADDRESS' | 'PENDING_TXS' | 'ASSET' | 'SEND' | 'CONFIRM_SEND'| 'PROCESSING' | 'SUCCESS';
   selectedAddress: string;
   selectedChain: Chain;
   selectedAsset: AssetAndBalance;
   amountToSend: number;
   recipient: string;
 
+  @Input() userSetting: boolean;
+  @Output() userSettingChange = new EventEmitter<boolean>();
+
   constructor(
     private userService: UserService,
     private txStatusService: TransactionStatusService,
-    public dialogRef: MatDialogRef<UserSettingsDialogComponent>
+    // public dialogRef: MatDialogRef<UserSettingsDialogComponent>
   ) {
 
     this.pendingTxCount = 0;
@@ -110,7 +113,8 @@ export class UserSettingsDialogComponent implements OnInit, OnDestroy {
 
   disconnect() {
     this.userService.setUser(null);
-    this.dialogRef.close();
+    this.userSettingChange.emit(!this.userSetting);
+    // this.dialogRef.close();
   }
 
   ngOnDestroy(): void {

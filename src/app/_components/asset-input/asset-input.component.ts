@@ -49,6 +49,8 @@ export class AssetInputComponent implements OnInit {
   _balance: number;
 
   @Input() hideMax: boolean;
+  @Input() overlay: boolean;
+  @Output() overlayChange = new EventEmitter<boolean>();
 
   @Input() disabledMarketSelect: boolean;
   @Input() loading: boolean;
@@ -107,27 +109,29 @@ export class AssetInputComponent implements OnInit {
   }
 
   launchMarketsModal() {
+    //TODO: change the data flow into the compoenent directly
+    this.overlayChange.emit(!this.overlay);
 
-    const dialogRef = this.dialog.open(
-      MarketsModalComponent,
-      {
-        minWidth: '260px',
-        maxWidth: '420px',
-        width: '50vw',
-        data: {
-          disabledAssetSymbol: this.disabledAssetSymbol,
-          selectableMarkets: this.selectableMarkets
-        }
-      }
-    );
+    // const dialogRef = this.dialog.open(
+    //   MarketsModalComponent,
+    //   {
+    //     minWidth: '260px',
+    //     maxWidth: '420px',
+    //     width: '50vw',
+    //     data: {
+    //       disabledAssetSymbol: this.disabledAssetSymbol,
+    //       selectableMarkets: this.selectableMarkets
+    //     }
+    //   }
+    // );
 
-    dialogRef.afterClosed().subscribe( (result: Asset) => {
+    // dialogRef.afterClosed().subscribe( (result: Asset) => {
 
-      if (result) {
-        this.selectedAssetChange.emit(result);
-      }
+    //   if (result) {
+    //     this.selectedAssetChange.emit(result);
+    //   }
 
-    });
+    // });
 
   }
 

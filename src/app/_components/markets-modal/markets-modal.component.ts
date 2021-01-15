@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, Inject, Input, Output, EventEmitter } from '@angular/core';
 import { Market } from 'src/app/_classes/market';
 import { UserService } from 'src/app/_services/user.service';
 import { Asset } from '../../_classes/asset';
@@ -41,13 +41,22 @@ export class MarketsModalComponent implements OnInit, OnDestroy {
   loading: boolean;
   user: User;
 
+  @Input() overlay: boolean;
+  @Output() overlayChange = new EventEmitter<boolean>();
+
+  @Input() selectableMarkets: AssetAndBalance[];
+  @Input() disabledAssetSymbol: string;
+
+  @Input() selectedAsset: Asset;
+  @Output() selectedAssetChange = new EventEmitter<Asset>();
+
   constructor(
     private userService: UserService,
-    @Inject(MAT_DIALOG_DATA) public data: { disabledAssetSymbol: string, selectableMarkets: AssetAndBalance[] },
-    public dialogRef: MatDialogRef<MarketsModalComponent>
+    // @Inject(MAT_DIALOG_DATA) public data: { disabledAssetSymbol: string, selectableMarkets: AssetAndBalance[] },
+    // public dialogRef: MatDialogRef<MarketsModalComponent>
   ) {
 
-    this.marketListItems = this.data.selectableMarkets;
+    // this.marketListItems = this.selectableMarkets;
 
     const user$ = this.userService.user$.subscribe(
       (user) => {
@@ -66,6 +75,8 @@ export class MarketsModalComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.marketListItems = this.selectableMarkets;
+
     this.initList();
   }
 
@@ -128,12 +139,16 @@ export class MarketsModalComponent implements OnInit, OnDestroy {
   }
 
   selectItem(item: Asset) {
-    if (item.symbol !== this.data.disabledAssetSymbol) {
-      this.dialogRef.close(item);
+    if (item.symbol !== '') {
+      // this.dialogRef.close(item);
+      this.selectedAssetChange.emit(item);
+      this.overlay = false;
+      this.overlayChange.emit(this.overlay);
     }
   }
 
   closeDialog() {
-    this.dialogRef.close();
+    this.overlay = false;
+    this.overlayChange.emit(this.overlay);
   }
 }

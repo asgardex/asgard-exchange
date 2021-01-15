@@ -1,30 +1,29 @@
 /**
  * Connect Styling
  */
- .connect-option {
-  background-color: transparent;
+.connect-option {
+  text-transform: uppercase;
   display: flex;
-  flex-direction: row;
   -webkit-box-align: center;
   align-items: center;
-  -webkit-box-pack: justify;
-  margin-top: 0px;
   color: white;
-  width: 100%;
   padding: 4px 20px;
   height: 56px;
+  width: 377px;
+  border-radius: 3px;
+  margin: auto;
 
   span {
     display: flex;
     flex-flow: row nowrap;
-    font-size: 1rem;
-    font-weight: 500;
-    margin-left: 10px;
+    font-size: 21px;
+    font-weight: 700;
   }
 
   &:hover {
     cursor: pointer;
-    background-color: rgba(255, 255, 255, 0.05);
+    color: #000b12;
+    background-color: #28f4af;
     // border: 1px solid rgb(33, 114, 229);
   }
 
@@ -36,7 +35,6 @@
       background-color: transparent;
       cursor: inherit;
     }
-
   }
 
   &__logo {
@@ -48,5 +46,20 @@
     border-radius: 5px;
     padding: 3px;
   }
+}
 
+.connect-wallet {
+  text-transform: uppercase;
+  font-family: Roboto;
+  display: block;
+  margin: auto;
+  margin-top: 30px;
+  width: 100%;
+  height: 56px;
+  background-color: #fff;
+  color: #000b12;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 32px;
+  padding: 10px 0;
 }

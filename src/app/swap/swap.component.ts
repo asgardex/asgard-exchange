@@ -34,6 +34,18 @@ export enum SwapType {
   SINGLE_SWAP = 'single_swap',
 }
 
+export interface SwapData {
+  sourceAsset;
+  targetAsset;
+  runeFee: number;
+  bnbFee: number;
+  basePrice: number;
+  inputValue: number;
+  outputValue;
+  user: User;
+  slip: number;
+}
+
 @Component({
   selector: 'app-swap',
   templateUrl: './swap.component.html',
@@ -158,6 +170,11 @@ export class SwapComponent implements OnInit, OnDestroy {
   coinGeckoList: CGCoinListItem[];
 
   selectableMarkets: AssetAndBalance[];
+  overlayShow: boolean;
+  targetMarketShow: boolean;
+  sourceMarketShow: boolean;
+  swapData: SwapData;
+  confirmShow: boolean;
 
   constructor(
     private dialog: MatDialog,
@@ -166,8 +183,12 @@ export class SwapComponent implements OnInit, OnDestroy {
     private binanceService: BinanceService,
     private cgService: CoinGeckoService) {
 
+    this.selectableMarkets = undefined;
     this.selectedSourceAsset = new Asset(`BNB.${this.runeSymbol}`);
-
+    this.overlayShow = false;
+    this.targetMarketShow = false;
+    this.sourceMarketShow = false;
+    this.confirmShow = false;
 
     const balances$ = this.userService.userBalances$.subscribe(
       (balances) => {
@@ -268,34 +289,52 @@ export class SwapComponent implements OnInit, OnDestroy {
   }
 
   openConfirmationDialog() {
-    const dialogRef = this.dialog.open(
-      ConfirmSwapModalComponent,
-      {
-        minWidth: '260px',
-        maxWidth: '420px',
-        width: '50vw',
-        data: {
-          sourceAsset: this.selectedSourceAsset,
-          targetAsset: this.selectedTargetAsset,
-          runeFee: this.runeTransactionFee,
-          bnbFee: this.binanceTransferFeeDisplay,
-          basePrice: this.basePrice,
-          inputValue: this.sourceAssetUnit,
-          outputValue: this.targetAssetUnit.div(10 ** 8),
-          user: this.user,
-          slip: this.slip
-        }
-      }
-    );
+    const output = this.targetAssetUnit.div(10 ** 8);
+    console.log(output);
 
-    dialogRef.afterClosed().subscribe( (transactionSuccess: boolean) => {
+    this.swapData = {
+      sourceAsset: this.selectedSourceAsset,
+      targetAsset: this.selectedTargetAsset,
+      runeFee: this.runeTransactionFee,
+      bnbFee: this.binanceTransferFeeDisplay,
+      basePrice: this.basePrice,
+      inputValue: this.sourceAssetUnit,
+      outputValue: output,
+      user: this.user,
+      slip: this.slip
+    }
 
-      if (transactionSuccess) {
-        this.targetAssetUnit = null;
-        this.sourceAssetUnit = null;
-      }
+    console.log(this.swapData);
 
-    });
+    this.confirmShow = true;
+    // const dialogRef = this.dialog.open(
+    //   ConfirmSwapModalComponent,
+    //   {
+    //     minWidth: '260px',
+    //     maxWidth: '420px',
+    //     width: '50vw',
+    //     data: {
+    //       sourceAsset: this.selectedSourceAsset,
+    //       targetAsset: this.selectedTargetAsset,
+    //       runeFee: this.runeTransactionFee,
+    //       bnbFee: this.binanceTransferFeeDisplay,
+    //       basePrice: this.basePrice,
+    //       inputValue: this.sourceAssetUnit,
+    //       outputValue: this.targetAssetUnit.div(10 ** 8),
+    //       user: this.user,
+    //       slip: this.slip
+    //     }
+    //   }
+    // );
+
+    // dialogRef.afterClosed().subscribe( (transactionSuccess: boolean) => {
+
+    //   if (transactionSuccess) {
+    //     this.targetAssetUnit = null;
+    //     this.sourceAssetUnit = null;
+    //   }
+
+    // });
   }
 
   getPoolDetails(chain: string, symbol: string, type: 'source' | 'target') {

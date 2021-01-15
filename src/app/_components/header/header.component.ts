@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, SimpleChange } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { User } from 'src/app/_classes/user';
 import { UserService } from 'src/app/_services/user.service';
@@ -15,6 +15,16 @@ export class HeaderComponent implements OnInit, OnDestroy {
   user: User;
   subs: Subscription[];
 
+  private _overlay: boolean;
+  get overlay(): boolean {
+    return this._overlay;
+  }
+  @Input() set overlay(value: boolean) {
+    this._overlay = value;
+    this.overlayChange.emit(value);
+  }
+  @Output() overlayChange = new EventEmitter<boolean>();
+
   constructor(private userService: UserService) {
     this.isTestnet = environment.network === 'testnet' ? true : false;
 
@@ -27,6 +37,14 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+  }
+
+  ngOnChanges(changes: SimpleChange) {
+    for (const propName in changes) {
+      const changedProp = changes[propName];
+      const to = JSON.stringify(changedProp.currentValue);
+      console.log(to)
+    }
   }
 
   ngOnDestroy() {

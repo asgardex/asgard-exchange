@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { UserService } from 'src/app/_services/user.service';
 import { environment } from 'src/environments/environment';
@@ -13,23 +13,27 @@ import { WalletConnectService } from 'src/app/_services/wallet-connect.service';
 })
 export class ConnectComponent implements OnInit {
 
-  modalDimensions = {
-    maxWidth: '420px',
-    width: '50vw',
-    minWidth: '260px'
-  };
+  // modalDimensions = {
+  //   maxWidth: '420px',
+  //   width: '50vw',
+  //   minWidth: '260px'
+  // };
 
   constructor(private dialog: MatDialog, private walletConnectService: WalletConnectService) { }
+
+  @Input() overlay: boolean;
+  @Output() overlayChange = new EventEmitter<boolean>();
 
   ngOnInit(): void {
     this.walletConnectService.initWalletConnect();
   }
 
   openDialog() {
-    this.dialog.open(
-      ConnectModal,
-      this.modalDimensions
-    );
+    // this.dialog.open(
+    //   ConnectModal,
+    //   this.modalDimensions
+    // );
+    this.overlayChange.emit(true);
   }
 
 }
@@ -55,7 +59,7 @@ export class ConnectModal implements OnDestroy {
   selectedChain: 'BNB' | 'BTC';
 
   constructor(
-    public dialogRef: MatDialogRef<ConnectModal>,
+    // public dialogRef: MatDialogRef<ConnectModal>,
     private walletConnectService: WalletConnectService,
     private userService: UserService
   ) {
@@ -72,6 +76,9 @@ export class ConnectModal implements OnDestroy {
     this.subs = [user$];
 
   }
+
+  @Input() overlay: boolean;
+  @Output() overlayChange = new EventEmitter<boolean>();
 
   setSelectedChain(chain: 'BNB' | 'BTC') {
     this.selectedChain = chain;
@@ -98,7 +105,8 @@ export class ConnectModal implements OnDestroy {
   }
 
   close() {
-    this.dialogRef.close();
+    // this.dialogRef.close();
+    this.overlayChange.emit(false);
   }
 
   ngOnDestroy() {

@@ -1,3 +1,7 @@
+.container {
+  position: relative;
+}
+
 .swap-from {
   flex-flow: row;
   height: 90px;
@@ -13,12 +17,12 @@
   padding: 0px 0.5rem;
 }
 
-.base-price {
-  padding: 6px 1rem 0;
-  font-weight: 500;
-  font-size: 14px;
-  color: rgb(195, 197, 203);
-}
+// .base-price {
+//   padding: 6px 1rem 0;
+//   font-weight: 500;
+//   font-size: 14px;
+//   color: rgb(195, 197, 203);
+// }
 
 // .tag {
 //   position: absolute;

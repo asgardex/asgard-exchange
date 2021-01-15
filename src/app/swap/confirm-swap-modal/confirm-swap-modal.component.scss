@@ -1,0 +1,18 @@
+.container {
+    &.pending {
+        border: 2px solid #F3BA2F;
+    }
+
+    &.sumbit {
+        border: 2px solid #00CCFF;
+    }
+
+    &.success {
+        border: 2px solid #FFF;
+    }
+}
+
+.processing {
+    color: #00CCFF;
+    border-color: #00CCFF;
+}

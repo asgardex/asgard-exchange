@@ -1,128 +1,10 @@
-
-$w: 100vw;
-$h: 100vh;
-$f: $h/$w;
-$n: 7;
-$g: 1em;
-$c0: #2c2f36;
-$c1: #151f1e;
-
-@function int_ch($ch0, $ch1) {
-	@return calc(
-		var(--i)*#{$ch1} + var(--noti)*#{$ch0})
-}
-
-@function int_col($c0, $c1) {
-	$ch: 'red' 'green' 'blue';
-	$n: length($ch);
-	$args: ();
-
-	@each $fn in $ch {
-		$args: $args, int_ch(call(get-function($fn), $c0), call(get-function($fn), $c1))
-	}
-
-	@return RGB(#{$args})
+.background-container {
+	min-width: 100%;
+	background-color: #000B12;
 }
 
 main {
   position: relative;
-}
-
-.background-container {
-  position: fixed;
-
-  overflow: hidden;
-	// position: relative;
-	width: var(--w, #{$w});
-	height: var(--h, #{$h});
-	// border-radius: .5em;
-	box-shadow: 2px 2px 17px #000;
-  background: linear-gradient(var(--ang, 180deg), $c0, $c1);
-
-  filter: blur(0px);
-  -webkit-filter: blur(0px);
-
-	&, &:before, &:after {
-		--strip-stop: 100%;
-		--strip-f: .25;
-		--strip-stop-0: calc(var(--strip-f)*var(--strip-stop));
-		--strip-stop-1: calc(var(--strip-stop) - var(--strip-stop-0));
-		--strip-end: green;
-		--strip-mid: transparent;
-		--strip-list:
-			var(--strip-end) 0,
-			var(--strip-end) var(--strip-stop-0),
-			var(--strip-mid) 0,
-			var(--strip-mid) var(--strip-stop-1),
-			var(--strip-end) 0,
-			var(--strip-end) var(--strip-stop);
-		--joint-list:
-			var(--joint-end, green) var(--joint-stop, 25%),
-			var(--joint-mid, transparent) 0;
-		--joint-0:
-			linear-gradient(135deg, var(--joint-list));
-		--joint-1:
-			linear-gradient(-135deg, var(--joint-list));
-		--joint-2:
-			linear-gradient(-45deg, var(--joint-list));
-		--joint-3:
-			linear-gradient(45deg, var(--joint-list));
-	}
-
-	&:before, &:after {
-		--i: 0;
-		--noti: calc(1 - var(--i));
-		--sgni: calc(2*var(--i) - 1);
-		--c: hsl(0, 0%, 0%, var(--i));
-		--notc: hsl(0, 0%, 0%, var(--noti));
-		--fill: linear-gradient(var(--c), var(--c));
-		position: absolute;
-		top: 0; right: 0; bottom: 0; left: 0;
-		--c0: #{int_col($c0, $c1)};
-		--c1: #{int_col($c1, $c0)};
-		-webkit-mask: var(--mask);
-						mask: var(--mask);
-		-webkit-mask-position: var(--mask-o, 50% 50%);
-						mask-position: var(--mask-o, 50% 50%);
-		-webkit-mask-size: var(--mask-d);
-						mask-size: var(--mask-d);
-		content: ''
-	}
-
-	&:after { --i: 1 }
-
-  --d: 8em;
-	--ang: 45deg;
-
-	&:before, &:after {
-		background: var(--c0);
-		--strip-end: var(--c);
-		--strip-mid: var(--notc);
-		--strip-stop: var(--d);
-		--mask:
-			linear-gradient(90deg, red, transparent),
-			radial-gradient(circle at 25% 25%, red 9%, transparent 35%),
-			repeating-linear-gradient(90deg, var(--strip-list)),
-			repeating-linear-gradient(-45deg, var(--strip-list));
-		--mask-o: calc(50% - .25*var(--d)) 50%, 50% 50%, 50% 50%, 50% 50%;
-		--mask-d: calc(.5*var(--d)), 8px 8px, 100%, 100%;
-		-webkit-mask-composite: source-in, source-in, source-in, source-over;
-						mask-composite: intersect
-	}
-
-}
-
-.noise-background {
-  position: fixed;
-  width: 100vw;
-  height: 100vh;
-  background-repeat: repeat;
-  // background-color: slategray;
-  background-image: url('/assets/noisy-texture-transparent.png');
-
-  // In case we want to put gradients instead of patterns
-  // https://mycolor.space/gradient3?ori=circle&hex=%23000129&hex2=%23011538&hex3=%23002643&submit=submit
-  // background-image: linear-gradient(to top, #000118, #04051e, #060924, #060e2a, #051130, #031332, #021534, #001736, #001835, #001933, #001a31, #001b2f);
 }
 
 footer {
@@ -130,18 +12,16 @@ footer {
   z-index: 1;
   width: 100%;
   padding: 15px 15px;
-  font-family: 'VT323', monospace;
 
   .footer-content {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    flex-flow: column;
+	width: 100%;
+	display: flex;
+	color: #4B5261;
+    justify-content: center;
+    align-items: center;
 
     @media (min-width: 768px) {
       flex-flow: row;
-      align-items: flex-end;
     }
 
   }
@@ -157,39 +37,6 @@ footer {
 
     @media (min-width: 768px) {
       width: auto;
-    }
-
-  }
-
-  .footer-social {
-    padding-bottom: 15px;
-
-    // img {
-    //   width: 24px;
-    // }
-
-    .footer-logo {
-      background-color: #15a36f;
-      display: block;
-      width: 25px;
-      height: 25px;
-      margin-left: 12px;
-
-      &--twitter {
-        -webkit-mask: url(https://raw.githubusercontent.com/Pusher-Labs/asgard-exchange/master/src/assets/icons/twitter-brands.svg) no-repeat center;
-        mask: url(https://raw.githubusercontent.com/Pusher-Labs/asgard-exchange/master/src/assets/icons/twitter-brands.svg) no-repeat center;
-      }
-
-      &--discord {
-        -webkit-mask: url(https://raw.githubusercontent.com/Pusher-Labs/asgard-exchange/master/src/assets/icons/discord-brands.svg) no-repeat center;
-        mask: url(https://raw.githubusercontent.com/Pusher-Labs/asgard-exchange/master/src/assets/icons/discord-brands.svg) no-repeat center;
-      }
-
-      &--github {
-        -webkit-mask: url(https://raw.githubusercontent.com/Pusher-Labs/asgard-exchange/master/src/assets/icons/github-alt-brands.svg) no-repeat center;
-        mask: url(https://raw.githubusercontent.com/Pusher-Labs/asgard-exchange/master/src/assets/icons/github-alt-brands.svg) no-repeat center;
-      }
-
     }
 
   }

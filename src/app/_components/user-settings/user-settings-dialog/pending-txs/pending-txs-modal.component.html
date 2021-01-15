@@ -1,61 +1,66 @@
-<div class="container">
+<!-- <div class="container" style="position: absolute; top: -2px; left: -2px;"> -->
 
-  <div style="padding: 1rem 1rem 0" class="section-head-container">
-    <button (click)="back.emit()" mat-icon-button>
-      <mat-icon>arrow_back</mat-icon>
-    </button>
+<!-- <div style="padding: 1rem 1rem 0" class="section-head-container">
+    
     <h1>Transactions</h1>
     <div style="width: 40px"></div>
-  </div>
+  </div> -->
 
-  <div class="dialog-content">
-    <div mat-dialog-content>
+<div class="transactions">
 
-      <div>
 
-        <ul *ngIf="txs && txs.length > 0">
-          <li *ngFor="let tx of txs">
+  <ul *ngIf="txs && txs.length > 0" style="width: 100%;">
+    <li *ngFor="let tx of txs" class="transaction">
 
-            <a [href]="((tx.chain === 'BTC') ? bitcoinExplorerUrl : binanceExplorerUrl) + '/' + tx.hash" target="_blank" class="uni-input">
+      <a [href]="((tx.chain === 'BTC') ? bitcoinExplorerUrl : binanceExplorerUrl) + '/' + tx.hash" target="_blank"
+        class="uni-input">
 
-              <label style="width: 100%" class="flxr flxr--just-space-between">
-                <span>{{tx.ticker}}</span>
-                <span>{{tx.action}}</span>
-              </label>
+        <label style="width: 100%" class="flxr flxr--just-space-between">
+          <span>{{tx.ticker}}</span>
+          <span>{{tx.action}}</span>
+        </label>
 
-              <div class="flxr" style="width: 100%">
+        <div class="flxr" style="width: 100%">
 
-                <input [value]="tx.hash" name="thor-address" [disabled]="true" />
+          <input [value]="tx.hash" name="thor-address" [disabled]="true" />
 
-                <button matSuffix mat-icon-button>
-                  <mat-icon *ngIf="tx.status === 'COMPLETE'">check_circle</mat-icon>
-                  <mat-progress-spinner *ngIf="tx.status === 'PENDING'" diameter="16" color="primary" mode="indeterminate"></mat-progress-spinner>
-                </button>
+          <!-- <button matSuffix mat-icon-button>
+            <mat-icon *ngIf="tx.status === 'COMPLETE'">check_circle</mat-icon>
+            <mat-progress-spinner *ngIf="tx.status === 'PENDING'" diameter="16" color="primary" mode="indeterminate">
+            </mat-progress-spinner>
+          </button> -->
 
-              </div>
-
-              <span *ngIf="tx.action === 'Refund'" style="font-size: 0.6rem; font-style: italic">*Something went wrong submitting your transaction on the network. Your transaction has been refunded.</span>
-
-            </a>
-
-          </li>
-        </ul>
-
-        <div *ngIf="!txs || (txs && txs.length < 1)">
-          No transactions found
         </div>
 
-      </div>
+        <!-- <span *ngIf="tx.action === 'Refund'" style="font-size: 0.6rem; font-style: italic">*Something went wrong
+          submitting your transaction on the network. Your transaction has been refunded.</span> -->
 
-    </div>
+      </a>
 
-    <!-- close dialog -->
-    <div mat-dialog-actions class="dialog-actions">
-      <button mat-icon-button aria-label="Close Connect Wallet Dialog" mat-dialog-close>
-        <mat-icon>close</mat-icon>
-      </button>
-    </div>
+    </li>
+  </ul>
 
+  <div *ngIf="!txs || (txs && txs.length < 1)" style="display: flex; justify-content: center; align-items: center;">
+    <span>No transactions found</span>
   </div>
 
 </div>
+
+
+<!-- close dialog -->
+<!-- <div class="bottom-actios">
+      <div style="width: 50%;">
+        <button class="close-btn" (click)="back.emit()">
+          <span>back</span>
+        </button>
+      </div>
+    </div> -->
+
+<!-- <div mat-dialog-actions class="dialog-actions">
+      <button mat-icon-button aria-label="Close Connect Wallet Dialog" mat-dialog-close>
+        <mat-icon>close</mat-icon>
+      </button>
+    </div> -->
+
+
+<!-- </div> -->

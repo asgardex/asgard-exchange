@@ -1,18 +1,26 @@
-<div *ngIf="txState == 'PENDING_CONFIRMATION' && asset">
+<div>
 
-  <div style="padding: 1rem 1rem 0" class="section-head-container">
-    <button (click)="back.emit()" mat-icon-button>
+  <div>
+    <!-- <button (click)="back.emit()" mat-icon-button>
       <mat-icon>arrow_back</mat-icon>
-    </button>
-    <h1 class="flxr">
-      Confirm Send
-    </h1>
-    <div style="width: 40px"></div>
+    </button> -->
+    <div *ngIf="txState === 'PENDING_CONFIRMATION'" class="outline-btn" style="width: 139px; border-color: #F3BA2F; color: #F3BA2F;" >
+      <h1>
+        Confirm Send
+      </h1>
+    </div>
+    <div *ngIf="txState === 'SUBMITTING'" class="outline-btn" style="border-color: #00CCFF; color: #00CCFF; width: 223px;">
+      <h1>TRANSACTION PROCESSING</h1>
+    </div>
+    <div *ngIf="txState === 'SUCCESS'" class="outline-btn" style="border-color: #fff; color: #fff; width: 259px;">
+      <h1>TRANSACTION PROCESSING</h1>
+    </div>
+    <!-- <div style="width: 40px"></div> -->
   </div>
 
-  <div class="modal-head confirm-modal-head">
+  <div class="modal-head confirm-modal-head" style="margin-top: 31px;">
 
-    <div class="flxr flxr--just-space-between transaction-detail">
+    <!-- <div class="flxr flxr--just-space-between transaction-detail">
 
       <div class="flxr flxr--align-center">
         <div style="margin-right: 12px;" class="asset-icon-container flxr flxr--align-center">
@@ -28,22 +36,64 @@
 
     <div class="flxr">
       <mat-icon style="margin-left: 4px; margin-bottom: 12px;" class="to-btn-icon disabled">arrow_downward</mat-icon>
-    </div>
+    </div> -->
+
+    <app-asset-input
+      label="Send"
+      [(selectedAsset)]="asset.asset"
+      [(assetUnit)]="amount"
+      [balance]="asset.balance.amount().toNumber()"
+      [disabledAssetSymbol]="asset.asset.symbol"
+      [disabledMarketSelect]="true">
+    </app-asset-input>
 
     <div class="uni-input">
       <label>Recipient Address</label>
-      <textarea [(ngModel)]="recipientAddress" name="recipient-address" [disabled]="true"></textarea>
+      <textarea class="password" [(ngModel)]="recipientAddress" name="recipient-address" [disabled]="true"></textarea>
     </div>
 
-    <button (click)="submitTransaction()" mat-flat-button color="primary" class="main-action-btn">Send {{asset.asset.ticker}}</button>
+    <div style="padding: 0 15px;">
+      <span style="color: #F3BA2F; font-size: 14px; line-height: 24px;">You’re sending TESTNET BNB. Make sure your recipient’s address is a TESTNET address.</span>
+    </div>
 
   </div>
 
 </div>
 
-<app-transaction-processing-modal
+<div *ngIf="txState === 'PENDING_CONFIRMATION' && asset" class="bottom-actions" style="display: flex; margin-top: 59px;">
+  <div style="width: 50%;" >
+    <div style="margin-right: 6px;">
+      <button class="close-btn" (click)="back.emit()">
+        <span>cancel</span>
+      </button>
+    </div>
+  </div>
+  <div style="width: 50%;">
+    <div style="margin-left: 6px;">
+      <button (click)="submitTransaction()" class="next-btn" style="background-color: #F3BA2F !important; margin-left: 6px;">
+        <span>confirm</span>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="bottom-actions" style="display: flex; margin-top: 59px;" *ngIf="txState === 'SUBMITTING' && asset">
+  <div style="width: 100%;">
+    <button style="background-color: #00CCFF !important;" class="next-btn" aria-label="TRANSACTION PROCESSING…">
+      <span>TRANSACTION PROCESSING…</span>
+    </button>
+  </div>
+</div>
+<div class="bottom-actions" style="display: flex; margin-top: 59px;" *ngIf="txState === 'SUCCESS' && asset">
+  <div style="width: 100%;">
+    <button class="close-btn" aria-label="TRANSACTION PROCESSING…" (click)="back.emit()">
+      <span>close</span>
+    </button>
+  </div>
+</div>
+
+<!-- <app-transaction-processing-modal
   *ngIf="txState === 'SUBMITTING' && asset"
   transactionDetail="Sending {{asset.asset.ticker}}">
-</app-transaction-processing-modal>
+</app-transaction-processing-modal> -->
 
 

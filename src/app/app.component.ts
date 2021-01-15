@@ -18,14 +18,19 @@ export class AppComponent implements OnInit, OnDestroy {
   killPolling: Subject<void> = new Subject();
   subs: Subscription[];
   isTestnet: boolean;
+  showUserSetting: boolean;
+  showReconnect: boolean;
+  keystore: any;
 
   constructor(
-    private dialog: MatDialog,
+    // private dialog: MatDialog,
     private midgardService: MidgardService,
     private lastBlockService: LastBlockService,
   ) {
     this.subs = [];
     this.isTestnet = (environment.network === 'testnet');
+    this.showUserSetting = false;
+    this.showReconnect = false
   }
 
   ngOnInit(): void {
@@ -34,22 +39,25 @@ export class AppComponent implements OnInit, OnDestroy {
     const keystoreString = localStorage.getItem('keystore');
     const keystore = JSON.parse(keystoreString);
     if (keystore) {
-      this.openReconnectDialog(keystore);
+      this.keystore = keystore;
+      this.openReconnectDialog();
     }
   }
 
-  openReconnectDialog(keystore) {
-    this.dialog.open(
-      ReconnectDialogComponent,
-      {
-        maxWidth: '420px',
-        width: '50vw',
-        minWidth: '260px',
-        data: {
-          keystore
-        }
-      }
-    );
+  openReconnectDialog() {
+    //TODO: this needs to be shown every time keystroke has been find
+    this.showReconnect = true;
+    // this.dialog.open(
+    //   ReconnectDialogComponent,
+    //   {
+    //     maxWidth: '420px',
+    //     width: '50vw',
+    //     minWidth: '260px',
+    //     data: {
+    //       keystore
+    //     }
+    //   }
+    // );
   }
 
   pollLastBlock(): void {

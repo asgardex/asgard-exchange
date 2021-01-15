@@ -2,14 +2,14 @@
 
   <div style="width: 100%;">
     <div class="flxr flxr--just-space-between">
-      <label for="{{label}}Input">{{label}}</label>
-      <label *ngIf="selectedAsset && balance">
+      <label class="label-title" for="{{label}}Input">{{label}}</label>
+      <label style="color: #fff; font-size: 14px; font-weight: 500; text-align: right; margin-right: 8px;" *ngIf="selectedAsset && balance">
         Balance: {{balance | number:"1.0-8"}} <br />
-        <span style="float: right; font-size: 0.6rem" *ngIf="usdValue">(<i>≈${{usdValue | number:"1.0-0"}}</i>)</span>
+        <!-- <span style="float: right;" *ngIf="usdValue">(<i>≈${{usdValue | number:"1.0-0"}}</i>)</span> -->
       </label>
     </div>
 
-    <div class="flxr flxr--just-space-between flxr--align-center">
+    <div class="flxr flxr--just-space-between flxr--align-center" style="position: relative;">
 
       <div *ngIf="loading" class="flxr flxr--align-center" style="height: 53px">
         <mat-progress-spinner diameter="16" color="primary" mode="indeterminate"></mat-progress-spinner>
@@ -21,8 +21,9 @@
       </div>
 
       <input
+        class="priceInput"
         *ngIf="!loading && !error"
-        style="font-size: 1.4rem"
+        style="font-size: 22px; font-weight: 500; font-family: 'Roboto Mono'; color: #32FA96;"
         [ngModel]="assetUnit"
         (ngModelChange)="updateAssetUnits($event)"
         id="{{label}}Input"
@@ -30,10 +31,13 @@
         placeholder="0.0"
         type="number"
         [disabled]="disableInput" />
+      <span class="usd-est" *ngIf="usdValue">${{usdValue | number:"1.0-0"}} USD</span>
 
-      <button *ngIf="!selectedAsset" color="primary" style="min-width: 160px;" mat-flat-button (click)="launchMarketsModal()">
-        Select a token
-        <mat-icon>expand_more</mat-icon>
+      <button *ngIf="!selectedAsset" class="launch-markets-btn" (click)="launchMarketsModal()">
+        <div class="flxr flxr--align-center asset-selector select-token">
+          SELECT
+          <mat-icon style="font-size: 30px; height: 28px; color: #30F091">expand_more</mat-icon>
+        </div>
       </button>
 
       <button (click)="setMax()" *ngIf="balance && balance > 0 && balance != assetUnit && !hideMax" class="max">
@@ -43,7 +47,7 @@
       <button *ngIf="selectedAsset" class="launch-markets-btn" (click)="launchMarketsModal()" [disabled]="disabledMarketSelect">
         <div class="flxr flxr--align-center asset-selector">
           <app-icon-ticker [iconPath]="selectedAsset.iconPath" [ticker]="selectedAsset.ticker"></app-icon-ticker>
-          <mat-icon *ngIf="!disabledMarketSelect">expand_more</mat-icon>
+          <mat-icon *ngIf="!disabledMarketSelect" style="font-size: 30px; height: 28px; color: #30F091">expand_more</mat-icon>
         </div>
       </button>
 

@@ -1,0 +1,20 @@
+// .overlay-of-content {
+//     position: absolute;
+//     display: flex;
+//     flex-direction: column;
+//     justify-content: center;
+//     top: 0;
+//     left: 0;
+//     background-color: #16191b;
+//     width: 100%;
+// }
+
+.overlay-of-content {
+    padding: 0 52px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border: 2px solid #FFF;
+    border-radius: 20px;
+    min-height: 632px;
+}

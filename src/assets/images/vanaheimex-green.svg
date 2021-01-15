@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="41px" height="46px" viewBox="0 0 41 46" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.5 (67469) - http://www.bohemiancoding.com/sketch -->
+    <title>Shape</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <linearGradient x1="100%" y1="0%" x2="0%" y2="100%" id="linearGradient-1">
+            <stop stop-color="#33FF99" offset="0%"></stop>
+            <stop stop-color="#00CCFF" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="VANAHEIM" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="VANAHEIMEX" transform="translate(-163.000000, -21.000000)" fill-rule="nonzero" stroke="url(#linearGradient-1)">
+            <g id="Navigation" transform="translate(165.000000, 20.000000)">
+                <g id="Logo">
+                    <g id="VANAHEIM">
+                        <path d="M0,45 L29.3207806,32.6510899 L20.0460775,23.2448114 L0,45 Z M10.7686333,13.8385328 L20.0460775,23.2448114 L36.614998,3 L10.7686333,13.8385328 Z" id="Shape"></path>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

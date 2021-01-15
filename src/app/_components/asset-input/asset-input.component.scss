@@ -1,7 +1,26 @@
 .swap-input {
   flex-flow: row;
   min-height: 90px;
-  border: 1px solid transparent;
+  border: 2px solid #0D1B23;
+  background-color: transparent;
+}
+
+.label-title {
+  color: #fff;
+  font-family: Roboto;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.priceInput {
+  &::placeholder {
+    color: #32FA96;
+  }
+}
+
+.select-token {
+  font-size: 22px;
+  line-height: 30px;
 }
 
 .swap-input:focus-within{
@@ -27,15 +46,26 @@
   }
 }
 
+.usd-est {
+  position: absolute;
+  font-family: 'Roboto Mono';
+  font-weight: 500;
+  line-height: 24px;
+  font-size: 10px;
+  left: 0px;
+  bottom: -10px;
+  color: #fff;
+}
+
 .max {
-  background-color: rgba(21, 61, 111, 0.44) !important;
-  color: rgb(109, 168, 255);
+  // background-color: rgba(21, 61, 111, 0.44) !important;
+  color: #fff;
   padding: 4px 8px;
-  border-radius: 8px;
-  border: 1px solid rgba(21, 61, 111, 0.44);
+  border-radius: 3px;
+  border: 1px solid #30F091;
 
   &:hover {
-    border: 1px solid rgb(33, 114, 229);
+    color: #30F091;
   }
 }
 

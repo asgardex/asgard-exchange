@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
+import { Component, OnInit, Inject, OnDestroy, Input, SimpleChanges, Output, EventEmitter } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { User } from 'src/app/_classes/user';
 import { MidgardService } from 'src/app/_services/midgard.service';
@@ -41,9 +41,14 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
   subs: Subscription[];
   error: string;
 
+  @Input() swapData: SwapData;
+
+  @Input() overlay: boolean;
+  @Output() overlayChange = new EventEmitter<boolean>();
+
   constructor(
-    @Inject(MAT_DIALOG_DATA) public swapData: SwapData,
-    public dialogRef: MatDialogRef<ConfirmSwapModalComponent>,
+    // @Inject(MAT_DIALOG_DATA) public swapData: SwapData,
+    // public dialogRef: MatDialogRef<ConfirmSwapModalComponent>,
     private midgardService: MidgardService,
     private walletConnectService: WalletConnectService,
     private txStatusService: TransactionStatusService,
@@ -68,8 +73,15 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
   }
 
+  ngOnChanges(changes: SimpleChanges) {
+    if(changes['swapData']) {
+      console.log(this.swapData);
+    }
+  }
+
   closeDialog(transactionSucess?: boolean) {
-    this.dialogRef.close(transactionSucess);
+    this.overlayChange.emit(!this.overlay);
+    // this.dialogRef.close(transactionSucess);
   }
 
   submitTransaction() {

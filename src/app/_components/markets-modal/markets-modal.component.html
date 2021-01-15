@@ -1,13 +1,12 @@
 
-<div>
+<div class="overlay-of-content">
 
   <div class="modal-head">
-    <h1 mat-dialog-title>Select a token</h1>
+    <!-- <h1 mat-dialog-title>Select a token</h1> -->
 
     <div class="uni-input" style="margin-top: 1rem;">
-      <input style="padding: 0" [(ngModel)]="searchTerm" name="keystore-password" placeholder="Search Token Symbol" />
+      <input class="search" [(ngModel)]="searchTerm" name="keystore-password" placeholder="Search" />
     </div>
-
   </div>
   <div>
     <div mat-dialog-content>
@@ -15,18 +14,19 @@
       <app-assets-list
         [loading]="loading"
         [assetListItems]="filteredMarketListItems"
-        [disabledAssetSymbol]="data.disabledAssetSymbol"
+        [disabledAssetSymbol]="disabledAssetSymbol"
         (selectAsset)="selectItem($event)">
       </app-assets-list>
 
     </div>
 
-    <!-- close dialog -->
-    <div mat-dialog-actions class="dialog-actions">
-      <button mat-icon-button aria-label="Close Markets Dialog" (click)="closeDialog()" mat-dialog-close>
-        <mat-icon>close</mat-icon>
-      </button>
-    </div>
+  </div>
+
+  <!-- close dialog -->
+  <div class="bottom-actions" style="margin: 30px 0;">
+    <button class="close-btn" aria-label="Close Markets Dialog" (click)="closeDialog()">
+      <span>close</span>
+    </button>
   </div>
 
 </div>

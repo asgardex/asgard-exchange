@@ -15,3 +15,50 @@
   }
 
 }
+
+.transaction {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-radius: 3px;
+
+  .icon-addr label {
+    font-weight: 700;
+    font-size: 22px;
+    line-height: 30px;
+  }
+
+  .asset-icon-container {
+    display: flex;
+    align-content: center;
+    margin-right: 8px;
+  }
+
+  .addr input {
+    text-align: right;
+    background-color: transparent;
+    border: none;
+    color: #414856;
+    font-weight: 700;
+    font-size: 22px;
+    line-height: 30px;
+  }
+
+  .addr {
+    width: 250px;
+  }
+
+  .icon-addr {
+    display: flex;
+    align-items: center;
+  }
+
+  &:hover {
+    background: #28F4AF;
+    
+    label, input {
+      color: #000;
+    }
+  }
+}

@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 import { User } from 'src/app/_classes/user';
@@ -20,6 +20,8 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
     minWidth: '260px'
   };
   subs: Subscription[];
+  @Input() overlay: boolean;
+  @Output() overlayChange = new EventEmitter<boolean>();
 
   constructor(private dialog: MatDialog, private txStatusService: TransactionStatusService) {
     this.pendingTxCount = 0;
@@ -35,10 +37,11 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
   }
 
   openUserSettings() {
-    this.dialog.open(
-      UserSettingsDialogComponent,
-      this.modalDimensions
-    );
+    // this.dialog.open(
+    //   UserSettingsDialogComponent,
+    //   this.modalDimensions
+    // );
+    this.overlayChange.emit(!this.overlay)
   }
 
   ngOnDestroy() {

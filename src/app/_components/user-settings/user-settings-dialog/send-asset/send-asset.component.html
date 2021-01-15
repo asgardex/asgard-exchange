@@ -1,16 +1,18 @@
-<div style="padding: 1rem 1rem 0; margin-bottom: 0;" class="section-head-container">
-  <button (click)="back.next()" mat-icon-button>
+<div style="margin-bottom: 31px;">
+  <!-- <button (click)="back.next()" mat-icon-button>
     <mat-icon>arrow_back</mat-icon>
-  </button>
-  <h1 *ngIf="asset && asset.asset && asset.asset.ticker" class="flxr">
-    Send {{asset.asset.ticker}}
-  </h1>
-  <div style="width: 40px"></div>
+  </button> -->
+  <div class="outline-btn" style="width: 105px;">
+    <h1 *ngIf="asset && asset.asset && asset.asset.ticker" class="flxr">
+      Send {{asset.asset.ticker}}
+    </h1>
+  </div>
+  <!-- <div style="width: 40px"></div> -->
 </div>
 
 <div mat-dialog-content *ngIf="asset">
 
-  <div style="padding: 1rem">
+  <div>
     <app-asset-input
       label="Input"
       [(selectedAsset)]="asset.asset"
@@ -21,20 +23,34 @@
       [coinGeckoList]="coinGeckoList">
     </app-asset-input>
 
+    <div style="height: 30px;"></div>
+
     <div class="uni-input">
       <label>Recipient Address</label>
-      <input [(ngModel)]="recipientAddress" name="recipient-address" placeholder="Enter Recipient {{asset.asset.ticker}} Address" />
+      <textarea class="password" [(ngModel)]="recipientAddress" name="recipient-address" placeholder="_______________________" ></textarea>
     </div>
 
-    <div class="flxr flxr--just-end flxr--align-center" style="height: 38px">
-      <div>
-        <button mat-flat-button color="accent" [disabled]="!amountSpendable || recipientAddress.length < 12" (click)="confirmSend.next({amount: amount, recipientAddress: recipientAddress})">
-          <span>Next</span>
-        </button>
-      </div>
+    <div>
+      <span style="color: #F3BA2F; font-size: 14px; line-height: 24px;">You’re sending TESTNET BNB. Make sure your recipient’s address is a TESTNET address.</span>
     </div>
 
   </div>
 
 </div>
 
+<div class="bottom-actions" style="display: flex; margin-top: 59px;">
+  <div style="width: 50%;">
+    <div style="margin-right: 6px;">
+      <button class="close-btn" (click)="back.emit()">
+        <span>back</span>
+      </button>
+    </div>
+  </div>
+  <div style="width: 50%;">
+    <div style="margin-left: 6px;">
+      <button class="next-btn" [disabled]="!amountSpendable || recipientAddress.length < 12" (click)="confirmSend.next({amount: amount, recipientAddress: recipientAddress})">
+        <span>Send</span>
+      </button>
+    </div>
+  </div>
+</div>

@@ -20,6 +20,9 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
   @Output() back: EventEmitter<null>;
   @Output() transactionSuccessful: EventEmitter<null>;
 
+  @Input() mode: 'ADDRESSES' | 'ADDRESS' | 'PENDING_TXS' | 'ASSET' | 'SEND' | 'CONFIRM_SEND'| 'PROCESSING' | 'SUCCESS';
+  @Output() modeChange = new EventEmitter();
+  
   user: User;
   subs: Subscription[];
   txState: TransactionConfirmationState;
@@ -41,7 +44,8 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
   }
 
   submitTransaction() {
-
+    this.mode = 'PROCESSING';
+    this.modeChange.emit(this.mode)
     this.txState = TransactionConfirmationState.SUBMITTING;
 
     if (this.user.type === 'keystore') {

@@ -6,14 +6,14 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 /** COMPONENTS */
 import { AppComponent } from './app.component';
-import { ConnectComponent, ConnectModal } from './_components/connect/connect.component';
+// import { ConnectComponent, ConnectModal } from './_components/connect/connect.component';
 import { ConfimSendComponent } from './_components/user-settings/user-settings-dialog/confim-send/confim-send.component';
-import { ConnectErrorComponent } from './_components/connect/connect-error/connect-error.component';
+// import { ConnectErrorComponent } from './_components/connect/connect-error/connect-error.component';
 import { HeaderComponent } from './_components/header/header.component';
-import { KeystoreConnectComponent } from './_components/connect/keystore-connect/keystore-connect.component';
+// import { KeystoreConnectComponent } from './_components/connect/keystore-connect/keystore-connect.component';
 import { LastBlockIndicatorComponent } from './_components/last-block-indicator/last-block-indicator.component';
-import { LedgerConnectComponent } from './_components/connect/ledger-connect/ledger-connect.component';
-import { KeystoreCreateComponent } from './_components/connect/keystore-create/keystore-create.component';
+// import { LedgerConnectComponent } from './_components/connect/ledger-connect/ledger-connect.component';
+// import { KeystoreCreateComponent } from './_components/connect/keystore-create/keystore-create.component';
 import { PendingTxsModalComponent } from './_components/user-settings/user-settings-dialog/pending-txs/pending-txs-modal.component';
 import { UserAddressComponent } from './_components/user-settings/user-settings-dialog/user-address/user-address.component';
 import { UserSettingsComponent } from './_components/user-settings/user-settings.component';
@@ -60,13 +60,13 @@ import { QRCodeModule } from 'angularx-qrcode';
   declarations: [
     AppComponent,
     HeaderComponent,
-    ConnectComponent,
-    ConnectModal,
-    KeystoreConnectComponent,
-    ConnectErrorComponent,
+    // ConnectComponent,
+    // ConnectModal,
+    // KeystoreConnectComponent,
+    // ConnectErrorComponent,
     LastBlockIndicatorComponent,
-    LedgerConnectComponent,
-    KeystoreCreateComponent,
+    // LedgerConnectComponent,
+    // KeystoreCreateComponent,
     UserSettingsComponent,
     UserSettingsDialogComponent,
     PendingTxsModalComponent,

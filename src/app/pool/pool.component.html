@@ -1,8 +1,15 @@
 
 <div class="container">
   <nav>
-    <a [routerLink]="['/', 'swap']" routerLinkActive="active">Swap</a>
-    <a [routerLink]="['/', 'pool']" routerLinkActive="active">Pool</a>
+    <div>
+      <a [routerLink]="['/', 'swap']" routerLinkActive="active">Swap</a>
+      <a [routerLink]="['/', 'pool']" routerLinkActive="active">
+        <p class="pool">
+          <span class="soon">soon</span>
+          Pool
+        </p>
+      </a>
+    </div>
   </nav>
 
   <div style="position: relative;">

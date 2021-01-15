@@ -22,10 +22,12 @@
 
   <div *ngIf="!connectionMethod">
     <div class="modal-head">
-      <h1 mat-dialog-title>Connect to a wallet</h1>
+      <div class="wallet-title outline-btn">
+        <h1 mat-dialog-title>Connect to wallet</h1>
+      </div>
     </div>
     <div>
-      <div mat-dialog-content>
+      <div class="keystore-content" mat-dialog-content>
 
         <!-- Connect Options -->
 
@@ -38,25 +40,21 @@
           <img id="ledger-logo" class="connect-option__logo" src="assets/images/ledger/ledger-logo.png" />
           <span>Ledger</span>
         </button> -->
-
         <button class="connect-option" (click)="createKeystore()">
-          <mat-icon class="connect-option__logo">add</mat-icon>
-          <span>Create Keystore</span>
+          <span>Create New Keystore</span>
         </button>
 
         <button class="connect-option" (click)="connectKeystore()">
-          <mat-icon class="connect-option__logo">vpn_key</mat-icon>
-          <span>Connect Keystore</span>
+          <span>Connect To Existing Keystore</span>
         </button>
 
+        <!-- close dialog -->
       </div>
-
-      <!-- close dialog -->
-      <div mat-dialog-actions class="dialog-actions">
-        <button mat-icon-button aria-label="Close Connect Wallet Dialog" mat-dialog-close>
-          <mat-icon>close</mat-icon>
-        </button>
-      </div>
+    </div>
+    <div class="bottom-actions">
+      <button class="close-btn" aria-label="Close Connect Wallet" (click)="close()">
+        <span>cancel</span>
+      </button>
     </div>
   </div>
 

@@ -5,18 +5,31 @@
   overflow: auto;
   will-change: transform;
   direction: ltr;
-  border-top: 1px solid rgb(44, 47, 54);
+  // border-top: 1px solid rgb(44, 47, 54);
+  background-color: #0D1B23;
+  padding: 10px;
+  border-radius: 6px;
 }
 
 .market-list-item {
   display: flex;
   align-items: center;
-  padding: 4px 20px;
-  height: 56px;
+  border-radius: 3px;
+  padding: 0 20px;
+  height: 49px;
   cursor: pointer;
 
   &:hover {
-    background-color: rgb(255, 255, 255, 0.1);
+    color: #0D1B23;
+    background-color: #28F4AF;
+
+    &__label {
+      color: #0D1B23;
+    }
+
+    &__chain {
+      color: #0D1B23;
+    }
   }
 
   &.disabled {
@@ -26,22 +39,25 @@
   }
 
   &__symbol {
-    font-size: 0.9rem;
+    font-size: 22px;
     font-weight: 500;
   }
 
   &__chain {
-    font-size: 0.6rem;
-    color: lighten(#536960, 20%);
+    font-size: 22px;
+    color:#414856;
   }
 
   &__label {
     font-size: 0.6rem;
-    color: lighten(#536960, 25%);
+    color: #414856;
   }
   &__balance {
-    font-size: 0.8rem;
-    font-weight: 400;
+    text-align: right;
+    font-family: 'Roboto Mono';
+    color: #414856;
+    font-size: 22px;
+    font-weight: 700;
   }
 }
 
@@ -56,6 +72,10 @@
   font-size: 0.7rem;
   text-transform: uppercase;
   color: lighten(#536960, 20%);
+}
+
+.asset-icon-container {
+  margin-right: 8px !important;
 }
 
 .list-title {

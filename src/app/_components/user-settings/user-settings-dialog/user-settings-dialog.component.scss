@@ -1,17 +1,86 @@
-.pending-tx-btn {
-  color: rgb(21, 163, 111);
-  padding-bottom: 1rem;
+// .pending-tx-btn {
+//   color: rgb(21, 163, 111);
+//   padding-bottom: 1rem;
+// }
+
+.container {
+  &.pending {
+      border: 2px solid #F3BA2F;
+  }
+
+  &.submit {
+      border: 2px solid #00CCFF;
+  }
+
+  &.success {
+      border: 2px solid #FFF;
+  }
 }
 
 .user-address {
   cursor: pointer;
-  border: 1px solid rgba(255, 255, 255, 0.02);
+  // border: 1px solid rgba(255, 255, 255, 0.02);
 
   input {
     cursor: pointer;
   }
 
   &:hover {
-    border: 1px solid white;
+    // border: 1px solid white;
+    background: #28F4AF;
+    
+    label, input {
+      color: #000;
+    }
+  }
+}
+
+.w-address {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-radius: 3px;
+
+  .icon-addr label {
+    font-weight: 700;
+    font-size: 22px;
+    line-height: 30px;
+  }
+
+  .asset-icon-container {
+    display: flex;
+    align-content: center;
+    margin-right: 8px;
+  }
+
+  .addr input {
+    text-align: right;
+    width: 230px;
+    background-color: transparent;
+    border: none;
+    color: #414856;
+    font-weight: 700;
+    font-size: 22px;
+    line-height: 30px;
+    text-overflow: ellipsis;
+  }
+
+  .addr {
+    width: 250px;
+    margin-left: 45px;
+  }
+
+  .icon-addr {
+    display: flex;
+    align-items: center;
+  }
+
+  &:hover {
+    background: #28F4AF;
+    
+    label, input {
+      color: #000 !important;
+    }
   }
 }
