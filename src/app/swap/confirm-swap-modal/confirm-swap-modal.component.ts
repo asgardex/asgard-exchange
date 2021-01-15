@@ -127,7 +127,6 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
 
       try {
         const hash = await binanceClient.transfer({
-          asset: this.swapData.sourceAsset,
           amount: assetToBase(assetAmount(amountNumber)),
           recipient: matchingPool.address,
           memo
