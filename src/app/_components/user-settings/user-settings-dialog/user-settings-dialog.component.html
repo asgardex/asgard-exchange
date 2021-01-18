@@ -23,15 +23,6 @@
             </button>
           </div>
 
-          <!-- <div *ngIf="thorAddress" class="uni-input user-address" (click)="selectAddress(thorAddress, 'THOR')">
-            <label>THORChain Address</label>
-
-            <div class="flxr" style="width: 100%">
-              <input [value]="thorAddress" name="thor-address" [disabled]="true" />
-
-            </div>
-          </div> -->
-
           <div *ngIf="thorAddress" class="uni-input user-address" (click)="selectAddress(thorAddress, 'THOR')">
             <label>RUNE Address</label>
 
@@ -67,6 +58,10 @@
           </div>
 
           <div class="flxr flxr--just-end">
+            <button style="margin-right: 6px" mat-flat-button (click)="mode = 'VIEW_PHRASE'">
+              <mat-icon>visibility</mat-icon>
+              View Phrase
+            </button>
             <button (click)="disconnect()" mat-flat-button color="primary">Disconnect</button>
           </div>
 
@@ -133,3 +128,5 @@
   (back)="mode = 'UPGRADE_RUNE'"
   (transactionSuccessful)="transactionSuccessful()">
 </app-upgrade-bnb-rune-confirm>
+
+<app-view-phrase *ngIf="mode === 'VIEW_PHRASE'" (back)="mode = 'ADDRESSES'"></app-view-phrase>

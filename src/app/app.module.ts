@@ -56,6 +56,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { QRCodeModule } from 'angularx-qrcode';
 import { UpgradeBnbRuneComponent } from './_components/user-settings/user-settings-dialog/upgrade-bnb-rune/upgrade-bnb-rune.component';
 import { UpgradeBnbRuneConfirmComponent } from './_components/user-settings/user-settings-dialog/upgrade-bnb-rune-confirm/upgrade-bnb-rune-confirm.component';
+import { ViewPhraseComponent } from './_components/user-settings/user-settings-dialog/view-phrase/view-phrase.component';
 
 
 @NgModule({
@@ -81,6 +82,7 @@ import { UpgradeBnbRuneConfirmComponent } from './_components/user-settings/user
     TestnetWarningComponent,
     UpgradeBnbRuneComponent,
     UpgradeBnbRuneConfirmComponent,
+    ViewPhraseComponent,
   ],
   imports: [
     AssetInputModule,

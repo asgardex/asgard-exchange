@@ -21,7 +21,9 @@ export class UserSettingsDialogComponent implements OnInit, OnDestroy {
   thorAddress: string;
   loading: boolean;
   pendingTxCount: number;
-  mode: 'ADDRESSES' | 'ADDRESS' | 'PENDING_TXS' | 'ASSET' | 'SEND' | 'CONFIRM_SEND' | 'UPGRADE_RUNE' | 'CONFIRM_UPGRADE_RUNE';
+  mode: 'ADDRESSES' | 'ADDRESS' | 'PENDING_TXS'
+    | 'ASSET' | 'SEND' | 'CONFIRM_SEND' | 'UPGRADE_RUNE'
+    | 'CONFIRM_UPGRADE_RUNE' | 'VIEW_PHRASE';
   selectedAddress: string;
   selectedChain: Chain;
   selectedAsset: AssetAndBalance;
