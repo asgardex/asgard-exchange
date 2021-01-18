@@ -97,10 +97,16 @@
 
   <app-transaction-success-modal
     *ngIf="txState === 'SUCCESS'"
-    chain="BNB"
+    chain="THOR"
     [hash]="hash"
     (closeDialog)="closeDialog(true)">
   </app-transaction-success-modal>
+
+  <div style="font-size: 0.8rem; padding: 2rem 0" class="flxr flxr--flow-col flxr--align-center" *ngIf="txState === 'ERROR'">
+    <mat-icon>warning</mat-icon>
+    <span *ngIf="error">{{error}}</span>
+    <span *ngIf="!error">Something went wrong</span>
+  </div>
 
 </div>
 

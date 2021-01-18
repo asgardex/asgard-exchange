@@ -37,6 +37,7 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
   hash: string;
   subs: Subscription[];
   killPolling: Subject<void> = new Subject();
+  error: string;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: ConfirmWithdrawData,
@@ -71,12 +72,14 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
       return;
     }
 
+    const txCost = assetToBase(assetAmount(0.00000001));
+
     const memo = `WITHDRAW:${this.data.asset.chain}.${this.data.asset.symbol}:${this.data.unstakePercent * 100}`;
 
     // withdraw RUNE
     try {
       const hash = await thorClient.deposit({
-        amount: assetToBase(assetAmount(this.data.runeAmount)),
+        amount: txCost,
         memo,
       });
 
@@ -93,6 +96,7 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
       this.txStatusService.pollTxOutputs(hash, 2, TxActions.WITHDRAW);
     } catch (error) {
       console.error('error making RUNE withdraw: ', error);
+      this.error = error;
       this.txState = TransactionConfirmationState.ERROR;
     }
 
@@ -152,6 +156,7 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
       this.txStatusService.pollTxOutputs(hash, 2, TxActions.WITHDRAW);
       // this.fetchOutputs(hash);
     } catch (error) {
+      this.error = error;
       console.error('error withdrawing: ', error);
     }
 
