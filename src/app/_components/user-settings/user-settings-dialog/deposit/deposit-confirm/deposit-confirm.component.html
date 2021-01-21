@@ -15,7 +15,7 @@
     <div style="padding: 1rem">
       <div class="uni-input">
         <label>Memo</label>
-        <input type="text" [(ngModel)]="memo" [disabled]="true">
+        <textarea type="text" [ngModel]="memo" disabled></textarea>
       </div>
 
       <div class="uni-input" *ngIf="action != 'WITHDRAW' && action != 'LEAVE' && action != 'UNBOND'">
