@@ -23,7 +23,7 @@ export class UserSettingsDialogComponent implements OnInit, OnDestroy {
   pendingTxCount: number;
   mode: 'ADDRESSES' | 'ADDRESS' | 'PENDING_TXS'
     | 'ASSET' | 'SEND' | 'CONFIRM_SEND' | 'UPGRADE_RUNE'
-    | 'CONFIRM_UPGRADE_RUNE' | 'VIEW_PHRASE';
+    | 'CONFIRM_UPGRADE_RUNE' | 'VIEW_PHRASE' | 'DEPOSIT' | 'CONFIRM_DEPOSIT';
   selectedAddress: string;
   selectedChain: Chain;
   selectedAsset: AssetAndBalance;

@@ -15,13 +15,15 @@ export class UserAssetComponent implements OnInit {
   @Output() back: EventEmitter<null>;
   @Output() send: EventEmitter<null>;
   @Output() upgradeRune: EventEmitter<null>;
+  @Output() deposit: EventEmitter<null>;
 
   usdValue: number;
 
   constructor(private cgService: CoinGeckoService, private copyService: CopyService) {
-    this.back = new EventEmitter<null>();
-    this.send = new EventEmitter<null>();
-    this.upgradeRune = new EventEmitter<null>();
+    this.back = new EventEmitter();
+    this.send = new EventEmitter();
+    this.upgradeRune = new EventEmitter();
+    this.deposit = new EventEmitter();
   }
 
   ngOnInit(): void {

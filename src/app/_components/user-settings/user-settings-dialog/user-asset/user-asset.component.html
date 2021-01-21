@@ -38,6 +38,15 @@
       Copy
     </li>
 
+    <!-- NATIVE RUNE DEPOSIT -->
+    <li *ngIf="asset.asset.chain === 'THOR' && asset.asset.ticker === 'RUNE'" class="action flxr flxr--flow-col flxr--align-center">
+      <button mat-mini-fab color="primary" aria-label="Copy" (click)="deposit.emit()">
+        <mat-icon>flash_on</mat-icon>
+      </button>
+      Deposit
+    </li>
+
+    <!-- UPGRADE BNB RUNE TO NATIVE RUNE -->
     <li *ngIf="asset.asset.chain === 'BNB' && asset.asset.ticker === 'RUNE'" class="action flxr flxr--flow-col flxr--align-center">
       <button mat-mini-fab color="primary" aria-label="Copy" (click)="upgradeRune.emit()">
         <mat-icon>swap_horiz</mat-icon>

@@ -1,0 +1,123 @@
+<div style="padding: 1rem 1rem 0; margin-bottom: 0;" class="section-head-container">
+  <button (click)="back.next()" mat-icon-button>
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+  <h1 class="flxr">
+    <mat-icon>warning</mat-icon> Manual Memo
+  </h1>
+  <div style="width: 40px"></div>
+</div>
+
+<div mat-dialog-content *ngIf="asset">
+
+  <div>
+
+    <div style="padding: 1rem">
+      <div class="uni-input">
+        <label>Memo</label>
+        <input type="text" [(ngModel)]="memo" [disabled]="true">
+      </div>
+    </div>
+
+    <div class="memo-form" style="border-top: 1px solid #2c2f36; border-bottom: 1px solid #2c2f36">
+
+      <div style="padding: 1rem">
+
+        <div class="uni-input">
+          <label>Action</label>
+          <mat-select [ngModel]="action" (ngModelChange)="updateAction($event)">
+            <mat-option value="SWAP">
+              Swap
+            </mat-option>
+            <mat-option value="ADD">
+              Add
+            </mat-option>
+            <mat-option value="WITHDRAW">
+              Withdraw
+            </mat-option>
+            <mat-option value="BOND">
+              Bond
+            </mat-option>
+            <mat-option value="UNBOND">
+              Unbond
+            </mat-option>
+            <mat-option value="LEAVE">
+              Leave
+            </mat-option>
+          </mat-select>
+        </div>
+
+        <div *ngIf="action === 'SWAP' || action === 'ADD' || action === 'WITHDRAW'" class="uni-input">
+          <label>Asset</label>
+          <input type="text" [ngModel]="memoAsset" (ngModelChange)="onMemoAssetChange($event)">
+        </div>
+
+        <div *ngIf="action === 'SWAP' || action === 'BOND' || action === 'UNBOND' || action === 'LEAVE'">
+          <div class="uni-input">
+            <label>Address</label>
+            <input type="text" [ngModel]="destinationAddress" (ngModelChange)="updateDestinationAddress($event)">
+          </div>
+        </div>
+
+        <div class="uni-input" *ngIf="action === 'SWAP'">
+          <label>Limit</label>
+          <input type="text" [ngModel]="swapLimit" (ngModelChange)="updateSwapLimit($event)">
+        </div>
+
+        <div class="uni-input" *ngIf="action === 'UNBOND'">
+          <label>Unbond Amount</label>
+          <input type="number" [ngModel]="memoAmount" (ngModelChange)="updateUnbondAmount($event)">
+        </div>
+
+        <div class="uni-input" *ngIf="action === 'WITHDRAW'">
+
+          <span>Amount</span>
+
+          <span class="unstake-percent">{{withdrawAmount}}%</span>
+
+          <mat-slider
+            class="slider"
+            [max]="100"
+            [min]="0"
+            step="1"
+            [tickInterval]="25"
+            [(ngModel)]="withdrawAmount">
+          </mat-slider>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div style="padding: 1rem">
+
+      <app-asset-input
+        *ngIf="action != 'WITHDRAW' && action != 'LEAVE' && action != 'UNBOND'"
+        label="Input"
+        [(selectedAsset)]="asset.asset"
+        [(assetUnit)]="depositAmount"
+        [disabledMarketSelect]="true"
+        [coinGeckoList]="coinGeckoList">
+      </app-asset-input>
+
+      <div *ngIf="action == 'WITHDRAW' || action == 'LEAVE' || action == 'UNBOND'">
+        <div class="uni-input">
+          <label>Input</label>
+          <input type="text" [value]="'0.00000001'" disabled>
+        </div>
+      </div>
+
+      <div class="flxr flxr--just-end flxr--align-center" style="height: 38px">
+        <div>
+          <button mat-flat-button color="accent" (click)="confirmSend()">
+            <span>Next</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

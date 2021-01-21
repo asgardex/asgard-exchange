@@ -96,7 +96,8 @@
   [address]="selectedAddress"
   (back)="clearSelectedAsset()"
   (send)="mode = 'SEND'"
-  (upgradeRune)="mode = 'UPGRADE_RUNE'">
+  (upgradeRune)="mode = 'UPGRADE_RUNE'"
+  (deposit)="mode = 'DEPOSIT'">
 </app-user-asset>
 
 <app-send-asset
@@ -129,4 +130,13 @@
   (transactionSuccessful)="transactionSuccessful()">
 </app-upgrade-bnb-rune-confirm>
 
-<app-view-phrase *ngIf="mode === 'VIEW_PHRASE'" (back)="mode = 'ADDRESSES'"></app-view-phrase>
+<app-view-phrase
+  *ngIf="mode === 'VIEW_PHRASE'"
+  (back)="mode = 'ADDRESSES'">
+</app-view-phrase>
+
+<app-deposit
+  *ngIf="mode === 'DEPOSIT'"
+  [asset]="selectedAsset"
+  (back)="mode = 'ASSET'">
+</app-deposit>
