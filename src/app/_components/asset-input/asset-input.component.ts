@@ -5,6 +5,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { UserService } from 'src/app/_services/user.service';
 import { CGCoinListItem, CoinGeckoService } from 'src/app/_services/coin-gecko.service';
 import { AssetAndBalance } from 'src/app/_classes/asset-and-balance';
+import { userInfo } from 'os';
 
 @Component({
   selector: 'app-asset-input',
@@ -19,6 +20,7 @@ export class AssetInputComponent implements OnInit {
   @Input() set selectedAsset(asset: Asset) {
     this._selectedAsset = asset;
     this.checkUsdBalance();
+    this.getAssetPrice();
   }
   get selectedAsset() {
     return this._selectedAsset;
@@ -59,6 +61,7 @@ export class AssetInputComponent implements OnInit {
     this._coinGeckoList = list;
     if (this._coinGeckoList) {
       this.checkUsdBalance();
+      this.getAssetPrice();
     }
   }
   get coinGeckoList() {
@@ -69,6 +72,7 @@ export class AssetInputComponent implements OnInit {
   @Input() selectableMarkets: AssetAndBalance[];
 
   usdValue: number;
+  assetUsd: number;
 
   constructor(private dialog: MatDialog, private userService: UserService, private cgService: CoinGeckoService) {
   }
@@ -77,20 +81,41 @@ export class AssetInputComponent implements OnInit {
   }
 
   checkUsdBalance() {
-
+    
     if (this.selectedAsset && this.balance && this.coinGeckoList) {
       const id = this.cgService.getCoinIdBySymbol(this.selectedAsset.ticker, this.coinGeckoList);
-
+      
       if (id) {
-
         this.cgService.getCurrencyConversion(id).subscribe(
           (res) => {
+            console.log(res)
+
             for (const [_key, value] of Object.entries(res)) {
               this.usdValue = this.balance * value.usd;
             }
           }
         );
 
+      }
+    }
+  }
+
+  getAssetPrice() {
+
+    if (this.selectedAsset && this.coinGeckoList) {
+      const id = this.cgService.getCoinIdBySymbol(this.selectedAsset.ticker, this.coinGeckoList);
+        
+      if (id) {
+        this.cgService.getCurrencyConversion(id).subscribe(
+          (res) => {
+            console.log(res);
+  
+            for (const [_key, value] of Object.entries(res)) {
+              this.assetUsd = value.usd;
+            }
+          }
+        );
+  
       }
     }
   }
@@ -110,7 +135,14 @@ export class AssetInputComponent implements OnInit {
 
   launchMarketsModal() {
     //TODO: change the data flow into the compoenent directly
-    this.overlayChange.emit(!this.overlay);
+    this.userService.user$.subscribe(
+      async (user) => {
+        if(user) {
+          this.overlayChange.emit(!this.overlay);
+        }
+      }
+    );
+    
 
     // const dialogRef = this.dialog.open(
     //   MarketsModalComponent,

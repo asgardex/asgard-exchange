@@ -47,12 +47,12 @@
       [disabledMarketSelect]="true">
     </app-asset-input>
 
-    <div class="uni-input">
+    <div class="uni-input" style="margin-top: 38px;">
       <label>Recipient Address</label>
       <textarea class="password" [(ngModel)]="recipientAddress" name="recipient-address" [disabled]="true"></textarea>
     </div>
 
-    <div style="padding: 0 15px;">
+    <div style="padding: 14px;">
       <span style="color: #F3BA2F; font-size: 14px; line-height: 24px;">You’re sending TESTNET BNB. Make sure your recipient’s address is a TESTNET address.</span>
     </div>
 
@@ -60,30 +60,30 @@
 
 </div>
 
-<div *ngIf="txState === 'PENDING_CONFIRMATION' && asset" class="bottom-actions" style="display: flex; margin-top: 59px;">
-  <div style="width: 50%;" >
+<div *ngIf="txState === 'PENDING_CONFIRMATION' && asset" class="bottom-actions" style="display: flex; margin-top: 41px;">
+  <div style="flex: 1 1 0;" >
     <div style="margin-right: 6px;">
       <button class="close-btn" (click)="back.emit()">
         <span>cancel</span>
       </button>
     </div>
   </div>
-  <div style="width: 50%;">
+  <div style="flex: 1 1 0;">
     <div style="margin-left: 6px;">
-      <button (click)="submitTransaction()" class="next-btn" style="background-color: #F3BA2F !important; margin-left: 6px;">
+      <button (click)="submitTransaction()" class="next-btn" style="background-color: #F3BA2F !important;">
         <span>confirm</span>
       </button>
     </div>
   </div>
 </div>
-<div class="bottom-actions" style="display: flex; margin-top: 59px;" *ngIf="txState === 'SUBMITTING' && asset">
+<div class="bottom-actions" style="display: flex; margin-top: 41px;" *ngIf="txState === 'SUBMITTING' && asset">
   <div style="width: 100%;">
     <button style="background-color: #00CCFF !important;" class="next-btn" aria-label="TRANSACTION PROCESSING…">
       <span>TRANSACTION PROCESSING…</span>
     </button>
   </div>
 </div>
-<div class="bottom-actions" style="display: flex; margin-top: 59px;" *ngIf="txState === 'SUCCESS' && asset">
+<div class="bottom-actions" style="display: flex; margin-top: 41px;" *ngIf="txState === 'SUCCESS' && asset">
   <div style="width: 100%;">
     <button class="close-btn" aria-label="TRANSACTION PROCESSING…" (click)="back.emit()">
       <span>close</span>

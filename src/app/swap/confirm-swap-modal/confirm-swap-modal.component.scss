@@ -1,9 +1,12 @@
 .container {
+    width: 100%;
+    height: 100%;
+
     &.pending {
         border: 2px solid #F3BA2F;
     }
 
-    &.sumbit {
+    &.submit {
         border: 2px solid #00CCFF;
     }
 
@@ -15,4 +18,32 @@
 .processing {
     color: #00CCFF;
     border-color: #00CCFF;
+}
+
+.confirm-box {
+    flex-flow: column;
+    max-height: 112px;
+
+    .label-box {
+        display: flex;
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .input-box {
+        display: flex;
+        padding: 2px 0;
+
+        .launch-markets-btn {
+            padding-right: 0;
+            
+            .asset-selector {
+                padding-right: 0;
+
+                &:hover {
+                    background-color: transparent;
+                }
+            }
+        }
+    }
 }

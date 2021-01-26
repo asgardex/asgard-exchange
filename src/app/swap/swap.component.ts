@@ -44,6 +44,9 @@ export interface SwapData {
   outputValue;
   user: User;
   slip: number;
+  balance: number;
+  sourceAssetPrice: number;
+  targetAssetPrice: number;
 }
 
 @Component({
@@ -184,7 +187,8 @@ export class SwapComponent implements OnInit, OnDestroy {
     private cgService: CoinGeckoService) {
 
     this.selectableMarkets = undefined;
-    this.selectedSourceAsset = new Asset(`BNB.${this.runeSymbol}`);
+    // Just in case at the begining There is no Source Asset yet.
+    // this.selectedSourceAsset = new Asset(`BNB.${this.runeSymbol}`);
     this.overlayShow = false;
     this.targetMarketShow = false;
     this.sourceMarketShow = false;
@@ -211,6 +215,7 @@ export class SwapComponent implements OnInit, OnDestroy {
 
       }
     );
+
 
     const user$ = this.userService.user$.subscribe(
       async (user) => {
@@ -292,21 +297,65 @@ export class SwapComponent implements OnInit, OnDestroy {
     const output = this.targetAssetUnit.div(10 ** 8);
     console.log(output);
 
-    this.swapData = {
-      sourceAsset: this.selectedSourceAsset,
-      targetAsset: this.selectedTargetAsset,
-      runeFee: this.runeTransactionFee,
-      bnbFee: this.binanceTransferFeeDisplay,
-      basePrice: this.basePrice,
-      inputValue: this.sourceAssetUnit,
-      outputValue: output,
-      user: this.user,
-      slip: this.slip
+    const id = this.cgService.getCoinIdBySymbol(this.selectedSourceAsset.ticker, this.coinGeckoList);
+
+    if (id) {
+      let sourceAssetPrice;
+      let targetAssetPrice;
+
+      console.log('check balance');
+
+      this.cgService.getCurrencyConversion(id).subscribe(
+        (res) => {
+          console.log(res)
+
+          for (const [_key, value] of Object.entries(res)) {
+            sourceAssetPrice = value.usd;
+
+            const id = this.cgService.getCoinIdBySymbol(this.selectedTargetAsset.ticker, this.coinGeckoList);
+
+            if (id) {
+              console.log('check balance');
+
+              this.cgService.getCurrencyConversion(id).subscribe(
+                (res) => {
+                  console.log(res)
+
+                  for (const [_key, value] of Object.entries(res)) {
+                    targetAssetPrice = value.usd;
+                    
+                    this.swapData = {
+                      sourceAsset: this.selectedSourceAsset,
+                      targetAsset: this.selectedTargetAsset,
+                      runeFee: this.runeTransactionFee,
+                      bnbFee: this.binanceTransferFeeDisplay,
+                      basePrice: this.basePrice,
+                      inputValue: this.sourceAssetUnit,
+                      outputValue: output,
+                      user: this.user,
+                      slip: this.slip,
+                      balance: this.sourceBalance,
+                      sourceAssetPrice,
+                      targetAssetPrice,
+                    }
+
+                    console.log(this.swapData);
+
+                    this.confirmShow = true;
+
+                  }
+                }
+              );
+
+            }
+
+          }
+        }
+      );
+
     }
 
-    console.log(this.swapData);
-
-    this.confirmShow = true;
+    
     // const dialogRef = this.dialog.open(
     //   ConfirmSwapModalComponent,
     //   {

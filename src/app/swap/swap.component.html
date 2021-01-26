@@ -1,127 +1,119 @@
-<div class="container">
-  <nav>
-    <div>
-      <a [routerLink]="['/', 'swap']" routerLinkActive="active">Swap</a>
-      <a [routerLink]="['/', 'pool']" routerLinkActive="active">
-        <p class="pool">
-          <span class="soon">soon</span>
-          Pool
-        </p>
-      </a>
-    </div>
-  </nav>
-
-  <div class="main-container" style="position: relative;">
-
-    <!-- SOURCE -->
-    <app-asset-input
-      label="Send"
-      [(overlay)]="sourceMarketShow"
-      [(selectedAsset)]="selectedSourceAsset"
-      [(assetUnit)]="sourceAssetUnit"
-      [balance]="sourceBalance"
-      [disabledAssetSymbol]="selectedTargetAsset ? selectedTargetAsset.symbol : null"
-      [coinGeckoList]="coinGeckoList"
-      [selectableMarkets]="selectableMarkets">
-    </app-asset-input>
-
-    <!-- Deleted for the new design -->
-    <div style="height: 30px;"></div>
-    <!-- <div class="flxr flxr--align-center flxr--just-center">
-      <button class="reverse-transaction" (click)="reverseTransaction()" [disabled]="!selectedSourceAsset || !selectedTargetAsset">
-        <mat-icon [class.disabled]="!selectedSourceAsset || !selectedTargetAsset" style="font-size: 14px; height: 40px; color: #30F091;" class="to-btn-icon">arrow_downward</mat-icon>
-      </button>
-    </div> -->
-
-    <!-- TARGET -->
-    <app-asset-input
-      [label]="selectedTargetAsset ? 'Receive (est.)' : 'Receive'"
-      [(overlay)]="targetMarketShow"
-      [(selectedAsset)]="selectedTargetAsset"
-      [(assetUnit)]="targetAssetUnitDisplay"
-      [balance]="targetBalance"
-      [disableInput]="true"
-      [disabledAssetSymbol]="selectedSourceAsset ? selectedSourceAsset.symbol : null"
-      [loading]="calculatingTargetAsset"
-      [hideMax]="true"
-      [error]="poolDetailTargetError || poolDetailSourceError"
-      [coinGeckoList]="coinGeckoList"
-      [selectableMarkets]="selectableMarkets">
-    </app-asset-input>
-
-    <div class="swap-details">
-      <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
-        <span class="tx-detail-label">Price:</span>
-        <span *ngIf="basePrice && selectedTargetAsset && selectedSourceAsset, else noPrice">{{basePrice | number:"1.2-6"}}  {{selectedSourceAsset.ticker}} per {{selectedTargetAsset.ticker}}</span>
-        <ng-template #noPrice>
-          <span>...</span>
-        </ng-template>
-      </div>
-      <!-- total fee and slip -->
-      <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
-        <span class="tx-detail-label">Total Fee:</span>
-        <span *ngIf="basePrice && selectedTargetAsset && selectedSourceAsset && runeTransactionFee && binanceTransferFeeDisplay, else nothingFee">{{binanceTransferFeeDisplay | number:"0.0-6"}} BNB + {{runeTransactionFee}} Rune</span>
-        <ng-template #nothingFee>
-          <span>...</span>
-        </ng-template>
-      </div>
-      <!-- <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
-        <span class="tx-detail-label"></span>
-        <span *ngIf="basePrice && selectedTargetAsset && selectedSourceAsset && runeTransactionFee && binanceTransferFeeDisplay">{{runeTransactionFee}} Rune</span>
-      </div> -->
-      <div class="flxr flxr--just-space-between">
-        <span class="tx-detail-label">Slip:</span>
-        <span *ngIf="basePrice && selectedTargetAsset && selectedSourceAsset && runeTransactionFee && binanceTransferFeeDisplay, else nothingSlip">{{slip | percent:"0.2-4" }}</span>
-        <ng-template #nothingSlip>
-          <span>...</span>
-        </ng-template>
-      </div>
-      <span style="display: block; color: #FF4954; font-size: 14px; margin-top: 5px;">Disclaimer: I’m a BETA product. Don’t swap/deposit large</span>
-    </div>
-    <!-- <div class="tag">
-      <div class="tag-contents">
-        
-      </div>
-    </div> -->
-
-    <!-- please connect button -->
-    <div>
-      <button
-        *ngIf="(user && balances) || balances"
-        (click)="openConfirmationDialog()"
-        class="next-btn"
-        style="margin-top: 23px;"
-        [disabled]="formInvalid()"
-      >
-        <span>Swap</span>
-      </button>
-      <app-connect *ngIf="!user" [(overlay)]="overlayShow"></app-connect>
-    </div>
-
-  </div>
-
-  <div class="overlay-container" *ngIf="targetMarketShow && selectableMarkets">
-    <app-markets-modal *ngIf="selectableMarkets" [(overlay)]="targetMarketShow" [(selectedAsset)]="selectedTargetAsset" [selectableMarkets]="selectableMarkets" [disabledAssetSymbol]="selectedSourceAsset ? selectedSourceAsset.symbol : null"></app-markets-modal>
-  </div>
-
-  <div class="overlay-container" *ngIf="sourceMarketShow && selectableMarkets">
-    <app-markets-modal *ngIf="selectableMarkets" [(overlay)]="sourceMarketShow" [(selectedAsset)]="selectedSourceAsset" [selectableMarkets]="selectableMarkets" [disabledAssetSymbol]="selectedTargetAsset ? selectedTargetAsset.symbol : null"></app-markets-modal>
-  </div>
+<div class="container-wrapper">
+  <div class="container">
+    <div *ngIf="!targetMarketShow && !sourceMarketShow && !overlayShow && !confirmShow">
+      <nav>
+        <div>
+          <a class="swap-wrapper" [routerLink]="['/', 'swap']" routerLinkActive="active">Swap</a>
+          <a class="pool-wrapper" [routerLink]="['/', 'pool']" routerLinkActive="active">
+            <p class="pool">
+              <span class="soon">soon</span>
+              Pool
+            </p>
+          </a>
+        </div>
+      </nav>
   
-  <div class="overlay-container" *ngIf="overlayShow">
-    <app-connect-modal [(overlay)]="overlayShow"></app-connect-modal>
-  </div>
+      <div class="main-container" style="position: relative;">
+  
+        <!-- SOURCE -->
+        <app-asset-input label="Send" [(overlay)]="sourceMarketShow" [(selectedAsset)]="selectedSourceAsset"
+          [(assetUnit)]="sourceAssetUnit" [balance]="sourceBalance" [disableInput]="user ? false : true"
+          [disabledAssetSymbol]="selectedTargetAsset ? selectedTargetAsset.symbol : null" [coinGeckoList]="coinGeckoList"
+          [selectableMarkets]="selectableMarkets">
+        </app-asset-input>
+  
+        <!-- Deleted for the new design -->
+        <!-- <div style="height: 30px;"></div> -->
+        <div class="flxr flxr--align-center flxr--just-center">
+          <button class="reverse-transaction" (click)="reverseTransaction()"
+            [disabled]="!selectedSourceAsset || !selectedTargetAsset">
+            <!-- <img [class.disabled]="!selectedSourceAsset || !selectedTargetAsset" style="height: 34px; width: 10px;" src="assets/icons/arrow.svg" /> -->
+            <!-- <mat-icon [class.disabled]="!selectedSourceAsset || !selectedTargetAsset"
+              style="font-size: 14px; height: 40px; color: #30F091;" class="to-btn-icon">arrow_downward</mat-icon> -->
+            <span class="arrow-down">⭣</span>
+          </button>
+        </div>
+  
+        <!-- TARGET -->
+        <app-asset-input [label]="selectedTargetAsset ? 'Receive (est.)' : 'Receive'" [(overlay)]="targetMarketShow"
+          [(selectedAsset)]="selectedTargetAsset" [(assetUnit)]="targetAssetUnitDisplay" [balance]="targetBalance"
+          [disableInput]="true" [disabledAssetSymbol]="selectedSourceAsset ? selectedSourceAsset.symbol : null"
+          [loading]="calculatingTargetAsset" [hideMax]="true" [error]="poolDetailTargetError || poolDetailSourceError"
+          [coinGeckoList]="coinGeckoList" [selectableMarkets]="selectableMarkets">
+        </app-asset-input>
+  
+        <div class="swap-details">
+          <div class="flxr flxr--just-space-between">
+            <span class="tx-detail-label">Price:</span>
+            <span
+              *ngIf="basePrice && selectedTargetAsset && selectedSourceAsset, else noPrice">{{basePrice | number:"1.2-6"}}
+              {{selectedSourceAsset.ticker}} per {{selectedTargetAsset.ticker}}</span>
+            <ng-template #noPrice>
+              <span>...</span>
+            </ng-template>
+          </div>
+          <!-- total fee and slip -->
+          <div class="flxr flxr--just-space-between">
+            <span class="tx-detail-label">Total Fee:</span>
+            <span
+              *ngIf="basePrice && selectedTargetAsset && selectedSourceAsset && runeTransactionFee && binanceTransferFeeDisplay, else nothingFee">{{binanceTransferFeeDisplay | number:"0.0-6"}}
+              BNB + {{runeTransactionFee}} Rune</span>
+            <ng-template #nothingFee>
+              <span>...</span>
+            </ng-template>
+          </div>
+          <!-- <div class="flxr flxr--just-space-between">
+          <span class="tx-detail-label"></span>
+          <span *ngIf="basePrice && selectedTargetAsset && selectedSourceAsset && runeTransactionFee && binanceTransferFeeDisplay">{{runeTransactionFee}} Rune</span>
+        </div> -->
+          <div class="flxr flxr--just-space-between">
+            <span class="tx-detail-label">Slip:</span>
+            <span
+              *ngIf="basePrice && selectedTargetAsset && selectedSourceAsset && runeTransactionFee && binanceTransferFeeDisplay, else nothingSlip">{{slip | percent:"0.2-4" }}</span>
+            <ng-template #nothingSlip>
+              <span>...</span>
+            </ng-template>
+          </div>
+          <span style="display: block; color: #FF4954; font-size: 14px; margin-top: 5px;">Disclaimer: I’m a BETA product.
+            Don’t swap/deposit large</span>
+        </div>
+        <!-- <div class="tag">
+        <div class="tag-contents">
+          
+        </div>
+        </div> -->
+  
+        <!-- please connect button -->
+        <div>
+          <button *ngIf="(user && balances)" (click)="openConfirmationDialog()" class="next-btn graident-btn"
+            style="margin-top: 18px;" [disabled]="formInvalid()">
+            <span>Swap</span>
+          </button>
+          <app-connect *ngIf="!user" [(overlay)]="overlayShow"></app-connect>
+        </div>
+  
+      </div>
+    </div>
+    
+    <div class="overlay-container overlay-connect-wallet" *ngIf="targetMarketShow">
+      <app-markets-modal [(overlay)]="targetMarketShow"
+        [(selectedAsset)]="selectedTargetAsset" [selectableMarkets]="selectableMarkets"
+        [disabledAssetSymbol]="selectedSourceAsset ? selectedSourceAsset.symbol : null"></app-markets-modal>
+    </div>
 
-  <div class="overlay-container" *ngIf="confirmShow">
-    <app-confirm-swap-modal 
-      *ngIf="swapData"
-      [swapData]="swapData"
-      [(overlay)]="confirmShow">
-    </app-confirm-swap-modal>
-  </div>
+    <div class="overlay-container overlay-connect-wallet" *ngIf="sourceMarketShow">
+      <app-markets-modal [(overlay)]="sourceMarketShow"
+        [(selectedAsset)]="selectedSourceAsset" [selectableMarkets]="selectableMarkets"
+        [disabledAssetSymbol]="selectedTargetAsset ? selectedTargetAsset.symbol : null"></app-markets-modal>
+    </div>
 
+    <div class="overlay-container overlay-connect-wallet" *ngIf="overlayShow">
+      <app-connect-modal [(overlay)]="overlayShow"></app-connect-modal>
+    </div>
+
+    <div class="overlay-container" *ngIf="confirmShow">
+      <app-confirm-swap-modal *ngIf="swapData" [swapData]="swapData" [(overlay)]="confirmShow">
+      </app-confirm-swap-modal>
+    </div>
+  </div>
 </div>
-
-
-
-

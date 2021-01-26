@@ -1,6 +1,6 @@
 <div class="swap-input uni-input">
 
-  <div style="width: 100%;">
+  <div style="width: 100%; margin-bottom: -15px;">
     <div class="flxr flxr--just-space-between">
       <label class="label-title" for="{{label}}Input">{{label}}</label>
       <label style="color: #fff; font-size: 14px; font-weight: 500; text-align: right; margin-right: 8px;" *ngIf="selectedAsset && balance">
@@ -23,7 +23,7 @@
       <input
         class="priceInput"
         *ngIf="!loading && !error"
-        style="font-size: 22px; font-weight: 500; font-family: 'Roboto Mono'; color: #32FA96;"
+        style="font-size: 22px; font-weight: 500; font-family: 'Roboto Mono'; color: #32FA96; width: 179px;"
         [ngModel]="assetUnit"
         (ngModelChange)="updateAssetUnits($event)"
         id="{{label}}Input"
@@ -31,7 +31,6 @@
         placeholder="0.0"
         type="number"
         [disabled]="disableInput" />
-      <span class="usd-est" *ngIf="usdValue">${{usdValue | number:"1.0-0"}} USD</span>
 
       <button *ngIf="!selectedAsset" class="launch-markets-btn" (click)="launchMarketsModal()">
         <div class="flxr flxr--align-center asset-selector select-token">
@@ -52,6 +51,9 @@
       </button>
 
     </div>
+
+    <span class="usd-est">${{(assetUsd ? assetUsd * assetUnit : 0) | number: '.2-5' }} USD</span>
+
   </div>
 
 </div>

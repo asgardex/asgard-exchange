@@ -117,6 +117,10 @@ export class UserSettingsDialogComponent implements OnInit, OnDestroy {
     // this.dialogRef.close();
   }
 
+  close() {
+    this.userSettingChange.emit(false);
+  }
+
   ngOnDestroy(): void {
     for (const sub of this.subs) {
       sub.unsubscribe();

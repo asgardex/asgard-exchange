@@ -133,9 +133,9 @@ button {
   * Material Dialog
   */
 .mat-dialog-container, .overlay-container {
-  padding: 0 !important;
-  box-shadow: none;
-  border-radius: 8px !important;
+  // padding: 0 !important;
+  // box-shadow: none;
+  // border-radius: 8px !important;
   position: relative;
   // background-color: #212A26;
   background-color: #000B12;
@@ -173,7 +173,7 @@ button {
     justify-content: center;
     // float: left;
     // width: 100%;
-    padding: 51px 0 31px 0;
+    padding-bottom: 31px;
   }
 
   .bottom-actions {
@@ -195,6 +195,51 @@ button {
   min-height: 632px;
   top: -2px;
   left: -2px;
+
+  &.overlay-connect-wallet {
+    position: relative;
+    width: auto;
+    min-height: auto;
+    height: 100%;
+    top: 0px;
+    left: 0px;
+    padding: 0;
+    overflow: hidden;
+
+    .bottom-actions {
+      margin-top: 30px;
+      margin-bottom: 0;
+    }
+  }
+
+  .inner-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
+    .outline-btn {
+      padding: 10px 20px;
+    }
+
+    .disclaimer {
+      margin-top: 13px;
+    }
+
+    .uni-input {
+      height: 95px;
+
+      &--file {
+        height: 56px;
+      }
+    }
+
+    .bottom-actions {
+      width: 100%;
+      position: absolute;
+      bottom: 0;
+    }
+  }
 }
 
 .cdk-overlay-dark-backdrop {
@@ -209,23 +254,28 @@ button {
   align-items: center;
   -webkit-box-pack: justify;
   justify-content: space-between;
-  padding: 1rem;
+  padding: 20px;
   margin-top: 0px;
   opacity: 1;
   width: 100% !important;
-  margin-bottom: 10px;
+  // margin-bottom: 10px;
   flex-flow: column;
   justify-content: start;
   align-items: flex-start;
   // background-color: rgba(255, 255, 255, 0.02);
   border: 2px solid #0D1B23;
 
+  &:focus {
+    outline: none;
+  }
+
   label {
     box-sizing: border-box;
     margin: 0px;
     min-width: 0px;
     font-weight: 500;
-    font-size: 0.8rem;
+    font-size: 14px;
+    line-height: 24px;
     color: #C7D0CB;
   }
 
@@ -242,17 +292,21 @@ button {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    padding-bottom: 0.75rem;
-    appearance: textfield;
+    padding: 0;
+    // appearance: textfield;
 
     &::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
       color: #536960;
       opacity: 1; /* Firefox */
+      text-overflow: unset;
     }
-
 
     &:focus {
       outline: none;
+    }
+
+    #text-field-container {
+      width: 179px;
     }
   }
 
@@ -300,20 +354,6 @@ button {
 //   }
 // }
 
-.container {
-  &.pending {
-      border: 2px solid #F3BA2F;
-  }
-
-  &.sumbit {
-      border: 2px solid #00CCFF;
-  }
-
-  &.success {
-      border: 2px solid #FFF;
-  }
-}
-
 .uni-input {
   .search {
     line-height: 26px;
@@ -346,7 +386,7 @@ button {
 
 .swap-input {
   flex-flow: row;
-  min-height: 90px;
+  min-height: 112px;
   border: 2px solid #0D1B23;
   background-color: transparent;
 }
@@ -369,10 +409,10 @@ button {
   line-height: 30px;
 }
 
-.swap-input:focus-within{
-  border: 1px solid white;
-  transition: border-color 100ms;
-}
+// .swap-input:focus-within{
+//   border: 1px solid white;
+//   transition: border-color 100ms;
+// }
 
 .asset-selector {
   padding: 3px 5px;
@@ -393,7 +433,8 @@ button {
 }
 
 .usd-est {
-  position: absolute;
+  top: -8px;
+  position: relative;
   font-family: 'Roboto Mono';
   font-weight: 500;
   line-height: 24px;
@@ -539,6 +580,21 @@ input[type=number] {
   border-radius: 6px;
   height: 56px;
 
+  &.graident-btn {
+    background-color: #0cf;
+    background-image: linear-gradient(to top right,#0cf,#3f9);
+  }
+
+  &.spinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .mat-progress-spinner circle, .mat-spinner circle {
+      stroke: #32FA96;
+    }
+  }
+
   span {
     text-transform: uppercase;
     font-weight: 700;
@@ -549,6 +605,7 @@ input[type=number] {
   &:disabled {
     // border: 2px solid #fff;
     background-color: #0D1B23;
+    background-image: unset;
   }
 
   &:not(:disabled) {
@@ -656,37 +713,44 @@ main {
   padding: 45px 15px 100px;
   min-height: calc(100vh - 138px);
 
-  @media (min-width: 768px) {
-    padding: 100px 15px;
+  .container-wrapper {
+    border-radius: 20px;
+    padding: 2px;
+    background: linear-gradient( 45deg ,#00CCFF,#33FF99);
+
+    &.pending {
+      background: unset;
+      background-color: #F3BA2F;
+      // border: 2px solid #F3BA2F;
+    }
+
+    &.sumbit {
+      background: unset;
+      border: 2px solid #00CCFF;
+    }
+
+    &.success {
+      background: unset;
+      border: 2px solid #FFF;
+    }
   }
 
   .container {
+    position: relative;
     background: #000B12;
-    padding: 50px 52px;
-    min-height: 400px;
+    padding: 51px 51px;
+    border-radius: 20px;
     height: 632px;
-    width: 500px;
+    width: 496px;
     display: flex;
     flex-flow: column;
-    position: relative;
-    // width: 450px;
-    border: 2px solid #30F091;
+    // border: 2px solid #30F091;
 
-    @media (min-width: 768px) {
-      // width: 100%;
-      // max-width: 450px;
-      width: 500px;
+    .arrow-down {
+      color: #30F091;
+      font-size: 24px;
+      line-height: 24px;
     }
-
-    // This box shadow doesn't do much on dark background
-    // box-shadow: rgba(0, 0, 0, 0.01) 0px 0px 1px, rgba(0, 0, 0, 0.04) 0px 4px 8px, rgba(0, 0, 0, 0.04) 0px 16px 24px, rgba(0, 0, 0, 0.01) 0px 24px 32px;
-    // box-shadow: 0 -2px 20px rgba(64, 64, 64, 0.4);
-    border-radius: 20px;
-    // margin-top: -75px;
-  }
-
-  .sub-contaienr {
-    
   }
 
   nav {
@@ -695,7 +759,8 @@ main {
     -webkit-box-align: center;
     align-items: center;
     justify-content: center;
-    margin-bottom: 32px;
+    margin-bottom: 31px;
+    height: 48px;
     
     div {
       display: flex;
@@ -720,7 +785,7 @@ main {
       font-family: Roboto;
       border-radius: 10px;
       text-transform: uppercase;
-      padding: 0 20px;
+      padding: 0 19px;
       z-index: 0;
 
       &.active {
@@ -766,7 +831,7 @@ main {
 .confirm-modal-head {
   // font-size: 20px;
 
-  h1, .transaction-detail {
+  h1 {
     font-size: 20px;
     font-weight: 500;
     margin-bottom: 1rem;
@@ -797,33 +862,33 @@ main {
   }
 }
 
-.submitting, .success {
+// .submitting, .success {
 
-  .modal-head {
+//   .modal-head {
 
-    h1, span, a {
-      margin-bottom: 10px;
-    }
+//     h1, span, a {
+//       margin-bottom: 0px;
+//     }
 
-    a {
-      color: #2172e5 !important;
-      text-decoration: none;
-    }
+//     a {
+//       color: #2172e5 !important;
+//       text-decoration: none;
+//     }
 
-    .swap-details {
-      font-size: .8rem;
-      font-weight: 500;
-    }
+//     .swap-details {
+//       font-size: .8rem;
+//       font-weight: 500;
+//     }
 
-    .addendum {
-      color: rgb(195, 197, 203);
-      font-size: .8rem;
-      font-style: italic;
-    }
+//     .addendum {
+//       color: rgb(195, 197, 203);
+//       font-size: .8rem;
+//       font-style: italic;
+//     }
 
-  }
+//   }
 
-}
+// }
 
 .mat-slider-wrapper {
   background-color: rgb(195, 197, 203);

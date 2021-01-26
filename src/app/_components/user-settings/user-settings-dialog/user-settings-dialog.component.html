@@ -1,11 +1,14 @@
-<div class="container"
+<div class="container-wrapper"
   [ngClass]="{'pending': mode === 'CONFIRM_SEND', 'success': mode === 'SUCCESS', 'submit': mode === 'PROCESSING'}">
+<div class="container">
   <div class="modal-head" *ngIf="mode === 'ADDRESSES' || mode === 'PENDING_TXS'">
     <nav>
       <div>
         <a [ngClass]="{'active': mode === 'ADDRESSES'}" (click)="mode = 'ADDRESSES'"
-          style="width: 247px; display: flex; justify-content: space-between; color: #fff;"> slippage tolerance: <span
-            style="color: #33FF99;">3%</span></a>
+          style="width: 247px; display: flex; justify-content: space-between; color: #fff;"> 
+          <span>slippage tolerance :</span>
+          <app-slippage-tolerance></app-slippage-tolerance>
+        </a>
         <a [ngClass]="{'active': mode === 'PENDING_TXS'}" style="color: #fff" (click)="mode = 'PENDING_TXS'">
           transactions </a>
       </div>
@@ -99,7 +102,9 @@
       </div>
 
     </div>
+    
     <app-pending-txs-modal *ngIf="mode === 'PENDING_TXS'" (back)="mode = 'ADDRESSES'"></app-pending-txs-modal>
+    
     <app-user-address *ngIf="mode === 'ADDRESS'" [chain]="selectedChain" [address]="selectedAddress"
       (back)="clearSelectedAddress()" (navigateToAsset)="selectAsset($event)">
     </app-user-address>
@@ -109,7 +114,7 @@
     </app-user-asset>
 
     <app-send-asset *ngIf="mode === 'SEND'" [asset]="selectedAsset" (confirmSend)="confirmSend($event)"
-      (back)="mode = 'ASSET'">
+      (back)="mode = 'ADDRESSES'">
     </app-send-asset>
 
     <app-confim-send *ngIf="mode === 'CONFIRM_SEND' || mode === 'SUCCESS' || mode === 'PROCESSING'"
@@ -123,7 +128,8 @@
       *ngIf="mode === 'ADDRESSES' || mode === 'PENDING_TXS'">
       <div style="width: 50%;">
         <div style="margin-right: 6px;">
-          <button class="close-btn">
+          <button class="close-btn" (click)="close()">
+            <span>⭠ swap</span>
           </button>
         </div>
       </div>
@@ -136,4 +142,5 @@
       </div>
     </div>
   </div>
+</div>
 </div>

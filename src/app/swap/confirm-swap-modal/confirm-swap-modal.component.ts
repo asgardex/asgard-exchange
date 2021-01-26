@@ -25,6 +25,9 @@ export interface SwapData {
   outputValue: number;
   user: User;
   slip: number;
+  balance: number;
+  sourceAssetPrice: number;
+  targetAssetPrice: number;
 }
 
 @Component({

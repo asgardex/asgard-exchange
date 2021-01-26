@@ -6,7 +6,7 @@
       </div>
       <div class="nav-rune-number">
         <span [ngClass]="{'nav-rune-number-new-block': updating}" *ngIf="lastBlock">{{ lastBlock | number:'1.0':'en-US' }}</span>
-        <span *ngIf="!lastBlock">000000</span>
+        <span *ngIf="!lastBlock">CONNECTING</span>
         <!-- <div id="indicator-container">
           <span id="last-block-indicator"></span>
           <div *ngIf="updating" class="spin"></div>

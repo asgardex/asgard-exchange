@@ -23,14 +23,12 @@
       [coinGeckoList]="coinGeckoList">
     </app-asset-input>
 
-    <div style="height: 30px;"></div>
-
-    <div class="uni-input">
+    <div class="uni-input" style="margin-top: 38px; height: 125px;">
       <label>Recipient Address</label>
       <textarea class="password" [(ngModel)]="recipientAddress" name="recipient-address" placeholder="_______________________" ></textarea>
     </div>
 
-    <div>
+    <div class="disclaimer">
       <span style="color: #F3BA2F; font-size: 14px; line-height: 24px;">You’re sending TESTNET BNB. Make sure your recipient’s address is a TESTNET address.</span>
     </div>
 
@@ -38,17 +36,17 @@
 
 </div>
 
-<div class="bottom-actions" style="display: flex; margin-top: 59px;">
+<div class="bottom-actions" style="display: flex; margin-top: 58px;">
   <div style="width: 50%;">
     <div style="margin-right: 6px;">
       <button class="close-btn" (click)="back.emit()">
-        <span>back</span>
+        <span>⭠ WALLET</span>
       </button>
     </div>
   </div>
   <div style="width: 50%;">
     <div style="margin-left: 6px;">
-      <button class="next-btn" [disabled]="!amountSpendable || recipientAddress.length < 12" (click)="confirmSend.next({amount: amount, recipientAddress: recipientAddress})">
+      <button class="next-btn graident-btn" [disabled]="!amountSpendable || recipientAddress.length < 12" (click)="confirmSend.next({amount: amount, recipientAddress: recipientAddress})">
         <span>Send</span>
       </button>
     </div>
