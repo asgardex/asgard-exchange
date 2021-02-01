@@ -1,7 +1,7 @@
 import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MultiTransfer } from '@xchainjs/xchain-binance';
-import { assetAmount, assetToBase } from '@thorchain/asgardex-util';
+import { assetAmount, assetToBase } from '@xchainjs/xchain-util';
 import { Subscription } from 'rxjs';
 import { PoolAddressDTO, PoolAddressesDTO } from 'src/app/_classes/pool-address';
 import { User } from 'src/app/_classes/user';

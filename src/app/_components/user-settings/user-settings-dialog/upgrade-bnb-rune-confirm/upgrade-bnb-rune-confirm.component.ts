@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
-import { assetAmount, assetToBase } from '@thorchain/asgardex-util';
+import { assetAmount, assetToBase } from '@xchainjs/xchain-util';
 import { Subscription } from 'rxjs';
 import { Asset } from 'src/app/_classes/asset';
 import { AssetAndBalance } from 'src/app/_classes/asset-and-balance';

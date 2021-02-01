@@ -96,9 +96,11 @@
     (closeDialog)="closeDialog(true)">
   </app-transaction-success-modal>
 
-  <div style="font-size: 0.8rem; padding: 2rem 0" class="flxr flxr--flow-col flxr--align-center" *ngIf="txState === 'ERROR'">
+  <div style="font-size: 0.8rem; padding: 2rem 2rem;" class="flxr flxr--flow-col flxr--align-center" *ngIf="txState === 'ERROR'">
     <mat-icon>warning</mat-icon>
-    {{error}}
+    <span style="margin-top: 1rem;">
+      {{error}}
+    </span>
   </div>
 
 </div>

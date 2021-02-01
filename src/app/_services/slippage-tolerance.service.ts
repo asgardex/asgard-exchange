@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { assetAmount, assetToBase } from '@thorchain/asgardex-util';
+import { assetAmount, assetToBase } from '@xchainjs/xchain-util';
 import BigNumber from 'bignumber.js';
 import { BehaviorSubject } from 'rxjs';
 

@@ -2,23 +2,26 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Asset } from '../_classes/asset';
 import { UserService } from '../_services/user.service';
 import { Subscription } from 'rxjs';
-// import { environment } from 'src/environments/environment';
 import {
-  bn,
   getSwapOutputWithFee,
   getDoubleSwapOutput,
   getDoubleSwapOutputWithFee,
   getSwapSlip,
   getDoubleSwapSlip,
-  baseAmount,
-  BaseAmount,
   PoolData,
-  assetToBase,
-  assetAmount,
   getValueOfAssetInRune,
   getValueOfRuneInAsset,
+  getSwapOutput
 } from '@thorchain/asgardex-util';
 import BigNumber from 'bignumber.js';
+import {
+  bn,
+  baseAmount,
+  BaseAmount,
+  assetToBase,
+  assetAmount,
+  // getSwapOutput,
+} from '@xchainjs/xchain-util';
 import { PoolDetail } from '../_classes/pool-detail';
 import { MidgardService } from '../_services/midgard.service';
 import { BinanceService } from '../_services/binance.service';
@@ -465,10 +468,16 @@ export class SwapComponent implements OnInit, OnDestroy {
       const slip = getSwapSlip(this._sourceAssetTokenValue, pool, toRune);
       this.slip = slip.toNumber();
 
+      console.log('slip is: ', this.slip);
+      console.log('input amount is: ', this._sourceAssetTokenValue.amount().toNumber());
+      console.log('pool is: ', pool);
+
       /**
        * Total output amount in target units minus 1 RUNE
        */
-      const totalAmount = getSwapOutputWithFee(baseAmount(this._sourceAssetTokenValue.amount()), pool, toRune);
+      // const totalAmount = getSwapOutputWithFee(baseAmount(this._sourceAssetTokenValue.amount()), pool, toRune);
+      const totalAmount = getSwapOutput(baseAmount(this._sourceAssetTokenValue.amount()), pool, toRune);
+      console.log('total amount is: ', totalAmount.amount().toNumber());
 
       if (this.sourceAssetUnit) {
         this.targetAssetUnit = (totalAmount.amount().isLessThan(0)) ? bn(0) : totalAmount.amount();

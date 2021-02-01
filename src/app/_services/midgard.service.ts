@@ -46,14 +46,14 @@ export class MidgardService {
   }
 
   getMember(address: string): Observable<MemberDTO> {
-    return this.http.get<MemberDTO>(`${this.v2BasePath}/members/${address}`);
+    return this.http.get<MemberDTO>(`${this.v2BasePath}/member/${address}`);
   }
 
   getTransaction(txId: string): Observable<TransactionDTO> {
 
     const params = new HttpParams().set('offset', '0').set('limit', '1').set('txid', txId);
 
-    return this.http.get<TransactionDTO>(`${this.v2BasePath}/tx`, {params});
+    return this.http.get<TransactionDTO>(`${this.v2BasePath}/actions`, {params});
   }
 
 }

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { assetFromString, AssetChain } from '@thorchain/asgardex-util';
+import { assetFromString, Chain } from '@xchainjs/xchain-util';
 import { BehaviorSubject, of, Subject, timer } from 'rxjs';
 import { catchError, switchMap, takeUntil } from 'rxjs/operators';
 import { TransactionDTO } from '../_classes/transaction';
@@ -22,7 +22,7 @@ export enum TxActions {
 }
 
 export interface Tx {
-  chain: AssetChain;
+  chain: Chain;
   ticker: string;
   hash: string;
   status: TxStatus;
@@ -104,9 +104,9 @@ export class TransactionStatusService {
         catchError(error => of(error))
       ).subscribe( (tx: TransactionDTO) => {
 
-        if (tx && tx.txs && tx.txs[0] && tx.txs[0].out && tx.txs[0].out.length >= outputLength) {
+        if (tx && tx.actions && tx.actions[0] && tx.actions[0].out && tx.actions[0].out.length >= outputLength) {
 
-          for (const output of tx.txs[0].out) {
+          for (const output of tx.actions[0].out) {
 
             const asset = assetFromString(output.coins[0].asset);
 
@@ -115,7 +115,7 @@ export class TransactionStatusService {
               hash: output.txID,
               ticker: asset.ticker,
               status: TxStatus.PENDING,
-              action: (tx.txs[0].type.toUpperCase() === 'REFUND') ? TxActions.REFUND : action
+              action: (tx.actions[0].type.toUpperCase() === 'REFUND') ? TxActions.REFUND : action
             });
           }
 
@@ -137,13 +137,25 @@ export class TransactionStatusService {
       catchError(error => of(error))
     ).subscribe( async (res: TransactionDTO) => {
 
-      if (res.count > 0) {
-        for (const resTx of res.txs) {
+      console.log('polling tx hash id: ', tx.hash);
 
-          if (resTx.in.txID.toUpperCase() === tx.hash.toUpperCase() && resTx.status.toUpperCase() === 'SUCCESS') {
+      if (res.count > 0) {
+        for (const resTx of res.actions) {
+
+          // if (resTx.in[0].txID.toUpperCase() === tx.hash.toUpperCase() ) {
+
+          // }
+
+          if (resTx.in[0].txID.toUpperCase() === tx.hash.toUpperCase() && resTx.status.toUpperCase() === 'SUCCESS') {
+            console.log('!! TX is successful !!');
             this.updateTxStatus(tx.hash, TxStatus.COMPLETE);
             this.userService.fetchBalances();
             this.killTxPolling[tx.hash].next();
+          } else {
+            console.log('still pending...');
+            console.log('resTx.in[0].txID.toUpperCase() is ', resTx.in[0].txID.toUpperCase());
+            console.log('tx.hash.toUpperCase() is: ', tx.hash.toUpperCase());
+            console.log('resTx.status.toUpperCase() is: ', resTx.status.toUpperCase());
           }
         }
       }

@@ -9,6 +9,7 @@ import { UserService } from '../_services/user.service';
 import { environment } from 'src/environments/environment';
 import { PoolDTO } from '../_classes/pool';
 import { MemberPool } from '../_classes/member';
+import { TransactionStatusService } from '../_services/transaction-status.service';
 
 @Component({
   selector: 'app-pool',
@@ -36,7 +37,7 @@ export class PoolComponent implements OnInit, OnDestroy {
   //   memberData: MemberPool
   // }[];
 
-  constructor(private userService: UserService, private midgardService: MidgardService) {
+  constructor(private userService: UserService, private midgardService: MidgardService, private txStatusService: TransactionStatusService) {
 
     this.subs = [];
 
@@ -54,7 +55,18 @@ export class PoolComponent implements OnInit, OnDestroy {
       }
     );
 
-    this.subs.push(user$, balances$);
+    const pendingTx$ = this.txStatusService.txs$.subscribe(
+      () => {
+        console.log('pendingTx GET ACCOUNT POOLS');
+
+        // have to call this twice to break the midgard cache
+        setTimeout( () => {
+          this.getAccountPools();
+        }, 1000);
+      }
+    );
+
+    this.subs.push(user$, balances$, pendingTx$);
 
   }
 

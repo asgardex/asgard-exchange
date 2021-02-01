@@ -1,4 +1,4 @@
-import { BaseAmount } from '@thorchain/asgardex-token';
+import { BaseAmount } from '@xchainjs/xchain-util';
 
 export type FeeType =
   | 'submit_proposal'

@@ -1,6 +1,6 @@
 export class TransactionDTO {
   count: number;
-  txs: Transaction[];
+  actions: Transaction[];
 }
 
 export interface AssetAmount {
@@ -25,7 +25,7 @@ export class Transaction {
   pool: string;
   type: string; // TODO -> enum this
   status: string; // TODO -> enum this
-  in: TransactionDetail;
+  in: TransactionDetail[];
   out: TransactionDetail[];
   date: number;
   height: string;

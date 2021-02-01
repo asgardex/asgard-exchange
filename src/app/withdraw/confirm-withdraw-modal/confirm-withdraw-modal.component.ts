@@ -10,7 +10,7 @@ import { MidgardService } from '../../_services/midgard.service';
 import { UserService } from '../../_services/user.service';
 import { WalletConnectService } from '../../_services/wallet-connect.service';
 import { environment } from 'src/environments/environment';
-import { assetAmount, assetToBase } from '@thorchain/asgardex-util';
+import { assetAmount, assetToBase } from '@xchainjs/xchain-util';
 import { TransactionStatusService, TxActions, TxStatus } from 'src/app/_services/transaction-status.service';
 
 // TODO: this is the same as ConfirmStakeData in confirm stake modal
@@ -93,7 +93,7 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
       });
 
       this.txSuccess(hash);
-      this.txStatusService.pollTxOutputs(hash, 2, TxActions.WITHDRAW);
+      // this.txStatusService.pollTxOutputs(hash, 2, TxActions.WITHDRAW);
     } catch (error) {
       console.error('error making RUNE withdraw: ', error);
       this.error = error;

@@ -1,8 +1,12 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { assetAmount, assetToBase, baseAmount, getValueOfAssetInRune, getValueOfRuneInAsset, PoolData } from '@thorchain/asgardex-util';
+import { getValueOfAssetInRune, getValueOfRuneInAsset, PoolData } from '@thorchain/asgardex-util';
+import {
+  baseAmount,
+  assetToBase,
+  assetAmount,
+} from '@xchainjs/xchain-util';
 import { Subscription } from 'rxjs';
-import { environment } from 'src/environments/environment';
 import { Asset } from '../_classes/asset';
 import { MidgardService } from '../_services/midgard.service';
 import { UserService } from '../_services/user.service';

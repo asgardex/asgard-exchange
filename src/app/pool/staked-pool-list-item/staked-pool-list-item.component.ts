@@ -1,10 +1,9 @@
 import { Component, Input, OnChanges } from '@angular/core';
-import { getPoolShare, PoolData, UnitData, baseAmount } from '@thorchain/asgardex-util';
+import { getPoolShare, PoolData, UnitData } from '@thorchain/asgardex-util';
+import { baseAmount } from '@xchainjs/xchain-util';
 import { Asset } from 'src/app/_classes/asset';
 import { MemberPool } from 'src/app/_classes/member';
 import { PoolDTO } from 'src/app/_classes/pool';
-import { PoolDetail } from 'src/app/_classes/pool-detail';
-import { StakerPoolData } from 'src/app/_classes/staker-pool-data';
 
 @Component({
   selector: 'app-staked-pool-list-item',

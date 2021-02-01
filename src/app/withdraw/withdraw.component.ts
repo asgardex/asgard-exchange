@@ -1,7 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
-import { assetAmount, assetToBase, baseAmount, getPoolShare, getValueOfAssetInRune, getValueOfRuneInAsset, PoolData, UnitData } from '@thorchain/asgardex-util';
+import { getPoolShare, getValueOfAssetInRune, getValueOfRuneInAsset, PoolData, UnitData } from '@thorchain/asgardex-util';
+import {
+  baseAmount,
+  assetToBase,
+  assetAmount,
+} from '@xchainjs/xchain-util';
 import { Subscription } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { Asset } from '../_classes/asset';

@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
-import { Chain } from '@thorchain/asgardex-util';
+import { Chain } from '@xchainjs/xchain-util';
 import { Subscription } from 'rxjs';
 import { AssetAndBalance } from 'src/app/_classes/asset-and-balance';
 import { User } from 'src/app/_classes/user';

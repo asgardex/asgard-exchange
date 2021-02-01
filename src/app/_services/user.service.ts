@@ -5,15 +5,16 @@ import {
   BinanceClient,
 } from '@thorchain/asgardex-binance';
 import { Market, MarketResponse } from '../_classes/market';
-import { assetAmount, baseToAsset } from '@thorchain/asgardex-util';
 import { environment } from 'src/environments/environment';
 import { Asset } from '../_classes/asset';
 import { Balances } from '@xchainjs/xchain-client';
 import { BncClient } from '@binance-chain/javascript-sdk/lib/client';
 import {
-  assetFromString,
+  assetAmount,
   assetToBase,
-} from '@thorchain/asgardex-util';
+  assetFromString,
+  baseToAsset
+} from '@xchainjs/xchain-util';
 import { BehaviorSubject, of, Subject, timer } from 'rxjs';
 import { catchError, switchMap, takeUntil } from 'rxjs/operators';
 

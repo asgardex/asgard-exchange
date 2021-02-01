@@ -10,7 +10,11 @@ import { tokenAmount, tokenToBase } from '@thorchain/asgardex-token';
 import { Subscription } from 'rxjs';
 import { BinanceService } from 'src/app/_services/binance.service';
 import { WalletConnectService } from 'src/app/_services/wallet-connect.service';
-import { assetAmount, assetToBase, baseAmount } from '@thorchain/asgardex-util';
+import {
+  baseAmount,
+  assetToBase,
+  assetAmount,
+} from '@xchainjs/xchain-util';
 import { TransactionStatusService, TxActions, TxStatus } from 'src/app/_services/transaction-status.service';
 import { SlippageToleranceService } from 'src/app/_services/slippage-tolerance.service';
 
@@ -164,6 +168,7 @@ export class ConfirmSwapModalComponent implements OnDestroy {
         this.txState = TransactionConfirmationState.SUCCESS;
       } catch (error) {
         console.error('error making transfer: ', error);
+        this.error = error;
         this.txState = TransactionConfirmationState.ERROR;
       }
 
@@ -189,6 +194,7 @@ export class ConfirmSwapModalComponent implements OnDestroy {
         this.txState = TransactionConfirmationState.SUCCESS;
       } catch (error) {
         console.error('error making transfer: ', error);
+        this.error = error;
         this.txState = TransactionConfirmationState.ERROR;
       }
 
