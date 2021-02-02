@@ -150,6 +150,9 @@ export class UserService {
     if (asset.chain === 'BNB' && asset.symbol === 'BNB') {
       const max = balance - 0.01 - 0.000375;
       return (max >= 0) ? max : 0;
+    } else if (asset.chain === 'THOR' && asset.symbol === 'RUNE') {
+      const max = balance - 1;
+      return (max >= 0) ? max : 0;
     } else {
       return balance;
     }
