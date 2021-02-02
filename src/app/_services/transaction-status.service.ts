@@ -14,11 +14,12 @@ export const enum TxStatus {
 }
 
 export enum TxActions {
-  SWAP      = 'Swap',
-  DEPOSIT   = 'Deposit',
-  WITHDRAW  = 'Withdraw',
-  SEND      = 'Send',
-  REFUND    = 'Refund'
+  SWAP            = 'Swap',
+  DEPOSIT         = 'Deposit',
+  WITHDRAW        = 'Withdraw',
+  SEND            = 'Send',
+  REFUND          = 'Refund',
+  UPGRADE_RUNE    = 'Upgrade'
 }
 
 export interface Tx {

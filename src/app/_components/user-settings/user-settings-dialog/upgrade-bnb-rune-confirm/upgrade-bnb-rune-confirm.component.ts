@@ -111,7 +111,7 @@ export class UpgradeBnbRuneConfirmComponent implements OnInit, OnDestroy {
           hash: this.hash,
           ticker: this.asset.asset.ticker,
           status: TxStatus.PENDING,
-          action: TxActions.SWAP
+          action: TxActions.UPGRADE_RUNE
         });
 
         this.userService.pollNativeRuneBalance(this.runeBalance ?? 0);
