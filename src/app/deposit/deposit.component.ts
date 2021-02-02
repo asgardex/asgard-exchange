@@ -195,7 +195,9 @@ export class DepositComponent implements OnInit, OnDestroy {
         const sortedByName = poolNames.sort();
         this.selectableMarkets = sortedByName.map((poolName) => ({
           asset: new Asset(poolName),
-        }));
+        }))
+        // filter out until we can add support
+        .filter( (pool) => pool.asset.chain === 'BNB' || pool.asset.chain === 'THOR' || pool.asset.chain === 'BTC' );
 
         // Keeping RUNE at top by default
         // this.selectableMarkets.unshift({
