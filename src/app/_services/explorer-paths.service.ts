@@ -18,8 +18,13 @@ export class ExplorerPathsService {
       ? 'https://blockstream.info/testnet'
       : 'https://blockstream.info';
 
+    // this.thorchainExplorerUrl = environment.network === 'testnet'
+    //   ? 'https://multichain-testnet.thorchain.net'
+    //   : 'https://thorchain.net';
+
     this.thorchainExplorerUrl = environment.network === 'testnet'
-      ? 'https://multichain-testnet.thorchain.net'
+      ? 'https://main.d3mbd42yfy75lz.amplifyapp.com/#' // flutter web beta
       : 'https://thorchain.net';
+
   }
 }
