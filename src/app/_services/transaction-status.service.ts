@@ -51,6 +51,9 @@ export class TransactionStatusService {
     this._txs = [];
   }
 
+  // this needs to be simplified and cleaned up
+  // only check against thorchain to see if tx is successful
+  // add inputs and outputs to Tx
   addTransaction(pendingTx: Tx) {
     this._txs.unshift(pendingTx);
 
@@ -90,6 +93,8 @@ export class TransactionStatusService {
 
   }
 
+  // to deprecate
+  // this needs to be simplified and cleaned up
   pollTxOutputs(hash: string, outputLength: number, action: TxActions) {
 
     this.killOutputsPolling[hash] = new Subject();
@@ -104,7 +109,7 @@ export class TransactionStatusService {
         catchError(error => of(error))
       ).subscribe( (tx: TransactionDTO) => {
 
-        if (tx && tx.actions && tx.actions[0] && tx.actions[0].out && tx.actions[0].out.length >= outputLength) {
+        if (tx && tx.actions && tx.actions[0] && tx.actions[0].out && tx.actions[0].status.toUpperCase() === 'SUCCESS') {
 
           for (const output of tx.actions[0].out) {
 
@@ -112,16 +117,36 @@ export class TransactionStatusService {
 
             this.addTransaction({
               chain: asset.chain,
-              hash: output.txID,
+              // hash: output.txID,
+              hash,
               ticker: asset.ticker,
-              status: TxStatus.PENDING,
+              status: TxStatus.COMPLETE,
               action: (tx.actions[0].type.toUpperCase() === 'REFUND') ? TxActions.REFUND : action
             });
+
+            this.killOutputsPolling[hash].next();
           }
 
-          this.killOutputsPolling[hash].next();
-
         }
+
+        // if (tx && tx.actions && tx.actions[0] && tx.actions[0].out && tx.actions[0].out.length >= outputLength) {
+
+        //   for (const output of tx.actions[0].out) {
+
+        //     const asset = assetFromString(output.coins[0].asset);
+
+        //     this.addTransaction({
+        //       chain: asset.chain,
+        //       hash: output.txID,
+        //       ticker: asset.ticker,
+        //       status: TxStatus.PENDING,
+        //       action: (tx.actions[0].type.toUpperCase() === 'REFUND') ? TxActions.REFUND : action
+        //     });
+        //   }
+
+        //   this.killOutputsPolling[hash].next();
+
+        // }
 
       });
   }

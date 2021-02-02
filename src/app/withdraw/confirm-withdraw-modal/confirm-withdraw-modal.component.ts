@@ -128,6 +128,8 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
     // );
   }
 
+
+  // deprecated
   async keystoreTransaction(matchingPool: PoolAddressDTO, memo: string) {
 
     // const bncClient = this.binanceService.bncClient;
