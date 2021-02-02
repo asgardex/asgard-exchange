@@ -479,13 +479,19 @@ export class SwapComponent implements OnInit, OnDestroy {
        */
       // const totalAmount = getSwapOutputWithFee(baseAmount(this._sourceAssetTokenValue.amount()), pool, toRune);
       const totalAmount = getSwapOutput(baseAmount(this._sourceAssetTokenValue.amount()), pool, toRune);
-      console.log('total amount is: ', totalAmount.amount().toNumber());
+
+      const afterFee = baseAmount(totalAmount.amount().minus(
+        (toRune)
+        ? valueOfAssetInRune.amount()
+        : valueOfRuneInAsset.amount()
+      ));
 
       if (this.sourceAssetUnit) {
-        this.targetAssetUnit = (totalAmount.amount().isLessThan(0)) ? bn(0) : totalAmount.amount();
+        this.targetAssetUnit = (afterFee.amount().isLessThan(0)) ? bn(0) : afterFee.amount();
       } else {
-        this.targetAssetUnit = (this.sourceAssetUnit) ? (totalAmount.amount().isLessThan(0)) ? bn(0) : totalAmount.amount() : null;
+        this.targetAssetUnit = (this.sourceAssetUnit) ? (afterFee.amount().isLessThan(0)) ? bn(0) : afterFee.amount() : null;
       }
+
     }
 
     this.calculatingTargetAsset = false;
