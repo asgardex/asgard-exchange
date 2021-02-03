@@ -174,16 +174,20 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
     let client: binanceClient | bitcoinClient;
     let address: string;
     let recipientPool: PoolAddressDTO;
+    let feeRate;
 
     switch (this.data.asset.chain) {
       case 'BNB':
         client = clients.binance;
         recipientPool = pools.current.find( (pool) => pool.chain === 'BNB' );
+        feeRate = 0.000375;
         break;
 
       case 'BTC':
         client = clients.bitcoin;
         recipientPool = pools.current.find( (pool) => pool.chain === 'BTC' );
+        const feeRates = await client.getFeeRates();
+        feeRate = feeRates.average;
         break;
     }
 
@@ -219,17 +223,12 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
     // deposit token
     try {
 
-      const fees = await client.getFees();
-      console.log('fees are: ', fees.average.amount().toNumber());
-      console.log('targetTokenMemo: ', targetTokenMemo);
-      console.log('recipient pool is: ', recipientPool);
-      // fees.
 
       const hash = await client.transfer({
         amount: assetToBase(assetAmount(this.data.assetAmount)),
         recipient: recipientPool.address,
         memo: targetTokenMemo,
-        feeRate: fees.average.amount().toNumber()
+        feeRate
       });
 
       this.hash = hash;
