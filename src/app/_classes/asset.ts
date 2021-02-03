@@ -1,8 +1,9 @@
 import { CoinIconsFromTrustWallet } from 'src/app/_const/icon-list';
+import { Chain } from '@xchainjs/xchain-util';
 
 export class Asset {
 
-  chain: 'BNB' | 'BTC' | 'ETH' | 'THOR';
+  chain: Chain;
   symbol: string;
   ticker: string;
   iconPath: string;
@@ -28,6 +29,10 @@ export class Asset {
           this.iconPath = 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/BTCB-1DE/logo.png';
           break;
 
+        case 'THOR.RUNE':
+          this.iconPath = 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/RUNE-B1A/logo.png';
+          break;
+
         default:
           console.warn(`Icon not available for poolName ${poolName}. Add override in src\\app\\_classes\\asset.ts`);
           this.iconPath = 'assets/images/token-icons/unknown.png';
@@ -38,17 +43,17 @@ export class Asset {
   }
 
   getAssetFromString(poolName: string): {
-    chain: 'BNB' | 'BTC' | 'ETH' | 'THOR';
+    chain: Chain;
     symbol: string;
     ticker: string;
   } {
-    let chain: 'BNB' | 'BTC' | 'ETH' | 'THOR';
+    let chain: Chain;
     let symbol: string;
     let ticker: string;
 
     const data = poolName.split('.');
     if (poolName.includes('.')) {
-      chain = data[0] as 'BNB' | 'BTC' | 'ETH' | 'THOR';
+      chain = data[0] as Chain;
       symbol = data[1];
     } else {
       symbol = data[0];

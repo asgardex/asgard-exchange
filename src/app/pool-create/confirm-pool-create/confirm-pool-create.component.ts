@@ -1,6 +1,6 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { assetAmount, assetToBase } from '@thorchain/asgardex-util';
+import { assetAmount, assetToBase } from '@xchainjs/xchain-util';
 import { MultiTransfer } from '@xchainjs/xchain-binance';
 import { Subscription } from 'rxjs';
 import { User } from 'src/app/_classes/user';
@@ -52,7 +52,7 @@ export class ConfirmPoolCreateComponent implements OnInit, OnDestroy {
   submitTransaction(): void {
     this.txState = TransactionConfirmationState.SUBMITTING;
 
-    this.midgardService.getProxiedPoolAddresses().subscribe(
+    this.midgardService.getInboundAddresses().subscribe(
       async (res) => {
 
         const currentPools = res.current;

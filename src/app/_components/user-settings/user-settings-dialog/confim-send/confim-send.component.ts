@@ -1,5 +1,9 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
-import { assetAmount, assetToBase, baseAmount } from '@thorchain/asgardex-util';
+import {
+  baseAmount,
+  assetToBase,
+  assetAmount,
+} from '@xchainjs/xchain-util';
 import { Subscription } from 'rxjs';
 import { AssetAndBalance } from 'src/app/_classes/asset-and-balance';
 import { User } from 'src/app/_classes/user';
@@ -54,7 +58,40 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
 
     if (this.asset && this.asset.asset) {
 
-      if (this.asset.asset.chain === 'BNB') {
+      if (this.asset.asset.chain === 'THOR') {
+
+        const client = this.user.clients.thorchain;
+        if (!client) {
+          console.error('no thorchain client found');
+          return;
+        }
+
+        try {
+
+          const fees = await client.getFees();
+          // const amount = this.amount - fees.average.amount().toNumber();
+          const test = assetToBase(assetAmount(this.amount)).amount().toNumber();
+
+          const hash = await client.transfer({
+            // amount: assetToBase(assetAmount(amount)),
+            amount: baseAmount(test - fees.average.amount().toNumber()),
+            recipient: this.recipientAddress,
+          });
+
+          this.txStatusService.addTransaction({
+            chain: 'THOR',
+            hash,
+            ticker: this.asset.asset.ticker,
+            status: TxStatus.COMPLETE,
+            action: TxActions.SEND
+          });
+          this.transactionSuccessful.next();
+        } catch (error) {
+          console.error('error making transfer: ', error);
+          this.txState = TransactionConfirmationState.ERROR;
+        }
+
+      } else if (this.asset.asset.chain === 'BNB') {
 
         const binanceClient = this.user.clients.binance;
 

@@ -15,6 +15,7 @@ export class PendingTxsModalComponent implements OnInit, OnDestroy {
   subs: Subscription[];
   bitcoinExplorerUrl: string;
   binanceExplorerUrl: string;
+  thorchainExplorerUrl: string;
   @Output() back: EventEmitter<null>;
 
   constructor(
@@ -28,6 +29,7 @@ export class PendingTxsModalComponent implements OnInit, OnDestroy {
 
     this.binanceExplorerUrl = `${this.explorerPathsService.binanceExplorerUrl}/tx`;
     this.bitcoinExplorerUrl = `${this.explorerPathsService.bitcoinExplorerUrl}/tx`;
+    this.thorchainExplorerUrl = `${this.explorerPathsService.thorchainExplorerUrl}/tx`;
 
     const pendingTxs$ = this.txStatusService.txs$.subscribe( (txs) => {
       this.txs = txs;
@@ -41,7 +43,23 @@ export class PendingTxsModalComponent implements OnInit, OnDestroy {
 
   }
 
-  close() {
+  explorerUrl(chain: string): string {
+    switch (chain) {
+      case 'BTC':
+        return this.bitcoinExplorerUrl;
+
+      case 'BNB':
+        return this.binanceExplorerUrl;
+
+      case 'THOR':
+        return this.thorchainExplorerUrl;
+
+      default:
+        return '';
+    }
+  }
+
+  close(): void {
     this.dialogRef.close();
   }
 

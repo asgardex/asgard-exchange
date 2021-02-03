@@ -3,11 +3,13 @@
 export type WalletType = 'keystore' | 'walletconnect' | 'ledger';
 import { Client as binanceClient } from '@xchainjs/xchain-binance';
 import { Client as bitcoinClient } from '@xchainjs/xchain-bitcoin';
+import { Client as thorchainClient } from '@xchainjs/xchain-thorchain';
 import { Balances } from '@xchainjs/xchain-client';
 
-interface AvailableClients {
+export interface AvailableClients {
   binance?: binanceClient;
   bitcoin?: bitcoinClient;
+  thorchain?: thorchainClient;
 }
 
 export class User {

@@ -1,4 +1,4 @@
-import { AssetAmount } from '@thorchain/asgardex-util';
+import { AssetAmount } from '@xchainjs/xchain-util';
 import { Asset } from './asset';
 
 export type AssetAndBalance = {

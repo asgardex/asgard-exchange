@@ -6,7 +6,7 @@ import { Subscription } from 'rxjs';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { User } from 'src/app/_classes/user';
 import { Balance, Balances } from '@xchainjs/xchain-client';
-import { baseToAsset } from '@thorchain/asgardex-util';
+import { baseToAsset } from '@xchainjs/xchain-util';
 import { AssetAndBalance } from 'src/app/_classes/asset-and-balance';
 
 

@@ -13,7 +13,7 @@
 
       <span>Amount</span>
 
-      <span class="unstake-percent">{{unstakePercent}}%</span>
+      <span class="unstake-percent">{{withdrawPercent}}%</span>
 
       <mat-slider
         class="slider"
@@ -22,7 +22,7 @@
         [min]="0"
         step="1"
         [tickInterval]="25"
-        [(ngModel)]="unstakePercent">
+        [(ngModel)]="withdrawPercent">
       </mat-slider>
 
     </div>
@@ -70,13 +70,19 @@
 
       <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
         <span class="tx-detail-label"></span>
-        <span>{{assetBasePrice | number:"0.0-4"}} {{asset.ticker}}</span>
+        <!-- TODO: estimate this on the fly -->
+        <span>+ {{asset.ticker}} Network Gas</span>
       </div>
 
-      <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
+      <!-- <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
+        <span class="tx-detail-label"></span>
+        <span>{{assetBasePrice | number:"0.0-4"}} {{asset.ticker}}</span>
+      </div> -->
+
+      <!-- <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
         <span class="tx-detail-label">Network Fee</span>
         <span>0.0003 BNB</span>
-      </div>
+      </div> -->
 
     </div>
 

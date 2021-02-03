@@ -42,7 +42,7 @@
     </div>
 
     <div>
-      <div mat-dialog-content class="confirm-modal-content">
+      <div mat-dialog-content class="confirm-modal-content" style="float: left; width: 100%">
 
         <div>
 
@@ -51,24 +51,33 @@
             <span>1 {{data.rune.ticker}} = {{data.assetBasePrice | number:"1.2-4"}} {{data.asset.ticker}}</span>
           </div>
 
+          <br />
+
           <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
             <span class="tx-detail-label"></span>
             <span>1 {{data.asset.ticker}} = {{data.runeBasePrice | number:"1.2-4"}} {{data.rune.ticker}}</span>
           </div>
 
-          <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
+          <br />
+
+          <!-- <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
             <span class="tx-detail-label">BNB Fee</span>
             <span>0.0003</span>
-          </div>
+          </div> -->
+
+          <br />
 
           <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
             <span class="tx-detail-label">RUNE Fee</span>
             <span>1</span>
           </div>
 
+          <br />
+
           <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
             <span class="tx-detail-label">{{data.asset.ticker}} Fee</span>
-            <span>{{data.assetBasePrice | number:"0.0-4"}}</span>
+            <!-- TODO: calculate this -->
+            <span>{{data.asset.ticker}} Network Gas</span>
           </div>
 
         </div>
@@ -97,10 +106,16 @@
 
   <app-transaction-success-modal
     *ngIf="txState === 'SUCCESS'"
-    chain="BNB"
+    chain="THOR"
     [hash]="hash"
     (closeDialog)="closeDialog(true)">
   </app-transaction-success-modal>
+
+  <div style="font-size: 0.8rem; padding: 2rem 0" class="flxr flxr--flow-col flxr--align-center" *ngIf="txState === 'ERROR'">
+    <mat-icon>warning</mat-icon>
+    <span *ngIf="error">{{error}}</span>
+    <span *ngIf="!error">Something went wrong</span>
+  </div>
 
 </div>
 

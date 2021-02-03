@@ -48,12 +48,24 @@ import { CopyService } from './_services/copy.service';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatRadioModule } from '@angular/material/radio';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSliderModule } from '@angular/material/slider';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 /** EXTERNAL */
 import { QRCodeModule } from 'angularx-qrcode';
+import { UpgradeBnbRuneComponent } from './_components/user-settings/user-settings-dialog/upgrade-bnb-rune/upgrade-bnb-rune.component';
+import { UpgradeBnbRuneConfirmComponent } from './_components/user-settings/user-settings-dialog/upgrade-bnb-rune-confirm/upgrade-bnb-rune-confirm.component';
+import { ViewPhraseComponent } from './_components/user-settings/user-settings-dialog/view-phrase/view-phrase.component';
+import { DepositComponent } from './_components/user-settings/user-settings-dialog/deposit/deposit.component';
+import {
+  DepositConfirmComponent
+} from './_components/user-settings/user-settings-dialog/deposit/deposit-confirm/deposit-confirm.component';
+import { DepositFormComponent } from './_components/user-settings/user-settings-dialog/deposit/deposit-form/deposit-form.component';
+import { TransactionSuccessModalModule } from './_components/transaction-success-modal/transaction-success-modal.module';
 
 
 @NgModule({
@@ -77,6 +89,12 @@ import { QRCodeModule } from 'angularx-qrcode';
     ReconnectDialogComponent,
     SlippageToleranceComponent,
     TestnetWarningComponent,
+    UpgradeBnbRuneComponent,
+    UpgradeBnbRuneConfirmComponent,
+    ViewPhraseComponent,
+    DepositComponent,
+    DepositConfirmComponent,
+    DepositFormComponent,
   ],
   imports: [
     AssetInputModule,
@@ -87,13 +105,17 @@ import { QRCodeModule } from 'angularx-qrcode';
     HttpClientModule,
     MatButtonModule,
     MatIconModule,
+    MatInputModule,
     MatDialogModule,
     MatRadioModule,
     MatProgressSpinnerModule,
+    MatSelectModule,
+    MatSliderModule,
     MatSnackBarModule,
     TransactionProcessingModalModule,
     QRCodeModule,
     AppRoutingModule,
+    TransactionSuccessModalModule,
   ],
   providers: [
     BinanceService,

@@ -1,20 +1,22 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
 import { User } from '../_classes/user';
 import {
   Client as binanceClient,
   BinanceClient,
 } from '@thorchain/asgardex-binance';
 import { Market, MarketResponse } from '../_classes/market';
-import { assetAmount, baseToAsset } from '@thorchain/asgardex-util';
 import { environment } from 'src/environments/environment';
 import { Asset } from '../_classes/asset';
 import { Balances } from '@xchainjs/xchain-client';
 import { BncClient } from '@binance-chain/javascript-sdk/lib/client';
 import {
-  assetFromString,
+  assetAmount,
   assetToBase,
-} from '@thorchain/asgardex-util';
+  assetFromString,
+  baseToAsset
+} from '@xchainjs/xchain-util';
+import { BehaviorSubject, of, Subject, timer } from 'rxjs';
+import { catchError, switchMap, takeUntil } from 'rxjs/operators';
 
 export interface MidgardData<T> {
   key: string;
@@ -36,6 +38,8 @@ export class UserService {
 
   private userBalancesSource = new BehaviorSubject<Balances>(null);
   userBalances$ = this.userBalancesSource.asObservable();
+
+  private killRunePolling: Subject<void> = new Subject();
 
   asgardexBncClient: BinanceClient;
 
@@ -107,10 +111,47 @@ export class UserService {
 
   }
 
+  /**
+   * Midgard has no way to tell when BNB has been successfully upgraded to RUNE
+   * so we poll the native RUNE balance to check for a difference
+   */
+  pollNativeRuneBalance(currentBalance: number) {
+
+    if (this._user && this._user.clients && this._user.clients.thorchain) {
+
+      timer(5000, 15000)
+      .pipe(
+        // This kills the request if the user closes the component
+        takeUntil(this.killRunePolling),
+        // switchMap cancels the last request, if no response have been received since last tick
+        // switchMap(() => this.midgardService.getTransaction(tx.hash)),
+        switchMap(() => this._user.clients.thorchain.getBalance()),
+        // catchError handles http throws
+        catchError(error => of(error))
+      ).subscribe( async (res: Balances) => {
+
+        const runeBalance = this.findBalance(res, new Asset('THOR.RUNE'));
+        if (runeBalance && currentBalance < runeBalance) {
+          console.log('increased!');
+          this.fetchBalances();
+          this.killRunePolling.next();
+        }
+
+      });
+
+    } else {
+      console.error('no thorchain client found');
+    }
+
+  }
+
   maximumSpendableBalance(asset: Asset, balance: number) {
 
     if (asset.chain === 'BNB' && asset.symbol === 'BNB') {
       const max = balance - 0.01 - 0.000375;
+      return (max >= 0) ? max : 0;
+    } else if (asset.chain === 'THOR' && asset.symbol === 'RUNE') {
+      const max = balance - 1;
       return (max >= 0) ? max : 0;
     } else {
       return balance;

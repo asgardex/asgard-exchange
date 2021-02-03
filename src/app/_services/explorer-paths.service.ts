@@ -8,6 +8,7 @@ export class ExplorerPathsService {
 
   binanceExplorerUrl: string;
   bitcoinExplorerUrl: string;
+  thorchainExplorerUrl: string;
 
   constructor() {
     this.binanceExplorerUrl = environment.network === 'testnet'
@@ -16,5 +17,14 @@ export class ExplorerPathsService {
     this.bitcoinExplorerUrl = environment.network === 'testnet'
       ? 'https://blockstream.info/testnet'
       : 'https://blockstream.info';
+
+    // this.thorchainExplorerUrl = environment.network === 'testnet'
+    //   ? 'https://multichain-testnet.thorchain.net'
+    //   : 'https://thorchain.net';
+
+    this.thorchainExplorerUrl = environment.network === 'testnet'
+      ? 'https://main.d3mbd42yfy75lz.amplifyapp.com/#' // flutter web beta
+      : 'https://thorchain.net';
+
   }
 }

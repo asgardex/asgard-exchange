@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
+import { Component, Inject, OnDestroy } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { User } from 'src/app/_classes/user';
 import { MidgardService } from 'src/app/_services/midgard.service';
@@ -10,7 +10,11 @@ import { tokenAmount, tokenToBase } from '@thorchain/asgardex-token';
 import { Subscription } from 'rxjs';
 import { BinanceService } from 'src/app/_services/binance.service';
 import { WalletConnectService } from 'src/app/_services/wallet-connect.service';
-import { assetAmount, assetToBase, baseAmount } from '@thorchain/asgardex-util';
+import {
+  baseAmount,
+  assetToBase,
+  assetAmount,
+} from '@xchainjs/xchain-util';
 import { TransactionStatusService, TxActions, TxStatus } from 'src/app/_services/transaction-status.service';
 import { SlippageToleranceService } from 'src/app/_services/slippage-tolerance.service';
 
@@ -32,7 +36,7 @@ export interface SwapData {
   templateUrl: './confirm-swap-modal.component.html',
   styleUrls: ['./confirm-swap-modal.component.scss']
 })
-export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
+export class ConfirmSwapModalComponent implements OnDestroy {
 
   confirmationPending: boolean;
   transactionSubmitted: boolean;
@@ -65,8 +69,6 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
 
   }
 
-  ngOnInit(): void {
-  }
 
   closeDialog(transactionSucess?: boolean) {
     this.dialogRef.close(transactionSucess);
@@ -76,44 +78,67 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
 
     this.txState = TransactionConfirmationState.SUBMITTING;
 
-    this.midgardService.getProxiedPoolAddresses().subscribe(
-      async (res) => {
+    // Source asset is not RUNE
+    if (this.swapData.sourceAsset.chain === 'BNB' || this.swapData.sourceAsset.chain === 'BTC') {
 
-        const currentPools = res.current;
+      this.midgardService.getInboundAddresses().subscribe(
+        async (res) => {
 
-        if (currentPools && currentPools.length > 0) {
+          const currentPools = res.current;
 
-          const matchingPool = currentPools.find( (pool) => pool.chain === this.swapData.sourceAsset.chain );
+          if (currentPools && currentPools.length > 0) {
 
-          console.log('matching pool is: ', matchingPool);
+            const matchingPool = currentPools.find( (pool) => pool.chain === this.swapData.sourceAsset.chain );
 
-          if (matchingPool) {
+            console.log('matching pool is: ', matchingPool);
 
-            if (this.swapData.user.type === 'keystore' || this.swapData.user.type === 'ledger') {
-              this.keystoreTransfer(matchingPool);
-            } else if (this.swapData.user.type === 'walletconnect') {
-              this.walletConnectTransfer(matchingPool);
+            if (matchingPool) {
+
+              if (this.swapData.user.type === 'keystore' || this.swapData.user.type === 'ledger') {
+                this.keystoreTransfer(matchingPool);
+              } else if (this.swapData.user.type === 'walletconnect') {
+                this.walletConnectTransfer(matchingPool);
+              }
+
             }
 
           }
 
         }
+      );
 
-      }
-    );
+    } else { // RUNE is source asset
+      this.keystoreTransfer();
+    }
 
   }
 
-  async keystoreTransfer(matchingPool: PoolAddressDTO) {
+  async keystoreTransfer(matchingPool?: PoolAddressDTO) {
 
     const amountNumber = this.swapData.inputValue;
     const binanceClient = this.swapData.user.clients.binance;
     const bitcoinClient = this.swapData.user.clients.bitcoin;
+    const thorClient = this.swapData.user.clients.thorchain;
     const bitcoinAddress = await bitcoinClient.getAddress();
     const binanceAddress = await binanceClient.getAddress();
-    const targetAddress = (this.swapData.targetAsset.chain === 'BTC')
-      ? bitcoinAddress
-      : binanceAddress;
+    const runeAddress = await thorClient.getAddress();
+
+    let targetAddress = '';
+
+    switch (this.swapData.targetAsset.chain) {
+      case 'BTC':
+        targetAddress = bitcoinAddress;
+        break;
+
+      case 'BNB':
+        targetAddress = binanceAddress;
+        break;
+
+      case 'THOR':
+        targetAddress = runeAddress;
+        break;
+    }
+
     const floor = this.slipLimitService.getSlipLimitFromAmount(this.swapData.outputValue);
 
     const memo = this.getSwapMemo(
@@ -123,7 +148,31 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
       Math.floor(floor.toNumber())
     );
 
-    if (this.swapData.sourceAsset.chain === 'BNB') {
+    if (this.swapData.sourceAsset.chain === 'THOR') {
+
+      try {
+        const hash = await thorClient.deposit({
+          amount: assetToBase(assetAmount(amountNumber)),
+          memo
+        });
+
+        this.hash = hash;
+        this.txStatusService.addTransaction({
+          chain: 'THOR',
+          hash: this.hash,
+          ticker: this.swapData.sourceAsset.ticker,
+          status: TxStatus.PENDING,
+          action: TxActions.SWAP
+        });
+        this.txStatusService.pollTxOutputs(hash, 1, TxActions.SWAP);
+        this.txState = TransactionConfirmationState.SUCCESS;
+      } catch (error) {
+        console.error('error making transfer: ', error);
+        this.error = error;
+        this.txState = TransactionConfirmationState.ERROR;
+      }
+
+    } else if (this.swapData.sourceAsset.chain === 'BNB') {
 
       try {
         const hash = await binanceClient.transfer({
@@ -145,6 +194,7 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
         this.txState = TransactionConfirmationState.SUCCESS;
       } catch (error) {
         console.error('error making transfer: ', error);
+        this.error = error;
         this.txState = TransactionConfirmationState.ERROR;
       }
 
@@ -152,13 +202,12 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
 
       try {
 
-        console.log('matching pool address is: ', matchingPool.address);
-
         const fee = await bitcoinClient.getFeesWithMemo(memo);
         const feeRates = await bitcoinClient.getFeeRates();
         const toBase = assetToBase(assetAmount(amountNumber));
         const amount = toBase.amount().minus(fee.average.amount());
         console.log('fee is: ', fee.average.amount().toNumber());
+        console.log('memo is: ', memo);
 
         const hash = await bitcoinClient.transfer({
           amount: baseAmount(amount),
@@ -256,11 +305,11 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
 
   }
 
-  getSwapMemo(chain: string, symbol: string, addr: string, sliplimit: number) {
-    return `SWAP:${chain}.${symbol}:${addr}:${sliplimit}`;
+  getSwapMemo(chain: string, symbol: string, addr: string, sliplimit: number): string {
+    return `=:${chain}.${symbol}:${addr}:${sliplimit}`;
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     for (const sub of this.subs) {
       sub.unsubscribe();
     }

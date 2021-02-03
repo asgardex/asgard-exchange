@@ -4,8 +4,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Fee, Fees, TransferFee, DexFees, BinanceClient, Client as binanceClient, } from '@thorchain/asgardex-binance';
 import { Observable } from 'rxjs';
 import { TransferFees } from '../_classes/binance-fee';
-import { baseAmount } from '@thorchain/asgardex-token';
-import Transaction from '@binance-chain/javascript-sdk/lib/tx';
+import { baseAmount } from '@xchainjs/xchain-util';
 
 @Injectable({
   providedIn: 'root'
@@ -57,7 +56,21 @@ export class BinanceService {
 
   getTransferFees(feesData: Fees) {
 
-    const fees = this.getTransferFeeds(feesData);
+    const fees = feesData.reduce((acc: TransferFees, dataItem) => {
+      if (!acc && this.isTransferFee(dataItem)) {
+        const single = dataItem.fixed_fee_params.fee;
+        const multi = dataItem.multi_transfer_fee;
+        if (single && multi) {
+          return {
+            single: baseAmount(single),
+            multi: baseAmount(multi)
+          } as TransferFees;
+        }
+        return null;
+      }
+      return acc;
+    }, null);
+
     if (fees) {
       return fees;
     } else {
@@ -83,19 +96,19 @@ export class BinanceService {
     !!(v as TransferFee)?.multi_transfer_fee;
   }
 
-  getTransferFeeds(fees: Fees): TransferFees {
-    return fees.reduce((acc: TransferFees, dataItem) => {
-      if (!acc && this.isTransferFee(dataItem)) {
-        const single = dataItem.fixed_fee_params.fee;
-        const multi = dataItem.multi_transfer_fee;
-        if (single && multi) {
-          return { single: baseAmount(single), multi: baseAmount(multi) } as TransferFees;
-        }
-        return null;
-      }
-      return acc;
-    }, null);
-  }
+  // getTransferFeeds(fees: Fees): TransferFees {
+  //   return fees.reduce((acc: TransferFees, dataItem) => {
+  //     if (!acc && this.isTransferFee(dataItem)) {
+  //       const single = dataItem.fixed_fee_params.fee;
+  //       const multi = dataItem.multi_transfer_fee;
+  //       if (single && multi) {
+  //         return { single: baseAmount(single), multi: baseAmount(multi) } as TransferFees;
+  //       }
+  //       return null;
+  //     }
+  //     return acc;
+  //   }, null);
+  // }
 
   getTx(hash: string) {
     const params = new HttpParams().set('format', 'json');

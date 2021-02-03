@@ -38,9 +38,16 @@
       [selectableMarkets]="selectableMarkets">
     </app-asset-input>
 
-    <div *ngIf="basePrice && selectedTargetAsset && selectedSourceAsset" class="flxr flxr--just-space-between base-price">
+    <div *ngIf="selectedTargetAsset && selectedSourceAsset" class="flxr flxr--just-space-between swap-details">
       <span>Price:</span>
-      <span>{{basePrice | number:"1.2-6"}}  {{selectedSourceAsset.ticker}} per {{selectedTargetAsset.ticker}}</span>
+      <span *ngIf="basePrice">{{basePrice | number:"1.2-6"}}  {{selectedSourceAsset.ticker}} per {{selectedTargetAsset.ticker}}</span>
+      <span *ngIf="!basePrice">-</span>
+    </div>
+
+    <div *ngIf="selectedTargetAsset && selectedSourceAsset" class="flxr flxr--just-space-between swap-details">
+      <span class="tx-detail-label">Slip</span>
+      <span *ngIf="slip">{{slip | percent:"0.2-4" }}</span>
+      <span *ngIf="!slip">-</span>
     </div>
 
     <div>
@@ -55,7 +62,7 @@
       </button>
     </div>
 
-    <div class="tag" *ngIf="basePrice && selectedTargetAsset && selectedSourceAsset && runeTransactionFee && binanceTransferFeeDisplay">
+    <!-- <div class="tag" *ngIf="basePrice && selectedTargetAsset && selectedSourceAsset">
       <div class="tag-contents">
         <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
           <span class="tx-detail-label">Total Fee</span>
@@ -70,7 +77,7 @@
           <span>{{slip | percent:"0.2-4" }}</span>
         </div>
       </div>
-    </div>
+    </div> -->
 
   </div>
 

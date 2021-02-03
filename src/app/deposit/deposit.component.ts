@@ -1,8 +1,12 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { assetAmount, assetToBase, baseAmount, getValueOfAssetInRune, getValueOfRuneInAsset, PoolData } from '@thorchain/asgardex-util';
+import { getValueOfAssetInRune, getValueOfRuneInAsset, PoolData } from '@thorchain/asgardex-util';
+import {
+  baseAmount,
+  assetToBase,
+  assetAmount,
+} from '@xchainjs/xchain-util';
 import { Subscription } from 'rxjs';
-import { environment } from 'src/environments/environment';
 import { Asset } from '../_classes/asset';
 import { MidgardService } from '../_services/midgard.service';
 import { UserService } from '../_services/user.service';
@@ -20,7 +24,6 @@ import { AssetAndBalance } from '../_classes/asset-and-balance';
 })
 export class DepositComponent implements OnInit, OnDestroy {
 
-  runeSymbol = environment.network === 'chaosnet' ? 'RUNE-B1A' : 'RUNE-67C';
 
   /**
    * Rune
@@ -99,7 +102,7 @@ export class DepositComponent implements OnInit, OnDestroy {
     private midgardService: MidgardService,
     private cgService: CoinGeckoService
   ) {
-    this.rune = new Asset(`BNB.${this.runeSymbol}`);
+    this.rune = new Asset('THOR.RUNE');
 
     const balances$ = this.userService.userBalances$.subscribe(
       (balances) => {
@@ -157,16 +160,28 @@ export class DepositComponent implements OnInit, OnDestroy {
   }
 
   getPoolDetail(asset: string) {
-    this.midgardService.getPoolDetails([asset], 'simple').subscribe(
+    // this.midgardService.getPoolDetails([asset], 'simple').subscribe(
+    //   (res) => {
+
+    //     if (res && res.length > 0) {
+
+    //       this.assetPoolData = {
+    //         assetBalance: baseAmount(res[0].assetDepth),
+    //         runeBalance: baseAmount(res[0].runeDepth),
+    //       };
+
+    //     }
+    //   },
+    //   (err) => console.error('error getting pool detail: ', err)
+    // );
+
+    this.midgardService.getPool(asset).subscribe(
       (res) => {
-
-        if (res && res.length > 0) {
-
+        if (res) {
           this.assetPoolData = {
-            assetBalance: baseAmount(res[0].assetDepth),
-            runeBalance: baseAmount(res[0].runeDepth),
+            assetBalance: baseAmount(res.assetDepth),
+            runeBalance: baseAmount(res.runeDepth),
           };
-
         }
       },
       (err) => console.error('error getting pool detail: ', err)
@@ -176,10 +191,13 @@ export class DepositComponent implements OnInit, OnDestroy {
   getPools() {
     this.midgardService.getPools().subscribe(
       (res) => {
-        const sortedByName = res.sort();
+        const poolNames = res.map( (pool) => pool.asset );
+        const sortedByName = poolNames.sort();
         this.selectableMarkets = sortedByName.map((poolName) => ({
           asset: new Asset(poolName),
-        }));
+        }))
+        // filter out until we can add support
+        .filter( (pool) => pool.asset.chain === 'BNB' || pool.asset.chain === 'THOR' || pool.asset.chain === 'BTC' );
 
         // Keeping RUNE at top by default
         // this.selectableMarkets.unshift({

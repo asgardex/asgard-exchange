@@ -10,7 +10,7 @@ import { MidgardService } from '../../_services/midgard.service';
 import { UserService } from '../../_services/user.service';
 import { WalletConnectService } from '../../_services/wallet-connect.service';
 import { environment } from 'src/environments/environment';
-import { assetAmount, assetToBase } from '@thorchain/asgardex-util';
+import { assetAmount, assetToBase } from '@xchainjs/xchain-util';
 import { TransactionStatusService, TxActions, TxStatus } from 'src/app/_services/transaction-status.service';
 
 // TODO: this is the same as ConfirmStakeData in confirm stake modal
@@ -37,6 +37,7 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
   hash: string;
   subs: Subscription[];
   killPolling: Subject<void> = new Subject();
+  error: string;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: ConfirmWithdrawData,
@@ -62,37 +63,73 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
   }
 
-  submitTransaction(): void {
+  async submitTransaction(): Promise<void> {
     this.txState = TransactionConfirmationState.SUBMITTING;
 
-    this.midgardService.getProxiedPoolAddresses().subscribe(
-      async (res) => {
+    const thorClient = this.data.user.clients.thorchain;
+    if (!thorClient) {
+      console.error('no thor client found!');
+      return;
+    }
 
-        const currentPools = res.current;
+    const txCost = assetToBase(assetAmount(0.00000001));
 
-        if (currentPools && currentPools.length > 0) {
+    const memo = `WITHDRAW:${this.data.asset.chain}.${this.data.asset.symbol}:${this.data.unstakePercent * 100}`;
 
-          const matchingPool = currentPools.find( (pool) => pool.chain === this.data.asset.chain );
-          const bnbPool = currentPools.find( (pool) => pool.chain === 'BNB' );
+    // withdraw RUNE
+    try {
+      const hash = await thorClient.deposit({
+        amount: txCost,
+        memo,
+      });
 
-          const memo = `WITHDRAW:${this.data.asset.chain}.${this.data.asset.symbol}:${this.data.unstakePercent * 100}`;
+      this.hash = hash;
+      this.txStatusService.addTransaction({
+        chain: 'THOR',
+        hash: this.hash,
+        ticker: 'RUNE',
+        status: TxStatus.PENDING,
+        action: TxActions.WITHDRAW
+      });
 
-          if (bnbPool) {
+      this.txSuccess(hash);
+      // this.txStatusService.pollTxOutputs(hash, 2, TxActions.WITHDRAW);
+    } catch (error) {
+      console.error('error making RUNE withdraw: ', error);
+      this.error = error;
+      this.txState = TransactionConfirmationState.ERROR;
+    }
 
-            if (this.data.user.type === 'keystore' || this.data.user.type === 'ledger') {
-              this.keystoreTransaction(bnbPool, memo);
-            } else if (this.data.user.type === 'walletconnect') {
-              this.walletConnectTransaction(bnbPool, memo);
-            }
+    // this.midgardService.getInboundAddresses().subscribe(
+    //   async (res) => {
 
-          }
+    //     const currentPools = res.current;
 
-        }
+    //     if (currentPools && currentPools.length > 0) {
 
-      }
-    );
+    //       const matchingPool = currentPools.find( (pool) => pool.chain === this.data.asset.chain );
+    //       const bnbPool = currentPools.find( (pool) => pool.chain === 'BNB' );
+
+    //       const memo = `WITHDRAW:${this.data.asset.chain}.${this.data.asset.symbol}:${this.data.unstakePercent * 100}`;
+
+    //       if (bnbPool) {
+
+    //         if (this.data.user.type === 'keystore' || this.data.user.type === 'ledger') {
+    //           this.keystoreTransaction(bnbPool, memo);
+    //         } else if (this.data.user.type === 'walletconnect') {
+    //           this.walletConnectTransaction(bnbPool, memo);
+    //         }
+
+    //       }
+
+    //     }
+
+    //   }
+    // );
   }
 
+
+  // deprecated
   async keystoreTransaction(matchingPool: PoolAddressDTO, memo: string) {
 
     // const bncClient = this.binanceService.bncClient;
@@ -121,6 +158,7 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
       this.txStatusService.pollTxOutputs(hash, 2, TxActions.WITHDRAW);
       // this.fetchOutputs(hash);
     } catch (error) {
+      this.error = error;
       console.error('error withdrawing: ', error);
     }
 
@@ -211,7 +249,7 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
     this.txState = TransactionConfirmationState.SUCCESS;
     this.hash = hash;
     this.txStatusService.addTransaction({
-      chain: 'BNB',
+      chain: 'THOR',
       hash: this.hash,
       ticker: `${this.data.asset.ticker}-RUNE`,
       status: TxStatus.PENDING,
