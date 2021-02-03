@@ -248,67 +248,6 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
 
   }
 
-  async multichainKeystoreTx(corePool: PoolAddressDTO, bnbPool: PoolAddressDTO) {
-    const binanceClient = this.data.user.clients.binance;
-    const bitcoinClient = this.data.user.clients.bitcoin;
-    const bitcoinAddress = await bitcoinClient.getAddress();
-    const binanceAddress = await binanceClient.getAddress();
-    const asset = this.data.asset;
-
-    const coreChainMemo = `STAKE:${asset.chain}.${asset.symbol}:${binanceAddress}`;
-    const bnbMemo = `STAKE:${asset.chain}.${asset.symbol}:${bitcoinAddress}`;
-
-    // send RUNE
-    try {
-      const hash = await binanceClient.transfer({
-        asset: this.data.rune,
-        amount: assetToBase(assetAmount(this.data.runeAmount)),
-        recipient: bnbPool.address,
-        memo: bnbMemo
-      });
-
-      this.hash = hash;
-      this.txStatusService.addTransaction({
-        chain: 'BNB',
-        hash: this.hash,
-        ticker: 'RUNE',
-        status: TxStatus.PENDING,
-        action: TxActions.DEPOSIT
-      });
-    } catch (error) {
-      console.error('error making transfer: ', error);
-      this.txState = TransactionConfirmationState.ERROR;
-      return;
-    }
-
-    // send BTC
-    try {
-
-      const feeRates = await bitcoinClient.getFeeRates();
-
-      const hash = await bitcoinClient.transfer({
-        amount: assetToBase(assetAmount(this.data.assetAmount)),
-        recipient: corePool.address,
-        memo: coreChainMemo,
-        feeRate: feeRates.average
-      });
-
-      this.hash = hash;
-      this.txStatusService.addTransaction({
-        chain: 'BTC',
-        hash: this.hash,
-        ticker: 'BTC',
-        status: TxStatus.PENDING,
-        action: TxActions.DEPOSIT
-      });
-      this.txState = TransactionConfirmationState.SUCCESS;
-    } catch (error) {
-      console.error('error making transfer: ', error);
-      this.txState = TransactionConfirmationState.ERROR;
-    }
-
-  }
-
   /** currently deprecated */
   walletConnectTransaction(outputs: MultiTransfer[], memo: string, matchingPool: PoolAddressDTO) {
 
