@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 import { DepositFormComponent } from './deposit-form.component';
 
@@ -8,7 +9,8 @@ describe('DepositFormComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ DepositFormComponent ]
+      declarations: [ DepositFormComponent ],
+      imports: [ HttpClientTestingModule ]
     })
     .compileComponents();
   });
