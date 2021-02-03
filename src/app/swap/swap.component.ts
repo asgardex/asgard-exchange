@@ -459,6 +459,9 @@ export class SwapComponent implements OnInit, OnDestroy {
       const valueOfRuneInAsset = getValueOfRuneInAsset(assetToBase(assetAmount(1)), pool);
       const valueOfAssetInRune = getValueOfAssetInRune(assetToBase(assetAmount(1)), pool);
 
+      console.log('value of rune in asset is: ', valueOfRuneInAsset.amount().toNumber());
+      console.log('value of ASSET in RUNE is: ', valueOfAssetInRune.amount().toNumber());
+
       const basePrice = (toRune)
         ? valueOfRuneInAsset
         : valueOfAssetInRune;
@@ -477,8 +480,14 @@ export class SwapComponent implements OnInit, OnDestroy {
       /**
        * Total output amount in target units minus 1 RUNE
        */
-      // const totalAmount = getSwapOutputWithFee(baseAmount(this._sourceAssetTokenValue.amount()), pool, toRune);
-      const totalAmount = getSwapOutput(baseAmount(this._sourceAssetTokenValue.amount()), pool, toRune);
+      // const totalAmount = getSwapOutput(baseAmount(this._sourceAssetTokenValue.amount()), pool, toRune);
+      const totalAmount = getSwapOutput(baseAmount(this._sourceAssetTokenValue.amount()
+        .minus( // subtract network fee
+          toRune
+            ? valueOfRuneInAsset.amount()
+            : assetToBase(assetAmount(1)).amount()
+          )
+        ), pool, toRune);
 
       if (this.sourceAssetUnit) {
         this.targetAssetUnit = (totalAmount.amount().isLessThan(0)) ? bn(0) : totalAmount.amount();
