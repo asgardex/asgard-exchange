@@ -101,13 +101,6 @@
         [coinGeckoList]="coinGeckoList">
       </app-asset-input>
 
-      <div *ngIf="action == 'WITHDRAW' || action == 'LEAVE' || action == 'UNBOND'">
-        <div class="uni-input">
-          <label>Input</label>
-          <input type="text" [value]="'0.00000001'" disabled>
-        </div>
-      </div>
-
       <div class="flxr flxr--just-end flxr--align-center" style="height: 38px">
         <div>
           <button mat-flat-button color="accent" (click)="confirmSend()">
