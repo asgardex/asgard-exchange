@@ -30,7 +30,6 @@ export class DepositFormComponent implements OnInit {
     return this._depositAmount;
   }
   set depositAmount(amount: number) {
-    console.log(`setting deposit amount: ${amount}`);
 
     if (amount !== this.depositAmount) {
       this.depositAmountChange.next(amount);
@@ -115,7 +114,7 @@ export class DepositFormComponent implements OnInit {
     this.memoChange.next(action);
 
     if (action === 'WITHDRAW' || action === 'LEAVE' || action === 'UNBOND') {
-      const smallestUnit = 0.00000001;
+      const smallestUnit = 0;
       this.depositAmountChange.next(smallestUnit);
       this.depositAmount = smallestUnit;
     } else {
