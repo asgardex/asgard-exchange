@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
-import { environment } from 'src/environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { MidgardConstants } from '../_classes/midgard-constants';
-import { PoolAddressesDTO } from '../_classes/pool-address';
+import { PoolAddressDTO } from '../_classes/pool-address';
 import { TransactionDTO } from '../_classes/transaction';
 import { LastBlock } from '../_classes/last-block';
 import { PoolDTO } from '../_classes/pool';
@@ -33,8 +32,8 @@ export class MidgardService {
   }
 
 
-  getInboundAddresses(): Observable<PoolAddressesDTO> {
-    return this.http.get<PoolAddressesDTO>(`${this.v2BasePath}/thorchain/inbound_addresses`);
+  getInboundAddresses(): Observable<PoolAddressDTO[]> {
+    return this.http.get<PoolAddressDTO[]>(`${this.v2BasePath}/thorchain/inbound_addresses`);
   }
 
   getPools(): Observable<PoolDTO[]> {
