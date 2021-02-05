@@ -84,13 +84,11 @@ export class ConfirmSwapModalComponent implements OnDestroy {
       this.midgardService.getInboundAddresses().subscribe(
         async (res) => {
 
-          const currentPools = res.current;
+          const currentPools = res;
 
           if (currentPools && currentPools.length > 0) {
 
             const matchingPool = currentPools.find( (pool) => pool.chain === this.swapData.sourceAsset.chain );
-
-            console.log('matching pool is: ', matchingPool);
 
             if (matchingPool) {
 
@@ -98,10 +96,16 @@ export class ConfirmSwapModalComponent implements OnDestroy {
                 this.keystoreTransfer(matchingPool);
               } else if (this.swapData.user.type === 'walletconnect') {
                 this.walletConnectTransfer(matchingPool);
+              } else {
+                console.log('no error type matches');
               }
 
+            } else {
+              console.log('no matching pool found');
             }
 
+          } else {
+            console.log('no current pools found...');
           }
 
         }

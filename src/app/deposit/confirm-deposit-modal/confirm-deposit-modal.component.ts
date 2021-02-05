@@ -3,7 +3,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MultiTransfer } from '@xchainjs/xchain-binance';
 import { assetAmount, assetToBase } from '@xchainjs/xchain-util';
 import { Subscription } from 'rxjs';
-import { PoolAddressDTO, PoolAddressesDTO } from 'src/app/_classes/pool-address';
+import { PoolAddressDTO } from 'src/app/_classes/pool-address';
 import { User } from 'src/app/_classes/user';
 import { TransactionConfirmationState } from 'src/app/_const/transaction-confirmation-state';
 import { BinanceService } from 'src/app/_services/binance.service';
@@ -66,7 +66,7 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
     this.midgardService.getInboundAddresses().subscribe(
       async (res) => {
 
-        if (res.current && res.current.length > 0) {
+        if (res && res.length > 0) {
 
           this.deposit(res);
 
@@ -120,52 +120,8 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
     );
   }
 
-  // async singleChainBnbKeystoreTx(outputs, memo: string) {
 
-  //   // const bncClient = this.binanceService.bncClient;
-
-  //   // await bncClient.initChain();
-
-  //   // if (this.data.user.type === 'ledger') {
-
-  //   //   bncClient.useLedgerSigningDelegate(
-  //   //     this.data.user.ledger,
-  //   //     () => this.txState = TransactionConfirmationState.PENDING_LEDGER_CONFIRMATION,
-  //   //     () => this.txState = TransactionConfirmationState.SUBMITTING,
-  //   //     (err) => {
-  //   //       this.txState = TransactionConfirmationState.ERROR;
-  //   //       console.error('useLedgerSigningDelegate error: ', err);
-  //   //     },
-  //   //     this.data.user.hdPath
-  //   //   );
-  //   // }
-
-  //   const binanceClient = this.data.user.clients.binance;
-  //   if (binanceClient) {
-
-  //     try {
-  //       const hash = await binanceClient.multiSend({transactions: outputs, memo});
-  //       this.txState = TransactionConfirmationState.SUCCESS;
-  //       this.hash = hash;
-  //       this.txStatusService.addTransaction({
-  //         chain: 'BNB',
-  //         hash: this.hash,
-  //         ticker: this.data.asset.ticker,
-  //         status: TxStatus.PENDING,
-  //         action: TxActions.DEPOSIT
-  //       });
-  //     } catch (error) {
-  //       console.error('error making transfer: ', error);
-  //       this.txState = TransactionConfirmationState.ERROR;
-  //     }
-
-  //   } else {
-  //     console.error('no binance client for user');
-  //   }
-
-  // }
-
-  async deposit(pools: PoolAddressesDTO) {
+  async deposit(pools: PoolAddressDTO[]) {
 
     const clients = this.data.user.clients;
     const asset = this.data.asset;
@@ -179,13 +135,13 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
     switch (this.data.asset.chain) {
       case 'BNB':
         client = clients.binance;
-        recipientPool = pools.current.find( (pool) => pool.chain === 'BNB' );
+        recipientPool = pools.find( (pool) => pool.chain === 'BNB' );
         feeRate = 0.000375;
         break;
 
       case 'BTC':
         client = clients.bitcoin;
-        recipientPool = pools.current.find( (pool) => pool.chain === 'BTC' );
+        recipientPool = pools.find( (pool) => pool.chain === 'BTC' );
         const feeRates = await client.getFeeRates();
         feeRate = feeRates.average;
         break;

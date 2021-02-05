@@ -55,7 +55,7 @@ export class ConfirmPoolCreateComponent implements OnInit, OnDestroy {
     this.midgardService.getInboundAddresses().subscribe(
       async (res) => {
 
-        const currentPools = res.current;
+        const currentPools = res;
 
         if (currentPools && currentPools.length > 0) {
 

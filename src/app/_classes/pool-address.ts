@@ -1,7 +1,3 @@
-export interface PoolAddressesDTO {
-  current: PoolAddressDTO[];
-}
-
 export interface PoolAddressDTO {
   chain: string;
   pub_key: string;
