@@ -4,7 +4,7 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 ## Development server
 
-Create a `.env` file with a `BLOCKCHAIR_KEY`. 
+Create a `.env` file with a `BLOCKCHAIR_KEY` and `ETHERSCAN_KEY`. 
 Run `npm run start` for local dev. This will build out the `src/environments` folder and start a local server.
 Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 After your environments folder is build out, running `ng serve` will work fine.

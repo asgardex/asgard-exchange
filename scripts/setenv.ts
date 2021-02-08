@@ -35,7 +35,8 @@ const environmentFileContent = `
 export const environment = {
    production: ${isProduction},
    network: '${isTestnet ? 'testnet' : 'chaosnet'}',
-   blockchairKey: '${process.env.BLOCKCHAIR_KEY}'
+   blockchairKey: '${process.env.BLOCKCHAIR_KEY}',
+   etherscanKey: '${process.env.ETHERSCAN_KEY}'
 };
 `;
 // write the content to the respective file
