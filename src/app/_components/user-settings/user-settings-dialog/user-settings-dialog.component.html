@@ -119,7 +119,8 @@
 <app-upgrade-bnb-rune
   *ngIf="mode === 'UPGRADE_RUNE'"
   [asset]="selectedAsset"
-  (confirmUpgrade)="confirmUpgradeRune($event)">
+  (confirmUpgrade)="confirmUpgradeRune($event)"
+  (back)="mode = 'ASSET'">
 </app-upgrade-bnb-rune>
 
 <app-upgrade-bnb-rune-confirm
