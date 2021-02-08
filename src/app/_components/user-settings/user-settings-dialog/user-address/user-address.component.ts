@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { assetAmount, baseToAsset, Chain } from '@xchainjs/xchain-util';
+import { baseToAsset, Chain } from '@xchainjs/xchain-util';
 import { Balances } from '@xchainjs/xchain-client';
 import { Subscription } from 'rxjs';
 import { Asset } from 'src/app/_classes/asset';
