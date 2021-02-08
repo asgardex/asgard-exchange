@@ -3,9 +3,7 @@ import { Asset } from '../_classes/asset';
 import { UserService } from '../_services/user.service';
 import { Subscription } from 'rxjs';
 import {
-  getSwapOutputWithFee,
   getDoubleSwapOutput,
-  getDoubleSwapOutputWithFee,
   getSwapSlip,
   getDoubleSwapSlip,
   PoolData,
@@ -20,7 +18,6 @@ import {
   BaseAmount,
   assetToBase,
   assetAmount,
-  // getSwapOutput,
 } from '@xchainjs/xchain-util';
 import { PoolDetail } from '../_classes/pool-detail';
 import { MidgardService } from '../_services/midgard.service';
@@ -521,7 +518,8 @@ export class SwapComponent implements OnInit, OnDestroy {
         runeBalance: baseAmount(targetPool.runeDepth),
       };
 
-      const basePrice = getDoubleSwapOutput(assetToBase(assetAmount(1)), pool1, pool2);
+      // const basePrice = getDoubleSwapOutput(assetToBase(assetAmount(1)), pool1, pool2);
+      const basePrice = getDoubleSwapOutput(assetToBase(assetAmount(1)), pool2, pool1);
       this.basePrice = basePrice.amount().div(10 ** 8).toNumber();
 
       const slip = getDoubleSwapSlip(this._sourceAssetTokenValue, pool1, pool2);
