@@ -156,6 +156,29 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
     const runeMemo = `+:${asset.chain}.${asset.symbol}:${address}`;
     const targetTokenMemo = `+:${asset.chain}.${asset.symbol}:${thorchainAddress}`;
 
+    // deposit token
+    try {
+      const hash = await client.transfer({
+        amount: assetToBase(assetAmount(this.data.assetAmount)),
+        recipient: recipientPool.address,
+        memo: targetTokenMemo,
+        feeRate
+      });
+
+      this.hash = hash;
+      this.txStatusService.addTransaction({
+        chain: asset.chain,
+        hash: this.hash,
+        ticker: asset.ticker,
+        status: TxStatus.PENDING,
+        action: TxActions.DEPOSIT
+      });
+    } catch (error) {
+      console.error('error making token transfer: ', error);
+      this.txState = TransactionConfirmationState.ERROR;
+      return;
+    }
+
     // deposit RUNE
     try {
       const hash = await thorClient.deposit({
@@ -176,29 +199,6 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
       this.txState = TransactionConfirmationState.ERROR;
     }
 
-    // deposit token
-    try {
-
-
-      const hash = await client.transfer({
-        amount: assetToBase(assetAmount(this.data.assetAmount)),
-        recipient: recipientPool.address,
-        memo: targetTokenMemo,
-        feeRate
-      });
-
-      this.hash = hash;
-      this.txStatusService.addTransaction({
-        chain: asset.chain,
-        hash: this.hash,
-        ticker: asset.ticker,
-        status: TxStatus.PENDING,
-        action: TxActions.DEPOSIT
-      });
-    } catch (error) {
-      console.error('error making token transfer: ', error);
-      this.txState = TransactionConfirmationState.ERROR;
-    }
 
     this.txState = TransactionConfirmationState.SUCCESS;
 
