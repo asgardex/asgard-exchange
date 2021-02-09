@@ -1,15 +1,11 @@
-import { Component, Inject, OnDestroy } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { User } from 'src/app/_classes/user';
 import { MidgardService } from 'src/app/_services/midgard.service';
 import { UserService } from 'src/app/_services/user.service';
 import { TransactionConfirmationState } from 'src/app/_const/transaction-confirmation-state';
 import { PoolAddressDTO } from 'src/app/_classes/pool-address';
-import { environment } from 'src/environments/environment';
-import { tokenAmount, tokenToBase } from '@thorchain/asgardex-token';
 import { Subscription } from 'rxjs';
-import { BinanceService } from 'src/app/_services/binance.service';
-import { WalletConnectService } from 'src/app/_services/wallet-connect.service';
 import {
   baseAmount,
   assetToBase,
@@ -17,6 +13,7 @@ import {
 } from '@xchainjs/xchain-util';
 import { TransactionStatusService, TxActions, TxStatus } from 'src/app/_services/transaction-status.service';
 import { SlippageToleranceService } from 'src/app/_services/slippage-tolerance.service';
+import BigNumber from 'bignumber.js';
 
 
 export interface SwapData {
@@ -26,7 +23,7 @@ export interface SwapData {
   bnbFee: number;
   basePrice: number;
   inputValue: number;
-  outputValue: number;
+  outputValue: BigNumber;
   user: User;
   slip: number;
 }
@@ -49,9 +46,7 @@ export class ConfirmSwapModalComponent implements OnDestroy {
     @Inject(MAT_DIALOG_DATA) public swapData: SwapData,
     public dialogRef: MatDialogRef<ConfirmSwapModalComponent>,
     private midgardService: MidgardService,
-    private walletConnectService: WalletConnectService,
     private txStatusService: TransactionStatusService,
-    private binanceService: BinanceService,
     private userService: UserService,
     private slipLimitService: SlippageToleranceService,
   ) {
@@ -94,8 +89,6 @@ export class ConfirmSwapModalComponent implements OnDestroy {
 
               if (this.swapData.user.type === 'keystore' || this.swapData.user.type === 'ledger') {
                 this.keystoreTransfer(matchingPool);
-              } else if (this.swapData.user.type === 'walletconnect') {
-                this.walletConnectTransfer(matchingPool);
               } else {
                 console.log('no error type matches');
               }
@@ -210,8 +203,6 @@ export class ConfirmSwapModalComponent implements OnDestroy {
         const feeRates = await bitcoinClient.getFeeRates();
         const toBase = assetToBase(assetAmount(amountNumber));
         const amount = toBase.amount().minus(fee.average.amount());
-        console.log('fee is: ', fee.average.amount().toNumber());
-        console.log('memo is: ', memo);
 
         const hash = await bitcoinClient.transfer({
           amount: baseAmount(amount),
@@ -237,75 +228,6 @@ export class ConfirmSwapModalComponent implements OnDestroy {
       }
 
     }
-
-  }
-
-  walletConnectTransfer(matchingPool: PoolAddressDTO) {
-
-    const coins = [{
-      denom: this.swapData.sourceAsset.symbol,
-      amount: tokenToBase(tokenAmount(this.swapData.inputValue))
-        .amount()
-        .toNumber(),
-    }];
-    const sendOrder = this.walletConnectService.walletConnectGetSendOrderMsg({
-      fromAddress: this.swapData.user.wallet,
-      toAddress: matchingPool.address,
-      coins,
-    });
-
-    const floor = this.slipLimitService.getSlipLimitFromAmount(this.swapData.outputValue);
-
-    const memo = this.getSwapMemo(
-      this.swapData.targetAsset.chain,
-      this.swapData.targetAsset.symbol,
-      this.swapData.user.wallet,
-      Math.floor(floor.toNumber())
-    );
-
-    const bncClient = this.binanceService.bncClient;
-
-    bncClient
-      .getAccount(this.swapData.user.wallet)
-      .then( async (response) => {
-
-        if (!response) {
-          console.error('no response getting account:', response);
-          return;
-        }
-
-        const account = response.result;
-        const chainId = environment.network === 'testnet' ? 'Binance-Chain-Nile' : 'Binance-Chain-Tigris';
-        const tx = {
-          accountNumber: account.account_number.toString(),
-          sequence: account.sequence.toString(),
-          send_order: sendOrder,
-          chainId,
-          memo,
-        };
-
-        const res = await this.walletConnectService.walletConnectSendTx(tx, bncClient);
-
-        if (res) {
-          this.txState = TransactionConfirmationState.SUCCESS;
-
-          if (res.result && res.result.length > 0) {
-            this.hash = res.result[0].hash;
-            this.txStatusService.addTransaction({
-              chain: 'BNB',
-              hash: this.hash,
-              ticker: this.swapData.targetAsset.ticker,
-              status: TxStatus.PENDING,
-              action: TxActions.SWAP
-            });
-          }
-        }
-
-
-      })
-      .catch((error) => {
-        console.error('getAccount error: ', error);
-      });
 
   }
 
