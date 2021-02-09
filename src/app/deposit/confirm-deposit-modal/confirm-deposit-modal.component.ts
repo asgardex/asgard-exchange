@@ -67,53 +67,7 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
       async (res) => {
 
         if (res && res.length > 0) {
-
           this.deposit(res);
-
-          // const bnbPool = currentPools.find( (pool) => pool.chain === 'BNB' );
-          // const btcPool = currentPools.find( (pool) => pool.chain === 'BTC' );
-
-          // if (this.data.asset.chain === 'BNB') {
-
-          //   console.log('RUNE AMOUNT IS: ', assetToBase(assetAmount(this.data.runeAmount)).amount().toNumber());
-          //   console.log('ASSET AMOUNT IS: ', assetToBase(assetAmount(this.data.assetAmount)).amount().toNumber());
-
-          //   const outputs: MultiTransfer[] = [
-          //     {
-          //       to: bnbPool.address,
-          //       coins: [
-          //         {
-          //           asset: this.data.rune,
-          //           amount: assetToBase(assetAmount(this.data.runeAmount))
-          //           // amount: (this.data.user.type === 'keystore' || this.data.user.type === 'ledger')
-          //           //   ? assetToBase(assetAmount(this.data.runeAmount))
-          //           //   : assetToBase(assetAmount(this.data.runeAmount)),
-          //         },
-          //         {
-          //           asset: this.data.asset,
-          //           amount: assetToBase(assetAmount(this.data.assetAmount))
-          //           // amount: (this.data.user.type === 'keystore' || this.data.user.type === 'ledger')
-          //           //   ? assetToBase(assetAmount(this.data.assetAmount))
-          //           //   : assetToBase(assetAmount(this.data.assetAmount))
-          //         },
-          //       ],
-          //     },
-          //   ];
-
-          //   const memo = `STAKE:BNB.${this.data.asset.symbol}`;
-
-          //   if (bnbPool) {
-          //     if (this.data.user.type === 'keystore' || this.data.user.type === 'ledger') {
-          //       this.singleChainBnbKeystoreTx(outputs, memo);
-          //     } else if (this.data.user.type === 'walletconnect') {
-          //       this.walletConnectTransaction(outputs, memo, bnbPool);
-          //     }
-          //   }
-
-          // } else if (this.data.asset.chain === 'BTC') {
-          //   this.multichainKeystoreTx(btcPool, bnbPool);
-          // }
-
         }
 
       }
