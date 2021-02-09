@@ -34,13 +34,8 @@ export class NativeRunePromptModalComponent implements OnInit {
   }
 
   confirmUpgradeRune(p: {amount: number}) {
-    console.log('confirm!');
     this.amountToSend = p.amount;
     this.mode = 'CONFIRM';
-  }
-
-  transactionSuccessful() {
-    console.log('transaction successful');
   }
 
 }

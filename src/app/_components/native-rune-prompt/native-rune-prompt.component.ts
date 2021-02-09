@@ -22,7 +22,6 @@ export class NativeRunePromptComponent implements OnInit, OnDestroy {
 
     const balances$ = this.userService.userBalances$.subscribe(
       (balances) => {
-        console.log('user balances are: ', balances);
 
         if (balances) {
           const nonNativeRuneAssets = balances.filter( (balance) => {

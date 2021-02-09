@@ -206,7 +206,6 @@ export class UserService {
     });
 
     return marketListItems;
-    // this.filteredMarketListItems = this.marketListItems;
 
   }
 
