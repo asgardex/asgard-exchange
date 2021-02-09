@@ -57,8 +57,6 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 /** EXTERNAL */
 import { QRCodeModule } from 'angularx-qrcode';
-import { UpgradeBnbRuneComponent } from './_components/user-settings/user-settings-dialog/upgrade-bnb-rune/upgrade-bnb-rune.component';
-import { UpgradeBnbRuneConfirmComponent } from './_components/user-settings/user-settings-dialog/upgrade-bnb-rune-confirm/upgrade-bnb-rune-confirm.component';
 import { ViewPhraseComponent } from './_components/user-settings/user-settings-dialog/view-phrase/view-phrase.component';
 import { DepositComponent } from './_components/user-settings/user-settings-dialog/deposit/deposit.component';
 import {
@@ -66,6 +64,9 @@ import {
 } from './_components/user-settings/user-settings-dialog/deposit/deposit-confirm/deposit-confirm.component';
 import { DepositFormComponent } from './_components/user-settings/user-settings-dialog/deposit/deposit-form/deposit-form.component';
 import { TransactionSuccessModalModule } from './_components/transaction-success-modal/transaction-success-modal.module';
+import { NativeRunePromptModule } from './_components/native-rune-prompt/native-rune-prompt.module';
+import { UpgradeRuneModule } from './_components/upgrade-rune/upgrade-rune.module';
+import { UpgradeRuneConfirmModule } from './_components/upgrade-rune-confirm/upgrade-rune-confirm.module';
 
 
 @NgModule({
@@ -89,8 +90,6 @@ import { TransactionSuccessModalModule } from './_components/transaction-success
     ReconnectDialogComponent,
     SlippageToleranceComponent,
     TestnetWarningComponent,
-    UpgradeBnbRuneComponent,
-    UpgradeBnbRuneConfirmComponent,
     ViewPhraseComponent,
     DepositComponent,
     DepositConfirmComponent,
@@ -112,7 +111,10 @@ import { TransactionSuccessModalModule } from './_components/transaction-success
     MatSelectModule,
     MatSliderModule,
     MatSnackBarModule,
+    NativeRunePromptModule,
     TransactionProcessingModalModule,
+    UpgradeRuneModule,
+    UpgradeRuneConfirmModule,
     QRCodeModule,
     AppRoutingModule,
     TransactionSuccessModalModule,

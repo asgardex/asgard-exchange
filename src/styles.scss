@@ -363,10 +363,12 @@ input[type=number] {
 
 main {
   display: flex;
+  flex-flow: column;
   justify-content: center;
   align-items: center;
   padding: 45px 15px 100px;
   min-height: calc(100vh - 138px);
+  position: relative;
 
   @media (min-width: 768px) {
     padding: 100px 15px;

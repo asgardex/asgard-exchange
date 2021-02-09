@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { UpgradeBnbRuneComponent } from './upgrade-bnb-rune.component';
+import { UpgradeRuneComponent } from './upgrade-rune.component';
 
-describe('UpgradeBnbRuneComponent', () => {
-  let component: UpgradeBnbRuneComponent;
-  let fixture: ComponentFixture<UpgradeBnbRuneComponent>;
+describe('UpgradeRuneComponent', () => {
+  let component: UpgradeRuneComponent;
+  let fixture: ComponentFixture<UpgradeRuneComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ UpgradeBnbRuneComponent ]
+      declarations: [ UpgradeRuneComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(UpgradeBnbRuneComponent);
+    fixture = TestBed.createComponent(UpgradeRuneComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

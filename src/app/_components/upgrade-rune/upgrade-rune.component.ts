@@ -4,11 +4,11 @@ import { AssetAndBalance } from 'src/app/_classes/asset-and-balance';
 import { UserService } from 'src/app/_services/user.service';
 
 @Component({
-  selector: 'app-upgrade-bnb-rune',
-  templateUrl: './upgrade-bnb-rune.component.html',
-  styleUrls: ['./upgrade-bnb-rune.component.scss']
+  selector: 'app-upgrade-rune',
+  templateUrl: './upgrade-rune.component.html',
+  styleUrls: ['./upgrade-rune.component.scss']
 })
-export class UpgradeBnbRuneComponent implements OnInit {
+export class UpgradeRuneComponent implements OnInit {
 
   @Input() asset: AssetAndBalance;
   @Output() back: EventEmitter<null>;
