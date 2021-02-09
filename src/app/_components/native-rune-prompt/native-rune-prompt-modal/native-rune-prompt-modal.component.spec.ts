@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Asset } from 'src/app/_classes/asset';
 
 import { NativeRunePromptModalComponent } from './native-rune-prompt-modal.component';
 
@@ -8,7 +10,15 @@ describe('NativeRunePromptModalComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ NativeRunePromptModalComponent ]
+      declarations: [ NativeRunePromptModalComponent ],
+      providers: [
+        { provide: MAT_DIALOG_DATA, useValue: {
+          asset: new Asset('BNB.RUNE'),
+          amount: 1000
+        }
+      },
+      { provide: MatDialogRef, useValue: { close: (dialogResult: any) => { } } }
+      ]
     })
     .compileComponents();
   });

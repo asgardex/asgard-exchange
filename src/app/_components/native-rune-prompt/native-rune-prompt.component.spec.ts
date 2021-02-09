@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 
 import { NativeRunePromptComponent } from './native-rune-prompt.component';
 
@@ -8,7 +9,8 @@ describe('NativeRunePromptComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ NativeRunePromptComponent ]
+      declarations: [ NativeRunePromptComponent ],
+      imports: [ MatDialogModule ]
     })
     .compileComponents();
   });
