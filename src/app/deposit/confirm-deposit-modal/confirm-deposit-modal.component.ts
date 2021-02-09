@@ -114,6 +114,11 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
     // deposit token
     try {
       const hash = await client.transfer({
+        asset: {
+          chain: this.data.asset.chain,
+          symbol: this.data.asset.symbol,
+          ticker: this.data.asset.ticker
+        },
         amount: assetToBase(assetAmount(this.data.assetAmount)),
         recipient: recipientPool.address,
         memo: targetTokenMemo,
