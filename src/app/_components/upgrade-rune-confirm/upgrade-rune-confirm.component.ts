@@ -11,11 +11,11 @@ import { TransactionStatusService, TxActions, TxStatus } from 'src/app/_services
 import { UserService } from 'src/app/_services/user.service';
 
 @Component({
-  selector: 'app-upgrade-bnb-rune-confirm',
-  templateUrl: './upgrade-bnb-rune-confirm.component.html',
-  styleUrls: ['./upgrade-bnb-rune-confirm.component.scss']
+  selector: 'app-upgrade-rune-confirm',
+  templateUrl: './upgrade-rune-confirm.component.html',
+  styleUrls: ['./upgrade-rune-confirm.component.scss']
 })
-export class UpgradeBnbRuneConfirmComponent implements OnInit, OnDestroy {
+export class UpgradeRuneConfirmComponent implements OnInit, OnDestroy {
 
   @Input() asset: AssetAndBalance;
   @Input() amount: number;

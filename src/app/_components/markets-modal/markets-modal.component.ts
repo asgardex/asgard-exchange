@@ -73,35 +73,7 @@ export class MarketsModalComponent implements OnInit, OnDestroy {
     // Sort first by user balances
     if (this.userBalances && this.marketListItems) {
 
-      const balMap: {[key: string]: Balance} = {};
-      this.userBalances.forEach((item) => {
-        balMap[`${item.asset.chain}.${item.asset.symbol}`] = item;
-      });
-
-      this.marketListItems = this.marketListItems.map((mItem) => {
-
-        if (balMap[`${mItem.asset.chain}.${mItem.asset.symbol}`]) {
-          return {
-            asset: mItem.asset,
-            balance: baseToAsset(balMap[`${mItem.asset.chain}.${mItem.asset.symbol}`].amount),
-          };
-        }
-        else {
-          return {
-            asset: mItem.asset,
-          };
-        }
-
-      });
-
-      this.marketListItems = this.marketListItems.sort((a, b) => {
-        if (!a.balance && !b.balance) { return 0; }
-        if (!a.balance) { return 1; }
-        if (!b.balance) { return -1; }
-        return (
-          b.balance.amount().toNumber() - a.balance.amount().toNumber()
-        );
-      });
+      this.marketListItems = this.userService.sortMarketsByUserBalance(this.userBalances, this.marketListItems);
       this.filteredMarketListItems = this.marketListItems;
     }
   }
