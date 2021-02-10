@@ -24,10 +24,6 @@ $c1: #151f1e;
 	@return RGB(#{$args})
 }
 
-main {
-  position: relative;
-}
-
 .background-container {
   position: fixed;
 
@@ -164,10 +160,6 @@ footer {
   .footer-social {
     padding-bottom: 15px;
 
-    // img {
-    //   width: 24px;
-    // }
-
     .footer-logo {
       background-color: #15a36f;
       display: block;
@@ -176,18 +168,23 @@ footer {
       margin-left: 12px;
 
       &--twitter {
-        -webkit-mask: url(https://raw.githubusercontent.com/Pusher-Labs/asgard-exchange/master/src/assets/icons/twitter-brands.svg) no-repeat center;
-        mask: url(https://raw.githubusercontent.com/Pusher-Labs/asgard-exchange/master/src/assets/icons/twitter-brands.svg) no-repeat center;
+        -webkit-mask: url(https://raw.githubusercontent.com/asgardex/asgard-exchange/master/src/assets/icons/twitter-brands.svg) no-repeat center;
+        mask: url(https://raw.githubusercontent.com/asgardex/asgard-exchange/master/src/assets/icons/twitter-brands.svg) no-repeat center;
       }
 
       &--discord {
-        -webkit-mask: url(https://raw.githubusercontent.com/Pusher-Labs/asgard-exchange/master/src/assets/icons/discord-brands.svg) no-repeat center;
-        mask: url(https://raw.githubusercontent.com/Pusher-Labs/asgard-exchange/master/src/assets/icons/discord-brands.svg) no-repeat center;
+        -webkit-mask: url(https://raw.githubusercontent.com/asgardex/asgard-exchange/master/src/assets/icons/discord-brands.svg) no-repeat center;
+        mask: url(https://raw.githubusercontent.com/asgardex/asgard-exchange/master/src/assets/icons/discord-brands.svg) no-repeat center;
       }
 
       &--github {
-        -webkit-mask: url(https://raw.githubusercontent.com/Pusher-Labs/asgard-exchange/master/src/assets/icons/github-alt-brands.svg) no-repeat center;
-        mask: url(https://raw.githubusercontent.com/Pusher-Labs/asgard-exchange/master/src/assets/icons/github-alt-brands.svg) no-repeat center;
+        -webkit-mask: url(https://raw.githubusercontent.com/asgardex/asgard-exchange/master/src/assets/icons/github-alt-brands.svg) no-repeat center;
+        mask: url(https://raw.githubusercontent.com/asgardex/asgard-exchange/master/src/assets/icons/github-alt-brands.svg) no-repeat center;
+      }
+
+      &--telegram {
+        -webkit-mask: url(https://raw.githubusercontent.com/asgardex/asgard-exchange/master/src/assets/icons/telegram-plane-brands.svg) no-repeat center;
+        mask: url(https://raw.githubusercontent.com/asgardex/asgard-exchange/master/src/assets/icons/telegram-plane-brands.svg) no-repeat center;
       }
 
     }

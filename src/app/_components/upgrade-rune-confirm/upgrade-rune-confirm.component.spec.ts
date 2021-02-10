@@ -1,22 +1,22 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
-import { UpgradeBnbRuneConfirmComponent } from './upgrade-bnb-rune-confirm.component';
+import { UpgradeRuneConfirmComponent } from './upgrade-rune-confirm.component';
 
-describe('UpgradeBnbRuneConfirmComponent', () => {
-  let component: UpgradeBnbRuneConfirmComponent;
-  let fixture: ComponentFixture<UpgradeBnbRuneConfirmComponent>;
+describe('UpgradeRuneConfirmComponent', () => {
+  let component: UpgradeRuneConfirmComponent;
+  let fixture: ComponentFixture<UpgradeRuneConfirmComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ UpgradeBnbRuneConfirmComponent ],
+      declarations: [ UpgradeRuneConfirmComponent ],
       imports: [ HttpClientTestingModule ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(UpgradeBnbRuneConfirmComponent);
+    fixture = TestBed.createComponent(UpgradeRuneConfirmComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

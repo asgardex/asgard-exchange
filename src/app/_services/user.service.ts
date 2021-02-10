@@ -7,7 +7,7 @@ import {
 import { Market, MarketResponse } from '../_classes/market';
 import { environment } from 'src/environments/environment';
 import { Asset } from '../_classes/asset';
-import { Balances } from '@xchainjs/xchain-client';
+import { Balance, Balances } from '@xchainjs/xchain-client';
 import { BncClient } from '@binance-chain/javascript-sdk/lib/client';
 import {
   assetAmount,
@@ -17,6 +17,7 @@ import {
 } from '@xchainjs/xchain-util';
 import { BehaviorSubject, of, Subject, timer } from 'rxjs';
 import { catchError, switchMap, takeUntil } from 'rxjs/operators';
+import { AssetAndBalance } from '../_classes/asset-and-balance';
 
 export interface MidgardData<T> {
   key: string;
@@ -170,6 +171,42 @@ export class UserService {
         return 0.0;
       }
     }
+  }
+
+  sortMarketsByUserBalance(userBalances: Balances, marketListItems: AssetAndBalance[]): AssetAndBalance[] {
+
+    const balMap: {[key: string]: Balance} = {};
+    userBalances.forEach((item) => {
+      balMap[`${item.asset.chain}.${item.asset.symbol}`] = item;
+    });
+
+    marketListItems = marketListItems.map((mItem) => {
+
+      if (balMap[`${mItem.asset.chain}.${mItem.asset.symbol}`]) {
+        return {
+          asset: mItem.asset,
+          balance: baseToAsset(balMap[`${mItem.asset.chain}.${mItem.asset.symbol}`].amount),
+        };
+      }
+      else {
+        return {
+          asset: mItem.asset,
+        };
+      }
+
+    });
+
+    marketListItems = marketListItems.sort((a, b) => {
+      if (!a.balance && !b.balance) { return 0; }
+      if (!a.balance) { return 1; }
+      if (!b.balance) { return -1; }
+      return (
+        b.balance.amount().toNumber() - a.balance.amount().toNumber()
+      );
+    });
+
+    return marketListItems;
+
   }
 
 

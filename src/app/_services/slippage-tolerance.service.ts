@@ -21,9 +21,10 @@ export class SlippageToleranceService {
     this.slippageToleranceSource.next(percent);
   }
 
-  getSlipLimitFromAmount(amount: number): BigNumber {
+  getSlipLimitFromAmount(amount: BigNumber): BigNumber {
     const baseTransferAmount = assetToBase(assetAmount(amount));
-    return baseTransferAmount.amount().multipliedBy( (100 - this._slippageTolerance) / 100);
+    const limitFromAmount = baseTransferAmount.amount().multipliedBy( (100 - this._slippageTolerance) / 100);
+    return limitFromAmount;
   }
 
 }

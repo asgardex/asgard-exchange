@@ -3,9 +3,7 @@ import { Asset } from '../_classes/asset';
 import { UserService } from '../_services/user.service';
 import { Subscription } from 'rxjs';
 import {
-  getSwapOutputWithFee,
   getDoubleSwapOutput,
-  getDoubleSwapOutputWithFee,
   getSwapSlip,
   getDoubleSwapSlip,
   PoolData,
@@ -20,7 +18,6 @@ import {
   BaseAmount,
   assetToBase,
   assetAmount,
-  // getSwapOutput,
 } from '@xchainjs/xchain-util';
 import { PoolDetail } from '../_classes/pool-detail';
 import { MidgardService } from '../_services/midgard.service';
@@ -32,6 +29,7 @@ import { Balances } from '@xchainjs/xchain-client';
 import { CGCoinListItem, CoinGeckoService } from '../_services/coin-gecko.service';
 import { AssetAndBalance } from '../_classes/asset-and-balance';
 import { PoolDTO } from '../_classes/pool';
+import { SlippageToleranceService } from '../_services/slippage-tolerance.service';
 
 export enum SwapType {
   DOUBLE_SWAP = 'double_swap',
@@ -144,6 +142,7 @@ export class SwapComponent implements OnInit, OnDestroy {
   subs: Subscription[];
 
   slip: number;
+  slippageTolerance: number;
   runeTransactionFee: number;
   user: User;
   basePrice: number;
@@ -169,7 +168,8 @@ export class SwapComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private midgardService: MidgardService,
     private binanceService: BinanceService,
-    private cgService: CoinGeckoService) {
+    private cgService: CoinGeckoService,
+    private slipLimitService: SlippageToleranceService) {
 
     this.selectedSourceAsset = new Asset('THOR.RUNE');
 
@@ -182,12 +182,10 @@ export class SwapComponent implements OnInit, OnDestroy {
         const bnbBalance = this.userService.findBalance(this.balances, new Asset('BNB.BNB'));
         this.insufficientBnb = bnbBalance < 0.000375;
 
-        // if (this.selectedTargetAsset && this.selectedTargetAsset.symbol !== this.runeSymbol) {
         if (this.selectedTargetAsset && !this.isRune(this.selectedTargetAsset)) {
           this.getPoolDetails(this.selectedTargetAsset.chain, this.selectedTargetAsset.symbol, 'target');
         }
 
-        // if (this.selectedSourceAsset && this.selectedSourceAsset.symbol !== this.runeSymbol) {
         if (this.selectedSourceAsset && !this.isRune(this.selectedSourceAsset)) {
           this.getPoolDetails(this.selectedSourceAsset.chain, this.selectedSourceAsset.symbol, 'source');
         }
@@ -201,7 +199,11 @@ export class SwapComponent implements OnInit, OnDestroy {
       }
     );
 
-    this.subs = [balances$, user$];
+    const slippageTolerange$ = this.slipLimitService.slippageTolerance$.subscribe(
+      (limit) => this.slippageTolerance = limit
+    );
+
+    this.subs = [balances$, user$, slippageTolerange$];
 
   }
 
@@ -231,6 +233,8 @@ export class SwapComponent implements OnInit, OnDestroy {
       return 'Insufficient balance';
     } else if (this.selectedSourceAsset.chain === 'BNB' && this.insufficientBnb) {
       return 'Insufficient BNB for Fee';
+    } else if ((this.slip * 100) > this.slippageTolerance) {
+      return 'Slip Limit Exceeded';
     } else if (this.user && this.sourceAssetUnit && this.sourceAssetUnit <= this.sourceBalance && this.selectedTargetAsset) {
       return 'Swap';
     } else {
@@ -243,8 +247,6 @@ export class SwapComponent implements OnInit, OnDestroy {
     this.midgardService.getPools().subscribe(
       (res) => {
 
-        console.log('POOLS are: ', res);
-
         const poolNames = res.map( (pool) => pool.asset );
         const sortedByName = poolNames.sort();
         this.selectableMarkets = sortedByName.map((poolName) => ({
@@ -254,11 +256,6 @@ export class SwapComponent implements OnInit, OnDestroy {
         .filter( (pool) => pool.asset.chain === 'BNB' || pool.asset.chain === 'THOR' || pool.asset.chain === 'BTC' );
 
         // Keeping RUNE at top by default
-        // this.selectableMarkets.unshift({
-        //   asset: new Asset(
-        //     environment.network === 'chaosnet' ? 'BNB.RUNE-B1A' : 'BNB.RUNE-67C'
-        //   ),
-        // });
         this.selectableMarkets.unshift({
           asset: new Asset('THOR.RUNE'),
         });
@@ -281,6 +278,7 @@ export class SwapComponent implements OnInit, OnDestroy {
       || (this.selectedSourceAsset && this.sourceBalance
         && (this.sourceAssetUnit > this.userService.maximumSpendableBalance(this.selectedSourceAsset, this.sourceBalance)))
       || !this.user || !this.balances
+      || (this.slip * 100) > this.slippageTolerance
       || (this.selectedSourceAsset.chain === 'BNB' && this.insufficientBnb); // source is BNB and not enough funds to cover fee
   }
 
@@ -319,22 +317,6 @@ export class SwapComponent implements OnInit, OnDestroy {
 
     this.poolDetailTargetError = (type === 'target') ? false : this.poolDetailTargetError;
     this.poolDetailSourceError = (type === 'source') ? false : this.poolDetailSourceError;
-
-    // this.midgardService.getPoolDetails([`${chain}.${symbol}`], 'simple').subscribe(
-    //   (res) => {
-
-    //     if (res && res.length > 0) {
-    //       this.poolDetailMap[`${chain}.${symbol}`] = res[0];
-    //       this.updateSwapDetails();
-    //     }
-
-    //   },
-    //   (err) => {
-    //     console.error('error fetching pool details: ', err);
-    //     this.poolDetailTargetError = (type === 'target') ? true : this.poolDetailTargetError;
-    //     this.poolDetailSourceError = (type === 'source') ? true : this.poolDetailSourceError;
-    //   }
-    // );
 
     this.midgardService.getPool(`${chain}.${symbol}`).subscribe(
       (res) => {
@@ -459,9 +441,6 @@ export class SwapComponent implements OnInit, OnDestroy {
       const valueOfRuneInAsset = getValueOfRuneInAsset(assetToBase(assetAmount(1)), pool);
       const valueOfAssetInRune = getValueOfAssetInRune(assetToBase(assetAmount(1)), pool);
 
-      console.log('value of rune in asset is: ', valueOfRuneInAsset.amount().toNumber());
-      console.log('value of ASSET in RUNE is: ', valueOfAssetInRune.amount().toNumber());
-
       const basePrice = (toRune)
         ? valueOfRuneInAsset
         : valueOfAssetInRune;
@@ -472,10 +451,6 @@ export class SwapComponent implements OnInit, OnDestroy {
        */
       const slip = getSwapSlip(this._sourceAssetTokenValue, pool, toRune);
       this.slip = slip.toNumber();
-
-      console.log('slip is: ', this.slip);
-      console.log('input amount is: ', this._sourceAssetTokenValue.amount().toNumber());
-      console.log('pool is: ', pool);
 
       /**
        * Total output amount in target units minus 1 RUNE
@@ -521,7 +496,8 @@ export class SwapComponent implements OnInit, OnDestroy {
         runeBalance: baseAmount(targetPool.runeDepth),
       };
 
-      const basePrice = getDoubleSwapOutput(assetToBase(assetAmount(1)), pool1, pool2);
+      // const basePrice = getDoubleSwapOutput(assetToBase(assetAmount(1)), pool1, pool2);
+      const basePrice = getDoubleSwapOutput(assetToBase(assetAmount(1)), pool2, pool1);
       this.basePrice = basePrice.amount().div(10 ** 8).toNumber();
 
       const slip = getDoubleSwapSlip(this._sourceAssetTokenValue, pool1, pool2);

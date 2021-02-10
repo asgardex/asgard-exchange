@@ -35,6 +35,7 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
   txState: TransactionConfirmationState;
   hash: string;
   subs: Subscription[];
+  error: string;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: ConfirmDepositData,
@@ -67,53 +68,7 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
       async (res) => {
 
         if (res && res.length > 0) {
-
           this.deposit(res);
-
-          // const bnbPool = currentPools.find( (pool) => pool.chain === 'BNB' );
-          // const btcPool = currentPools.find( (pool) => pool.chain === 'BTC' );
-
-          // if (this.data.asset.chain === 'BNB') {
-
-          //   console.log('RUNE AMOUNT IS: ', assetToBase(assetAmount(this.data.runeAmount)).amount().toNumber());
-          //   console.log('ASSET AMOUNT IS: ', assetToBase(assetAmount(this.data.assetAmount)).amount().toNumber());
-
-          //   const outputs: MultiTransfer[] = [
-          //     {
-          //       to: bnbPool.address,
-          //       coins: [
-          //         {
-          //           asset: this.data.rune,
-          //           amount: assetToBase(assetAmount(this.data.runeAmount))
-          //           // amount: (this.data.user.type === 'keystore' || this.data.user.type === 'ledger')
-          //           //   ? assetToBase(assetAmount(this.data.runeAmount))
-          //           //   : assetToBase(assetAmount(this.data.runeAmount)),
-          //         },
-          //         {
-          //           asset: this.data.asset,
-          //           amount: assetToBase(assetAmount(this.data.assetAmount))
-          //           // amount: (this.data.user.type === 'keystore' || this.data.user.type === 'ledger')
-          //           //   ? assetToBase(assetAmount(this.data.assetAmount))
-          //           //   : assetToBase(assetAmount(this.data.assetAmount))
-          //         },
-          //       ],
-          //     },
-          //   ];
-
-          //   const memo = `STAKE:BNB.${this.data.asset.symbol}`;
-
-          //   if (bnbPool) {
-          //     if (this.data.user.type === 'keystore' || this.data.user.type === 'ledger') {
-          //       this.singleChainBnbKeystoreTx(outputs, memo);
-          //     } else if (this.data.user.type === 'walletconnect') {
-          //       this.walletConnectTransaction(outputs, memo, bnbPool);
-          //     }
-          //   }
-
-          // } else if (this.data.asset.chain === 'BTC') {
-          //   this.multichainKeystoreTx(btcPool, bnbPool);
-          // }
-
         }
 
       }
@@ -156,6 +111,35 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
     const runeMemo = `+:${asset.chain}.${asset.symbol}:${address}`;
     const targetTokenMemo = `+:${asset.chain}.${asset.symbol}:${thorchainAddress}`;
 
+    // deposit token
+    try {
+      const hash = await client.transfer({
+        asset: {
+          chain: this.data.asset.chain,
+          symbol: this.data.asset.symbol,
+          ticker: this.data.asset.ticker
+        },
+        amount: assetToBase(assetAmount(this.data.assetAmount)),
+        recipient: recipientPool.address,
+        memo: targetTokenMemo,
+        feeRate
+      });
+
+      this.hash = hash;
+      this.txStatusService.addTransaction({
+        chain: asset.chain,
+        hash: this.hash,
+        ticker: asset.ticker,
+        status: TxStatus.PENDING,
+        action: TxActions.DEPOSIT
+      });
+    } catch (error) {
+      console.error('error making token transfer: ', error);
+      this.txState = TransactionConfirmationState.ERROR;
+      this.error = error;
+      return;
+    }
+
     // deposit RUNE
     try {
       const hash = await thorClient.deposit({
@@ -174,89 +158,12 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
     } catch (error) {
       console.error('error making RUNE transfer: ', error);
       this.txState = TransactionConfirmationState.ERROR;
+      this.error = error;
     }
 
-    // deposit token
-    try {
-
-
-      const hash = await client.transfer({
-        amount: assetToBase(assetAmount(this.data.assetAmount)),
-        recipient: recipientPool.address,
-        memo: targetTokenMemo,
-        feeRate
-      });
-
-      this.hash = hash;
-      this.txStatusService.addTransaction({
-        chain: asset.chain,
-        hash: this.hash,
-        ticker: asset.ticker,
-        status: TxStatus.PENDING,
-        action: TxActions.DEPOSIT
-      });
-    } catch (error) {
-      console.error('error making token transfer: ', error);
-      this.txState = TransactionConfirmationState.ERROR;
-    }
 
     this.txState = TransactionConfirmationState.SUCCESS;
 
-  }
-
-  /** currently deprecated */
-  walletConnectTransaction(outputs: MultiTransfer[], memo: string, matchingPool: PoolAddressDTO) {
-
-    const sendOrder = this.walletConnectService.walletConnectGetSendOrderMsg({
-      fromAddress: this.data.user.wallet,
-      toAddress: matchingPool.address,
-      coins: outputs[0].coins
-    });
-
-    const bncClient = this.binanceService.bncClient;
-
-    /**
-     * TODO: clean up, this is used in confirm-swap-modal as well
-     */
-    bncClient
-      .getAccount(this.data.user.wallet)
-      .then(async (response) => {
-        if (!response) {
-          console.error('error getting response from getAccount');
-          return;
-        }
-
-        const account = response.result;
-        const chainId = environment.network === 'testnet' ? 'Binance-Chain-Nile' : 'Binance-Chain-Tigris';
-        const tx = {
-          accountNumber: account.account_number.toString(),
-          sequence: account.sequence.toString(),
-          send_order: sendOrder,
-          chainId,
-          memo,
-        };
-
-        const res = await this.walletConnectService.walletConnectSendTx(tx, bncClient);
-
-        if (res) {
-          this.txState = TransactionConfirmationState.SUCCESS;
-
-          if (res.result && res.result.length > 0) {
-            this.hash = res.result[0].hash;
-            this.txStatusService.addTransaction({
-              chain: 'BNB',
-              hash: this.hash,
-              ticker: this.data.asset.ticker,
-              status: TxStatus.PENDING,
-              action: TxActions.DEPOSIT
-            });
-          }
-        }
-
-    })
-    .catch((error) => {
-      console.error('getAccount error: ', error);
-    });
   }
 
   closeDialog(transactionSucess?: boolean) {

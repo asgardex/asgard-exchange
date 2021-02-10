@@ -116,19 +116,20 @@
   (transactionSuccessful)="transactionSuccessful()">
 </app-confim-send>
 
-<app-upgrade-bnb-rune
+<app-upgrade-rune
   *ngIf="mode === 'UPGRADE_RUNE'"
   [asset]="selectedAsset"
-  (confirmUpgrade)="confirmUpgradeRune($event)">
-</app-upgrade-bnb-rune>
+  (confirmUpgrade)="confirmUpgradeRune($event)"
+  (back)="mode = 'ASSET'">
+</app-upgrade-rune>
 
-<app-upgrade-bnb-rune-confirm
+<app-upgrade-rune-confirm
   *ngIf="mode === 'CONFIRM_UPGRADE_RUNE'"
   [asset]="selectedAsset"
   [amount]="amountToSend"
   (back)="mode = 'UPGRADE_RUNE'"
   (transactionSuccessful)="transactionSuccessful()">
-</app-upgrade-bnb-rune-confirm>
+</app-upgrade-rune-confirm>
 
 <app-view-phrase
   *ngIf="mode === 'VIEW_PHRASE'"
