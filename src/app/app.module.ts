@@ -12,7 +12,6 @@ import { ConnectErrorComponent } from './_components/connect/connect-error/conne
 import { HeaderComponent } from './_components/header/header.component';
 import { KeystoreConnectComponent } from './_components/connect/keystore-connect/keystore-connect.component';
 import { LastBlockIndicatorComponent } from './_components/last-block-indicator/last-block-indicator.component';
-import { LedgerConnectComponent } from './_components/connect/ledger-connect/ledger-connect.component';
 import { KeystoreCreateComponent } from './_components/connect/keystore-create/keystore-create.component';
 import { PendingTxsModalComponent } from './_components/user-settings/user-settings-dialog/pending-txs/pending-txs-modal.component';
 import { UserAddressComponent } from './_components/user-settings/user-settings-dialog/user-address/user-address.component';
@@ -78,7 +77,6 @@ import { UpgradeRuneConfirmModule } from './_components/upgrade-rune-confirm/upg
     KeystoreConnectComponent,
     ConnectErrorComponent,
     LastBlockIndicatorComponent,
-    LedgerConnectComponent,
     KeystoreCreateComponent,
     UserSettingsComponent,
     UserSettingsDialogComponent,

@@ -3,6 +3,7 @@ import { assetFromString, Chain } from '@xchainjs/xchain-util';
 import { BehaviorSubject, of, Subject, timer } from 'rxjs';
 import { catchError, switchMap, takeUntil } from 'rxjs/operators';
 import { TransactionDTO } from '../_classes/transaction';
+import { User } from '../_classes/user';
 import { BinanceService } from './binance.service';
 import { BlockchairBtcTransactionDTO, BlockchairService } from './blockchair.service';
 import { MidgardService } from './midgard.service';
@@ -42,6 +43,7 @@ export class TransactionStatusService {
   killOutputsPolling: {[key: string]: Subject<void>} = {};
 
   killTxPolling: {[key: string]: Subject<void>} = {};
+  user: User;
 
   constructor(
     private blockchairService: BlockchairService,
@@ -50,6 +52,11 @@ export class TransactionStatusService {
     private binanceService: BinanceService
   ) {
     this._txs = [];
+
+    userService.user$.subscribe(
+      (user) => this.user = user
+    );
+
   }
 
   // this needs to be simplified and cleaned up
@@ -68,6 +75,8 @@ export class TransactionStatusService {
         this.pollThorchainTx(pendingTx);
       } else if (pendingTx.chain === 'BTC') {
         this.pollBtcTx(pendingTx);
+      } else if (pendingTx.chain === 'ETH') {
+        this.pollThorchainTx(pendingTx);
       }
 
     }
@@ -188,6 +197,7 @@ export class TransactionStatusService {
 
     });
   }
+
 
   pollBtcTx(tx: Tx) {
     timer(0, 15000)

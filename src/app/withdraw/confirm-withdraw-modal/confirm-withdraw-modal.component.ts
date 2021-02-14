@@ -1,14 +1,9 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { tokenAmount, tokenToBase } from '@thorchain/asgardex-token';
 import { Subject, Subscription } from 'rxjs';
-import { PoolAddressDTO } from '../../_classes/pool-address';
 import { User } from '../../_classes/user';
 import { TransactionConfirmationState } from '../../_const/transaction-confirmation-state';
-import { BinanceService } from '../../_services/binance.service';
-import { MidgardService } from '../../_services/midgard.service';
 import { UserService } from '../../_services/user.service';
-import { WalletConnectService } from '../../_services/wallet-connect.service';
 import { environment } from 'src/environments/environment';
 import { assetAmount, assetToBase } from '@xchainjs/xchain-util';
 import { TransactionStatusService, TxActions, TxStatus } from 'src/app/_services/transaction-status.service';
@@ -42,10 +37,7 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: ConfirmWithdrawData,
     public dialogRef: MatDialogRef<ConfirmWithdrawModalComponent>,
-    private walletConnectService: WalletConnectService,
     private txStatusService: TransactionStatusService,
-    private binanceService: BinanceService,
-    private midgardService: MidgardService,
     private userService: UserService
   ) {
     this.txState = TransactionConfirmationState.PENDING_CONFIRMATION;
@@ -99,149 +91,6 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
       this.error = error;
       this.txState = TransactionConfirmationState.ERROR;
     }
-
-    // this.midgardService.getInboundAddresses().subscribe(
-    //   async (res) => {
-
-    //     const currentPools = res.current;
-
-    //     if (currentPools && currentPools.length > 0) {
-
-    //       const matchingPool = currentPools.find( (pool) => pool.chain === this.data.asset.chain );
-    //       const bnbPool = currentPools.find( (pool) => pool.chain === 'BNB' );
-
-    //       const memo = `WITHDRAW:${this.data.asset.chain}.${this.data.asset.symbol}:${this.data.unstakePercent * 100}`;
-
-    //       if (bnbPool) {
-
-    //         if (this.data.user.type === 'keystore' || this.data.user.type === 'ledger') {
-    //           this.keystoreTransaction(bnbPool, memo);
-    //         } else if (this.data.user.type === 'walletconnect') {
-    //           this.walletConnectTransaction(bnbPool, memo);
-    //         }
-
-    //       }
-
-    //     }
-
-    //   }
-    // );
-  }
-
-
-  // deprecated
-  async keystoreTransaction(matchingPool: PoolAddressDTO, memo: string) {
-
-    // const bncClient = this.binanceService.bncClient;
-
-    // if (this.data.user.type === 'ledger') {
-    //   bncClient.useLedgerSigningDelegate(
-    //     this.data.user.ledger,
-    //     () => this.txState = TransactionConfirmationState.PENDING_LEDGER_CONFIRMATION,
-    //     () => this.txState = TransactionConfirmationState.SUBMITTING,
-    //     (err) => console.log('error: ', err),
-    //     this.data.user.hdPath
-    //   );
-    // }
-
-    // await bncClient.initChain();
-
-    const amount = assetToBase(assetAmount(0.00000001));
-
-    // if (this.data.asset.chain === 'BNB') {
-
-    const binanceClient = this.data.user.clients.binance;
-
-    try {
-      const hash = await binanceClient.transfer({asset: this.data.rune, amount, recipient: matchingPool.address, memo});
-      this.txSuccess(hash);
-      this.txStatusService.pollTxOutputs(hash, 2, TxActions.WITHDRAW);
-      // this.fetchOutputs(hash);
-    } catch (error) {
-      this.error = error;
-      console.error('error withdrawing: ', error);
-    }
-
-    // }
-    // else if (this.data.asset.chain === 'BTC') {
-
-    //   const bitcoinClient = this.data.user.clients.bitcoin;
-
-    //   try {
-    //     const hash = await bitcoinClient.transfer({asset: this.data.asset, amount, recipient: matchingPool.address, memo});
-    //     this.txSuccess(hash);
-    //   } catch (error) {
-    //     console.error('error withdrawing: ', error);
-    //   }
-
-    // } else {
-    //   console.error('no matching chain: ', this.data.asset.chain);
-    // }
-
-  }
-
-  walletConnectTransaction(matchingPool: PoolAddressDTO, memo: string) {
-    const runeAmount = tokenToBase(tokenAmount(0.00000001))
-      .amount()
-      .toNumber();
-
-    const coins = [
-      {
-        denom: this.runeSymbol,
-        amount: runeAmount,
-      },
-    ];
-
-    const sendOrder = this.walletConnectService.walletConnectGetSendOrderMsg({
-      fromAddress: this.data.user.wallet,
-      toAddress: matchingPool.address,
-      coins,
-    });
-
-    const bncClient = this.binanceService.bncClient;
-
-    /**
-     * TODO: clean up, this is used in confirm-swap-modal as well
-     */
-    bncClient
-      .getAccount(this.data.user.wallet)
-      .then(async (response) => {
-        if (!response) {
-          console.error('error getting response from getAccount');
-          return;
-        }
-
-        const account = response.result;
-        const chainId = environment.network === 'testnet' ? 'Binance-Chain-Nile' : 'Binance-Chain-Tigris';
-        const tx = {
-          accountNumber: account.account_number.toString(),
-          sequence: account.sequence.toString(),
-          send_order: sendOrder,
-          chainId,
-          memo,
-        };
-
-        const res = await this.walletConnectService.walletConnectSendTx(tx, bncClient);
-
-        if (res) {
-          this.txState = TransactionConfirmationState.SUCCESS;
-
-          if (res.result && res.result.length > 0) {
-            this.hash = res.result[0].hash;
-            this.txStatusService.addTransaction({
-              chain: 'BNB',
-              hash: this.hash,
-              ticker: `${this.data.asset.ticker}-RUNE`,
-              status: TxStatus.PENDING,
-              action: TxActions.WITHDRAW
-            });
-          }
-        }
-
-    })
-    .catch((error) => {
-      console.error('getAccount error: ', error);
-    });
 
   }
 

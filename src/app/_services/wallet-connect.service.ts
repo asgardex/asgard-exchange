@@ -57,7 +57,7 @@ export class WalletConnectService {
       const bnbAccount = accounts.find( (account) => account.network === 714 );
 
       if (bnbAccount) {
-        const user = new User({type: 'walletconnect', wallet: bnbAccount.address, clients: {}});
+        const user = new User({type: 'walletconnect', wallet: bnbAccount.address});
         this.userService.setUser(user);
       }
 

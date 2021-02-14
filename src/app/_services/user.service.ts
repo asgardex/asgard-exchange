@@ -18,6 +18,12 @@ import {
 import { BehaviorSubject, of, Subject, timer } from 'rxjs';
 import { catchError, switchMap, takeUntil } from 'rxjs/operators';
 import { AssetAndBalance } from '../_classes/asset-and-balance';
+import { MidgardService } from './midgard.service';
+import { ethers } from 'ethers';
+// import { toPromise } from 'rxjs';
+
+// import 'rxjs/add/operator/map';
+// import 'rxjs/add/operator/toPromise';
 
 export interface MidgardData<T> {
   key: string;
@@ -44,7 +50,7 @@ export class UserService {
 
   asgardexBncClient: BinanceClient;
 
-  constructor() {
+  constructor(private midgardService: MidgardService) {
 
     this.asgardexBncClient = new binanceClient({
       network: (environment.network) === 'testnet' ? 'testnet' : 'mainnet',
@@ -101,6 +107,27 @@ export class UserService {
             };
           });
           // .filter((balance) => !asset || balance.asset === asset)
+
+      } else if (key === 'ethereum') {
+
+        // ETH
+        clientBalances = await client.getBalance();
+
+        const ethAddress = await client.getAddress();
+        const pools = await this.midgardService.getPools().toPromise();
+        const ethTokenPools = pools.filter( (pool) => pool.asset.indexOf('ETH') === 0)
+          .filter( (ethPool) => ethPool.asset.indexOf('-') >= 0 );
+
+        for (const token of ethTokenPools) {
+          const asset = new Asset(token.asset);
+          const assetAddress = asset.symbol.slice(asset.ticker.length + 1);
+          const strip0x = assetAddress.substr(2);
+          const checkSummedAddress = ethers.utils.getAddress(strip0x);
+          const tokenAsset = {chain: asset.chain, ticker: asset.ticker, symbol: `${asset.ticker}-${checkSummedAddress}`};
+          const tokenBalance = await client.getBalance(ethAddress, tokenAsset);
+          tokenBalance[0].asset = asset;
+          clientBalances.push(...tokenBalance);
+        }
 
       } else {
         clientBalances = await client.getBalance();

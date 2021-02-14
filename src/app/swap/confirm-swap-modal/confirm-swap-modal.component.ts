@@ -14,6 +14,10 @@ import {
 import { TransactionStatusService, TxActions, TxStatus } from 'src/app/_services/transaction-status.service';
 import { SlippageToleranceService } from 'src/app/_services/slippage-tolerance.service';
 import BigNumber from 'bignumber.js';
+import { TCRopsten } from '../../_abi/thorchain.js';
+import { environment } from 'src/environments/environment';
+import { thorchainContractAddress } from 'src/app/_const/ropsten-contract-address.js';
+import { ethers } from 'ethers';
 
 
 export interface SwapData {
@@ -33,7 +37,7 @@ export interface SwapData {
   templateUrl: './confirm-swap-modal.component.html',
   styleUrls: ['./confirm-swap-modal.component.scss']
 })
-export class ConfirmSwapModalComponent implements OnDestroy {
+export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
 
   confirmationPending: boolean;
   transactionSubmitted: boolean;
@@ -64,6 +68,35 @@ export class ConfirmSwapModalComponent implements OnDestroy {
 
   }
 
+  ngOnInit() {
+    console.log(this.swapData.sourceAsset);
+
+    const asset = this.swapData.sourceAsset;
+    if (asset.chain === 'ETH' && asset.symbol !== 'ETH') {
+      this.checkApproved();
+    }
+
+  }
+
+  async checkApproved() {
+    console.log('checking approved');
+    const ethClient = this.swapData.user.clients.ethereum;
+    const ethAddress = await ethClient.getAddress();
+    const amountNumber = this.swapData.inputValue;
+
+    this.midgardService.getInboundAddresses().subscribe(
+      async (res) => {
+
+        const ethPool = res.find( (pool) => pool.chain === 'ETH' );
+        if (ethPool) {
+          const isApproved = ethClient.isApproved(ethPool.router, ethAddress, assetToBase(assetAmount(amountNumber)));
+          console.log('is approved: ', isApproved);
+        }
+
+      });
+
+  }
+
 
   closeDialog(transactionSucess?: boolean) {
     this.dialogRef.close(transactionSucess);
@@ -74,7 +107,9 @@ export class ConfirmSwapModalComponent implements OnDestroy {
     this.txState = TransactionConfirmationState.SUBMITTING;
 
     // Source asset is not RUNE
-    if (this.swapData.sourceAsset.chain === 'BNB' || this.swapData.sourceAsset.chain === 'BTC') {
+    if (this.swapData.sourceAsset.chain === 'BNB'
+      || this.swapData.sourceAsset.chain === 'BTC'
+      || this.swapData.sourceAsset.chain === 'ETH') {
 
       this.midgardService.getInboundAddresses().subscribe(
         async (res) => {
@@ -83,7 +118,11 @@ export class ConfirmSwapModalComponent implements OnDestroy {
 
           if (currentPools && currentPools.length > 0) {
 
+            console.log('current pools are: ', currentPools);
+            console.log('source asset chain is: ', this.swapData.sourceAsset.chain);
+
             const matchingPool = currentPools.find( (pool) => pool.chain === this.swapData.sourceAsset.chain );
+            console.log('matching pool is: ', matchingPool);
 
             if (matchingPool) {
 
@@ -112,13 +151,17 @@ export class ConfirmSwapModalComponent implements OnDestroy {
 
   async keystoreTransfer(matchingPool?: PoolAddressDTO) {
 
+    console.log('matching pool is: ', matchingPool);
+
     const amountNumber = this.swapData.inputValue;
     const binanceClient = this.swapData.user.clients.binance;
     const bitcoinClient = this.swapData.user.clients.bitcoin;
     const thorClient = this.swapData.user.clients.thorchain;
+    const ethClient = this.swapData.user.clients.ethereum;
     const bitcoinAddress = await bitcoinClient.getAddress();
     const binanceAddress = await binanceClient.getAddress();
     const runeAddress = await thorClient.getAddress();
+    const ethAddress = await ethClient.getAddress();
 
     let targetAddress = '';
 
@@ -134,6 +177,9 @@ export class ConfirmSwapModalComponent implements OnDestroy {
       case 'THOR':
         targetAddress = runeAddress;
         break;
+
+      case 'ETH':
+        targetAddress = ethAddress;
     }
 
     const floor = this.slipLimitService.getSlipLimitFromAmount(this.swapData.outputValue);
@@ -216,6 +262,101 @@ export class ConfirmSwapModalComponent implements OnDestroy {
           chain: 'BTC',
           hash: this.hash,
           ticker: 'BTC',
+          status: TxStatus.PENDING,
+          action: TxActions.SWAP
+        });
+        this.txStatusService.pollTxOutputs(hash, 1, TxActions.SWAP);
+        this.txState = TransactionConfirmationState.SUCCESS;
+      } catch (error) {
+        console.error('error making transfer: ', error);
+        this.error = error;
+        this.txState = TransactionConfirmationState.ERROR;
+      }
+
+    } else if (this.swapData.sourceAsset.chain === 'ETH') {
+
+      try {
+
+        const sourceAsset = this.swapData.sourceAsset;
+
+        const split = sourceAsset.symbol.split('-');
+
+        const assetAddress = (sourceAsset.ticker !== 'ETH' && split.length > 0)
+          ? split[1]
+          : '0x0000000000000000000000000000000000000000';
+
+        const abi = (environment.network) === 'testnet'
+          ? TCRopsten
+          : TCRopsten;
+
+
+
+
+
+
+        // const params = [
+        //   matchingPool.address, // vault
+        //   assetAddress, // asset
+        //   assetToBase(assetAmount(amountNumber)).amount().toNumber(), // amount
+        //   memo
+        // ];
+        // const contractRes = await ethClient.call(matchingPool.router, abi, 'deposit', params);
+        // console.log('contract res is: ', contractRes);
+
+        let hash;
+        const targetAsset = this.swapData.targetAsset;
+
+        // this.swapData.targetAsset.chain,
+        // this.swapData.targetAsset.symbol,
+        // targetAddress,
+
+
+        // temporarily drops slip limit until mainnet
+        const ethMemo = `=:${targetAsset.chain}.${targetAsset.symbol}:${targetAddress}`;
+        console.log('eth memo is: ', ethMemo);
+
+
+        if (sourceAsset.ticker === 'ETH') {
+
+          const wallet = ethClient.getWallet();
+          const contract = new ethers.Contract(matchingPool.router, abi, wallet);
+          const contractRes = await contract.deposit(
+            `${matchingPool.address}`, // not sure if this is correct...
+            '0x0000000000000000000000000000000000000000',
+            ethers.utils.parseEther(String(amountNumber)),
+            // memo,
+            ethMemo,
+            {from: ethAddress, value: ethers.utils.parseEther(String(amountNumber))}
+          );
+
+          hash = contractRes['hash'] ? contractRes['hash'].substring(2) : '';
+
+          console.log('tx is: ', contractRes);
+
+        } else {
+
+          const params = [
+            // sourceAsset.ticker === 'ETH' // deposit amount
+            //   ? assetToBase(assetAmount(amountNumber)).amount().toNumber()
+            //   : assetToBase(assetAmount(0)).amount().toNumber(),
+            matchingPool.address, // vault
+            assetAddress, // asset
+            assetToBase(assetAmount(amountNumber)), // amount
+            memo
+          ];
+
+          const contractRes = await ethClient.call(matchingPool.router, abi, 'deposit', params);
+
+          hash = contractRes['hash'] ? contractRes['hash'] : '';
+
+          console.log('contract res is: ', contractRes);
+        }
+
+        this.hash = hash;
+        this.txStatusService.addTransaction({
+          chain: 'ETH',
+          hash: this.hash,
+          ticker: 'ETH',
           status: TxStatus.PENDING,
           action: TxActions.SWAP
         });

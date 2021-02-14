@@ -253,7 +253,11 @@ export class SwapComponent implements OnInit, OnDestroy {
           asset: new Asset(poolName),
         }))
         // filter out until we can add support
-        .filter( (pool) => pool.asset.chain === 'BNB' || pool.asset.chain === 'THOR' || pool.asset.chain === 'BTC' );
+        .filter( (pool) => pool.asset.chain === 'BNB'
+          || pool.asset.chain === 'THOR'
+          || pool.asset.chain === 'BTC'
+          || pool.asset.chain === 'ETH'
+        );
 
         // Keeping RUNE at top by default
         this.selectableMarkets.unshift({
@@ -355,6 +359,9 @@ export class SwapComponent implements OnInit, OnDestroy {
   }
 
   updateSwapDetails() {
+
+    console.log('this.selectedSourceAsset is: ', this.selectedSourceAsset );
+
     if (this.selectedSourceAsset && this.selectedTargetAsset) {
       this.calculateTargetUnits();
     } else {

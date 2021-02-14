@@ -197,14 +197,10 @@ export class DepositComponent implements OnInit, OnDestroy {
           asset: new Asset(poolName),
         }))
         // filter out until we can add support
-        .filter( (pool) => pool.asset.chain === 'BNB' || pool.asset.chain === 'THOR' || pool.asset.chain === 'BTC' );
-
-        // Keeping RUNE at top by default
-        // this.selectableMarkets.unshift({
-        //   asset: new Asset(
-        //     environment.network === 'chaosnet' ? 'BNB.RUNE-B1A' : 'BNB.RUNE-67C'
-        //   ),
-        // });
+        .filter( (pool) => pool.asset.chain === 'BNB'
+          || pool.asset.chain === 'THOR'
+          || pool.asset.chain === 'BTC'
+          || pool.asset.chain === 'ETH');
       },
       (err) => console.error('error fetching pools:', err)
     );

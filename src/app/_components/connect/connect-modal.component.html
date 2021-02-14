@@ -67,9 +67,6 @@
   <!-- KEYSTORE CONNECT -->
   <app-keystore-connect *ngIf="connectionMethod == 'KEYSTORE'" (back)="clearConnectionMethod()" (closeModal)="close()"></app-keystore-connect>
 
-  <!-- Ledger -->
-  <app-ledger-connect *ngIf="connectionMethod == 'LEDGER'" [chain]="selectedChain" (back)="clearConnectionMethod()" (closeModal)="close()"></app-ledger-connect>
-
   <!-- <app-connect-error *ngIf="error" (back)="clearConnectionMethod()"></app-connect-error> -->
 
 </div>

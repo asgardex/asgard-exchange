@@ -45,6 +45,17 @@
             </div>
           </div>
 
+          <div *ngIf="ethereumAddress" class="uni-input user-address" (click)="selectAddress(ethereumAddress, 'ETH')">
+            <label>Ethereum Address</label>
+
+            <div class="flxr flxr--align-center" style="width: 100%">
+              <div class="asset-icon-container">
+                <img class="asset-icon" src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png" />
+              </div>
+              <input [value]="ethereumAddress" name="ethereum-address" [disabled]="true" />
+            </div>
+          </div>
+
           <div *ngIf="binanceAddress" class="uni-input user-address" (click)="selectAddress(binanceAddress, 'BNB')">
             <label>BNB Address</label>
 
@@ -54,7 +65,6 @@
               </div>
               <input [value]="binanceAddress" name="binance-address" [disabled]="true" />
             </div>
-
           </div>
 
           <div class="flxr flxr--just-end">

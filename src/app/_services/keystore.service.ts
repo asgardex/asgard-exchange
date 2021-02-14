@@ -5,7 +5,7 @@ import { User } from '../_classes/user';
 import { Client as binanceClient, } from '@xchainjs/xchain-binance';
 import { Client as bitcoinClient, } from '@xchainjs/xchain-bitcoin';
 import { Client as thorchainClient, } from '@xchainjs/xchain-thorchain';
-import { Client as ethereumClient } from '@xchainjs/xchain-ethereum';
+import { Client as ethereumClient } from '@xchainjs/xchain-ethereum/lib';
 
 @Injectable({
   providedIn: 'root'
@@ -22,7 +22,12 @@ export class KeystoreService {
     const userBtcClient = new bitcoinClient({network, phrase, nodeUrl: blockchairUrl, nodeApiKey: environment.blockchairKey});
     const userThorchainClient = new thorchainClient({network, phrase});
     const thorAddress = await userThorchainClient.getAddress();
-    const userEthereumClient = new ethereumClient({network, phrase, etherscanApiKey: environment.etherscanKey});
+    const userEthereumClient = new ethereumClient({
+      network,
+      phrase,
+      etherscanApiKey: environment.etherscanKey,
+      infuraCreds: {projectId: environment.infuraProjectId}
+    });
 
     return new User({
       type: 'keystore',
@@ -31,7 +36,8 @@ export class KeystoreService {
       clients: {
         binance: userBinanceClient,
         bitcoin: userBtcClient,
-        thorchain: userThorchainClient
+        thorchain: userThorchainClient,
+        ethereum: userEthereumClient
       }
     });
   }
