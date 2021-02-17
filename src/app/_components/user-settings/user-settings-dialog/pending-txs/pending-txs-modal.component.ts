@@ -64,6 +64,16 @@ export class PendingTxsModalComponent implements OnInit, OnDestroy {
     }
   }
 
+  explorerPath(tx: Tx): string {
+    if (tx.isThorchainTx) {
+      return this.thorchainExplorerUrl + '/' + tx.hash;
+    } else if (tx.chain === 'ETH') {
+      return `${this.ethereumExplorerUrl}/0x${tx.hash}`;
+    } else {
+      return this.explorerUrl(tx.chain) + '/' + tx.hash;
+    }
+  }
+
   close(): void {
     this.dialogRef.close();
   }

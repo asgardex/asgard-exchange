@@ -173,6 +173,7 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
         ticker: `${asset.ticker}-RUNE`,
         status: TxStatus.PENDING,
         action: TxActions.DEPOSIT,
+        symbol: asset.symbol,
         isThorchainTx: true
       });
     } catch (error) {

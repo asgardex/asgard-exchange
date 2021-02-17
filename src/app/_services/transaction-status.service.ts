@@ -28,6 +28,7 @@ export enum TxActions {
 export interface Tx {
   chain: Chain;
   ticker: string;
+  symbol: string;
   hash: string;
   status: TxStatus;
   action: TxActions;
@@ -90,8 +91,7 @@ export class TransactionStatusService {
         } else if (pendingTx.chain === 'BTC') {
           this.pollBtcTx(pendingTx);
         } else if (pendingTx.chain === 'ETH') {
-          console.log('TODO: poll non-thorchain ETH tx. ex sending ETH out of wallet...');
-          // this.pollThorchainTx(pendingTx.hash);
+          this.pollEthTx(pendingTx);
         }
 
       }
@@ -241,6 +241,37 @@ export class TransactionStatusService {
         }
 
       });
+  }
+
+  pollEthTx(tx: Tx) {
+
+    if (this.user && this.user.clients && this.user.clients.ethereum) {
+
+      const ethClient = this.user.clients.ethereum;
+      const provider = ethClient.getProvider();
+
+      timer(5000, 15000)
+        .pipe(
+          // This kills the request if the user closes the component
+          takeUntil(this.killTxPolling[tx.hash]),
+          // switchMap cancels the last request, if no response have been received since last tick
+          switchMap(() => provider.getTransaction(`0x${tx.hash}`)),
+          // catchError handles http throws
+          catchError(error => of(error))
+        ).subscribe( async (res) => {
+
+          if (res.confirmations && res.confirmations > 0) {
+            this.updateTxStatus(tx.hash, TxStatus.COMPLETE);
+            this.userService.fetchBalances();
+            this.killTxPolling[tx.hash].next();
+          }
+
+        });
+
+    } else {
+      console.error('no eth client found...', this.user);
+    }
+
   }
 
   getPendingTxCount() {

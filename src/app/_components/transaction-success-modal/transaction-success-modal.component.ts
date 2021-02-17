@@ -12,6 +12,7 @@ export class TransactionSuccessModalComponent implements OnInit {
   @Input() chain: Chain;
   @Input() hash: string;
   @Input() label: string;
+  @Input() externalTx: boolean; // not Thorchain
   @Output() closeDialog: EventEmitter<null>;
 
   binanceExplorerUrl: string;

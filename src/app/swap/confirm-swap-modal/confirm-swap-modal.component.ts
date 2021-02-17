@@ -199,7 +199,8 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
           ticker: this.swapData.sourceAsset.ticker,
           status: TxStatus.PENDING,
           action: TxActions.SWAP,
-          isThorchainTx: true
+          isThorchainTx: true,
+          symbol: this.swapData.sourceAsset.symbol,
         });
         // this.txStatusService.pollTxOutputs(hash, 1, TxActions.SWAP);
         this.txState = TransactionConfirmationState.SUCCESS;
@@ -226,7 +227,8 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
           ticker: this.swapData.sourceAsset.ticker,
           status: TxStatus.PENDING,
           action: TxActions.SWAP,
-          isThorchainTx: true
+          isThorchainTx: true,
+          symbol: this.swapData.sourceAsset.symbol,
         });
         // this.txStatusService.pollTxOutputs(hash, 1, TxActions.SWAP);
         this.txState = TransactionConfirmationState.SUCCESS;
@@ -259,7 +261,8 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
           ticker: 'BTC',
           status: TxStatus.PENDING,
           action: TxActions.SWAP,
-          isThorchainTx: true
+          isThorchainTx: true,
+          symbol: this.swapData.sourceAsset.symbol,
         });
         // this.txStatusService.pollTxOutputs(hash, 1, TxActions.SWAP);
         this.txState = TransactionConfirmationState.SUCCESS;
@@ -287,14 +290,17 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
           ethClient
         });
 
-        this.hash = hash;
+        console.log('hash is: ', hash);
+
+        this.hash = hash.substr(2);
         this.txStatusService.addTransaction({
           chain: 'ETH',
-          hash: this.hash,
+          hash,
           ticker: 'ETH',
           status: TxStatus.PENDING,
           action: TxActions.SWAP,
-          isThorchainTx: true
+          isThorchainTx: true,
+          symbol: targetAsset.symbol,
         });
         this.txState = TransactionConfirmationState.SUCCESS;
       } catch (error) {

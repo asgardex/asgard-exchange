@@ -82,11 +82,11 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
         ticker: 'RUNE',
         status: TxStatus.PENDING,
         action: TxActions.WITHDRAW,
-        isThorchainTx: true
+        isThorchainTx: true,
+        symbol: this.data.asset.symbol
       });
 
       this.txSuccess(hash);
-      // this.txStatusService.pollTxOutputs(hash, 2, TxActions.WITHDRAW);
     } catch (error) {
       console.error('error making RUNE withdraw: ', error);
       this.error = error;
@@ -102,6 +102,7 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
       chain: 'THOR',
       hash: this.hash,
       ticker: `${this.data.asset.ticker}-RUNE`,
+      symbol: this.data.asset.symbol,
       status: TxStatus.PENDING,
       action: TxActions.WITHDRAW,
       isThorchainTx: true

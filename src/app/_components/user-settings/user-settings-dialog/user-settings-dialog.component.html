@@ -30,7 +30,7 @@
               <div class="asset-icon-container">
                 <img class="asset-icon" src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/RUNE-B1A/logo.png" />
               </div>
-              <input [value]="thorAddress" name="rune-address" [disabled]="true" />
+              <input [value]="thorAddress.substring(0, 8) + '...' + thorAddress.substring(thorAddress.length - 4, thorAddress.length)" name="rune-address" [disabled]="true" />
             </div>
           </div>
 
@@ -41,7 +41,7 @@
               <div class="asset-icon-container">
                 <img class="asset-icon" src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/BTCB-1DE/logo.png" />
               </div>
-              <input [value]="bitcoinAddress" name="btc-address" [disabled]="true" />
+              <input [value]="bitcoinAddress.substring(0, 8) + '...' + bitcoinAddress.substring(bitcoinAddress.length - 4, bitcoinAddress.length)" name="btc-address" [disabled]="true" />
             </div>
           </div>
 
@@ -52,7 +52,7 @@
               <div class="asset-icon-container">
                 <img class="asset-icon" src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png" />
               </div>
-              <input [value]="ethereumAddress" name="ethereum-address" [disabled]="true" />
+              <input [value]="ethereumAddress.substring(0, 8) + '...' + ethereumAddress.substring(ethereumAddress.length - 4, ethereumAddress.length)" name="ethereum-address" [disabled]="true" />
             </div>
           </div>
 
@@ -63,7 +63,7 @@
               <div class="asset-icon-container">
                 <img class="asset-icon" src="assets/images/token-icons/bnb.png" />
               </div>
-              <input [value]="binanceAddress" name="binance-address" [disabled]="true" />
+              <input [value]="binanceAddress.substring(0, 8 ) + '...' + binanceAddress.substring(binanceAddress.length - 4, binanceAddress.length)" name="binance-address" [disabled]="true" />
             </div>
           </div>
 

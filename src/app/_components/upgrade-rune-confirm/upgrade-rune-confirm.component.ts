@@ -110,6 +110,7 @@ export class UpgradeRuneConfirmComponent implements OnInit, OnDestroy {
           chain: 'BNB',
           hash: this.hash,
           ticker: this.asset.asset.ticker,
+          symbol: this.asset.asset.symbol,
           status: TxStatus.PENDING,
           action: TxActions.UPGRADE_RUNE,
           isThorchainTx: false

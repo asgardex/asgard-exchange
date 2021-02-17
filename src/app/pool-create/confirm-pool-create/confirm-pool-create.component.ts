@@ -114,6 +114,7 @@ export class ConfirmPoolCreateComponent implements OnInit, OnDestroy {
           chain: 'BNB',
           hash: this.hash,
           ticker: this.data.asset.ticker,
+          symbol: this.data.asset.symbol,
           status: TxStatus.PENDING,
           action: TxActions.DEPOSIT,
           isThorchainTx: true

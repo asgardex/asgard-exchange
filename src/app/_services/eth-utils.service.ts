@@ -47,7 +47,8 @@ export class EthUtilsService {
       checkSummedAddress = ethers.utils.getAddress(strip0x);
 
       const tokenContract = new ethers.Contract(checkSummedAddress, erc20ABI, wallet);
-      decimal = await tokenContract.decimals().toNumber();
+      const tokenDecimals = await tokenContract.decimals();
+      decimal = tokenDecimals.toNumber();
     }
     const contract = new ethers.Contract(ethInbound.router, TCRopstenAbi, wallet);
 

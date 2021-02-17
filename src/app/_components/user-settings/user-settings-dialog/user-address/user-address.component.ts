@@ -81,6 +81,14 @@ export class UserAddressComponent implements OnInit {
         this.explorerPath = `${this.explorerPathsService.binanceExplorerUrl}/address/${this.address}`;
         break;
 
+      case 'THOR':
+        this.explorerPath = `${this.explorerPathsService.thorchainExplorerUrl}/address/${this.address}`;
+        break;
+
+      case 'ETH':
+        this.explorerPath = `${this.explorerPathsService.ethereumExplorerUrl}/address/${this.address}`;
+        break;
+
       default:
         break;
     }

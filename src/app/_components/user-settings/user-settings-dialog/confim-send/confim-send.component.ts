@@ -85,6 +85,7 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
             chain: 'THOR',
             hash,
             ticker: this.asset.asset.ticker,
+            symbol: this.asset.asset.symbol,
             status: TxStatus.COMPLETE,
             action: TxActions.SEND,
             isThorchainTx: true
@@ -110,6 +111,7 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
             chain: 'BNB',
             hash,
             ticker: this.asset.asset.ticker,
+            symbol: this.asset.asset.symbol,
             status: TxStatus.COMPLETE,
             action: TxActions.SEND,
             isThorchainTx: false
@@ -141,6 +143,7 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
             chain: 'BTC',
             hash,
             ticker: 'BTC',
+            symbol: this.asset.asset.symbol,
             status: TxStatus.PENDING,
             action: TxActions.SEND,
             isThorchainTx: false
@@ -168,7 +171,6 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
           decimal = await tokenContract.decimals().toNumber();
         }
 
-
         const hash = await ethClient.transfer({
           asset: {
             chain: asset.chain,
@@ -179,13 +181,16 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
           recipient: this.recipientAddress,
         });
 
+        console.log('raw hash is: ', hash);
+
         this.txStatusService.addTransaction({
           chain: 'ETH',
           hash,
           ticker: asset.ticker,
           status: TxStatus.PENDING,
           action: TxActions.SEND,
-          isThorchainTx: false
+          isThorchainTx: false,
+          symbol: this.asset.asset.symbol,
         });
         this.transactionSuccessful.next();
 
