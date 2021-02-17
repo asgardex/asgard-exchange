@@ -36,15 +36,27 @@
       [coinGeckoList]="coinGeckoList">
     </app-asset-input>
 
-    <button
-      (click)="openConfirmationDialog()"
-      class="main-action-btn"
-      mat-flat-button
-      color="primary"
-      [disabled]="formDisabled()"
-    >
-      {{mainButtonText()}}
-    </button>
+    <div class="flxr">
+      <app-approve-eth-contract
+        *ngIf="ethContractApprovalRequired"
+        style="width: 50%; margin-right: 8px;"
+        [contractAddress]="ethRouter"
+        [asset]="asset"
+        (approved)="contractApproved()">
+      </app-approve-eth-contract>
+
+      <button
+        (click)="openConfirmationDialog()"
+        class="main-action-btn"
+        [ngStyle]="{'width': ethContractApprovalRequired ? '50%' : '100%'}"
+        mat-flat-button
+        color="primary"
+        [disabled]="formDisabled()"
+      >
+        {{mainButtonText()}}
+      </button>
+
+    </div>
 
     <div class="tag">
       <div class="tag-contents">

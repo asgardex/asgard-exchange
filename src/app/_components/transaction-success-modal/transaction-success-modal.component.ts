@@ -24,7 +24,7 @@ export class TransactionSuccessModalComponent implements OnInit {
     this.binanceExplorerUrl = `${this.explorerPathsService.binanceExplorerUrl}/tx`;
     this.bitcoinExplorerUrl = `${this.explorerPathsService.bitcoinExplorerUrl}/tx`;
     this.ethereumExplorerUrl = `${this.explorerPathsService.ethereumExplorerUrl}/tx`;
-    this.thorchainExplorerUrl = `${this.thorchainExplorerUrl}/tx`;
+    this.thorchainExplorerUrl = `${this.explorerPathsService.thorchainExplorerUrl}/tx`;
   }
 
   ngOnInit(): void {

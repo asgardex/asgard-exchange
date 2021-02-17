@@ -111,7 +111,8 @@ export class UpgradeRuneConfirmComponent implements OnInit, OnDestroy {
           hash: this.hash,
           ticker: this.asset.asset.ticker,
           status: TxStatus.PENDING,
-          action: TxActions.UPGRADE_RUNE
+          action: TxActions.UPGRADE_RUNE,
+          isThorchainTx: false
         });
 
         this.userService.pollNativeRuneBalance(this.runeBalance ?? 0);

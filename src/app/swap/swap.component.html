@@ -50,13 +50,21 @@
       <span *ngIf="!slip">-</span>
     </div>
 
-    <div>
+    <div class="flxr">
+      <app-approve-eth-contract
+        *ngIf="ethContractApprovalRequired && ethInboundAddress && selectedSourceAsset"
+        style="width: 50%; margin-right: 8px;"
+        [contractAddress]="ethInboundAddress.router"
+        [asset]="selectedSourceAsset"
+        (approved)="contractApproved()">
+      </app-approve-eth-contract>
       <button
         (click)="openConfirmationDialog()"
         class="main-action-btn"
         mat-flat-button
         color="primary"
         [disabled]="formInvalid()"
+        [ngStyle]="{'width': ethContractApprovalRequired ? '50%' : '100%'}"
       >
         {{mainButtonText()}}
       </button>

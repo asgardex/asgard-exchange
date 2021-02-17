@@ -17,6 +17,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TransactionProcessingModalModule } from '../_components/transaction-processing-modal/transaction-processing-modal.module';
 import { TransactionSuccessModalModule } from '../_components/transaction-success-modal/transaction-success-modal.module';
 import { TransactionLedgerConfirmModalModule } from '../_components/transaction-ledger-confirm-modal/transaction-ledger-confirm-modal.module';
+import { ApproveEthContractModule } from '../_components/approve-eth-contract/approve-eth-contract.module';
 
 @NgModule({
   declarations: [SwapComponent, ConfirmSwapModalComponent],
@@ -30,6 +31,7 @@ import { TransactionLedgerConfirmModalModule } from '../_components/transaction-
     TransactionProcessingModalModule,
     TransactionSuccessModalModule,
     TransactionLedgerConfirmModalModule,
+    ApproveEthContractModule,
     RouterModule.forChild([
       {
         path: '',

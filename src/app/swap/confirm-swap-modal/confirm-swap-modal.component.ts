@@ -6,18 +6,19 @@ import { UserService } from 'src/app/_services/user.service';
 import { TransactionConfirmationState } from 'src/app/_const/transaction-confirmation-state';
 import { PoolAddressDTO } from 'src/app/_classes/pool-address';
 import { Subscription } from 'rxjs';
+import { TransactionStatusService, TxActions, TxStatus } from 'src/app/_services/transaction-status.service';
+import { SlippageToleranceService } from 'src/app/_services/slippage-tolerance.service';
+import BigNumber from 'bignumber.js';
+import { TCRopstenAbi } from '../../_abi/thorchain.abi';
+import { environment } from 'src/environments/environment';
+import { ethers } from 'ethers';
+import { ETH_DECIMAL } from '@xchainjs/xchain-ethereum/lib';
+import { EthUtilsService } from 'src/app/_services/eth-utils.service.js';
 import {
   baseAmount,
   assetToBase,
   assetAmount,
 } from '@xchainjs/xchain-util';
-import { TransactionStatusService, TxActions, TxStatus } from 'src/app/_services/transaction-status.service';
-import { SlippageToleranceService } from 'src/app/_services/slippage-tolerance.service';
-import BigNumber from 'bignumber.js';
-import { TCRopsten } from '../../_abi/thorchain.js';
-import { environment } from 'src/environments/environment';
-import { thorchainContractAddress } from 'src/app/_const/ropsten-contract-address.js';
-import { ethers } from 'ethers';
 
 
 export interface SwapData {
@@ -45,6 +46,9 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
   hash: string;
   subs: Subscription[];
   error: string;
+  ethNetworkFee: number;
+  insufficientChainBalance: boolean;
+  loading: boolean;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public swapData: SwapData,
@@ -53,8 +57,11 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
     private txStatusService: TransactionStatusService,
     private userService: UserService,
     private slipLimitService: SlippageToleranceService,
+    private ethUtilsService: EthUtilsService
   ) {
+    this.loading = true;
     this.txState = TransactionConfirmationState.PENDING_CONFIRMATION;
+    this.insufficientChainBalance = false;
 
     const user$ = this.userService.user$.subscribe(
       (user) => {
@@ -69,34 +76,20 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    console.log(this.swapData.sourceAsset);
 
-    const asset = this.swapData.sourceAsset;
-    if (asset.chain === 'ETH' && asset.symbol !== 'ETH') {
-      this.checkApproved();
+    // const asset = this.swapData.sourceAsset;
+    const sourceAsset = this.swapData.sourceAsset;
+    if (sourceAsset.chain === 'ETH') {
+
+      // ESTIMATE GAS HERE
+      // const memo =
+      this.estimateEthGasPrice();
+
+    } else {
+      this.loading = false;
     }
 
   }
-
-  async checkApproved() {
-    console.log('checking approved');
-    const ethClient = this.swapData.user.clients.ethereum;
-    const ethAddress = await ethClient.getAddress();
-    const amountNumber = this.swapData.inputValue;
-
-    this.midgardService.getInboundAddresses().subscribe(
-      async (res) => {
-
-        const ethPool = res.find( (pool) => pool.chain === 'ETH' );
-        if (ethPool) {
-          const isApproved = ethClient.isApproved(ethPool.router, ethAddress, assetToBase(assetAmount(amountNumber)));
-          console.log('is approved: ', isApproved);
-        }
-
-      });
-
-  }
-
 
   closeDialog(transactionSucess?: boolean) {
     this.dialogRef.close(transactionSucess);
@@ -205,9 +198,10 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
           hash: this.hash,
           ticker: this.swapData.sourceAsset.ticker,
           status: TxStatus.PENDING,
-          action: TxActions.SWAP
+          action: TxActions.SWAP,
+          isThorchainTx: true
         });
-        this.txStatusService.pollTxOutputs(hash, 1, TxActions.SWAP);
+        // this.txStatusService.pollTxOutputs(hash, 1, TxActions.SWAP);
         this.txState = TransactionConfirmationState.SUCCESS;
       } catch (error) {
         console.error('error making transfer: ', error);
@@ -231,9 +225,10 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
           hash: this.hash,
           ticker: this.swapData.sourceAsset.ticker,
           status: TxStatus.PENDING,
-          action: TxActions.SWAP
+          action: TxActions.SWAP,
+          isThorchainTx: true
         });
-        this.txStatusService.pollTxOutputs(hash, 1, TxActions.SWAP);
+        // this.txStatusService.pollTxOutputs(hash, 1, TxActions.SWAP);
         this.txState = TransactionConfirmationState.SUCCESS;
       } catch (error) {
         console.error('error making transfer: ', error);
@@ -263,9 +258,10 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
           hash: this.hash,
           ticker: 'BTC',
           status: TxStatus.PENDING,
-          action: TxActions.SWAP
+          action: TxActions.SWAP,
+          isThorchainTx: true
         });
-        this.txStatusService.pollTxOutputs(hash, 1, TxActions.SWAP);
+        // this.txStatusService.pollTxOutputs(hash, 1, TxActions.SWAP);
         this.txState = TransactionConfirmationState.SUCCESS;
       } catch (error) {
         console.error('error making transfer: ', error);
@@ -278,79 +274,18 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
       try {
 
         const sourceAsset = this.swapData.sourceAsset;
-
-        const split = sourceAsset.symbol.split('-');
-
-        const assetAddress = (sourceAsset.ticker !== 'ETH' && split.length > 0)
-          ? split[1]
-          : '0x0000000000000000000000000000000000000000';
-
-        const abi = (environment.network) === 'testnet'
-          ? TCRopsten
-          : TCRopsten;
-
-
-
-
-
-
-        // const params = [
-        //   matchingPool.address, // vault
-        //   assetAddress, // asset
-        //   assetToBase(assetAmount(amountNumber)).amount().toNumber(), // amount
-        //   memo
-        // ];
-        // const contractRes = await ethClient.call(matchingPool.router, abi, 'deposit', params);
-        // console.log('contract res is: ', contractRes);
-
-        let hash;
         const targetAsset = this.swapData.targetAsset;
-
-        // this.swapData.targetAsset.chain,
-        // this.swapData.targetAsset.symbol,
-        // targetAddress,
-
 
         // temporarily drops slip limit until mainnet
         const ethMemo = `=:${targetAsset.chain}.${targetAsset.symbol}:${targetAddress}`;
-        console.log('eth memo is: ', ethMemo);
 
-
-        if (sourceAsset.ticker === 'ETH') {
-
-          const wallet = ethClient.getWallet();
-          const contract = new ethers.Contract(matchingPool.router, abi, wallet);
-          const contractRes = await contract.deposit(
-            `${matchingPool.address}`, // not sure if this is correct...
-            '0x0000000000000000000000000000000000000000',
-            ethers.utils.parseEther(String(amountNumber)),
-            // memo,
-            ethMemo,
-            {from: ethAddress, value: ethers.utils.parseEther(String(amountNumber))}
-          );
-
-          hash = contractRes['hash'] ? contractRes['hash'].substring(2) : '';
-
-          console.log('tx is: ', contractRes);
-
-        } else {
-
-          const params = [
-            // sourceAsset.ticker === 'ETH' // deposit amount
-            //   ? assetToBase(assetAmount(amountNumber)).amount().toNumber()
-            //   : assetToBase(assetAmount(0)).amount().toNumber(),
-            matchingPool.address, // vault
-            assetAddress, // asset
-            assetToBase(assetAmount(amountNumber)), // amount
-            memo
-          ];
-
-          const contractRes = await ethClient.call(matchingPool.router, abi, 'deposit', params);
-
-          hash = contractRes['hash'] ? contractRes['hash'] : '';
-
-          console.log('contract res is: ', contractRes);
-        }
+        const hash = await this.ethUtilsService.callDeposit({
+          inboundAddress: matchingPool,
+          asset: sourceAsset,
+          memo: ethMemo,
+          amount: amountNumber,
+          ethClient
+        });
 
         this.hash = hash;
         this.txStatusService.addTransaction({
@@ -358,9 +293,9 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
           hash: this.hash,
           ticker: 'ETH',
           status: TxStatus.PENDING,
-          action: TxActions.SWAP
+          action: TxActions.SWAP,
+          isThorchainTx: true
         });
-        this.txStatusService.pollTxOutputs(hash, 1, TxActions.SWAP);
         this.txState = TransactionConfirmationState.SUCCESS;
       } catch (error) {
         console.error('error making transfer: ', error);
@@ -372,8 +307,53 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
 
   }
 
+  async estimateEthGasPrice() {
+
+    const user = this.swapData.user;
+    const sourceAsset = this.swapData.sourceAsset;
+    const targetAsset = this.swapData.targetAsset;
+
+    if (user && user.clients && user.clients.ethereum) {
+
+
+      const ethClient = user.clients.ethereum;
+      const targetAddress = await ethClient.getAddress();
+      const ethBalances = await ethClient.getBalance();
+      const ethBalance = ethBalances[0];
+
+      // get inbound addresses
+      this.midgardService.getInboundAddresses().subscribe(
+        async (addresses) => {
+
+          const ethInbound = addresses.find( (inbound) => inbound.chain === 'ETH' );
+
+          const estimatedFeeWei = await this.ethUtilsService.estimateFee({
+            sourceAsset,
+            ethClient,
+            ethInbound,
+            inputAmount: this.swapData.inputValue,
+            memo: `=:${targetAsset.chain}.${targetAsset.symbol}:${targetAddress}`
+          });
+
+          // this.ethNetworkFeeWei = estimatedFeeWei.toNumber();
+          this.ethNetworkFee = estimatedFeeWei.dividedBy(10 ** ETH_DECIMAL).toNumber();
+
+          this.insufficientChainBalance = estimatedFeeWei.isGreaterThan(ethBalance.amount.amount());
+
+          this.loading = false;
+
+        }
+      );
+
+    }
+
+  }
+
   getSwapMemo(chain: string, symbol: string, addr: string, sliplimit: number): string {
-    return `=:${chain}.${symbol}:${addr}:${sliplimit}`;
+    // return `=:${chain}.${symbol}:${addr}:${sliplimit}`;
+
+    // temporarily disable slip limit for testnet
+    return `=:${chain}.${symbol}:${addr}`;
   }
 
   ngOnDestroy(): void {

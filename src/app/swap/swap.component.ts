@@ -30,6 +30,7 @@ import { CGCoinListItem, CoinGeckoService } from '../_services/coin-gecko.servic
 import { AssetAndBalance } from '../_classes/asset-and-balance';
 import { PoolDTO } from '../_classes/pool';
 import { SlippageToleranceService } from '../_services/slippage-tolerance.service';
+import { PoolAddressDTO } from '../_classes/pool-address';
 
 export enum SwapType {
   DOUBLE_SWAP = 'double_swap',
@@ -42,8 +43,6 @@ export enum SwapType {
   styleUrls: ['./swap.component.scss']
 })
 export class SwapComponent implements OnInit, OnDestroy {
-
-  // runeSymbol = environment.network === 'chaosnet' ? 'RUNE-B1A' : 'RUNE-67C';
 
   /**
    * From
@@ -72,6 +71,8 @@ export class SwapComponent implements OnInit, OnDestroy {
   }
   set selectedSourceAsset(asset: Asset) {
 
+    this.ethContractApprovalRequired = false;
+
     if (this.selectedSourceAsset) {
       this.targetAssetUnit = null;
       this.calculatingTargetAsset = true;
@@ -86,6 +87,10 @@ export class SwapComponent implements OnInit, OnDestroy {
     }
 
     this.sourceBalance = this.userService.findBalance(this.balances, asset);
+
+    if (asset.chain === 'ETH' && asset.ticker !== 'ETH') {
+      this.checkContractApproved();
+    }
 
     /**
      * If input value is more than balance of newly selected asset
@@ -160,8 +165,13 @@ export class SwapComponent implements OnInit, OnDestroy {
 
   insufficientBnb: boolean;
   coinGeckoList: CGCoinListItem[];
-
   selectableMarkets: AssetAndBalance[];
+
+  /**
+   * ETH specific
+   */
+  ethContractApprovalRequired: boolean;
+  ethInboundAddress: PoolAddressDTO;
 
   constructor(
     private dialog: MatDialog,
@@ -172,6 +182,7 @@ export class SwapComponent implements OnInit, OnDestroy {
     private slipLimitService: SlippageToleranceService) {
 
     this.selectedSourceAsset = new Asset('THOR.RUNE');
+    this.ethContractApprovalRequired = false;
 
     const balances$ = this.userService.userBalances$.subscribe(
       (balances) => {
@@ -212,10 +223,23 @@ export class SwapComponent implements OnInit, OnDestroy {
     this.getBinanceFees();
     this.getCoinGeckoCoinList();
     this.getPools();
+    this.getEthRouter();
   }
 
   isRune(asset: Asset): boolean {
     return asset && asset.ticker === 'RUNE'; // covers BNB and native
+  }
+
+  getEthRouter() {
+    this.midgardService.getInboundAddresses().subscribe(
+      (addresses) => {
+        const ethInbound = addresses.find( (inbound) => inbound.chain === 'ETH' );
+        if (ethInbound) {
+          this.ethInboundAddress = ethInbound;
+          console.log('setting eth router as: ', this.ethInboundAddress);
+        }
+      }
+    );
   }
 
   mainButtonText(): string {
@@ -276,12 +300,35 @@ export class SwapComponent implements OnInit, OnDestroy {
 
   }
 
+  async checkContractApproved() {
+
+    if (this.ethInboundAddress && this.user) {
+
+      const assetAddress = this.selectedSourceAsset.symbol.slice(this.selectedSourceAsset.ticker.length + 1);
+      const strip0x = assetAddress.substr(2);
+
+      if (this.sourceAssetUnit) {
+        console.log('sourceAssetUnit is: ', this.sourceAssetUnit);
+      }
+
+      const isApproved = await this.user.clients.ethereum.isApproved(this.ethInboundAddress.router, strip0x, baseAmount(1));
+      this.ethContractApprovalRequired = !isApproved;
+
+    }
+
+  }
+
+  contractApproved() {
+    this.ethContractApprovalRequired = false;
+  }
+
   formInvalid(): boolean {
 
     return !this.sourceAssetUnit || !this.selectedSourceAsset || !this.selectedTargetAsset || !this.targetAssetUnit
       || (this.selectedSourceAsset && this.sourceBalance
         && (this.sourceAssetUnit > this.userService.maximumSpendableBalance(this.selectedSourceAsset, this.sourceBalance)))
       || !this.user || !this.balances
+      || this.ethContractApprovalRequired
       || (this.slip * 100) > this.slippageTolerance
       || (this.selectedSourceAsset.chain === 'BNB' && this.insufficientBnb); // source is BNB and not enough funds to cover fee
   }
@@ -359,8 +406,6 @@ export class SwapComponent implements OnInit, OnDestroy {
   }
 
   updateSwapDetails() {
-
-    console.log('this.selectedSourceAsset is: ', this.selectedSourceAsset );
 
     if (this.selectedSourceAsset && this.selectedTargetAsset) {
       this.calculateTargetUnits();

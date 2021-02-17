@@ -81,7 +81,8 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
         hash: this.hash,
         ticker: 'RUNE',
         status: TxStatus.PENDING,
-        action: TxActions.WITHDRAW
+        action: TxActions.WITHDRAW,
+        isThorchainTx: true
       });
 
       this.txSuccess(hash);
@@ -102,7 +103,8 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
       hash: this.hash,
       ticker: `${this.data.asset.ticker}-RUNE`,
       status: TxStatus.PENDING,
-      action: TxActions.WITHDRAW
+      action: TxActions.WITHDRAW,
+      isThorchainTx: true
     });
   }
 

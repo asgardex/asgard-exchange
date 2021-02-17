@@ -10,7 +10,9 @@ import { UserService } from 'src/app/_services/user.service';
 import { TransactionStatusService, TxActions, TxStatus } from 'src/app/_services/transaction-status.service';
 import { Client as BinanceClient } from '@xchainjs/xchain-binance';
 import { Client as BitcoinClient } from '@xchainjs/xchain-bitcoin';
-import { Client as EthereumClient } from '@xchainjs/xchain-ethereum/lib';
+import { Client as EthereumClient, ETH_DECIMAL } from '@xchainjs/xchain-ethereum/lib';
+import { EthUtilsService } from 'src/app/_services/eth-utils.service';
+import { ethers } from 'ethers';
 
 export interface ConfirmDepositData {
   asset;
@@ -34,13 +36,19 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
   subs: Subscription[];
   error: string;
 
+  ethNetworkFee: number;
+  insufficientChainBalance: boolean;
+  loading: boolean;
+
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: ConfirmDepositData,
     public dialogRef: MatDialogRef<ConfirmDepositModalComponent>,
     private txStatusService: TransactionStatusService,
     private midgardService: MidgardService,
+    private ethUtilsService: EthUtilsService,
     private userService: UserService,
   ) {
+    this.loading = true;
     this.txState = TransactionConfirmationState.PENDING_CONFIRMATION;
     const user$ = this.userService.user$.subscribe(
       (user) => {
@@ -54,6 +62,13 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+
+    if (this.data.asset.chain === 'ETH') {
+      this.estimateEthGasPrice();
+    } else {
+      this.loading = false;
+    }
+
   }
 
   submitTransaction(): void {
@@ -157,7 +172,8 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
         hash: runeHash,
         ticker: `${asset.ticker}-RUNE`,
         status: TxStatus.PENDING,
-        action: TxActions.DEPOSIT
+        action: TxActions.DEPOSIT,
+        isThorchainTx: true
       });
     } catch (error) {
       console.error('error making RUNE transfer: ', error);
@@ -173,18 +189,12 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
     try {
       const asset = this.data.asset;
       const targetTokenMemo = `+:${asset.chain}.${asset.symbol}:${thorchainAddress}`;
-      const splitSymbol = asset.symbol.split('-');
-      const tokenContractAddress = splitSymbol.length > 0 ? splitSymbol[1] : '';
-
-      const hash = await client.transfer({
-        asset: {
-          chain: this.data.asset.chain,
-          symbol: this.data.asset.symbol,
-          ticker: this.data.asset.ticker
-        },
-        amount: assetToBase(assetAmount(this.data.assetAmount)),
-        recipient: recipientPool.address,
+      const hash = await this.ethUtilsService.callDeposit({
+        inboundAddress: recipientPool,
+        asset,
         memo: targetTokenMemo,
+        amount: this.data.assetAmount,
+        ethClient: client
       });
 
       return hash;
@@ -265,9 +275,45 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
     }
   }
 
-  // getRecipientPool(chain: Chain, pools: PoolAddressDTO[]) {
-  //   return pools.find( (pool) => pool.chain === chain );
-  // }
+  async estimateEthGasPrice() {
+
+    const user = this.data.user;
+    const sourceAsset = this.data.asset;
+
+    if (user && user.clients && user.clients.ethereum && user.clients.thorchain) {
+      const ethClient = user.clients.ethereum;
+      const thorClient = user.clients.thorchain;
+      const thorchainAddress = await thorClient.getAddress();
+      const ethBalances = await ethClient.getBalance();
+      const ethBalance = ethBalances[0];
+
+      // get inbound addresses
+      this.midgardService.getInboundAddresses().subscribe(
+        async (addresses) => {
+
+          const ethInbound = addresses.find( (inbound) => inbound.chain === 'ETH' );
+
+          const estimatedFeeWei = await this.ethUtilsService.estimateFee({
+            sourceAsset,
+            ethClient,
+            ethInbound,
+            inputAmount: this.data.assetAmount,
+            memo: `+:${sourceAsset.chain}.${sourceAsset.symbol}:${thorchainAddress}`
+          });
+
+          // this.ethNetworkFeeWei = estimatedFeeWei.toNumber();
+          this.ethNetworkFee = estimatedFeeWei.dividedBy(10 ** ETH_DECIMAL).toNumber();
+
+          this.insufficientChainBalance = estimatedFeeWei.isGreaterThan(ethBalance.amount.amount());
+
+          this.loading = false;
+
+        }
+      );
+
+    }
+
+  }
 
   closeDialog(transactionSucess?: boolean) {
     this.dialogRef.close(transactionSucess);

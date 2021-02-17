@@ -42,6 +42,7 @@ import { KeystoreService } from './_services/keystore.service';
 import { SlippageToleranceService } from './_services/slippage-tolerance.service';
 import { CoinGeckoService } from './_services/coin-gecko.service';
 import { CopyService } from './_services/copy.service';
+import { EthUtilsService } from './_services/eth-utils.service';
 
 /** MATERIAL */
 import { MatButtonModule } from '@angular/material/button';
@@ -129,7 +130,8 @@ import { UpgradeRuneConfirmModule } from './_components/upgrade-rune-confirm/upg
     WalletConnectService,
     ExplorerPathsService,
     SlippageToleranceService,
-    TransactionStatusService
+    TransactionStatusService,
+    EthUtilsService
   ],
   bootstrap: [AppComponent]
 })

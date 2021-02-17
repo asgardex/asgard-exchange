@@ -127,28 +127,6 @@ export class WithdrawComponent implements OnInit {
       }
       const address = await thorclient.getAddress();
 
-      // let address;
-      // if (this.asset.chain === 'BNB') {
-      //   address = await this.user.clients.binance.getAddress();
-      // } else if (this.asset.chain === 'BTC') {
-      //   address = await this.user.clients.bitcoin.getAddress();
-      // } else {
-      //   console.error('mismatched chain: ', this.asset.chain);
-      // }
-
-      // this.midgardService.getStakerPoolData(address, [`${this.asset.chain}.${this.asset.symbol}`]).subscribe(
-      //   (res) => {
-
-      //     if (res && res.length > 0) {
-      //       this.stakedPool = new StakerPoolData(res[0]);
-      //       this.heightLastStaked = res[0].heightLastStaked;
-      //       this.getConstants();
-      //     }
-
-      //   },
-      //   (err) => console.error('error fetching pool staker data: ', err)
-      // );
-
       this.midgardService.getMember(address).subscribe(
         (res) => this.memberPool = res.pools.find( (pool) => pool.pool === `${this.asset.chain}.${this.asset.symbol}` ),
         (err) => console.error('error fetching pool staker data: ', err)

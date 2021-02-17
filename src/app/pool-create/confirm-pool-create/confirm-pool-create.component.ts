@@ -115,7 +115,8 @@ export class ConfirmPoolCreateComponent implements OnInit, OnDestroy {
           hash: this.hash,
           ticker: this.data.asset.ticker,
           status: TxStatus.PENDING,
-          action: TxActions.DEPOSIT
+          action: TxActions.DEPOSIT,
+          isThorchainTx: true
         });
       } catch (error) {
         console.error('error making transfer: ', error);

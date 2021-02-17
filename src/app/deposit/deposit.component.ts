@@ -94,6 +94,9 @@ export class DepositComponent implements OnInit, OnDestroy {
   subs: Subscription[];
   selectableMarkets: AssetAndBalance[];
 
+  ethRouter: string;
+  ethContractApprovalRequired: boolean;
+
   constructor(
     private dialog: MatDialog,
     private userService: UserService,
@@ -117,7 +120,13 @@ export class DepositComponent implements OnInit, OnDestroy {
     );
 
     const user$ = this.userService.user$.subscribe(
-      (user) => this.user = user
+      (user) => {
+        this.user = user;
+
+        if (this.asset && this.asset.chain === 'ETH' && this.asset.ticker !== 'ETH') {
+          this.checkContractApproved(this.asset);
+        }
+      }
     );
 
     this.subs = [balances$, user$];
@@ -134,14 +143,47 @@ export class DepositComponent implements OnInit, OnDestroy {
         this.asset = new Asset(asset);
         this.getPoolDetail(asset);
         this.assetBalance = this.userService.findBalance(this.balances, this.asset);
+
+        if (this.asset.chain === 'ETH' && this.asset.ticker !== 'ETH') {
+          this.checkContractApproved(this.asset);
+        }
+
       }
 
     });
 
     this.getCoinGeckoCoinList();
     this.getPools();
+    this.getEthRouter();
 
     this.subs.push(params$);
+
+  }
+
+  getEthRouter() {
+    this.midgardService.getInboundAddresses().subscribe(
+      (addresses) => {
+        const ethInbound = addresses.find( (inbound) => inbound.chain === 'ETH' );
+        if (ethInbound) {
+          this.ethRouter = ethInbound.router;
+        }
+      }
+    );
+  }
+
+  contractApproved() {
+    this.ethContractApprovalRequired = false;
+  }
+
+  async checkContractApproved(asset: Asset) {
+
+    if (this.ethRouter && this.user) {
+      const assetAddress = asset.symbol.slice(asset.ticker.length + 1);
+      const strip0x = assetAddress.substr(2);
+      const isApproved = await this.user.clients.ethereum.isApproved(this.ethRouter, strip0x, baseAmount(1));
+      this.ethContractApprovalRequired = !isApproved;
+      console.log('is approved?', isApproved);
+    }
 
   }
 
@@ -160,20 +202,6 @@ export class DepositComponent implements OnInit, OnDestroy {
   }
 
   getPoolDetail(asset: string) {
-    // this.midgardService.getPoolDetails([asset], 'simple').subscribe(
-    //   (res) => {
-
-    //     if (res && res.length > 0) {
-
-    //       this.assetPoolData = {
-    //         assetBalance: baseAmount(res[0].assetDepth),
-    //         runeBalance: baseAmount(res[0].runeDepth),
-    //       };
-
-    //     }
-    //   },
-    //   (err) => console.error('error getting pool detail: ', err)
-    // );
 
     this.midgardService.getPool(asset).subscribe(
       (res) => {
@@ -208,7 +236,7 @@ export class DepositComponent implements OnInit, OnDestroy {
 
   formDisabled(): boolean {
 
-    return !this.balances || !this.runeAmount || !this.assetAmount || this.insufficientBnb
+    return !this.balances || !this.runeAmount || !this.assetAmount || this.insufficientBnb || this.ethContractApprovalRequired
     || (this.balances
       && (this.runeAmount > this.runeBalance || this.assetAmount > this.userService.maximumSpendableBalance(this.asset, this.assetBalance))
     );
