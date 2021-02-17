@@ -32,6 +32,9 @@
         </div>
       </div>
     </li>
+    <li *ngIf="displayAddTokenButton" class="flxr flxr--just-center flxr--align-center" style="padding: 1rem 0;">
+      <button mat-flat-button color="accent" (click)="addToken.emit()">Add Token</button>
+    </li>
   </ul>
 
 </div>

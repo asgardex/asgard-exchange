@@ -97,7 +97,8 @@
   [chain]="selectedChain"
   [address]="selectedAddress"
   (back)="clearSelectedAddress()"
-  (navigateToAsset)="selectAsset($event)">
+  (navigateToAsset)="selectAsset($event)"
+  (navigateToAddToken)="mode = 'ADDRESS_ADD_TOKEN'">
 </app-user-address>
 
 <app-user-asset
@@ -151,3 +152,10 @@
   [asset]="selectedAsset"
   (back)="mode = 'ASSET'">
 </app-deposit>
+
+<app-user-address-add-token
+  *ngIf="mode === 'ADDRESS_ADD_TOKEN'"
+  [chain]="selectedChain"
+  [chainAddress]="selectedAddress"
+  (back)="mode = 'ADDRESS'">
+</app-user-address-add-token>

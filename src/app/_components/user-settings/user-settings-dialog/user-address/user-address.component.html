@@ -38,5 +38,12 @@
 </div>
 
 <div mat-dialog-content>
-  <app-assets-list [assetListItems]="assets" [loading]="loading" [disabledAssetSymbol]="''" (selectAsset)="selectAsset($event)"></app-assets-list>
+  <app-assets-list
+    [assetListItems]="assets"
+    [loading]="loading"
+    [disabledAssetSymbol]="''"
+    [displayAddTokenButton]="chain === 'ETH'"
+    (selectAsset)="selectAsset($event)"
+    (addToken)="navigateToAddToken.emit()">
+  </app-assets-list>
 </div>

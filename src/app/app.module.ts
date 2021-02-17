@@ -22,6 +22,7 @@ import { SlippageToleranceComponent } from './_components/slippage-tolerance/sli
 import { TestnetWarningComponent } from './_components/testnet-warning/testnet-warning.component';
 import { UserAssetComponent } from './_components/user-settings/user-settings-dialog/user-asset/user-asset.component';
 import { SendAssetComponent } from './_components/user-settings/user-settings-dialog/send-asset/send-asset.component';
+import { UserAddressAddTokenComponent } from './_components/user-settings/user-settings-dialog/user-address-add-token/user-address-add-token.component';
 
 /** MODULES */
 import { AppRoutingModule } from './app-routing.module';
@@ -93,6 +94,7 @@ import { UpgradeRuneConfirmModule } from './_components/upgrade-rune-confirm/upg
     DepositComponent,
     DepositConfirmComponent,
     DepositFormComponent,
+    UserAddressAddTokenComponent,
   ],
   imports: [
     AssetInputModule,

@@ -20,6 +20,7 @@ export class UserAddressComponent implements OnInit {
   @Input() chain: Chain;
   @Output() back: EventEmitter<null>;
   @Output() navigateToAsset: EventEmitter<AssetAndBalance>;
+  @Output() navigateToAddToken: EventEmitter<null>;
   iconPath: string;
   user: User;
   balances: Balances;
@@ -31,6 +32,7 @@ export class UserAddressComponent implements OnInit {
   constructor(private userService: UserService, private copyService: CopyService, private explorerPathsService: ExplorerPathsService) {
     this.back = new EventEmitter<null>();
     this.navigateToAsset = new EventEmitter<AssetAndBalance>();
+    this.navigateToAddToken = new EventEmitter<null>();
     this.loading = true;
   }
 
