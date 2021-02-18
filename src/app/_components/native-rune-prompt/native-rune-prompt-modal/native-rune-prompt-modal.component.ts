@@ -15,6 +15,7 @@ export class NativeRunePromptModalComponent implements OnInit {
   mode: 'SELECT_ASSET' | 'UPGRADE_ASSET' | 'CONFIRM' | 'SUCCESS';
   selectedAsset: AssetAndBalance;
   amountToSend: number;
+  successfulTxHash: string;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: {assets: AssetAndBalance[]},
@@ -31,6 +32,11 @@ export class NativeRunePromptModalComponent implements OnInit {
     const withBalance = this.assets.find( (anb) => `${anb.asset.chain}.${anb.asset.symbol}` === `${asset.chain}.${asset.symbol}` );
     this.selectedAsset = withBalance;
     this.mode = 'UPGRADE_ASSET';
+  }
+
+  transactionSuccessful(hash: string) {
+    this.successfulTxHash = hash;
+    this.mode = 'SUCCESS';
   }
 
   confirmUpgradeRune(p: {amount: number}) {

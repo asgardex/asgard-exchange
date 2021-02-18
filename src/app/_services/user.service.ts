@@ -20,10 +20,6 @@ import { catchError, switchMap, takeUntil } from 'rxjs/operators';
 import { AssetAndBalance } from '../_classes/asset-and-balance';
 import { MidgardService } from './midgard.service';
 import { ethers } from 'ethers';
-// import { toPromise } from 'rxjs';
-
-// import 'rxjs/add/operator/map';
-// import 'rxjs/add/operator/toPromise';
 
 export interface MidgardData<T> {
   key: string;
@@ -115,6 +111,15 @@ export class UserService {
 
         const ethAddress = await client.getAddress();
         const assetsToQuery: Asset[] = [];
+
+        /**
+         * Add ETH RUNE
+         */
+        assetsToQuery.push(
+          (environment.network === 'testnet')
+          ? new Asset(`ETH.RUNE-${'0xd601c6A3a36721320573885A8d8420746dA3d7A0'.toUpperCase()}`)
+          : new Asset(`ETH.RUNE-${'0x3155BA85D5F96b2d030a4966AF206230e46849cb'.toUpperCase()}`)
+        );
 
         /**
          * Check user balance for tokens that have existing THORChain pools

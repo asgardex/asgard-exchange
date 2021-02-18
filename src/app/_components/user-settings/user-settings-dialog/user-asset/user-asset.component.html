@@ -46,8 +46,8 @@
       Deposit
     </li>
 
-    <!-- UPGRADE BNB RUNE TO NATIVE RUNE -->
-    <li *ngIf="asset && asset.asset.chain === 'BNB' && asset.asset.ticker === 'RUNE'" class="action flxr flxr--flow-col flxr--align-center">
+    <!-- UPGRADE BNB/ETH RUNE TO NATIVE RUNE -->
+    <li *ngIf="asset && (asset.asset.chain === 'BNB' || asset.asset.chain === 'ETH') && asset.asset.ticker === 'RUNE'" class="action flxr flxr--flow-col flxr--align-center">
       <button mat-mini-fab color="primary" aria-label="Copy" (click)="upgradeRune.emit()">
         <mat-icon>upgrade</mat-icon>
       </button>

@@ -5,8 +5,7 @@
     <mat-icon style="margin-right: 8px;">warning</mat-icon>
     <small>
       <span *ngFor="let asset of nonNativeRuneAssets; let i = index">
-        {{asset.asset.chain}}.RUNE
-        <span *ngIf="i == 0 && nonNativeRuneAssets.length > 1">,</span>
+        {{asset.asset.chain}}.RUNE<span *ngIf="i == 0 && nonNativeRuneAssets.length > 1">,</span>
       </span>
       <span> detected. Upgrade to Native RUNE.</span>
     </small>

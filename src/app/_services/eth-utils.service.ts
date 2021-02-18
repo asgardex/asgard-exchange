@@ -8,6 +8,7 @@ import { assetAmount, assetToBase } from '@xchainjs/xchain-util';
 import BigNumber from 'bignumber.js';
 import { erc20ABI } from '../_abi/erc20.abi';
 import { environment } from '../../environments/environment';
+import { ethRUNERopsten } from '../_abi/erc20RUNE.abi';
 
 export type EstimateFeeParams = {
   sourceAsset: Asset,
@@ -24,6 +25,8 @@ export type CallDepositParams = {
   ethClient: Client,
   amount: number
 };
+
+const testnetBasketABI = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"inputs":[{"internalType":"address","name":"coin","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"addCoin","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"coins","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"giveMeCoins","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"isAdded","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"}];
 
 @Injectable({
   providedIn: 'root'
@@ -117,6 +120,24 @@ export class EthUtilsService {
     }
 
     return hash;
+
+  }
+
+  async getTestnetRune(ethClient: Client) {
+
+    try {
+      const wallet = await ethClient.getWallet();
+
+      const basketERC20Contract = new ethers.Contract('0xEF7a88873190098F0EA2CFB7C68AF9526AD79aad', testnetBasketABI, wallet);
+      await basketERC20Contract.giveMeCoins();
+
+      const testnetRuneContract = new ethers.Contract('0xd601c6A3a36721320573885A8d8420746dA3d7A0', ethRUNERopsten, wallet);
+      await testnetRuneContract.functions.giveMeRUNE();
+
+    } catch (error) {
+      console.log('error getting testnet RUNE');
+      console.log(error);
+    }
 
   }
 
