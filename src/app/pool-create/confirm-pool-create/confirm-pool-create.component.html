@@ -46,13 +46,28 @@
         <div>
 
           <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
-            <span class="tx-detail-label">BNB Fee</span>
-            <span>0.0003</span>
+            <span *ngIf="data.asset && data.asset.chain" class="tx-detail-label">{{data.asset.chain}} Fee</span>
+            <span *ngIf="!data.asset.chain" class="tx-detail-label">- Fee</span>
+            <span *ngIf="networkFee">{{networkFee | number:"0.0-5"}}</span>
+            <span *ngIf="!networkFee">-</span>
           </div>
 
         </div>
 
-        <button (click)="submitTransaction()" mat-flat-button color="primary" class="main-action-btn">Confirm Deposit</button>
+        <div *ngIf="loading" style="width: 100%; height: 56px; margin-top: 1rem;" class="flxr flxr--just-center flxr--align-center">
+          <mat-progress-spinner mode="indeterminate" diameter="30"></mat-progress-spinner>
+        </div>
+
+        <button
+          *ngIf="!loading"
+          (click)="submitTransaction()"
+          mat-flat-button
+          color="primary"
+          class="main-action-btn"
+          [disabled]="insufficientChainBalance">
+            <span *ngIf="!insufficientChainBalance">Confirm Deposit</span>
+            <span *ngIf="insufficientChainBalance">Insufficient {{data.asset.chain}} Balance</span>
+        </button>
 
       </div>
 

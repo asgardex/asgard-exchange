@@ -10,6 +10,8 @@ import { SectionHeadModule } from '../_components/section-head/section-head.modu
 import { MatDialogModule } from '@angular/material/dialog';
 import { TransactionSuccessModalModule } from '../_components/transaction-success-modal/transaction-success-modal.module';
 import { TransactionProcessingModalModule } from '../_components/transaction-processing-modal/transaction-processing-modal.module';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { ApproveEthContractModule } from '../_components/approve-eth-contract/approve-eth-contract.module';
 
 
 @NgModule({
@@ -20,9 +22,11 @@ import { TransactionProcessingModalModule } from '../_components/transaction-pro
     MatIconModule,
     MatButtonModule,
     MatDialogModule,
+    MatProgressSpinnerModule,
     SectionHeadModule,
     TransactionSuccessModalModule,
     TransactionProcessingModalModule,
+    ApproveEthContractModule,
     RouterModule.forChild([
       {
         path: '',

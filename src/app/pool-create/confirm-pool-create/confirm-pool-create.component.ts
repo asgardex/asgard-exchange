@@ -1,7 +1,6 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Asset, assetAmount, assetToBase } from '@xchainjs/xchain-util';
-import { MultiTransfer } from '@xchainjs/xchain-binance';
+import { assetAmount, assetToBase } from '@xchainjs/xchain-util';
 import { Subscription } from 'rxjs';
 import { User } from 'src/app/_classes/user';
 import { TransactionConfirmationState } from 'src/app/_const/transaction-confirmation-state';
@@ -10,8 +9,7 @@ import { TransactionStatusService, TxActions, TxStatus } from 'src/app/_services
 import { UserService } from 'src/app/_services/user.service';
 import { Client as BinanceClient } from '@xchainjs/xchain-binance';
 import { PoolAddressDTO } from 'src/app/_classes/pool-address';
-import { Client as EthereumClient } from '@xchainjs/xchain-ethereum/lib';
-import { Client as ThorchainClient } from '@xchainjs/xchain-thorchain';
+import { Client as EthereumClient, ETH_DECIMAL } from '@xchainjs/xchain-ethereum/lib';
 import { EthUtilsService } from 'src/app/_services/eth-utils.service';
 
 export interface ConfirmCreatePoolData {
@@ -33,6 +31,10 @@ export class ConfirmPoolCreateComponent implements OnInit, OnDestroy {
   txState: TransactionConfirmationState;
   hash: string;
   error: string;
+  networkFee: number;
+  loading: boolean;
+  insufficientChainBalance: boolean;
+  bnbBalance: number;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: ConfirmCreatePoolData,
@@ -42,6 +44,7 @@ export class ConfirmPoolCreateComponent implements OnInit, OnDestroy {
     private txStatusService: TransactionStatusService,
     private ethUtilsService: EthUtilsService
   ) {
+    this.loading = true;
 
     this.txState = TransactionConfirmationState.PENDING_CONFIRMATION;
 
@@ -54,6 +57,30 @@ export class ConfirmPoolCreateComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+
+    if (this.data.asset.chain === 'ETH') {
+      this.estimateEthGasPrice();
+    } else if (this.data.asset.chain === 'BNB') {
+
+      const balances$ = this.userService.userBalances$.subscribe(
+        (balances) => {
+          if (balances) {
+            const bnbBalance = balances.find( (balance) => balance.asset.chain === 'BNB' && balance.asset.symbol === 'BNB' );
+            if (bnbBalance)  {
+              this.bnbBalance = bnbBalance.amount.amount().toNumber();
+              this.estimatBnbFee();
+              console.log('bnb balance is: ', this.bnbBalance);
+            }
+          }
+        }
+      );
+
+      this.subs.push(balances$);
+
+    }else {
+      this.loading = false;
+    }
+
   }
 
   submitTransaction(): void {
@@ -62,47 +89,9 @@ export class ConfirmPoolCreateComponent implements OnInit, OnDestroy {
     this.midgardService.getInboundAddresses().subscribe(
       async (res) => {
 
-        const currentPools = res;
+        const inboundAddresses = res;
 
-        if (currentPools && currentPools.length > 0) {
-
-          const bnbPool = currentPools.find( (pool) => pool.chain === 'BNB' );
-
-          if (this.data.asset.chain === 'BNB') {
-
-            const outputs: MultiTransfer[] = [
-              {
-                to: bnbPool.address,
-                coins: [
-                  {
-                    asset: this.data.rune,
-                    amount: (this.user.type === 'keystore' || this.user.type === 'ledger')
-                      ? assetToBase(assetAmount(this.data.runeAmount))
-                      : assetToBase(assetAmount(this.data.runeAmount)),
-                  },
-                  {
-                    asset: this.data.asset,
-                    amount: (this.user.type === 'keystore' || this.user.type === 'ledger')
-                      ? assetToBase(assetAmount((this.data.assetAmount)))
-                      : assetToBase(assetAmount(this.data.assetAmount))
-                  },
-                ],
-              },
-            ];
-
-            const memo = `STAKE:BNB.${this.data.asset.symbol}`;
-
-            if (bnbPool) {
-              if (this.user.type === 'keystore' || this.user.type === 'ledger') {
-                this.singleChainBnbKeystoreTx(outputs, memo);
-              }
-            }
-
-          } else {
-            console.log('atm only bnb pools are allowed to be created');
-          }
-
-        }
+        this.keystoreDeposit(inboundAddresses);
 
       }
     );
@@ -185,6 +174,9 @@ export class ConfirmPoolCreateComponent implements OnInit, OnDestroy {
         symbol: asset.symbol,
         isThorchainTx: true
       });
+
+      this.txState = TransactionConfirmationState.SUCCESS;
+
     } catch (error) {
       console.error('error making RUNE transfer: ', error);
       this.txState = TransactionConfirmationState.ERROR;
@@ -234,31 +226,48 @@ export class ConfirmPoolCreateComponent implements OnInit, OnDestroy {
     }
   }
 
-  async singleChainBnbKeystoreTx(outputs, memo: string) {
+  async estimatBnbFee() {
+    this.insufficientChainBalance = (this.bnbBalance && (this.bnbBalance / 10 ** 8 < 0.000375));
+    this.networkFee = 0.000375;
+    console.log('insufficient chain balance?', this.insufficientChainBalance);
+    this.loading = false;
+  }
 
-    const binanceClient = this.user.clients.binance;
-    if (binanceClient) {
+  async estimateEthGasPrice() {
 
-      try {
-        const hash = await binanceClient.multiSend({transactions: outputs, memo});
-        this.txState = TransactionConfirmationState.SUCCESS;
-        this.hash = hash;
-        this.txStatusService.addTransaction({
-          chain: 'BNB',
-          hash: this.hash,
-          ticker: this.data.asset.ticker,
-          symbol: this.data.asset.symbol,
-          status: TxStatus.PENDING,
-          action: TxActions.DEPOSIT,
-          isThorchainTx: true
-        });
-      } catch (error) {
-        console.error('error making transfer: ', error);
-        this.txState = TransactionConfirmationState.ERROR;
-      }
+    const user = this.user;
+    const sourceAsset = this.data.asset;
 
-    } else {
-      console.error('no binance client for user');
+    if (user && user.clients && user.clients.ethereum && user.clients.thorchain) {
+      const ethClient = user.clients.ethereum;
+      const thorClient = user.clients.thorchain;
+      const thorchainAddress = await thorClient.getAddress();
+      const ethBalances = await ethClient.getBalance();
+      const ethBalance = ethBalances[0];
+
+      // get inbound addresses
+      this.midgardService.getInboundAddresses().subscribe(
+        async (addresses) => {
+
+          const ethInbound = addresses.find( (inbound) => inbound.chain === 'ETH' );
+
+          const estimatedFeeWei = await this.ethUtilsService.estimateFee({
+            sourceAsset,
+            ethClient,
+            ethInbound,
+            inputAmount: this.data.assetAmount,
+            memo: `+:${sourceAsset.chain}.${sourceAsset.symbol}:${thorchainAddress}`
+          });
+
+          this.networkFee = estimatedFeeWei.dividedBy(10 ** ETH_DECIMAL).toNumber();
+
+          this.insufficientChainBalance = estimatedFeeWei.isGreaterThan(ethBalance.amount.amount());
+
+          this.loading = false;
+
+        }
+      );
+
     }
 
   }

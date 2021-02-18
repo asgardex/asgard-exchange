@@ -10,6 +10,8 @@ import { Balances } from '@xchainjs/xchain-client';
 import { AssetAndBalance } from '../_classes/asset-and-balance';
 import { ConfirmPoolCreateComponent } from './confirm-pool-create/confirm-pool-create.component';
 import { MatDialog } from '@angular/material/dialog';
+import { User } from '../_classes/user';
+import { baseAmount } from '@xchainjs/xchain-util';
 
 @Component({
   selector: 'app-pool-create',
@@ -88,6 +90,10 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
   pools: string[];
   selectableMarkets: AssetAndBalance[];
 
+  ethRouter: string;
+  ethContractApprovalRequired: boolean;
+  user: User;
+
   constructor(
     private dialog: MatDialog,
     private route: ActivatedRoute,
@@ -113,11 +119,23 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
       }
     );
 
-    this.subs = [balances$];
+    const user$ = this.userService.user$.subscribe(
+      (user) => {
+        this.user = user;
+
+        if (this.asset && this.asset.chain === 'ETH' && this.asset.ticker !== 'ETH') {
+          this.checkContractApproved(this.asset);
+        }
+      }
+    );
+
+    this.subs = [balances$, user$];
 
   }
 
   ngOnInit(): void {
+
+    this.getEthRouter();
 
     const params$ = this.route.queryParamMap.subscribe( (params) => {
 
@@ -133,6 +151,11 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
         if (this.balances) {
           this.assetBalance = this.userService.findBalance(this.balances, this.asset);
         }
+
+        if (this.asset.chain === 'ETH' && this.asset.ticker !== 'ETH') {
+          this.checkContractApproved(this.asset);
+        }
+
       } else {
         this.router.navigate(['/', 'pool']);
       }
@@ -143,6 +166,17 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
 
     this.subs.push(params$);
 
+  }
+
+  getEthRouter() {
+    this.midgardService.getInboundAddresses().subscribe(
+      (addresses) => {
+        const ethInbound = addresses.find( (inbound) => inbound.chain === 'ETH' );
+        if (ethInbound) {
+          this.ethRouter = ethInbound.router;
+        }
+      }
+    );
   }
 
   checkExisting(currentPool: string) {
@@ -217,7 +251,8 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
 
   formDisabled(): boolean {
 
-    return !this.balances || !this.runeAmount || !this.assetAmount || this.insufficientBnb || this.runeAmount < 1000
+    return !this.balances || !this.runeAmount || !this.assetAmount
+    || this.insufficientBnb || this.runeAmount < 1000 || this.ethContractApprovalRequired
     || (this.balances
       && (this.runeAmount > this.runeBalance || this.assetAmount > this.userService.maximumSpendableBalance(this.asset, this.assetBalance))
     );
@@ -227,6 +262,8 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
 
     if (!this.balances) {
       return 'Please connect wallet';
+    } else if (this.ethContractApprovalRequired) {
+      return 'Create Pool';
     } else if (this.balances && (!this.runeAmount || !this.assetAmount)) {
       return 'Enter an amount';
     } else if (this.balances && (this.runeAmount > this.runeBalance
@@ -289,6 +326,24 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
 
     });
   }
+
+  async checkContractApproved(asset: Asset) {
+
+    if (this.ethRouter && this.user) {
+      const assetAddress = asset.symbol.slice(asset.ticker.length + 1);
+      const strip0x = assetAddress.substr(2);
+      const isApproved = await this.user.clients.ethereum.isApproved(this.ethRouter, strip0x, baseAmount(1));
+      this.ethContractApprovalRequired = !isApproved;
+      console.log('is approved?', isApproved);
+    }
+
+  }
+
+
+  contractApproved() {
+    this.ethContractApprovalRequired = false;
+  }
+
 
   ngOnDestroy() {
     for (const sub of this.subs) {
