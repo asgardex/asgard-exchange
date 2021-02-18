@@ -271,7 +271,8 @@ export class SwapComponent implements OnInit, OnDestroy {
     this.midgardService.getPools().subscribe(
       (res) => {
 
-        const poolNames = res.map( (pool) => pool.asset );
+        const availablePools = res.filter( (pool) => pool.status === 'available' );
+        const poolNames = availablePools.map( (pool) => pool.asset );
         const sortedByName = poolNames.sort();
         this.selectableMarkets = sortedByName.map((poolName) => ({
           asset: new Asset(poolName),
