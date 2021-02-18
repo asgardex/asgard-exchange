@@ -11,6 +11,7 @@ import { TransactionSuccessModalModule } from '../_components/transaction-succes
 import { TransactionLedgerConfirmModalModule } from '../_components/transaction-ledger-confirm-modal/transaction-ledger-confirm-modal.module';
 import { ApproveEthContractModule } from '../_components/approve-eth-contract/approve-eth-contract.module';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { DirectivesModule } from '../_directives/directives.module';
 
 
 
@@ -26,6 +27,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     TransactionProcessingModalModule,
     TransactionLedgerConfirmModalModule,
     ApproveEthContractModule,
+    DirectivesModule,
     RouterModule.forChild([
       {
         path: ':asset',

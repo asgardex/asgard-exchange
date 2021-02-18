@@ -29,6 +29,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AssetsListModule } from './_components/assets-list/assets-list.module';
 import { AssetInputModule } from './_components/asset-input/asset-input.module';
 import { TransactionProcessingModalModule } from './_components/transaction-processing-modal/transaction-processing-modal.module';
+import { DirectivesModule } from './_directives/directives.module';
 
 /** SERVICES */
 import { BinanceService } from './_services/binance.service';
@@ -119,6 +120,7 @@ import { UpgradeRuneConfirmModule } from './_components/upgrade-rune-confirm/upg
     QRCodeModule,
     AppRoutingModule,
     TransactionSuccessModalModule,
+    DirectivesModule,
   ],
   providers: [
     BinanceService,

@@ -12,6 +12,7 @@ import { TransactionSuccessModalModule } from '../_components/transaction-succes
 import { TransactionProcessingModalModule } from '../_components/transaction-processing-modal/transaction-processing-modal.module';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ApproveEthContractModule } from '../_components/approve-eth-contract/approve-eth-contract.module';
+import { DirectivesModule } from '../_directives/directives.module';
 
 
 @NgModule({
@@ -27,6 +28,7 @@ import { ApproveEthContractModule } from '../_components/approve-eth-contract/ap
     TransactionSuccessModalModule,
     TransactionProcessingModalModule,
     ApproveEthContractModule,
+    DirectivesModule,
     RouterModule.forChild([
       {
         path: '',

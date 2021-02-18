@@ -18,7 +18,7 @@
     <li class="market-list-item" *ngFor="let item of assetListItems" (click)="selectAsset.emit(item.asset)" [class.disabled]="item.asset.symbol == disabledAssetSymbol">
 
       <div class="asset-icon-container">
-        <img *ngIf="item.asset.iconPath" class="asset-icon" [src]="item.asset.iconPath" />
+        <img *ngIf="item.asset.iconPath" class="asset-icon" [src]="item.asset.iconPath" appImgFallback />
         <mat-icon *ngIf="!item.asset.iconPath">help_outline</mat-icon>
       </div>
 

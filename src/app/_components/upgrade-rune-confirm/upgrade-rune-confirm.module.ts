@@ -4,6 +4,7 @@ import { UpgradeRuneConfirmComponent } from './upgrade-rune-confirm.component';
 import { MatIconModule } from '@angular/material/icon';
 import { TransactionProcessingModalModule } from '../transaction-processing-modal/transaction-processing-modal.module';
 import { MatButtonModule } from '@angular/material/button';
+import { DirectivesModule } from 'src/app/_directives/directives.module';
 
 
 
@@ -13,7 +14,8 @@ import { MatButtonModule } from '@angular/material/button';
     CommonModule,
     MatIconModule,
     MatButtonModule,
-    TransactionProcessingModalModule
+    TransactionProcessingModalModule,
+    DirectivesModule
   ],
   exports: [UpgradeRuneConfirmComponent]
 })

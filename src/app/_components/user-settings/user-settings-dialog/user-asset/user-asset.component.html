@@ -8,7 +8,7 @@
 
   <div class="flxr flxr--flow-col flxr--just-center flxr--align-center">
     <div style="width: 40px; margin-bottom: 1rem;">
-      <img *ngIf="asset && asset.asset && asset.asset.iconPath" class="asset-icon" [src]="asset && asset.asset && asset.asset.iconPath" style="max-width: 100%;" />
+      <img *ngIf="asset && asset.asset && asset.asset.iconPath" class="asset-icon" [src]="asset && asset.asset && asset.asset.iconPath" appImgFallback style="max-width: 100%;" />
     </div>
 
     <div *ngIf="address" style="text-align: center">

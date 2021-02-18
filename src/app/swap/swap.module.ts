@@ -18,6 +18,7 @@ import { TransactionProcessingModalModule } from '../_components/transaction-pro
 import { TransactionSuccessModalModule } from '../_components/transaction-success-modal/transaction-success-modal.module';
 import { TransactionLedgerConfirmModalModule } from '../_components/transaction-ledger-confirm-modal/transaction-ledger-confirm-modal.module';
 import { ApproveEthContractModule } from '../_components/approve-eth-contract/approve-eth-contract.module';
+import { DirectivesModule } from '../_directives/directives.module';
 
 @NgModule({
   declarations: [SwapComponent, ConfirmSwapModalComponent],
@@ -31,6 +32,7 @@ import { ApproveEthContractModule } from '../_components/approve-eth-contract/ap
     TransactionProcessingModalModule,
     TransactionSuccessModalModule,
     TransactionLedgerConfirmModalModule,
+    DirectivesModule,
     ApproveEthContractModule,
     RouterModule.forChild([
       {

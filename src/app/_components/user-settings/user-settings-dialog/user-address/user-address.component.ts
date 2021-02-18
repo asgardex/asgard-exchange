@@ -104,6 +104,9 @@ export class UserAddressComponent implements OnInit {
       case 'BTC':
         return 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/BTCB-1DE/logo.png';
 
+      case 'ETH':
+        return 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png';
+
       case 'THOR':
         return 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/RUNE-B1A/logo.png';
     }
