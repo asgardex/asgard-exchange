@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { User } from '../_classes/user';
+import { AvailableClients, User } from '../_classes/user';
 import {
   Client as binanceClient,
   BinanceClient,
@@ -13,7 +13,8 @@ import {
   assetAmount,
   assetToBase,
   assetFromString,
-  baseToAsset
+  baseToAsset,
+  Chain
 } from '@xchainjs/xchain-util';
 import { BehaviorSubject, of, Subject, timer } from 'rxjs';
 import { catchError, switchMap, takeUntil } from 'rxjs/operators';
@@ -256,6 +257,29 @@ export class UserService {
 
     return marketListItems;
 
+  }
+
+  async getTokenAddress(user: User, chain: Chain): Promise<string> {
+
+    const clients: AvailableClients = user.clients;
+
+    switch (chain) {
+      case 'BNB':
+        const bnbClient = clients.binance;
+        return await bnbClient.getAddress();
+
+      case 'BTC':
+        const btcClient = clients.bitcoin;
+        return await btcClient.getAddress();
+
+      case 'ETH':
+        const ethClient = clients.ethereum;
+        return await ethClient.getAddress();
+
+      default:
+        console.error(`${chain} does not match getting token address`);
+        return;
+    }
   }
 
 

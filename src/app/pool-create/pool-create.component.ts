@@ -18,7 +18,7 @@ import { MatDialog } from '@angular/material/dialog';
 })
 export class PoolCreateComponent implements OnInit, OnDestroy {
 
-  runeSymbol = environment.network === 'chaosnet' ? 'RUNE-B1A' : 'RUNE-67C';
+  // runeSymbol = environment.network === 'chaosnet' ? 'RUNE-B1A' : 'RUNE-67C';
 
   /**
    * Rune
@@ -32,6 +32,7 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
     this._runeAmount = val;
   }
   _runeAmount: number;
+  recommendedRuneAmount: number;
 
   /**
    * Asset
@@ -45,7 +46,7 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
       } else {
 
         if (val.symbol !== this._asset.symbol) {
-          this.router.navigate(['/', 'deposit', `${val.chain}.${val.symbol}`]);
+          this.router.navigate(['/', 'create-pool'], {queryParams: {pool: `${val.chain}.${val.symbol}`}});
           this._asset = val;
           this.assetBalance = this.userService.findBalance(this.balances, this.asset);
         }
@@ -70,6 +71,7 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
       this.updateRuneAmount();
     } else {
       this.runeAmount = null;
+      this.recommendedRuneAmount = null;
     }
 
   }
@@ -94,7 +96,7 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
     private cgService: CoinGeckoService,
     private userService: UserService,
   ) {
-    this.rune = new Asset(`BNB.${this.runeSymbol}`);
+    this.rune = new Asset(`THOR.RUNE`);
 
     const balances$ = this.userService.userBalances$.subscribe(
       (balances) => {
@@ -120,6 +122,9 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
     const params$ = this.route.queryParamMap.subscribe( (params) => {
 
       const pool = params.get('pool');
+      console.log('pool is: ', pool);
+      this.runeAmount = null;
+      this.recommendedRuneAmount = null;
 
       if (pool) {
         this.asset = new Asset(pool);
@@ -165,13 +170,21 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
     if (this.asset?.ticker && this.coinGeckoList) {
       const id = this.cgService.getCoinIdBySymbol(this.asset.ticker, this.coinGeckoList);
       if (id) {
+
+        console.log( `got ID for ${this.asset.ticker}: ${id}`);
+
         this.cgService.getCurrencyConversion(id).subscribe(
           (res) => {
+
+            console.log( `got USD value of ${this.asset.ticker}: `, res);
+
             for (const [_key, value] of Object.entries(res)) {
               this.assetUsdValue = value.usd;
             }
           }
         );
+      } else {
+        this.assetUsdValue = null;
       }
     }
   }
@@ -195,7 +208,10 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
   updateRuneAmount() {
     if (this.assetUsdValue && this.runeUsdValue) {
       const totalAssetValue = this.assetAmount * this.assetUsdValue;
-      this.runeAmount = totalAssetValue / this.runeUsdValue;
+      this.recommendedRuneAmount = totalAssetValue / this.runeUsdValue;
+      // this.runeAmount = totalAssetValue / this.runeUsdValue;
+    } else {
+      this.recommendedRuneAmount = null;
     }
   }
 

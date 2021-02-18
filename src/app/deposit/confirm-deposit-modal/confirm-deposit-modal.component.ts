@@ -1,9 +1,9 @@
 import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { assetAmount, assetToBase, Chain } from '@xchainjs/xchain-util';
+import { assetAmount, assetToBase } from '@xchainjs/xchain-util';
 import { Subscription } from 'rxjs';
 import { PoolAddressDTO } from 'src/app/_classes/pool-address';
-import { AvailableClients, User } from 'src/app/_classes/user';
+import { User } from 'src/app/_classes/user';
 import { TransactionConfirmationState } from 'src/app/_const/transaction-confirmation-state';
 import { MidgardService } from 'src/app/_services/midgard.service';
 import { UserService } from 'src/app/_services/user.service';
@@ -12,7 +12,6 @@ import { Client as BinanceClient } from '@xchainjs/xchain-binance';
 import { Client as BitcoinClient } from '@xchainjs/xchain-bitcoin';
 import { Client as EthereumClient, ETH_DECIMAL } from '@xchainjs/xchain-ethereum/lib';
 import { EthUtilsService } from 'src/app/_services/eth-utils.service';
-import { ethers } from 'ethers';
 
 export interface ConfirmDepositData {
   asset;
@@ -94,7 +93,7 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
     const thorchainAddress = await thorClient.getAddress();
 
     // get token address
-    const address = await this.getTokenAddress(this.data.user, this.data.asset.chain);
+    const address = await this.userService.getTokenAddress(this.data.user, this.data.asset.chain);
     if (!address || address === '') {
       console.error('no address found');
       return;
@@ -212,9 +211,9 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
       const targetTokenMemo = `+:${asset.chain}.${asset.symbol}:${thorchainAddress}`;
       const hash = await client.transfer({
         asset: {
-          chain: this.data.asset.chain,
-          symbol: this.data.asset.symbol,
-          ticker: this.data.asset.ticker
+          chain: asset.chain,
+          symbol: asset.symbol,
+          ticker: asset.ticker
         },
         amount: assetToBase(assetAmount(this.data.assetAmount)),
         recipient: recipientPool.address,
@@ -250,29 +249,6 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
       return hash;
     } catch (error) {
       throw(error);
-    }
-  }
-
-  async getTokenAddress(user: User, chain: Chain): Promise<string> {
-
-    const clients: AvailableClients = user.clients;
-
-    switch (chain) {
-      case 'BNB':
-        const bnbClient = clients.binance;
-        return await bnbClient.getAddress();
-
-      case 'BTC':
-        const btcClient = clients.bitcoin;
-        return await btcClient.getAddress();
-
-      case 'ETH':
-        const ethClient = clients.ethereum;
-        return await ethClient.getAddress();
-
-      default:
-        console.error(`${this.data.asset.chain} does not match getting token address`);
-        return;
     }
   }
 

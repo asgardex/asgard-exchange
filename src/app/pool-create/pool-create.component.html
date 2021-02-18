@@ -24,11 +24,17 @@
       [(assetUnit)]="runeAmount"
       [balance]="runeBalance"
       [hideMax]="true"
-      [disableInput]="true"
-      [disabledAssetSymbol]="rune.symbol"
       [disabledMarketSelect]="true"
+      [disabledAssetSymbol]="rune.symbol"
       [coinGeckoList]="coinGeckoList">
     </app-asset-input>
+
+    <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
+      <span class="tx-detail-label">Recommended RUNE Total</span>
+      <span *ngIf="recommendedRuneAmount">{{ recommendedRuneAmount | number:"0.0-0" }}</span>
+      <span *ngIf="!recommendedRuneAmount"> - </span>
+    </div>
+
 
     <div style="font-size: 0.8rem; font-style: italic;">
       *A minimum of 1,000 RUNE + balancing asset is required to create a pool
@@ -44,14 +50,14 @@
       {{mainButtonText()}}
     </button>
 
-    <div class="tag">
+    <!-- <div class="tag">
       <div class="tag-contents">
         <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
           <span class="tx-detail-label">Total Fee</span>
           <span>-0.000375 BNB</span>
         </div>
       </div>
-    </div>
+    </div> -->
 
   </div>
 
