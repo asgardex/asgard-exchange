@@ -114,7 +114,10 @@ export class DepositFormComponent implements OnInit {
     this.memoChange.next(action);
 
     if (action === 'WITHDRAW' || action === 'LEAVE' || action === 'UNBOND') {
-      const smallestUnit = 0;
+      /**
+       * this should be 0, will be updated on thorchain bugfix in 0.24.0
+       */
+      const smallestUnit = 1;
       this.depositAmountChange.next(smallestUnit);
       this.depositAmount = smallestUnit;
     } else {
