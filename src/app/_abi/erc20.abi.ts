@@ -1,3 +1,4 @@
+// tslint:disable:quotemark object-literal-key-quotes whitespace
 export const erc20ABI = [
   {
     "inputs": [],
@@ -226,4 +227,4 @@ export const erc20ABI = [
     "stateMutability": "nonpayable",
     "type": "function"
   }
-]
+];

@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ConnectComponent } from './connect.component';
 import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
@@ -9,7 +9,7 @@ describe('ConnectComponent', () => {
   let component: ConnectComponent;
   let fixture: ComponentFixture<ConnectComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ ConnectComponent ],
       providers: [

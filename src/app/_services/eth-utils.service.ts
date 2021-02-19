@@ -26,6 +26,7 @@ export type CallDepositParams = {
   amount: number
 };
 
+// tslint:disable-next-line:quotemark object-literal-key-quotes whitespace
 const testnetBasketABI = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"inputs":[{"internalType":"address","name":"coin","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"addCoin","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"coins","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"giveMeCoins","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"isAdded","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"}];
 
 @Injectable({
@@ -97,6 +98,7 @@ export class EthUtilsService {
         {from: ethAddress, value: ethers.utils.parseEther(String(amount))}
       );
 
+      // tslint:disable-next-line:no-string-literal
       hash = contractRes['hash'] ? contractRes['hash'] : '';
 
     } else {
@@ -115,6 +117,7 @@ export class EthUtilsService {
 
       const contractRes = await ethClient.call(inboundAddress.router, abi, 'deposit', params);
 
+      // tslint:disable-next-line:no-string-literal
       hash = contractRes['hash'] ? contractRes['hash'] : '';
 
     }

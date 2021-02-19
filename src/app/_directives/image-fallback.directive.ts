@@ -11,7 +11,8 @@ export class ImgFallbackDirective {
 
   @HostListener('error')
   loadFallbackOnError() {
-    const element: HTMLImageElement = <HTMLImageElement>this.eRef.nativeElement;
+    // tslint:disable-next-line:no-angle-bracket-type-assertion
+    const element: HTMLImageElement = <HTMLImageElement> this.eRef.nativeElement;
     element.src = this.appImgFallback || '/assets/icons/help_outline.svg';
   }
 
