@@ -181,8 +181,6 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
           recipient: this.recipientAddress,
         });
 
-        console.log('raw hash is: ', hash);
-
         this.txStatusService.addTransaction({
           chain: 'ETH',
           hash,

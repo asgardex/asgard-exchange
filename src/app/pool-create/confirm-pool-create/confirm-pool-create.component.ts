@@ -69,7 +69,6 @@ export class ConfirmPoolCreateComponent implements OnInit, OnDestroy {
             if (bnbBalance)  {
               this.bnbBalance = bnbBalance.amount.amount().toNumber();
               this.estimatBnbFee();
-              console.log('bnb balance is: ', this.bnbBalance);
             }
           }
         }
@@ -229,7 +228,6 @@ export class ConfirmPoolCreateComponent implements OnInit, OnDestroy {
   async estimatBnbFee() {
     this.insufficientChainBalance = (this.bnbBalance && (this.bnbBalance / 10 ** 8 < 0.000375));
     this.networkFee = 0.000375;
-    console.log('insufficient chain balance?', this.insufficientChainBalance);
     this.loading = false;
   }
 

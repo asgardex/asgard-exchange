@@ -140,7 +140,6 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
     const params$ = this.route.queryParamMap.subscribe( (params) => {
 
       const pool = params.get('pool');
-      console.log('pool is: ', pool);
       this.runeAmount = null;
       this.recommendedRuneAmount = null;
 
@@ -205,12 +204,8 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
       const id = this.cgService.getCoinIdBySymbol(this.asset.ticker, this.coinGeckoList);
       if (id) {
 
-        console.log( `got ID for ${this.asset.ticker}: ${id}`);
-
         this.cgService.getCurrencyConversion(id).subscribe(
           (res) => {
-
-            console.log( `got USD value of ${this.asset.ticker}: `, res);
 
             for (const [_key, value] of Object.entries(res)) {
               this.assetUsdValue = value.usd;
@@ -229,7 +224,6 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
       if (id) {
         this.cgService.getCurrencyConversion(id).subscribe(
           (res) => {
-            console.log('rune val is: ', res);
             for (const [_key, value] of Object.entries(res)) {
               this.runeUsdValue = value.usd;
             }
@@ -334,7 +328,6 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
       const strip0x = assetAddress.substr(2);
       const isApproved = await this.user.clients.ethereum.isApproved(this.ethRouter, strip0x, baseAmount(1));
       this.ethContractApprovalRequired = !isApproved;
-      console.log('is approved?', isApproved);
     }
 
   }

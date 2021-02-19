@@ -182,7 +182,6 @@ export class DepositComponent implements OnInit, OnDestroy {
       const strip0x = assetAddress.substr(2);
       const isApproved = await this.user.clients.ethereum.isApproved(this.ethRouter, strip0x, baseAmount(1));
       this.ethContractApprovalRequired = !isApproved;
-      console.log('is approved?', isApproved);
     }
 
   }

@@ -1,5 +1,5 @@
 import { Component, Input, OnDestroy, OnInit, Output, EventEmitter } from '@angular/core';
-import { Asset, baseAmount } from '@xchainjs/xchain-util';
+import { Asset } from '@xchainjs/xchain-util';
 import { Subscription } from 'rxjs';
 import { User } from 'src/app/_classes/user';
 import { TransactionStatusService } from 'src/app/_services/transaction-status.service';
@@ -33,7 +33,6 @@ export class ApproveEthContractComponent implements OnInit, OnDestroy {
     const ethContractApproval$ = this.txStatusService.ethContractApproval$.subscribe(
       (hash) => {
         if (hash === this.isApprovedTxHash) {
-          console.log('approve eth contract CONTRACT APPROVED match. emitting...');
           this.approved.emit();
         }
       }
@@ -52,13 +51,9 @@ export class ApproveEthContractComponent implements OnInit, OnDestroy {
 
       const assetAddress = this.asset.symbol.slice(this.asset.ticker.length + 1);
       const strip0x = assetAddress.substr(2);
-      console.log('approving strip0x: ', strip0x);
-      console.log('approving contract address: ', this.contractAddress);
       const approve = await this.user.clients.ethereum.approve(this.contractAddress, strip0x);
 
-      console.log('is approved is: ', approve);
       this.isApprovedTxHash = approve.hash;
-
       this.txStatusService.pollEthContractApproval(approve.hash);
       this.approving = true;
 

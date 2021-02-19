@@ -236,7 +236,6 @@ export class SwapComponent implements OnInit, OnDestroy {
         const ethInbound = addresses.find( (inbound) => inbound.chain === 'ETH' );
         if (ethInbound) {
           this.ethInboundAddress = ethInbound;
-          console.log('setting eth router as: ', this.ethInboundAddress);
         }
       }
     );
@@ -304,17 +303,10 @@ export class SwapComponent implements OnInit, OnDestroy {
   async checkContractApproved() {
 
     if (this.ethInboundAddress && this.user) {
-
       const assetAddress = this.selectedSourceAsset.symbol.slice(this.selectedSourceAsset.ticker.length + 1);
       const strip0x = assetAddress.substr(2);
-
-      if (this.sourceAssetUnit) {
-        console.log('sourceAssetUnit is: ', this.sourceAssetUnit);
-      }
-
       const isApproved = await this.user.clients.ethereum.isApproved(this.ethInboundAddress.router, strip0x, baseAmount(1));
       this.ethContractApprovalRequired = !isApproved;
-
     }
 
   }

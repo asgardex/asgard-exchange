@@ -144,7 +144,6 @@ export class TransactionStatusService {
         // catchError handles http throws
         catchError(error => of(error))
       ).subscribe( async (res: ethers.providers.TransactionResponse) => {
-        console.log('pollEthContractApproval tx hash id: ', res);
 
         if (res.confirmations > 0) {
           this.ethContractApprovalSource.next(txHash);
@@ -164,8 +163,6 @@ export class TransactionStatusService {
       // catchError handles http throws
       catchError(error => of(error))
     ).subscribe( async (res: TransactionDTO) => {
-
-      console.log('polling tx hash id: ', hash);
 
       if (res.count > 0) {
         for (const resTx of res.actions) {

@@ -111,11 +111,7 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
 
           if (currentPools && currentPools.length > 0) {
 
-            console.log('current pools are: ', currentPools);
-            console.log('source asset chain is: ', this.swapData.sourceAsset.chain);
-
             const matchingPool = currentPools.find( (pool) => pool.chain === this.swapData.sourceAsset.chain );
-            console.log('matching pool is: ', matchingPool);
 
             if (matchingPool) {
 
@@ -143,8 +139,6 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
   }
 
   async keystoreTransfer(matchingPool?: PoolAddressDTO) {
-
-    console.log('matching pool is: ', matchingPool);
 
     const amountNumber = this.swapData.inputValue;
     const binanceClient = this.swapData.user.clients.binance;
@@ -202,7 +196,6 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
           isThorchainTx: true,
           symbol: this.swapData.sourceAsset.symbol,
         });
-        // this.txStatusService.pollTxOutputs(hash, 1, TxActions.SWAP);
         this.txState = TransactionConfirmationState.SUCCESS;
       } catch (error) {
         console.error('error making transfer: ', error);
@@ -230,7 +223,6 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
           isThorchainTx: true,
           symbol: this.swapData.sourceAsset.symbol,
         });
-        // this.txStatusService.pollTxOutputs(hash, 1, TxActions.SWAP);
         this.txState = TransactionConfirmationState.SUCCESS;
       } catch (error) {
         console.error('error making transfer: ', error);
@@ -264,7 +256,6 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
           isThorchainTx: true,
           symbol: this.swapData.sourceAsset.symbol,
         });
-        // this.txStatusService.pollTxOutputs(hash, 1, TxActions.SWAP);
         this.txState = TransactionConfirmationState.SUCCESS;
       } catch (error) {
         console.error('error making transfer: ', error);
@@ -289,8 +280,6 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
           amount: amountNumber,
           ethClient
         });
-
-        console.log('hash is: ', hash);
 
         this.hash = hash.substr(2);
         this.txStatusService.addTransaction({
@@ -341,7 +330,6 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
             memo: `=:${targetAsset.chain}.${targetAsset.symbol}:${targetAddress}`
           });
 
-          // this.ethNetworkFeeWei = estimatedFeeWei.toNumber();
           this.ethNetworkFee = estimatedFeeWei.dividedBy(10 ** ETH_DECIMAL).toNumber();
 
           this.insufficientChainBalance = estimatedFeeWei.isGreaterThan(ethBalance.amount.amount());
