@@ -75,17 +75,6 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
         memo,
       });
 
-      this.hash = hash;
-      this.txStatusService.addTransaction({
-        chain: 'THOR',
-        hash: this.hash,
-        ticker: 'RUNE',
-        status: TxStatus.PENDING,
-        action: TxActions.WITHDRAW,
-        isThorchainTx: true,
-        symbol: this.data.asset.symbol
-      });
-
       this.txSuccess(hash);
     } catch (error) {
       console.error('error making RUNE withdraw: ', error);

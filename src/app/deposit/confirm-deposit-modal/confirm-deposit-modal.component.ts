@@ -91,6 +91,7 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
     const asset = this.data.asset;
     const thorClient = clients.thorchain;
     const thorchainAddress = await thorClient.getAddress();
+    let hash = '';
 
     // get token address
     const address = await this.userService.getTokenAddress(this.data.user, this.data.asset.chain);
@@ -108,8 +109,6 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
 
     // Deposit token
     try {
-
-      let hash = '';
 
       // deposit using xchain
       switch (this.data.asset.chain) {
@@ -138,17 +137,6 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
         return;
       }
 
-      // deposit successful
-      // add tx has to pending transactions
-      // this.hash = hash;
-      // this.txStatusService.addTransaction({
-      //   chain: asset.chain,
-      //   hash: this.hash,
-      //   ticker: asset.ticker,
-      //   status: TxStatus.PENDING,
-      //   action: TxActions.DEPOSIT
-      // });
-
     } catch (error) {
       console.error('error making token transfer: ', error);
       this.txState = TransactionConfirmationState.ERROR;
@@ -165,7 +153,7 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
         memo: runeMemo,
       });
 
-      // this.hash = hash;
+      this.hash = runeHash;
       this.txStatusService.addTransaction({
         chain: 'THOR',
         hash: runeHash,
