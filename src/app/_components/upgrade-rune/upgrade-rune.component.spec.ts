@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { UpgradeRuneComponent } from './upgrade-rune.component';
 
 describe('UpgradeRuneComponent', () => {
@@ -8,7 +8,8 @@ describe('UpgradeRuneComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ UpgradeRuneComponent ]
+      declarations: [ UpgradeRuneComponent ],
+      imports: [ HttpClientTestingModule ]
     })
     .compileComponents();
   });

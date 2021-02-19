@@ -58,12 +58,6 @@ export class KeystoreCreateComponent implements OnInit {
       console.error(error);
     }
 
-
-    // this.back.emit();
   }
-
-  // back() {
-  //   // this.dialogRef.close();
-  // }
 
 }

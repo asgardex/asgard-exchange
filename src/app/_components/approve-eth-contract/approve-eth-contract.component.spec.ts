@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ApproveEthContractComponent } from './approve-eth-contract.component';
 
 describe('ApproveEthContractComponent', () => {
@@ -8,7 +8,8 @@ describe('ApproveEthContractComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ApproveEthContractComponent ]
+      declarations: [ ApproveEthContractComponent ],
+      imports: [ HttpClientTestingModule ]
     })
     .compileComponents();
   });

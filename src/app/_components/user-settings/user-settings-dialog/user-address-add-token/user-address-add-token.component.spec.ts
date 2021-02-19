@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { UserAddressAddTokenComponent } from './user-address-add-token.component';
 
 describe('UserAddressAddTokenComponent', () => {
@@ -8,7 +8,8 @@ describe('UserAddressAddTokenComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ UserAddressAddTokenComponent ]
+      declarations: [ UserAddressAddTokenComponent ],
+      imports: [ HttpClientTestingModule ]
     })
     .compileComponents();
   });

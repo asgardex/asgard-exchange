@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { UserAddressComponent } from './user-address.component';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('UserAddressComponent', () => {
   let component: UserAddressComponent;
@@ -10,7 +11,7 @@ describe('UserAddressComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [ UserAddressComponent ],
-      imports: [MatSnackBarModule, MatIconModule]
+      imports: [ MatSnackBarModule, MatIconModule, HttpClientTestingModule ]
     })
     .compileComponents();
   });
