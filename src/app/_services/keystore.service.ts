@@ -17,9 +17,8 @@ export class KeystoreService {
   async unlockKeystore(keystore, password: string): Promise<User> {
     const phrase = await decryptFromKeystore(keystore, password);
     const network = environment.network === 'testnet' ? 'testnet' : 'mainnet';
-    const blockchairUrl = (environment.network === 'testnet') ? 'https://api.blockchair.com/bitcoin/testnet' : 'https://api.blockchair.com/bitcoin';
     const userBinanceClient = new binanceClient({network, phrase});
-    const userBtcClient = new bitcoinClient({network, phrase, nodeUrl: blockchairUrl, nodeApiKey: environment.blockchairKey});
+    const userBtcClient = new bitcoinClient({network, phrase, nodeUrl: 'https://sochain.com/api/v2'});
     const userThorchainClient = new thorchainClient({network, phrase});
     const thorAddress = await userThorchainClient.getAddress();
     const userEthereumClient = new ethereumClient({

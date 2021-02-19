@@ -1,15 +1,15 @@
 import { Injectable } from '@angular/core';
-import { assetFromString, Chain } from '@xchainjs/xchain-util';
+import { Chain } from '@xchainjs/xchain-util';
 import { BehaviorSubject, of, ReplaySubject, Subject, timer } from 'rxjs';
 import { catchError, switchMap, takeUntil } from 'rxjs/operators';
 import { TransactionDTO } from '../_classes/transaction';
 import { User } from '../_classes/user';
 import { BinanceService } from './binance.service';
-import { BlockchairBtcTransactionDTO, BlockchairService } from './blockchair.service';
 import { MidgardService } from './midgard.service';
 import { UserService } from './user.service';
 import { ethers } from 'ethers';
 import { environment } from 'src/environments/environment';
+import { SochainService, SochainTxResponse } from './sochain.service';
 
 export const enum TxStatus {
   PENDING = 'PENDING',
@@ -53,10 +53,10 @@ export class TransactionStatusService {
   ethContractApproval$ = this.ethContractApprovalSource.asObservable();
 
   constructor(
-    private blockchairService: BlockchairService,
     private userService: UserService,
     private midgardService: MidgardService,
-    private binanceService: BinanceService
+    private binanceService: BinanceService,
+    private sochainService: SochainService
   ) {
     this._txs = [];
 
@@ -189,30 +189,23 @@ export class TransactionStatusService {
 
 
   pollBtcTx(tx: Tx) {
+
+    const network = environment.network === 'testnet' ? 'testnet' : 'mainnet';
+
     timer(0, 15000)
       .pipe(
         // This kills the request if the user closes the component
         takeUntil(this.killTxPolling[tx.hash]),
         // switchMap cancels the last request, if no response have been received since last tick
-        switchMap(() => this.blockchairService.getBitcoinTransaction(tx.hash)),
+        switchMap(() => this.sochainService.getTransaction({txID: tx.hash, network})),
         // catchError handles http throws
         catchError(error => of(error))
-      ).subscribe( async (res: BlockchairBtcTransactionDTO) => {
+      ).subscribe( async (res: SochainTxResponse) => {
 
-        for (const key in res.data) {
-
-          if (key.toUpperCase === tx.hash.toUpperCase) {
-
-            if (res && res.data && res.data[key] && res.data[key].transaction
-              && res.data[key].transaction.block_id && res.data[key].transaction.block_id > 0) {
-
-                this.updateTxStatus(tx.hash, TxStatus.COMPLETE);
-                this.userService.fetchBalances();
-                this.killTxPolling[tx.hash].next();
-            }
-
-          }
-
+        if (res.status === 'success' && res.data && res.data.confirmations > 0) {
+          this.updateTxStatus(tx.hash, TxStatus.COMPLETE);
+          this.userService.fetchBalances();
+          this.killTxPolling[tx.hash].next();
         }
 
       });

@@ -33,7 +33,6 @@ import { DirectivesModule } from './_directives/directives.module';
 
 /** SERVICES */
 import { BinanceService } from './_services/binance.service';
-import { BlockchairService } from './_services/blockchair.service';
 import { ExplorerPathsService } from './_services/explorer-paths.service';
 import { LastBlockService } from './_services/last-block.service';
 import { MidgardService } from './_services/midgard.service';
@@ -69,6 +68,7 @@ import { TransactionSuccessModalModule } from './_components/transaction-success
 import { NativeRunePromptModule } from './_components/native-rune-prompt/native-rune-prompt.module';
 import { UpgradeRuneModule } from './_components/upgrade-rune/upgrade-rune.module';
 import { UpgradeRuneConfirmModule } from './_components/upgrade-rune-confirm/upgrade-rune-confirm.module';
+import { SochainService } from './_services/sochain.service';
 
 
 @NgModule({
@@ -124,7 +124,6 @@ import { UpgradeRuneConfirmModule } from './_components/upgrade-rune-confirm/upg
   ],
   providers: [
     BinanceService,
-    BlockchairService,
     CoinGeckoService,
     CopyService,
     KeystoreService,
@@ -135,7 +134,8 @@ import { UpgradeRuneConfirmModule } from './_components/upgrade-rune-confirm/upg
     ExplorerPathsService,
     SlippageToleranceService,
     TransactionStatusService,
-    EthUtilsService
+    EthUtilsService,
+    SochainService
   ],
   bootstrap: [AppComponent]
 })
