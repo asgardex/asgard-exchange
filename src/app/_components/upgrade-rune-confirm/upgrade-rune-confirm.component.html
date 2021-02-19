@@ -16,7 +16,7 @@
 
       <div class="flxr flxr--align-center">
         <div style="margin-right: 12px;" class="asset-icon-container flxr flxr--align-center">
-          <img *ngIf="asset.asset && asset.asset.iconPath" [src]="asset.asset.iconPath" />
+          <img *ngIf="asset.asset && asset.asset.iconPath" [src]="asset.asset.iconPath" appImgFallback />
           <mat-icon *ngIf="!asset.asset.iconPath">help_outline</mat-icon>
         </div>
         <span style="margin-right: 8px; font-size: 20px">{{amount}}</span>
@@ -27,8 +27,8 @@
     </div>
 
     <small>
-      This RUNE is currently a BNB token. <br />
-      By clicking the button below, you will be upgrading it off of the BNB chain to native RUNE. Your native RUNE will show up in your RUNE wallet in user settings.
+      This RUNE is currently a {{asset.asset.chain}} token. <br />
+      By clicking the button below, you will be upgrading it off of the {{asset.asset.chain}} chain to native RUNE. Your native RUNE will show up in your RUNE wallet in user settings.
     </small>
 
     <button (click)="submitTransaction()" mat-flat-button color="accent" class="main-action-btn">Upgrade RUNE</button>

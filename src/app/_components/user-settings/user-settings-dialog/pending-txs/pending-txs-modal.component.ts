@@ -16,6 +16,7 @@ export class PendingTxsModalComponent implements OnInit, OnDestroy {
   bitcoinExplorerUrl: string;
   binanceExplorerUrl: string;
   thorchainExplorerUrl: string;
+  ethereumExplorerUrl: string;
   @Output() back: EventEmitter<null>;
 
   constructor(
@@ -30,6 +31,7 @@ export class PendingTxsModalComponent implements OnInit, OnDestroy {
     this.binanceExplorerUrl = `${this.explorerPathsService.binanceExplorerUrl}/tx`;
     this.bitcoinExplorerUrl = `${this.explorerPathsService.bitcoinExplorerUrl}/tx`;
     this.thorchainExplorerUrl = `${this.explorerPathsService.thorchainExplorerUrl}/tx`;
+    this.ethereumExplorerUrl = `${this.explorerPathsService.ethereumExplorerUrl}/tx`;
 
     const pendingTxs$ = this.txStatusService.txs$.subscribe( (txs) => {
       this.txs = txs;
@@ -54,8 +56,21 @@ export class PendingTxsModalComponent implements OnInit, OnDestroy {
       case 'THOR':
         return this.thorchainExplorerUrl;
 
+      case 'ETH':
+        return this.ethereumExplorerUrl;
+
       default:
         return '';
+    }
+  }
+
+  explorerPath(tx: Tx): string {
+    if (tx.isThorchainTx) {
+      return this.thorchainExplorerUrl + '/' + tx.hash;
+    } else if (tx.chain === 'ETH') {
+      return `${this.ethereumExplorerUrl}/0x${tx.hash}`;
+    } else {
+      return this.explorerUrl(tx.chain) + '/' + tx.hash;
     }
   }
 

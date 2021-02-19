@@ -9,6 +9,9 @@ import { ConfirmDepositModalComponent } from './confirm-deposit-modal/confirm-de
 import { TransactionProcessingModalModule } from '../_components/transaction-processing-modal/transaction-processing-modal.module';
 import { TransactionSuccessModalModule } from '../_components/transaction-success-modal/transaction-success-modal.module';
 import { TransactionLedgerConfirmModalModule } from '../_components/transaction-ledger-confirm-modal/transaction-ledger-confirm-modal.module';
+import { ApproveEthContractModule } from '../_components/approve-eth-contract/approve-eth-contract.module';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { DirectivesModule } from '../_directives/directives.module';
 
 
 
@@ -17,11 +20,14 @@ import { TransactionLedgerConfirmModalModule } from '../_components/transaction-
   imports: [
     CommonModule,
     MatButtonModule,
+    MatProgressSpinnerModule,
     MatIconModule,
     AssetInputModule,
     TransactionSuccessModalModule,
     TransactionProcessingModalModule,
     TransactionLedgerConfirmModalModule,
+    ApproveEthContractModule,
+    DirectivesModule,
     RouterModule.forChild([
       {
         path: ':asset',

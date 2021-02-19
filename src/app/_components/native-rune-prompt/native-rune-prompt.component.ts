@@ -24,12 +24,18 @@ export class NativeRunePromptComponent implements OnInit, OnDestroy {
       (balances) => {
 
         if (balances) {
-          const nonNativeRuneAssets = balances.filter( (balance) => {
+          const nonNativeRuneAssets = balances
+          // get ETH.RUNE and BNB.RUNE
+          .filter( (balance) => {
 
             return (balance.asset.chain === 'BNB' && balance.asset.ticker === 'RUNE')
               || (balance.asset.chain === 'ETH' && balance.asset.ticker === 'RUNE');
 
-          }).map( (balance) => ({
+          })
+          // filter out 0 amounts
+          .filter( balance => balance.amount.amount().isGreaterThan(0))
+          // create Asset
+          .map( (balance) => ({
             asset: new Asset(`${balance.asset.chain}.${balance.asset.symbol}`)
           }));
 

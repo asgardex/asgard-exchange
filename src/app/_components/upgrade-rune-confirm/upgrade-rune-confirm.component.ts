@@ -6,6 +6,7 @@ import { AssetAndBalance } from 'src/app/_classes/asset-and-balance';
 import { PoolAddressDTO } from 'src/app/_classes/pool-address';
 import { User } from 'src/app/_classes/user';
 import { TransactionConfirmationState } from 'src/app/_const/transaction-confirmation-state';
+import { EthUtilsService } from 'src/app/_services/eth-utils.service';
 import { MidgardService } from 'src/app/_services/midgard.service';
 import { TransactionStatusService, TxActions, TxStatus } from 'src/app/_services/transaction-status.service';
 import { UserService } from 'src/app/_services/user.service';
@@ -20,7 +21,7 @@ export class UpgradeRuneConfirmComponent implements OnInit, OnDestroy {
   @Input() asset: AssetAndBalance;
   @Input() amount: number;
   @Output() back: EventEmitter<null>;
-  @Output() transactionSuccessful: EventEmitter<null>;
+  @Output() transactionSuccessful: EventEmitter<string>;
   txState: TransactionConfirmationState;
   user: User;
   subs: Subscription[];
@@ -31,9 +32,10 @@ export class UpgradeRuneConfirmComponent implements OnInit, OnDestroy {
     private midgardService: MidgardService,
     private userService: UserService,
     private txStatusService: TransactionStatusService,
+    private ethUtilsService: EthUtilsService
   ) {
     this.back = new EventEmitter<null>();
-    this.transactionSuccessful = new EventEmitter<null>();
+    this.transactionSuccessful = new EventEmitter<string>();
     this.txState = TransactionConfirmationState.PENDING_CONFIRMATION;
 
     const user$ = this.userService.user$.subscribe(
@@ -90,33 +92,71 @@ export class UpgradeRuneConfirmComponent implements OnInit, OnDestroy {
 
     try {
 
+      const asset = this.asset.asset;
       const amountNumber = this.amount;
-      const binanceClient = this.user.clients.binance;
       const thorchainClient = this.user.clients.thorchain;
       const runeAddress = await thorchainClient.getAddress();
+      const memo = this.getRuneUpgradeMemo(runeAddress);
 
-      if (thorchainClient && binanceClient && runeAddress && amountNumber > 0) {
 
-        const memo = this.getRuneUpgradeMemo(runeAddress);
-        const hash = await binanceClient.transfer({
-          asset: this.asset.asset,
-          amount: assetToBase(assetAmount(amountNumber)),
-          recipient: matchingPool.address,
-          memo
-        });
+      if (thorchainClient && runeAddress && this.user && this.user.clients && amountNumber > 0) {
 
-        this.hash = hash;
-        this.txStatusService.addTransaction({
-          chain: 'BNB',
-          hash: this.hash,
-          ticker: this.asset.asset.ticker,
-          status: TxStatus.PENDING,
-          action: TxActions.UPGRADE_RUNE
-        });
+        if (asset.chain === 'BNB') {
 
-        this.userService.pollNativeRuneBalance(this.runeBalance ?? 0);
+          const client = this.user.clients.binance;
 
-        this.transactionSuccessful.next();
+          const hash = await client.transfer({
+            asset: this.asset.asset,
+            amount: assetToBase(assetAmount(amountNumber)),
+            recipient: matchingPool.address,
+            memo
+          });
+
+          this.hash = hash;
+          this.txStatusService.addTransaction({
+            chain: asset.chain,
+            hash: this.hash,
+            ticker: asset.ticker,
+            symbol: asset.symbol,
+            status: TxStatus.PENDING,
+            action: TxActions.UPGRADE_RUNE,
+            isThorchainTx: false
+          });
+
+          this.userService.pollNativeRuneBalance(this.runeBalance ?? 0);
+
+          this.transactionSuccessful.next(hash);
+
+        } else if (asset.chain === 'ETH') {
+
+          const client = this.user.clients.ethereum;
+
+          const hash = await this.ethUtilsService.callDeposit({
+            asset: this.asset.asset,
+            inboundAddress: matchingPool,
+            memo,
+            amount: amountNumber,
+            ethClient: client
+          });
+
+          this.hash = hash.substr(2);
+
+          this.txStatusService.addTransaction({
+            chain: asset.chain,
+            hash,
+            ticker: asset.ticker,
+            symbol: asset.symbol,
+            status: TxStatus.PENDING,
+            action: TxActions.UPGRADE_RUNE,
+            isThorchainTx: false
+          });
+
+          this.userService.pollNativeRuneBalance(this.runeBalance ?? 0);
+
+          this.transactionSuccessful.next(hash);
+
+        }
+
       } else {
         this.txState = TransactionConfirmationState.ERROR;
       }

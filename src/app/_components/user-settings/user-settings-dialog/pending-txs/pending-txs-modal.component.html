@@ -16,7 +16,7 @@
         <ul *ngIf="txs && txs.length > 0">
           <li *ngFor="let tx of txs">
 
-            <a [href]="(explorerUrl(tx.chain)) + '/' + tx.hash" target="_blank" class="uni-input">
+            <a [href]="explorerPath(tx)" target="_blank" class="uni-input">
 
               <label style="width: 100%" class="flxr flxr--just-space-between">
                 <span>{{tx.ticker}}</span>
@@ -25,7 +25,7 @@
 
               <div class="flxr" style="width: 100%">
 
-                <input [value]="tx.hash" name="thor-address" [disabled]="true" />
+                <input [value]="tx.hash.substring(0, 4) + '...' + tx.hash.substring(tx.hash.length - 4, tx.hash.length)" name="thor-address" [disabled]="true" />
 
                 <button matSuffix mat-icon-button>
                   <mat-icon *ngIf="tx.status === 'COMPLETE'">check_circle</mat-icon>

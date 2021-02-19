@@ -26,8 +26,8 @@
     </label>
 
     <div class="flxr" style="width: 100%">
-      <input [value]="address" name="address" [disabled]="true" />
-      <button matSuffix mat-icon-button aria-label="BNB Address" (click)="copyToClipboard(address)">
+      <textarea [value]="address" name="address" [disabled]="true"></textarea>
+      <button matSuffix mat-icon-button aria-label="Copy To Clipboard" (click)="copyToClipboard(address)">
         <mat-icon matSuffix (click)="copyToClipboard(address)">content_copy</mat-icon>
       </button>
     </div>
@@ -38,5 +38,12 @@
 </div>
 
 <div mat-dialog-content>
-  <app-assets-list [assetListItems]="assets" [loading]="loading" [disabledAssetSymbol]="''" (selectAsset)="selectAsset($event)"></app-assets-list>
+  <app-assets-list
+    [assetListItems]="assets"
+    [loading]="loading"
+    [disabledAssetSymbol]="''"
+    [displayAddTokenButton]="chain === 'ETH'"
+    (selectAsset)="selectAsset($event)"
+    (addToken)="navigateToAddToken.emit()">
+  </app-assets-list>
 </div>

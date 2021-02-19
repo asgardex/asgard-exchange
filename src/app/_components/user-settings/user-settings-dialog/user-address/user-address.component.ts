@@ -20,6 +20,7 @@ export class UserAddressComponent implements OnInit {
   @Input() chain: Chain;
   @Output() back: EventEmitter<null>;
   @Output() navigateToAsset: EventEmitter<AssetAndBalance>;
+  @Output() navigateToAddToken: EventEmitter<null>;
   iconPath: string;
   user: User;
   balances: Balances;
@@ -31,6 +32,7 @@ export class UserAddressComponent implements OnInit {
   constructor(private userService: UserService, private copyService: CopyService, private explorerPathsService: ExplorerPathsService) {
     this.back = new EventEmitter<null>();
     this.navigateToAsset = new EventEmitter<AssetAndBalance>();
+    this.navigateToAddToken = new EventEmitter<null>();
     this.loading = true;
   }
 
@@ -81,6 +83,14 @@ export class UserAddressComponent implements OnInit {
         this.explorerPath = `${this.explorerPathsService.binanceExplorerUrl}/address/${this.address}`;
         break;
 
+      case 'THOR':
+        this.explorerPath = `${this.explorerPathsService.thorchainExplorerUrl}/address/${this.address}`;
+        break;
+
+      case 'ETH':
+        this.explorerPath = `${this.explorerPathsService.ethereumExplorerUrl}/address/${this.address}`;
+        break;
+
       default:
         break;
     }
@@ -93,6 +103,9 @@ export class UserAddressComponent implements OnInit {
 
       case 'BTC':
         return 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/BTCB-1DE/logo.png';
+
+      case 'ETH':
+        return 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png';
 
       case 'THOR':
         return 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/RUNE-B1A/logo.png';

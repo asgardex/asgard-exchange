@@ -8,7 +8,7 @@
 
   <div class="flxr flxr--flow-col flxr--just-center flxr--align-center">
     <div style="width: 40px; margin-bottom: 1rem;">
-      <img *ngIf="asset && asset.asset && asset.asset.iconPath" class="asset-icon" [src]="asset && asset.asset && asset.asset.iconPath" style="max-width: 100%;" />
+      <img *ngIf="asset && asset.asset && asset.asset.iconPath" class="asset-icon" [src]="asset && asset.asset && asset.asset.iconPath" appImgFallback style="max-width: 100%;" />
     </div>
 
     <div *ngIf="address" style="text-align: center">
@@ -46,8 +46,8 @@
       Deposit
     </li>
 
-    <!-- UPGRADE BNB RUNE TO NATIVE RUNE -->
-    <li *ngIf="asset && asset.asset.chain === 'BNB' && asset.asset.ticker === 'RUNE'" class="action flxr flxr--flow-col flxr--align-center">
+    <!-- UPGRADE BNB/ETH RUNE TO NATIVE RUNE -->
+    <li *ngIf="asset && (asset.asset.chain === 'BNB' || asset.asset.chain === 'ETH') && asset.asset.ticker === 'RUNE'" class="action flxr flxr--flow-col flxr--align-center">
       <button mat-mini-fab color="primary" aria-label="Copy" (click)="upgradeRune.emit()">
         <mat-icon>upgrade</mat-icon>
       </button>

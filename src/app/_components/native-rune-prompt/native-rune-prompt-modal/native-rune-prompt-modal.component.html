@@ -29,10 +29,13 @@
   [asset]="selectedAsset"
   [amount]="amountToSend"
   (back)="mode = 'UPGRADE_ASSET'"
-  (transactionSuccessful)="mode = 'SUCCESS'">
+  (transactionSuccessful)="transactionSuccessful($event)">
 </app-upgrade-rune-confirm>
 
 <app-transaction-success-modal
   *ngIf="mode === 'SUCCESS'"
+  [externalTx]="true"
+  [chain]="selectedAsset.asset.chain"
+  [hash]="successfulTxHash"
   (closeDialog)="dialogRef.close()">
 </app-transaction-success-modal>

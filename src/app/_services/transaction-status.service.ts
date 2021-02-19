@@ -1,12 +1,15 @@
 import { Injectable } from '@angular/core';
 import { assetFromString, Chain } from '@xchainjs/xchain-util';
-import { BehaviorSubject, of, Subject, timer } from 'rxjs';
+import { BehaviorSubject, of, ReplaySubject, Subject, timer } from 'rxjs';
 import { catchError, switchMap, takeUntil } from 'rxjs/operators';
 import { TransactionDTO } from '../_classes/transaction';
+import { User } from '../_classes/user';
 import { BinanceService } from './binance.service';
 import { BlockchairBtcTransactionDTO, BlockchairService } from './blockchair.service';
 import { MidgardService } from './midgard.service';
 import { UserService } from './user.service';
+import { ethers } from 'ethers';
+import { environment } from 'src/environments/environment';
 
 export const enum TxStatus {
   PENDING = 'PENDING',
@@ -25,9 +28,11 @@ export enum TxActions {
 export interface Tx {
   chain: Chain;
   ticker: string;
+  symbol: string;
   hash: string;
   status: TxStatus;
   action: TxActions;
+  isThorchainTx: boolean;
 }
 
 @Injectable({
@@ -42,6 +47,10 @@ export class TransactionStatusService {
   killOutputsPolling: {[key: string]: Subject<void>} = {};
 
   killTxPolling: {[key: string]: Subject<void>} = {};
+  user: User;
+
+  ethContractApprovalSource = new ReplaySubject<string>();
+  ethContractApproval$ = this.ethContractApprovalSource.asObservable();
 
   constructor(
     private blockchairService: BlockchairService,
@@ -50,24 +59,41 @@ export class TransactionStatusService {
     private binanceService: BinanceService
   ) {
     this._txs = [];
+
+    userService.user$.subscribe(
+      (user) => this.user = user
+    );
+
   }
 
   // this needs to be simplified and cleaned up
   // only check against thorchain to see if tx is successful
   // add inputs and outputs to Tx
   addTransaction(pendingTx: Tx) {
+
+    // remove 0x
+    if (pendingTx.chain === 'ETH') {
+      pendingTx.hash = pendingTx.hash.substr(2);
+    }
+
     this._txs.unshift(pendingTx);
 
     if (pendingTx.status === TxStatus.PENDING) {
 
       this.killTxPolling[pendingTx.hash] = new Subject();
 
-      if (pendingTx.chain === 'BNB') {
-        this.pollBnbTx(pendingTx);
-      } else if (pendingTx.chain === 'THOR') {
-        this.pollThorchainTx(pendingTx);
-      } else if (pendingTx.chain === 'BTC') {
-        this.pollBtcTx(pendingTx);
+      if (pendingTx.isThorchainTx || pendingTx.chain === 'THOR') {
+        this.pollThorchainTx(pendingTx.hash);
+      } else {
+
+        if (pendingTx.chain === 'BNB') {
+          this.pollBnbTx(pendingTx);
+        } else if (pendingTx.chain === 'BTC') {
+          this.pollBtcTx(pendingTx);
+        } else if (pendingTx.chain === 'ETH') {
+          this.pollEthTx(pendingTx);
+        }
+
       }
 
     }
@@ -94,76 +120,49 @@ export class TransactionStatusService {
 
   }
 
-  // to deprecate
-  // this needs to be simplified and cleaned up
-  pollTxOutputs(hash: string, outputLength: number, action: TxActions) {
 
-    this.killOutputsPolling[hash] = new Subject();
+  async pollEthContractApproval(txHash) {
 
-    timer(0, 15000)
+    if (!this.user) {
+      throw new Error('no user found polling eth contract approval');
+    }
+
+    this.killTxPolling[txHash] = new Subject();
+
+    const infuraProjectId = environment.infuraProjectId;
+
+    const provider = new ethers.providers.InfuraProvider(
+      environment.network === 'testnet' ? 'ropsten' : 'mainnet',
+      infuraProjectId
+    );
+    timer(0, 10000)
       .pipe(
         // This kills the request if the user closes the component
-        takeUntil(this.killOutputsPolling[hash]),
+        takeUntil(this.killTxPolling[txHash]),
         // switchMap cancels the last request, if no response have been received since last tick
-        switchMap(() => this.midgardService.getTransaction(hash)),
+        switchMap(() => provider.getTransaction(txHash)),
         // catchError handles http throws
         catchError(error => of(error))
-      ).subscribe( (tx: TransactionDTO) => {
+      ).subscribe( async (res: ethers.providers.TransactionResponse) => {
 
-        if (tx && tx.actions && tx.actions[0] && tx.actions[0].out && tx.actions[0].status.toUpperCase() === 'SUCCESS') {
-
-          for (const output of tx.actions[0].out) {
-
-            const asset = assetFromString(output.coins[0].asset);
-
-            this.addTransaction({
-              chain: asset.chain,
-              // hash: output.txID,
-              hash,
-              ticker: asset.ticker,
-              status: TxStatus.COMPLETE,
-              action: (tx.actions[0].type.toUpperCase() === 'REFUND') ? TxActions.REFUND : action
-            });
-
-            this.killOutputsPolling[hash].next();
-          }
-
+        if (res.confirmations > 0) {
+          this.ethContractApprovalSource.next(txHash);
+          this.killTxPolling[txHash].next();
         }
-
-        // if (tx && tx.actions && tx.actions[0] && tx.actions[0].out && tx.actions[0].out.length >= outputLength) {
-
-        //   for (const output of tx.actions[0].out) {
-
-        //     const asset = assetFromString(output.coins[0].asset);
-
-        //     this.addTransaction({
-        //       chain: asset.chain,
-        //       hash: output.txID,
-        //       ticker: asset.ticker,
-        //       status: TxStatus.PENDING,
-        //       action: (tx.actions[0].type.toUpperCase() === 'REFUND') ? TxActions.REFUND : action
-        //     });
-        //   }
-
-        //   this.killOutputsPolling[hash].next();
-
-        // }
 
       });
   }
 
-  pollThorchainTx(tx: Tx) {
+  pollThorchainTx(hash: string) {
     timer(0, 15000)
     .pipe(
       // This kills the request if the user closes the component
-      takeUntil(this.killTxPolling[tx.hash]),
+      takeUntil(this.killTxPolling[hash]),
       // switchMap cancels the last request, if no response have been received since last tick
-      switchMap(() => this.midgardService.getTransaction(tx.hash)),
+      switchMap(() => this.midgardService.getTransaction(hash)),
       // catchError handles http throws
       catchError(error => of(error))
     ).subscribe( async (res: TransactionDTO) => {
-
-      console.log('polling tx hash id: ', tx.hash);
 
       if (res.count > 0) {
         for (const resTx of res.actions) {
@@ -172,15 +171,14 @@ export class TransactionStatusService {
 
           // }
 
-          if (resTx.in[0].txID.toUpperCase() === tx.hash.toUpperCase() && resTx.status.toUpperCase() === 'SUCCESS') {
-            console.log('!! TX is successful !!');
-            this.updateTxStatus(tx.hash, TxStatus.COMPLETE);
+          if (resTx.in[0].txID.toUpperCase() === hash.toUpperCase() && resTx.status.toUpperCase() === 'SUCCESS') {
+            this.updateTxStatus(hash, TxStatus.COMPLETE);
             this.userService.fetchBalances();
-            this.killTxPolling[tx.hash].next();
+            this.killTxPolling[hash].next();
           } else {
             console.log('still pending...');
             console.log('resTx.in[0].txID.toUpperCase() is ', resTx.in[0].txID.toUpperCase());
-            console.log('tx.hash.toUpperCase() is: ', tx.hash.toUpperCase());
+            console.log('tx.hash.toUpperCase() is: ', hash.toUpperCase());
             console.log('resTx.status.toUpperCase() is: ', resTx.status.toUpperCase());
           }
         }
@@ -188,6 +186,7 @@ export class TransactionStatusService {
 
     });
   }
+
 
   pollBtcTx(tx: Tx) {
     timer(0, 15000)
@@ -239,6 +238,37 @@ export class TransactionStatusService {
         }
 
       });
+  }
+
+  pollEthTx(tx: Tx) {
+
+    if (this.user && this.user.clients && this.user.clients.ethereum) {
+
+      const ethClient = this.user.clients.ethereum;
+      const provider = ethClient.getProvider();
+
+      timer(5000, 15000)
+        .pipe(
+          // This kills the request if the user closes the component
+          takeUntil(this.killTxPolling[tx.hash]),
+          // switchMap cancels the last request, if no response have been received since last tick
+          switchMap(() => provider.getTransaction(`0x${tx.hash}`)),
+          // catchError handles http throws
+          catchError(error => of(error))
+        ).subscribe( async (res) => {
+
+          if (res.confirmations && res.confirmations > 0) {
+            this.updateTxStatus(tx.hash, TxStatus.COMPLETE);
+            this.userService.fetchBalances();
+            this.killTxPolling[tx.hash].next();
+          }
+
+        });
+
+    } else {
+      console.error('no eth client found...', this.user);
+    }
+
   }
 
   getPendingTxCount() {

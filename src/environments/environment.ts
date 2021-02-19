@@ -2,5 +2,7 @@
 export const environment = {
    production: false,
    network: 'testnet',
-   blockchairKey: ''
+   blockchairKey: '',
+   etherscanKey: '',
+   infuraProjectId: '',
 };

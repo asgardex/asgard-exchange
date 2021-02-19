@@ -30,7 +30,7 @@
               <div class="asset-icon-container">
                 <img class="asset-icon" src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/RUNE-B1A/logo.png" />
               </div>
-              <input [value]="thorAddress" name="rune-address" [disabled]="true" />
+              <input [value]="thorAddress.substring(0, 8) + '...' + thorAddress.substring(thorAddress.length - 4, thorAddress.length)" name="rune-address" [disabled]="true" />
             </div>
           </div>
 
@@ -41,7 +41,18 @@
               <div class="asset-icon-container">
                 <img class="asset-icon" src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/BTCB-1DE/logo.png" />
               </div>
-              <input [value]="bitcoinAddress" name="btc-address" [disabled]="true" />
+              <input [value]="bitcoinAddress.substring(0, 8) + '...' + bitcoinAddress.substring(bitcoinAddress.length - 4, bitcoinAddress.length)" name="btc-address" [disabled]="true" />
+            </div>
+          </div>
+
+          <div *ngIf="ethereumAddress" class="uni-input user-address" (click)="selectAddress(ethereumAddress, 'ETH')">
+            <label>Ethereum Address</label>
+
+            <div class="flxr flxr--align-center" style="width: 100%">
+              <div class="asset-icon-container">
+                <img class="asset-icon" src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png" />
+              </div>
+              <input [value]="ethereumAddress.substring(0, 8) + '...' + ethereumAddress.substring(ethereumAddress.length - 4, ethereumAddress.length)" name="ethereum-address" [disabled]="true" />
             </div>
           </div>
 
@@ -52,9 +63,8 @@
               <div class="asset-icon-container">
                 <img class="asset-icon" src="assets/images/token-icons/bnb.png" />
               </div>
-              <input [value]="binanceAddress" name="binance-address" [disabled]="true" />
+              <input [value]="binanceAddress.substring(0, 8 ) + '...' + binanceAddress.substring(binanceAddress.length - 4, binanceAddress.length)" name="binance-address" [disabled]="true" />
             </div>
-
           </div>
 
           <div class="flxr flxr--just-end">
@@ -87,7 +97,8 @@
   [chain]="selectedChain"
   [address]="selectedAddress"
   (back)="clearSelectedAddress()"
-  (navigateToAsset)="selectAsset($event)">
+  (navigateToAsset)="selectAsset($event)"
+  (navigateToAddToken)="mode = 'ADDRESS_ADD_TOKEN'">
 </app-user-address>
 
 <app-user-asset
@@ -141,3 +152,10 @@
   [asset]="selectedAsset"
   (back)="mode = 'ASSET'">
 </app-deposit>
+
+<app-user-address-add-token
+  *ngIf="mode === 'ADDRESS_ADD_TOKEN'"
+  [chain]="selectedChain"
+  [chainAddress]="selectedAddress"
+  (back)="mode = 'ADDRESS'">
+</app-user-address-add-token>

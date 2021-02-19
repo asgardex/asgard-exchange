@@ -1,0 +1,15 @@
+<div class="flxr flxr--just-space-between flxr--align-center">
+  <button
+    *ngIf="!approving"
+    mat-flat-button
+    color="primary"
+    class="main-action-btn"
+    style="width: 100%"
+    (click)="approve()">
+      Approve
+  </button>
+
+  <div *ngIf="approving" style="width: 100%; height: 56px; margin-top: 1rem;" class="flxr flxr--just-center flxr--align-center">
+    <mat-progress-spinner mode="indeterminate" diameter="30"></mat-progress-spinner>
+  </div>
+</div>

@@ -12,10 +12,13 @@ export class AssetsListComponent implements OnInit {
   @Input() loading: boolean;
   @Input() assetListItems: AssetAndBalance[];
   @Input() disabledAssetSymbol: string;
+  @Input() displayAddTokenButton: boolean;
   @Output() selectAsset: EventEmitter<Asset>;
+  @Output() addToken: EventEmitter<null>;
 
   constructor() {
     this.selectAsset = new EventEmitter<Asset>();
+    this.addToken = new EventEmitter<null>();
   }
 
   ngOnInit(): void {

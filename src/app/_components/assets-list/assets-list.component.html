@@ -5,7 +5,7 @@
   <span class="heading-balance__label">Balance</span>
 </div>
 
-<div style="font-size: 0.7rem; color: #849e93; padding: 0 1rem .5rem">Upgrade BNB RUNE to Native RUNE in User Settings</div>
+<div style="font-size: 0.7rem; color: #849e93; padding: 0 1rem .5rem">Upgrade to THOR.RUNE to access THORChain pools and more</div>
 
 <div class="market-list-container">
 
@@ -18,7 +18,7 @@
     <li class="market-list-item" *ngFor="let item of assetListItems" (click)="selectAsset.emit(item.asset)" [class.disabled]="item.asset.symbol == disabledAssetSymbol">
 
       <div class="asset-icon-container">
-        <img *ngIf="item.asset.iconPath" class="asset-icon" [src]="item.asset.iconPath" />
+        <img *ngIf="item.asset.iconPath" class="asset-icon" [src]="item.asset.iconPath" appImgFallback />
         <mat-icon *ngIf="!item.asset.iconPath">help_outline</mat-icon>
       </div>
 
@@ -31,6 +31,9 @@
           <span class="market-list-item__balance">{{item.balance.amount().toNumber()}}</span>
         </div>
       </div>
+    </li>
+    <li *ngIf="displayAddTokenButton" class="flxr flxr--just-center flxr--align-center" style="padding: 1rem 0;">
+      <button mat-flat-button color="accent" (click)="addToken.emit()">Add Token</button>
     </li>
   </ul>
 

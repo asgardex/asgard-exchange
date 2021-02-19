@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { User } from '../_classes/user';
+import { AvailableClients, User } from '../_classes/user';
 import {
   Client as binanceClient,
   BinanceClient,
@@ -13,11 +13,14 @@ import {
   assetAmount,
   assetToBase,
   assetFromString,
-  baseToAsset
+  baseToAsset,
+  Chain
 } from '@xchainjs/xchain-util';
 import { BehaviorSubject, of, Subject, timer } from 'rxjs';
 import { catchError, switchMap, takeUntil } from 'rxjs/operators';
 import { AssetAndBalance } from '../_classes/asset-and-balance';
+import { MidgardService } from './midgard.service';
+import { ethers } from 'ethers';
 
 export interface MidgardData<T> {
   key: string;
@@ -44,7 +47,7 @@ export class UserService {
 
   asgardexBncClient: BinanceClient;
 
-  constructor() {
+  constructor(private midgardService: MidgardService) {
 
     this.asgardexBncClient = new binanceClient({
       network: (environment.network) === 'testnet' ? 'testnet' : 'mainnet',
@@ -101,6 +104,53 @@ export class UserService {
             };
           });
           // .filter((balance) => !asset || balance.asset === asset)
+
+      } else if (key === 'ethereum') {
+
+        // ETH
+        clientBalances = await client.getBalance();
+
+        const ethAddress = await client.getAddress();
+        const assetsToQuery: Asset[] = [];
+
+        /**
+         * Add ETH RUNE
+         */
+        assetsToQuery.push(
+          (environment.network === 'testnet')
+          ? new Asset(`ETH.RUNE-${'0xd601c6A3a36721320573885A8d8420746dA3d7A0'.toUpperCase()}`)
+          : new Asset(`ETH.RUNE-${'0x3155BA85D5F96b2d030a4966AF206230e46849cb'.toUpperCase()}`)
+        );
+
+        /**
+         * Check user balance for tokens that have existing THORChain pools
+         */
+        const pools = await this.midgardService.getPools().toPromise();
+        const ethTokenPools = pools.filter( (pool) => pool.asset.indexOf('ETH') === 0)
+          .filter( (ethPool) => ethPool.asset.indexOf('-') >= 0 );
+
+        for (const token of ethTokenPools) {
+          assetsToQuery.push(new Asset(token.asset));
+        }
+
+        /**
+         * Check localstorage for user-added tokens
+         */
+        const userAddedTokens = JSON.parse(localStorage.getItem(`${ethAddress}_user_added`)) || [];
+        for (const token of userAddedTokens) {
+          assetsToQuery.push(new Asset(token));
+        }
+
+        for (const asset of assetsToQuery) {
+          const assetAddress = asset.symbol.slice(asset.ticker.length + 1);
+          const strip0x = assetAddress.substr(2);
+          const checkSummedAddress = ethers.utils.getAddress(strip0x);
+          const tokenAsset = {chain: asset.chain, ticker: asset.ticker, symbol: `${asset.ticker}-${checkSummedAddress}`};
+          const tokenBalance = await client.getBalance(ethAddress, tokenAsset);
+          tokenBalance[0].asset = asset;
+          clientBalances.push(...tokenBalance);
+        }
+
 
       } else {
         clientBalances = await client.getBalance();
@@ -207,6 +257,29 @@ export class UserService {
 
     return marketListItems;
 
+  }
+
+  async getTokenAddress(user: User, chain: Chain): Promise<string> {
+
+    const clients: AvailableClients = user.clients;
+
+    switch (chain) {
+      case 'BNB':
+        const bnbClient = clients.binance;
+        return await bnbClient.getAddress();
+
+      case 'BTC':
+        const btcClient = clients.bitcoin;
+        return await btcClient.getAddress();
+
+      case 'ETH':
+        const ethClient = clients.ethereum;
+        return await ethClient.getAddress();
+
+      default:
+        console.error(`${chain} does not match getting token address`);
+        return;
+    }
   }
 
 

@@ -12,7 +12,6 @@ import { ConnectErrorComponent } from './_components/connect/connect-error/conne
 import { HeaderComponent } from './_components/header/header.component';
 import { KeystoreConnectComponent } from './_components/connect/keystore-connect/keystore-connect.component';
 import { LastBlockIndicatorComponent } from './_components/last-block-indicator/last-block-indicator.component';
-import { LedgerConnectComponent } from './_components/connect/ledger-connect/ledger-connect.component';
 import { KeystoreCreateComponent } from './_components/connect/keystore-create/keystore-create.component';
 import { PendingTxsModalComponent } from './_components/user-settings/user-settings-dialog/pending-txs/pending-txs-modal.component';
 import { UserAddressComponent } from './_components/user-settings/user-settings-dialog/user-address/user-address.component';
@@ -23,12 +22,14 @@ import { SlippageToleranceComponent } from './_components/slippage-tolerance/sli
 import { TestnetWarningComponent } from './_components/testnet-warning/testnet-warning.component';
 import { UserAssetComponent } from './_components/user-settings/user-settings-dialog/user-asset/user-asset.component';
 import { SendAssetComponent } from './_components/user-settings/user-settings-dialog/send-asset/send-asset.component';
+import { UserAddressAddTokenComponent } from './_components/user-settings/user-settings-dialog/user-address-add-token/user-address-add-token.component';
 
 /** MODULES */
 import { AppRoutingModule } from './app-routing.module';
 import { AssetsListModule } from './_components/assets-list/assets-list.module';
 import { AssetInputModule } from './_components/asset-input/asset-input.module';
 import { TransactionProcessingModalModule } from './_components/transaction-processing-modal/transaction-processing-modal.module';
+import { DirectivesModule } from './_directives/directives.module';
 
 /** SERVICES */
 import { BinanceService } from './_services/binance.service';
@@ -43,6 +44,7 @@ import { KeystoreService } from './_services/keystore.service';
 import { SlippageToleranceService } from './_services/slippage-tolerance.service';
 import { CoinGeckoService } from './_services/coin-gecko.service';
 import { CopyService } from './_services/copy.service';
+import { EthUtilsService } from './_services/eth-utils.service';
 
 /** MATERIAL */
 import { MatButtonModule } from '@angular/material/button';
@@ -78,7 +80,6 @@ import { UpgradeRuneConfirmModule } from './_components/upgrade-rune-confirm/upg
     KeystoreConnectComponent,
     ConnectErrorComponent,
     LastBlockIndicatorComponent,
-    LedgerConnectComponent,
     KeystoreCreateComponent,
     UserSettingsComponent,
     UserSettingsDialogComponent,
@@ -94,6 +95,7 @@ import { UpgradeRuneConfirmModule } from './_components/upgrade-rune-confirm/upg
     DepositComponent,
     DepositConfirmComponent,
     DepositFormComponent,
+    UserAddressAddTokenComponent,
   ],
   imports: [
     AssetInputModule,
@@ -118,6 +120,7 @@ import { UpgradeRuneConfirmModule } from './_components/upgrade-rune-confirm/upg
     QRCodeModule,
     AppRoutingModule,
     TransactionSuccessModalModule,
+    DirectivesModule,
   ],
   providers: [
     BinanceService,
@@ -131,7 +134,8 @@ import { UpgradeRuneConfirmModule } from './_components/upgrade-rune-confirm/upg
     WalletConnectService,
     ExplorerPathsService,
     SlippageToleranceService,
-    TransactionStatusService
+    TransactionStatusService,
+    EthUtilsService
   ],
   bootstrap: [AppComponent]
 })

@@ -63,7 +63,9 @@ export class DepositConfirmComponent implements OnInit, OnDestroy {
           hash: this.hash,
           ticker: 'RUNE',
           status: TxStatus.PENDING,
-          action: TxActions.DEPOSIT
+          action: TxActions.DEPOSIT,
+          isThorchainTx: true,
+          symbol: 'RUNE'
         });
 
         this.transactionSubmitted.next();
