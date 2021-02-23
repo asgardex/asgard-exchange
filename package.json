@@ -63,6 +63,7 @@
     "@types/jasmine": "~3.5.0",
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "^12.11.1",
+    "bitcoinjs-lib": "^5.2.0",
     "codelyzer": "^6.0.1",
     "cosmos-client": "^0.39.2",
     "dotenv": "^8.2.0",
