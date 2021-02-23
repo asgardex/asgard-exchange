@@ -9,9 +9,6 @@ import { Subscription } from 'rxjs';
 import { TransactionStatusService, TxActions, TxStatus } from 'src/app/_services/transaction-status.service';
 import { SlippageToleranceService } from 'src/app/_services/slippage-tolerance.service';
 import BigNumber from 'bignumber.js';
-import { TCRopstenAbi } from '../../_abi/thorchain.abi';
-import { environment } from 'src/environments/environment';
-import { ethers } from 'ethers';
 import { ETH_DECIMAL } from '@xchainjs/xchain-ethereum/lib';
 import { EthUtilsService } from 'src/app/_services/eth-utils.service.js';
 import {

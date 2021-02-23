@@ -3,7 +3,6 @@ import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { UserSettingsComponent } from './user-settings.component';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TransactionStatusService } from 'src/app/_services/transaction-status.service';
-import { BlockchairService } from 'src/app/_services/blockchair.service';
 
 describe('UserSettingsComponent', () => {
   let component: UserSettingsComponent;
@@ -15,7 +14,6 @@ describe('UserSettingsComponent', () => {
       imports: [ MatDialogModule, HttpClientTestingModule ],
       providers: [
         TransactionStatusService,
-        BlockchairService,
         { provide: MAT_DIALOG_DATA, useValue: {} },
       ]
     })

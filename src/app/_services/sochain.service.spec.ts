@@ -1,16 +1,16 @@
 import { TestBed } from '@angular/core/testing';
-
-import { BlockchairService } from './blockchair.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
-describe('BlockchairService', () => {
-  let service: BlockchairService;
+import { SochainService } from './sochain.service';
+
+describe('SochainService', () => {
+  let service: SochainService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
-    service = TestBed.inject(BlockchairService);
+    service = TestBed.inject(SochainService);
   });
 
   it('should be created', () => {

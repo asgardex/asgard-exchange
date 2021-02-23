@@ -35,7 +35,6 @@ const environmentFileContent = `
 export const environment = {
    production: ${isProduction},
    network: '${isTestnet ? 'testnet' : 'chaosnet'}',
-   blockchairKey: '${process.env.BLOCKCHAIR_KEY}',
    etherscanKey: '${process.env.ETHERSCAN_KEY}',
    infuraProjectId: '${process.env.INFURA_PROJECT_ID}',
 };
