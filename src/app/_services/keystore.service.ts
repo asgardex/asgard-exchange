@@ -18,7 +18,12 @@ export class KeystoreService {
     const phrase = await decryptFromKeystore(keystore, password);
     const network = environment.network === 'testnet' ? 'testnet' : 'mainnet';
     const userBinanceClient = new binanceClient({network, phrase});
-    const userBtcClient = new bitcoinClient({network, phrase, nodeUrl: 'https://sochain.com/api/v2'});
+    const userBtcClient = new bitcoinClient({
+      network,
+      phrase,
+      sochainUrl: 'https://sochain.com/api/v2',
+      blockstreamUrl: 'https://blockstream.info'
+    });
     const userThorchainClient = new thorchainClient({network, phrase});
     const thorAddress = await userThorchainClient.getAddress();
     const userEthereumClient = new ethereumClient({

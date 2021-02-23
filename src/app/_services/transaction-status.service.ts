@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Chain } from '@xchainjs/xchain-util';
 import { BehaviorSubject, of, ReplaySubject, Subject, timer } from 'rxjs';
-import { catchError, switchMap, takeUntil } from 'rxjs/operators';
+import { catchError, switchMap, takeUntil, retryWhen, delay, take } from 'rxjs/operators';
 import { TransactionDTO } from '../_classes/transaction';
 import { User } from '../_classes/user';
 import { BinanceService } from './binance.service';
@@ -198,8 +198,9 @@ export class TransactionStatusService {
         takeUntil(this.killTxPolling[tx.hash]),
         // switchMap cancels the last request, if no response have been received since last tick
         switchMap(() => this.sochainService.getTransaction({txID: tx.hash, network})),
-        // catchError handles http throws
-        catchError(error => of(error))
+        // sochain returns 404 when not found
+        // this allows timer to continue polling
+        retryWhen(errors => errors.pipe(delay(10000), take(10)))
       ).subscribe( async (res: SochainTxResponse) => {
 
         if (res.status === 'success' && res.data && res.data.confirmations > 0) {

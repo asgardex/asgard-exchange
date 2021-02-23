@@ -26,7 +26,10 @@ export class SochainService {
   constructor(private http: HttpClient) { }
 
   getTransaction({txID, network}: {txID: string, network: string}): Observable<SochainTxResponse> {
-    return this.http.get<SochainTxResponse>(`https://sochain.com/api/v2/get_tx/${network}/${txID}`);
+
+    const sochainNetwork = network === 'testnet' ? 'BTCTEST' : 'BTC';
+
+    return this.http.get<SochainTxResponse>(`https://sochain.com/api/v2/get_tx/${sochainNetwork}/${txID}`);
   }
 
 }
