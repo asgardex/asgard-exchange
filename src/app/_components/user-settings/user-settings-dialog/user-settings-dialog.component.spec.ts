@@ -2,7 +2,6 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { BlockchairService } from 'src/app/_services/blockchair.service';
 import { TransactionStatusService } from 'src/app/_services/transaction-status.service';
 
 import { UserSettingsDialogComponent } from './user-settings-dialog.component';
@@ -17,7 +16,6 @@ describe('UserSettingsComponent', () => {
       imports: [ MatIconModule, MatIconModule, HttpClientTestingModule ],
       providers: [
         TransactionStatusService,
-        BlockchairService,
         { provide: MatDialogRef, useValue: { close: (dialogResult: any) => { } } }
       ],
     })
