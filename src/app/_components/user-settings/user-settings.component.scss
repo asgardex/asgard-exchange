@@ -1,0 +1,42 @@
+.expandable {
+  display: flex;
+  flex-direction: column;
+  width: 141px;
+  border-radius: 6px;
+  text-transform: none;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 11px;
+
+  &.expanded {
+    height: 170px;
+  }
+
+  .menu {
+    text-transform: uppercase;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 45px;
+    border-radius: 3px;
+    width: 100%;
+    cursor: pointer;
+
+    &:hover {
+      color: #000B13;
+      background: #28F4AE;
+
+      &.red {
+        background: #FF4954;
+      }
+    }
+
+    span {
+      font-weight: 500;
+      font-size: 14px;
+      line-height: 20px;
+      text-align: center;
+    }
+  }
+
+}

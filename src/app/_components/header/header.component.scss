@@ -1,14 +1,69 @@
+.top-bar {
+  display: block;
+  width: 100%;
+  height: 16px;
+  background: linear-gradient(45deg, #00CCFF 0%, #33FF99 100%);
+
+  span {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #02121D;
+    font-size: 11px;
+    line-height: 16px;
+    font-family: 'Roboto';
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+}
+
+.notification-wrapper {
+  width: 730px;
+  height: 42px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #FFFD00 0%, #F625F0 49.98%, #01F6EE 100%);
+  padding: 2px;
+
+  .notification {
+    border-radius: 6px;
+    background: #0D1B23;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    &:hover {
+      background: linear-gradient(90deg, #01F6EE 0%, #F625F0 47.94%, #FFFB00 100%);
+
+      .notification-text {
+        color: #000B12;
+      }
+    }
+
+
+    .notification-text {
+      font-weight: 700;
+      font-size: 14px;
+      color: #fff;
+    }
+  }
+}
+
 header {
   position: relative;
   display: flex;
-  width: 1120px;
+  width: 1370px;
   margin: auto;
-  justify-content: space-between;
-  padding: 1rem 1rem 0px;
+  justify-content: center;
+  align-items: center;
+  padding: 23px 0;
   z-index: 1;
 
   h1 {
     margin: 0;
+    position: absolute;
+    left: 15px;
     letter-spacing: 1px;
     font-size: 22.5px;
     font-family: 'Exo 2', monospace;
@@ -24,6 +79,7 @@ header {
 
     .title {
       position: relative;
+      margin: 0 0 2px 1px;
     }
 
     .testnet {
@@ -42,6 +98,8 @@ header {
     display: flex;
     justify-content: center;
     align-items: center;
+    position: absolute;
+    right: 15px;
   }
 
   #testnet-indicator {
@@ -60,42 +118,4 @@ header {
     margin-right: 20px;
     font-size: 0.8rem;
   }
-}
-
-.header-social {
-  padding-bottom: 15px;
-  justify-content: space-between;
-  padding-bottom: 5px;
-
-  .header-logo {
-    background-color: white;
-    display: block;
-    width: 20px;
-    height: 20px;
-    // margin-left: 12px;
-    transition: background-color 0.2s;
-    
-    &:hover {
-      background-color: #33FF99;
-    }
-
-    &--twitter {
-      -webkit-mask: url(./../../../assets/icons/twitter-brands.svg) no-repeat center;
-      mask: url(./../../../assets/icons/twitter-brands.svg) no-repeat center;
-
-    }
-
-    &--telegram {
-      margin-left: 0;
-      -webkit-mask: url(./../../../assets/icons/social-telegram-icon.svg) no-repeat center;
-      mask: url(./../../../assets/icons/social-telegram-icon.svg) no-repeat center;
-    }
-
-    &--github {
-      -webkit-mask: url(https://raw.githubusercontent.com/Pusher-Labs/asgard-exchange/master/src/assets/icons/github-alt-brands.svg) no-repeat center;
-      mask: url(https://raw.githubusercontent.com/Pusher-Labs/asgard-exchange/master/src/assets/icons/github-alt-brands.svg) no-repeat center;
-    }
-
-  }
-
 }

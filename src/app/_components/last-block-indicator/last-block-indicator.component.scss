@@ -31,6 +31,66 @@
 
 }
 
+.header-social {
+  justify-content: space-between;
+
+  .header-logo {
+    background-color: white;
+    display: block;
+    width: 15px;
+    height: 13px;
+    // margin-left: 12px;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: #33FF99;
+    }
+
+    &--twitter {
+      -webkit-mask: url(./../../../assets/icons/twitter-brands.svg) no-repeat center;
+      mask: url(./../../../assets/icons/twitter-brands.svg) no-repeat center;
+
+    }
+
+    &--telegram {
+      margin-left: 0;
+      -webkit-mask: url(./../../../assets/icons/social-telegram-icon.svg) no-repeat center;
+      mask: url(./../../../assets/icons/social-telegram-icon.svg) no-repeat center;
+    }
+
+    &--github {
+      -webkit-mask: url(https://raw.githubusercontent.com/Pusher-Labs/asgard-exchange/master/src/assets/icons/github-alt-brands.svg) no-repeat center;
+      mask: url(https://raw.githubusercontent.com/Pusher-Labs/asgard-exchange/master/src/assets/icons/github-alt-brands.svg) no-repeat center;
+    }
+
+  }
+
+}
+
+.nav-social {
+  display: flex;
+  .social-item {
+    padding: 0 12px;
+    &:first-of-type {
+      padding-left: 0;
+    }
+    .hover-pic {
+      display: none;
+    }
+    &:last-of-type {
+      padding-right: 0;
+    }
+    &:hover {
+      fill: #23dcc8;
+      .icon-pic {
+        display: none;
+      }
+      .hover-pic {
+        display: inline;
+      }
+    }
+  }
+}
 
 span {
   color: white;
@@ -50,20 +110,26 @@ span {
   text-decoration: none;
 }
 .nav-rune-container {
+  cursor: pointer;
+
+  .no-style {
+    text-decoration: none;
+  }
+}
+.nav-rune {
   display: flex;
-  padding: 1.5px;
-  width: 102px;
+  padding: 2px 1.5px 1.5px 1.5px;
+  width: 96px;
   border-radius: 2.5px;
   margin-top: 5px;
   background-color: white;
-  transition: 0.2s ease;
+  transition: 0.5s ease;
 
   &:hover {
-    background-color: #33FF99;
-    transition: 0.2s ease;
-    .nav-rune-number span {
-      transition: 0.2s ease;
-      color: #33FF99;
+    background-color: #23dcc8;
+    transition: 0.1s ease;
+    .nav-rune-number {
+      color: #23dcc8;
     }
   }
 
@@ -73,27 +139,24 @@ span {
   }
 
   .nav-rune-number {
+    font-family: "Roboto Mono", Roboto, monospace;
+    font-weight: 300;
     text-align: center;
     font-size: 11px;
     line-height: 1.2;
     color: #fff;
     flex-grow: 3;
     background-color: #000;
-
-    span {
-      font-family: 'Roboto Mono', Roboto, monospace;
-      font-weight: 300;
-      text-align: center;
-      transition: 0.2s ease;
-      display: block;
-
-      &.nav-rune-number-new-block{
-        color:  #33FF99;
-        transition: color 0.0s ease;
-      }
-    }
+    transition: color 0.5s ease;
   }
-
+  .nav-rune-number-new-block {
+    color: #20cab8;
+    transition: color 0s ease;
+  }
+}
+.nav-rune-new-block {
+  background-color: #20cab8;
+  transition: 0s ease;
 }
 .nav-rune-new-block{
   background-color:  #33FF99;

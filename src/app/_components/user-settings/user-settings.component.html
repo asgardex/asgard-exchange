@@ -1,12 +1,24 @@
-<button
+<div
   *ngIf="user"
-  class="outline-btn"
-  style="border-radius: 6px; margin-right: 27px; width: 141px; height: 40px; text-transform: none;"
-  (click)="openUserSettings()"
+  class="outline-btn expandable"
+  style="margin-right: 19px; position: absolute; top: 0; right: 96px;"
+  [ngClass]="{'expanded': showMenu}"
 >
-  <span *ngIf="pendingTxCount <= 0">{{user.wallet.substring(0, 6)}}...{{user.wallet.substring(user.wallet.length - 4, user.wallet.length)}}</span>
-  <div *ngIf="pendingTxCount > 0" class="flxr flxr--align-center">
+  <div *ngIf="pendingTxCount <= 0" style="margin-bottom: 5px; cursor: pointer;" (click)="toggleMenu()">{{user.wallet.substring(0, 6)}}...{{user.wallet.substring(user.wallet.length - 4, user.wallet.length)}}</div>
+  <div *ngIf="showMenu" class="menu" (click)="openUserSettings()">
+    <span>Wallet</span>
+  </div>
+  <div *ngIf="showMenu" class="menu">
+    <span>Transactions</span>
+  </div>
+  <div *ngIf="showMenu" class="menu">
+    <span>Settings</span>
+  </div>
+  <div *ngIf="showMenu" class="menu red">
+    <span>Disconnect</span>
+  </div>
+  <!-- <div *ngIf="pendingTxCount > 0" class="flxr flxr--align-center">
     <span style="margin-right: 8px">{{pendingTxCount}} Pending</span>
     <mat-progress-spinner class="light-spinner" mode="indeterminate" diameter="16" color="accent"></mat-progress-spinner>
-  </div>
-</button>
+  </div> -->
+</div>

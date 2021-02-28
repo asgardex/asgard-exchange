@@ -22,9 +22,11 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
   subs: Subscription[];
   @Input() overlay: boolean;
   @Output() overlayChange = new EventEmitter<boolean>();
+  showMenu: boolean;
 
   constructor(private dialog: MatDialog, private txStatusService: TransactionStatusService) {
     this.pendingTxCount = 0;
+    this.showMenu = false;
     const pendingTx$ = this.txStatusService.txs$.subscribe(
       (_txs) => {
         this.pendingTxCount = this.txStatusService.getPendingTxCount();
@@ -42,6 +44,10 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
     //   this.modalDimensions
     // );
     this.overlayChange.emit(!this.overlay)
+  }
+
+  toggleMenu() {
+    this.showMenu = !(this.showMenu)
   }
 
   ngOnDestroy() {

@@ -341,9 +341,9 @@ button {
 // .uni-input .password {
 //   border: none;
 //   width: $in-w;
-//   background: repeating-linear-gradient(90deg, 
-//     dimgrey 0, dimgrey $char-w, 
-//     transparent 0, transparent $char-w + $gap) 
+//   background: repeating-linear-gradient(90deg,
+//     dimgrey 0, dimgrey $char-w,
+//     transparent 0, transparent $char-w + $gap)
 //     0 100%/100% 2px no-repeat;
 //   font: 5ch consolas, monospace;
 //   letter-spacing: $gap;
@@ -377,7 +377,7 @@ button {
     line-height: 30px;
     font-weight: 500;
     letter-spacing: 1.5px;
-    
+
     &::placeholder {
       color: #32FA96;
     }
@@ -711,14 +711,16 @@ main {
   flex-flow: column;
   justify-content: center;
   align-items: center;
-  padding: 45px 15px 100px;
-  min-height: calc(100vh - 138px);
+  // padding: 45px 15px 100px;
+  // min-height: calc(100vh - 138px);
   position: relative;
 
   .container-wrapper {
     border-radius: 20px;
     padding: 2px;
-    background: linear-gradient( 45deg ,#00CCFF,#33FF99);
+    background: linear-gradient(45deg, #FFFD00 0%, #F625F0 49.98%, #01F6EE 100%);
+    width: 730px;
+    height: 629px;
 
     &.pending {
       background: unset;
@@ -742,8 +744,8 @@ main {
     background: #000B12;
     padding: 51px 51px;
     border-radius: 20px;
-    height: 632px;
-    width: 496px;
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-flow: column;
     // border: 2px solid #30F091;
@@ -763,7 +765,7 @@ main {
     justify-content: center;
     margin-bottom: 31px;
     height: 48px;
-    
+
     div {
       display: flex;
       border: 2px solid #0D1B23;
