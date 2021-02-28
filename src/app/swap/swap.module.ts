@@ -16,7 +16,7 @@ import { ConfirmSwapModalComponent } from './confirm-swap-modal/confirm-swap-mod
 import { ConnectComponent, ConnectModal } from './../_components/connect/connect.component';
 import { ConnectErrorComponent } from './../_components/connect/connect-error/connect-error.component';
 import { KeystoreConnectComponent } from './../_components/connect/keystore-connect/keystore-connect.component';
-import { LedgerConnectComponent } from './../_components/connect/ledger-connect/ledger-connect.component';
+// import { LedgerConnectComponent } from './../_components/connect/ledger-connect/ledger-connect.component';
 import { KeystoreCreateComponent } from './../_components/connect/keystore-create/keystore-create.component';
 // import { UserSettingsDialogComponent } from './../_components/user-settings/user-settings-dialog/user-settings-dialog.component';
 
@@ -30,16 +30,18 @@ import { TransactionLedgerConfirmModalModule } from '../_components/transaction-
 import { MarketsModalModule } from '../_components/markets-modal/markets-modal.module';
 import { from } from 'rxjs';
 
+import { ApproveEthContractModule } from '../_components/approve-eth-contract/approve-eth-contract.module';
+import { DirectivesModule } from '../_directives/directives.module';
 
 @NgModule({
   declarations: [
-    SwapComponent, 
-    ConfirmSwapModalComponent, 
-    ConnectComponent, 
-    ConnectModal, 
+    SwapComponent,
+    ConfirmSwapModalComponent,
+    ConnectComponent,
+    ConnectModal,
     KeystoreConnectComponent,
     ConnectErrorComponent,
-    LedgerConnectComponent,
+    // LedgerConnectComponent,
     KeystoreCreateComponent,
     // UserSettingsDialogComponent
   ],
@@ -56,6 +58,8 @@ import { from } from 'rxjs';
     TransactionProcessingModalModule,
     TransactionSuccessModalModule,
     TransactionLedgerConfirmModalModule,
+    DirectivesModule,
+    ApproveEthContractModule,
     RouterModule.forChild([
       {
         path: '',

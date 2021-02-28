@@ -20,7 +20,7 @@
         <!-- <div *ngIf="loading" class="flxr flxr--align-center" style="height: 53px">
           <mat-progress-spinner diameter="16" color="primary" mode="indeterminate"></mat-progress-spinner>
         </div>
-  
+
         <div *ngIf="!loading && error" class="flxr flxr--align-center" style="height: 53px">
           <mat-icon style="font-size: 1rem; height: 18px;">warning</mat-icon>
           <span style="font-size: 0.8rem">Error fetching pool</span>
@@ -30,12 +30,12 @@
           <div>Send</div>
           <div>Balance: {{swapData.balance}}</div>
         </div>
-        
+
         <div class="input-box">
           <input class="priceInput"
           style="font-size: 22px; font-weight: 500; font-family: 'Roboto Mono'; color: #32FA96;"
           [ngModel]="swapData.inputValue" placeholder="0.0" type="number" [disabled]="true" />
-          
+
           <button class="launch-markets-btn" [disabled]="true">
             <div class="flxr flxr--align-center asset-selector">
               <app-icon-ticker [iconPath]="swapData.sourceAsset.iconPath" [ticker]="swapData.sourceAsset.ticker">
@@ -46,7 +46,7 @@
         </div>
 
         <span class="usd-est" *ngIf="true">${{swapData.inputValue * swapData.sourceAssetPrice | number: '.2-3'}} USD</span>
-          
+
       </div>
 
       <!-- <div class="flxr flxr--align-center">
@@ -75,12 +75,12 @@
           <div class="label-box">
             <div>Receive (est.)</div>
           </div>
-          
+
           <div class="input-box">
             <input class="priceInput"
               style="font-size: 22px; font-weight: 500; font-family: 'Roboto Mono'; color: #32FA96;"
               [ngModel]="swapData.outputValue" placeholder="0.0" type="number" [disabled]="true" />
-  
+
             <button class="launch-markets-btn" [disabled]="true">
               <div class="flxr flxr--align-center asset-selector">
                 <app-icon-ticker [iconPath]="swapData.targetAsset.iconPath" [ticker]="swapData.targetAsset.ticker">
@@ -89,7 +89,7 @@
               </div>
             </button>
           </div>
-          <span class="usd-est" *ngIf="true">${{swapData.outputValue * swapData.targetAssetPrice | number: '.2-3'}} USD</span>
+          <!-- <span class="usd-est" *ngIf="true">${{swapData.outputValue * swapData.targetAssetPrice | number: '.2-3'}} USD</span> -->
         </div>
 
 
@@ -146,7 +146,7 @@
         </button>
       </div>
     </div>
-    
+
     <div *ngIf="txState === 'SUCCESS'">
       <div style="width: 100%;">
         <button class="close-btn" aria-label="TRANSACTION PROCESSING…" (click)="closeDialog()">

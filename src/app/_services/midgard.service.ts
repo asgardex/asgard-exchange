@@ -1,83 +1,58 @@
 import { Injectable } from '@angular/core';
-import { environment } from 'src/environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, of, Subject, timer } from 'rxjs';
-import { PoolDetail } from '../_classes/pool-detail';
-import { MidgardAsset } from '../_classes/midgard-asset';
+import { Observable } from 'rxjs';
 import { MidgardConstants } from '../_classes/midgard-constants';
-import { PoolAddressesDTO } from '../_classes/pool-address';
+import { PoolAddressDTO } from '../_classes/pool-address';
 import { TransactionDTO } from '../_classes/transaction';
-import { StakerDTO } from '../_classes/staker';
-import { StakerPoolDataDTO } from '../_classes/staker-pool-data';
 import { LastBlock } from '../_classes/last-block';
-import { catchError, switchMap, takeUntil } from 'rxjs/operators';
-import { UserService } from './user.service';
+import { PoolDTO } from '../_classes/pool';
+import { MemberDTO } from '../_classes/member';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MidgardService {
 
-  private basePath: string;
+  private v2BasePath: string;
 
-  constructor(private http: HttpClient, private userService: UserService) {
-    this.basePath = (environment.network === 'testnet')
-      ? 'https://testnet.multichain.midgard.thorchain.info/v1'
-      // ? 'http://18.158.236.117:8080/v1'
-      : 'https://chaosnet-midgard.bepswap.com/v1';
+  constructor(private http: HttpClient) {
+    this.v2BasePath = 'https://testnet.midgard.thorchain.info/v2';
   }
-
-  getPools(): Observable<string[]> {
-    return this.http.get<string[]>(`${this.basePath}/pools`);
-  }
-
-  getPoolDetails(assets: string[], view: 'balances' | 'simple' | 'full'): Observable<PoolDetail[]> {
-
-    const params = new HttpParams().set('asset', assets.join(',')).set('view', view);
-
-    return this.http.get<PoolDetail[]>(`${this.basePath}/pools/detail`, {params});
-  }
-
-  getAssets(assetsString?: string): Observable<MidgardAsset[]> {
-
-    let params = new HttpParams();
-
-    if (assetsString) {
-      params = params.set('asset', assetsString);
-    }
-
-    return this.http.get<MidgardAsset[]>(`${this.basePath}/assets`, {params});
-
-  }
+  /**
+   * V2 Endpoints
+   *
+   */
 
   getConstants(): Observable<MidgardConstants> {
-    return this.http.get<MidgardConstants>(`${this.basePath}/thorchain/constants`);
+    return this.http.get<MidgardConstants>(`${this.v2BasePath}/thorchain/constants`);
   }
 
-  getProxiedPoolAddresses(): Observable<PoolAddressesDTO> {
-    return this.http.get<PoolAddressesDTO>(`${this.basePath}/thorchain/pool_addresses`);
+  getLastBlock(): Observable<LastBlock[]> {
+    return this.http.get<LastBlock[]>(`${this.v2BasePath}/thorchain/lastblock`);
+  }
+
+
+  getInboundAddresses(): Observable<PoolAddressDTO[]> {
+    return this.http.get<PoolAddressDTO[]>(`${this.v2BasePath}/thorchain/inbound_addresses`);
+  }
+
+  getPools(): Observable<PoolDTO[]> {
+    return this.http.get<PoolDTO[]>(`${this.v2BasePath}/pools`);
+  }
+
+  getPool(asset: string): Observable<PoolDTO> {
+    return this.http.get<PoolDTO>(`${this.v2BasePath}/pool/${asset}`);
+  }
+
+  getMember(address: string): Observable<MemberDTO> {
+    return this.http.get<MemberDTO>(`${this.v2BasePath}/member/${address}`);
   }
 
   getTransaction(txId: string): Observable<TransactionDTO> {
 
     const params = new HttpParams().set('offset', '0').set('limit', '1').set('txid', txId);
 
-    return this.http.get<TransactionDTO>(`${this.basePath}/txs`, {params});
-  }
-
-  getStaker(address: string): Observable<StakerDTO> {
-    return this.http.get<StakerDTO>(`${this.basePath}/stakers/${address}`);
-  }
-
-  getStakerPoolData(accountId: string, assets: string[]): Observable<StakerPoolDataDTO[]> {
-
-    const params = new HttpParams().set('asset', assets.join(','));
-
-    return this.http.get<StakerPoolDataDTO[]>(`${this.basePath}/stakers/${accountId}/pools`, {params});
-  }
-
-  getLastBlock(): Observable<LastBlock> {
-    return this.http.get<LastBlock>(`${this.basePath}/thorchain/lastblock`);
+    return this.http.get<TransactionDTO>(`${this.v2BasePath}/actions`, {params});
   }
 
 }

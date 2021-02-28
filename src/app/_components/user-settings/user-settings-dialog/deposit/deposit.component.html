@@ -1,0 +1,31 @@
+<app-deposit-form
+  *ngIf="depositState === 'FORM'"
+  [asset]="asset"
+  [(action)]="action"
+  [(memoAsset)]="memoAsset"
+  [(destinationAddress)]="destinationAddress"
+  [(memo)]="memo"
+  [(swapLimit)]="swapLimit"
+  [(depositAmount)]="depositAmount"
+  [(withdrawAmount)]="withdrawAmount"
+  [(memoAmount)]="memoAmount"
+  (confirm)="depositState = 'CONFIRM'"
+  (back)="onBack()">
+</app-deposit-form>
+
+<app-deposit-confirm
+  *ngIf="depositState === 'CONFIRM'"
+  [memo]="memo"
+  [action]="action"
+  [depositAmount]="depositAmount"
+  (back)="onBack()"
+  (transactionSubmitted)="depositState = 'TX_SUBMITTED'">
+</app-deposit-confirm>
+
+<div *ngIf="depositState === 'TX_SUBMITTED'">
+
+  <app-transaction-success-modal
+    (closeDialog)="depositState = 'FORM'">
+  </app-transaction-success-modal>
+
+</div>

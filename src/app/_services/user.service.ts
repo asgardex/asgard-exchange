@@ -1,20 +1,26 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
-import { User } from '../_classes/user';
+import { AvailableClients, User } from '../_classes/user';
 import {
   Client as binanceClient,
   BinanceClient,
 } from '@thorchain/asgardex-binance';
 import { Market, MarketResponse } from '../_classes/market';
-import { assetAmount, baseToAsset } from '@thorchain/asgardex-util';
 import { environment } from 'src/environments/environment';
 import { Asset } from '../_classes/asset';
-import { Balances } from '@xchainjs/xchain-client';
+import { Balance, Balances } from '@xchainjs/xchain-client';
 import { BncClient } from '@binance-chain/javascript-sdk/lib/client';
 import {
-  assetFromString,
+  assetAmount,
   assetToBase,
-} from '@thorchain/asgardex-util';
+  assetFromString,
+  baseToAsset,
+  Chain
+} from '@xchainjs/xchain-util';
+import { BehaviorSubject, of, Subject, timer } from 'rxjs';
+import { catchError, switchMap, takeUntil } from 'rxjs/operators';
+import { AssetAndBalance } from '../_classes/asset-and-balance';
+import { MidgardService } from './midgard.service';
+import { ethers } from 'ethers';
 
 export interface MidgardData<T> {
   key: string;
@@ -37,9 +43,11 @@ export class UserService {
   private userBalancesSource = new BehaviorSubject<Balances>(null);
   userBalances$ = this.userBalancesSource.asObservable();
 
+  private killRunePolling: Subject<void> = new Subject();
+
   asgardexBncClient: BinanceClient;
 
-  constructor() {
+  constructor(private midgardService: MidgardService) {
 
     this.asgardexBncClient = new binanceClient({
       network: (environment.network) === 'testnet' ? 'testnet' : 'mainnet',
@@ -97,6 +105,53 @@ export class UserService {
           });
           // .filter((balance) => !asset || balance.asset === asset)
 
+      } else if (key === 'ethereum') {
+
+        // ETH
+        clientBalances = await client.getBalance();
+
+        const ethAddress = await client.getAddress();
+        const assetsToQuery: Asset[] = [];
+
+        /**
+         * Add ETH RUNE
+         */
+        assetsToQuery.push(
+          (environment.network === 'testnet')
+          ? new Asset(`ETH.RUNE-${'0xd601c6A3a36721320573885A8d8420746dA3d7A0'.toUpperCase()}`)
+          : new Asset(`ETH.RUNE-${'0x3155BA85D5F96b2d030a4966AF206230e46849cb'.toUpperCase()}`)
+        );
+
+        /**
+         * Check user balance for tokens that have existing THORChain pools
+         */
+        const pools = await this.midgardService.getPools().toPromise();
+        const ethTokenPools = pools.filter( (pool) => pool.asset.indexOf('ETH') === 0)
+          .filter( (ethPool) => ethPool.asset.indexOf('-') >= 0 );
+
+        for (const token of ethTokenPools) {
+          assetsToQuery.push(new Asset(token.asset));
+        }
+
+        /**
+         * Check localstorage for user-added tokens
+         */
+        const userAddedTokens = JSON.parse(localStorage.getItem(`${ethAddress}_user_added`)) || [];
+        for (const token of userAddedTokens) {
+          assetsToQuery.push(new Asset(token));
+        }
+
+        for (const asset of assetsToQuery) {
+          const assetAddress = asset.symbol.slice(asset.ticker.length + 1);
+          const strip0x = assetAddress.substr(2);
+          const checkSummedAddress = ethers.utils.getAddress(strip0x);
+          const tokenAsset = {chain: asset.chain, ticker: asset.ticker, symbol: `${asset.ticker}-${checkSummedAddress}`};
+          const tokenBalance = await client.getBalance(ethAddress, tokenAsset);
+          tokenBalance[0].asset = asset;
+          clientBalances.push(...tokenBalance);
+        }
+
+
       } else {
         clientBalances = await client.getBalance();
       }
@@ -107,10 +162,47 @@ export class UserService {
 
   }
 
+  /**
+   * Midgard has no way to tell when BNB has been successfully upgraded to RUNE
+   * so we poll the native RUNE balance to check for a difference
+   */
+  pollNativeRuneBalance(currentBalance: number) {
+
+    if (this._user && this._user.clients && this._user.clients.thorchain) {
+
+      timer(5000, 15000)
+      .pipe(
+        // This kills the request if the user closes the component
+        takeUntil(this.killRunePolling),
+        // switchMap cancels the last request, if no response have been received since last tick
+        // switchMap(() => this.midgardService.getTransaction(tx.hash)),
+        switchMap(() => this._user.clients.thorchain.getBalance()),
+        // catchError handles http throws
+        catchError(error => of(error))
+      ).subscribe( async (res: Balances) => {
+
+        const runeBalance = this.findBalance(res, new Asset('THOR.RUNE'));
+        if (runeBalance && currentBalance < runeBalance) {
+          console.log('increased!');
+          this.fetchBalances();
+          this.killRunePolling.next();
+        }
+
+      });
+
+    } else {
+      console.error('no thorchain client found');
+    }
+
+  }
+
   maximumSpendableBalance(asset: Asset, balance: number) {
 
     if (asset.chain === 'BNB' && asset.symbol === 'BNB') {
       const max = balance - 0.01 - 0.000375;
+      return (max >= 0) ? max : 0;
+    } else if (asset.chain === 'THOR' && asset.symbol === 'RUNE') {
+      const max = balance - 1;
       return (max >= 0) ? max : 0;
     } else {
       return balance;
@@ -128,6 +220,65 @@ export class UserService {
       } else {
         return 0.0;
       }
+    }
+  }
+
+  sortMarketsByUserBalance(userBalances: Balances, marketListItems: AssetAndBalance[]): AssetAndBalance[] {
+
+    const balMap: {[key: string]: Balance} = {};
+    userBalances.forEach((item) => {
+      balMap[`${item.asset.chain}.${item.asset.symbol}`] = item;
+    });
+
+    marketListItems = marketListItems.map((mItem) => {
+
+      if (balMap[`${mItem.asset.chain}.${mItem.asset.symbol}`]) {
+        return {
+          asset: mItem.asset,
+          balance: baseToAsset(balMap[`${mItem.asset.chain}.${mItem.asset.symbol}`].amount),
+        };
+      }
+      else {
+        return {
+          asset: mItem.asset,
+        };
+      }
+
+    });
+
+    marketListItems = marketListItems.sort((a, b) => {
+      if (!a.balance && !b.balance) { return 0; }
+      if (!a.balance) { return 1; }
+      if (!b.balance) { return -1; }
+      return (
+        b.balance.amount().toNumber() - a.balance.amount().toNumber()
+      );
+    });
+
+    return marketListItems;
+
+  }
+
+  async getTokenAddress(user: User, chain: Chain): Promise<string> {
+
+    const clients: AvailableClients = user.clients;
+
+    switch (chain) {
+      case 'BNB':
+        const bnbClient = clients.binance;
+        return await bnbClient.getAddress();
+
+      case 'BTC':
+        const btcClient = clients.bitcoin;
+        return await btcClient.getAddress();
+
+      case 'ETH':
+        const ethClient = clients.ethereum;
+        return await ethClient.getAddress();
+
+      default:
+        console.error(`${chain} does not match getting token address`);
+        return;
     }
   }
 

@@ -1,8 +1,10 @@
 import { CoinIconsFromTrustWallet } from 'src/app/_const/icon-list';
+import { Chain } from '@xchainjs/xchain-util';
+import { ethers } from 'ethers';
 
 export class Asset {
 
-  chain: 'BNB' | 'BTC' | 'ETH' | 'THOR';
+  chain: Chain;
   symbol: string;
   ticker: string;
   iconPath: string;
@@ -19,36 +21,59 @@ export class Asset {
       this.iconPath = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/${trustWalletMatch}/logo.png`;
     } else {
       // Override token icons when not found in trustwallet
-      switch (poolName){
-        case 'BNB.BNB':
-          this.iconPath = 'assets/images/token-icons/bnb.png';
-          break;
 
-        case 'BTC.BTC':
+
+      switch (chain) {
+        case 'BTC':
           this.iconPath = 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/BTCB-1DE/logo.png';
           break;
 
+        case 'BNB':
+
+          if (ticker === 'BNB') {
+            this.iconPath = 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/info/logo.png';
+          }
+
+          break;
+
+        case 'ETH':
+          if (this.symbol !== 'ETH') { // for ETH tokens
+            this.iconPath = this.setEthIconPath(symbol, ticker);
+          }
+          break;
+
+        case 'THOR':
+          this.iconPath = 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/RUNE-B1A/logo.png';
+          break;
+
+
         default:
-          console.warn(`Icon not available for poolName ${poolName}. Add override in src\\app\\_classes\\asset.ts`);
-          this.iconPath = 'assets/images/token-icons/unknown.png';
           break;
       }
+
     }
 
   }
 
+  setEthIconPath(assetSymbol: string, assetTicker: string): string {
+    const assetAddress = assetSymbol.slice(assetTicker.length + 1);
+    const strip0x = assetAddress.substr(2);
+    const checkSummedAddress = ethers.utils.getAddress(strip0x);
+    return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${checkSummedAddress}/logo.png`;
+  }
+
   getAssetFromString(poolName: string): {
-    chain: 'BNB' | 'BTC' | 'ETH' | 'THOR';
+    chain: Chain;
     symbol: string;
     ticker: string;
   } {
-    let chain: 'BNB' | 'BTC' | 'ETH' | 'THOR';
+    let chain: Chain;
     let symbol: string;
     let ticker: string;
 
     const data = poolName.split('.');
     if (poolName.includes('.')) {
-      chain = data[0] as 'BNB' | 'BTC' | 'ETH' | 'THOR';
+      chain = data[0] as Chain;
       symbol = data[1];
     } else {
       symbol = data[0];

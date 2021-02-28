@@ -24,33 +24,40 @@
       [(assetUnit)]="runeAmount"
       [balance]="runeBalance"
       [hideMax]="true"
-      [disableInput]="true"
-      [disabledAssetSymbol]="rune.symbol"
       [disabledMarketSelect]="true"
+      [disabledAssetSymbol]="rune.symbol"
       [coinGeckoList]="coinGeckoList">
     </app-asset-input>
+
+    <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
+      <span class="tx-detail-label">Recommended RUNE Total</span>
+      <span *ngIf="recommendedRuneAmount">{{ recommendedRuneAmount | number:"0.0-0" }}</span>
+      <span *ngIf="!recommendedRuneAmount"> - </span>
+    </div>
+
 
     <div style="font-size: 0.8rem; font-style: italic;">
       *A minimum of 1,000 RUNE + balancing asset is required to create a pool
     </div>
 
-    <button
-      (click)="openConfirmationDialog()"
-      class="main-action-btn"
-      mat-flat-button
-      color="primary"
-      [disabled]="formDisabled()"
-    >
-      {{mainButtonText()}}
-    </button>
+    <div class="flxr">
+      <app-approve-eth-contract
+        *ngIf="ethContractApprovalRequired"
+        style="width: 50%; margin-right: 8px;"
+        [contractAddress]="ethRouter"
+        [asset]="asset"
+        (approved)="contractApproved()">
+      </app-approve-eth-contract>
 
-    <div class="tag">
-      <div class="tag-contents">
-        <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
-          <span class="tx-detail-label">Total Fee</span>
-          <span>-0.000375 BNB</span>
-        </div>
-      </div>
+      <button
+        (click)="openConfirmationDialog()"
+        class="main-action-btn"
+        mat-flat-button
+        color="primary"
+        [ngStyle]="{'width': ethContractApprovalRequired ? '50%' : '100%'}"
+        [disabled]="formDisabled()">
+          {{mainButtonText()}}
+      </button>
     </div>
 
   </div>

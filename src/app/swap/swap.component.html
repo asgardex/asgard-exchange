@@ -12,16 +12,16 @@
           </a>
         </div>
       </nav>
-  
+
       <div class="main-container" style="position: relative;">
-  
+
         <!-- SOURCE -->
         <app-asset-input label="Send" [(overlay)]="sourceMarketShow" [(selectedAsset)]="selectedSourceAsset"
           [(assetUnit)]="sourceAssetUnit" [balance]="sourceBalance" [disableInput]="user ? false : true"
           [disabledAssetSymbol]="selectedTargetAsset ? selectedTargetAsset.symbol : null" [coinGeckoList]="coinGeckoList"
           [selectableMarkets]="selectableMarkets">
         </app-asset-input>
-  
+
         <!-- Deleted for the new design -->
         <!-- <div style="height: 30px;"></div> -->
         <div class="flxr flxr--align-center flxr--just-center">
@@ -33,7 +33,7 @@
             <span class="arrow-down">⭣</span>
           </button>
         </div>
-  
+
         <!-- TARGET -->
         <app-asset-input [label]="selectedTargetAsset ? 'Receive (est.)' : 'Receive'" [(overlay)]="targetMarketShow"
           [(selectedAsset)]="selectedTargetAsset" [(assetUnit)]="targetAssetUnitDisplay" [balance]="targetBalance"
@@ -41,7 +41,7 @@
           [loading]="calculatingTargetAsset" [hideMax]="true" [error]="poolDetailTargetError || poolDetailSourceError"
           [coinGeckoList]="coinGeckoList" [selectableMarkets]="selectableMarkets">
         </app-asset-input>
-  
+
         <div class="swap-details">
           <div class="flxr flxr--just-space-between">
             <span class="tx-detail-label">Price:</span>
@@ -79,10 +79,10 @@
         </div>
         <!-- <div class="tag">
         <div class="tag-contents">
-          
+
         </div>
         </div> -->
-  
+
         <!-- please connect button -->
         <div>
           <button *ngIf="(user && balances)" (click)="openConfirmationDialog()" class="next-btn graident-btn"
@@ -91,10 +91,10 @@
           </button>
           <app-connect *ngIf="!user" [(overlay)]="overlayShow"></app-connect>
         </div>
-  
+
       </div>
     </div>
-    
+
     <div class="overlay-container overlay-connect-wallet" *ngIf="targetMarketShow">
       <app-markets-modal [(overlay)]="targetMarketShow"
         [(selectedAsset)]="selectedTargetAsset" [selectableMarkets]="selectableMarkets"

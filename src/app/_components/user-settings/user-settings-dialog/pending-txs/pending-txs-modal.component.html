@@ -1,7 +1,7 @@
 <!-- <div class="container" style="position: absolute; top: -2px; left: -2px;"> -->
 
 <!-- <div style="padding: 1rem 1rem 0" class="section-head-container">
-    
+
     <h1>Transactions</h1>
     <div style="width: 40px"></div>
   </div> -->
@@ -12,7 +12,7 @@
   <ul *ngIf="txs && txs.length > 0" style="width: 100%;">
     <li *ngFor="let tx of txs" class="transaction">
 
-      <a [href]="((tx.chain === 'BTC') ? bitcoinExplorerUrl : binanceExplorerUrl) + '/' + tx.hash" target="_blank"
+      <a [href]="explorerPath(tx)" target="_blank"
         class="uni-input">
 
         <label style="width: 100%" class="flxr flxr--just-space-between">
@@ -22,7 +22,7 @@
 
         <div class="flxr" style="width: 100%">
 
-          <input [value]="tx.hash" name="thor-address" [disabled]="true" />
+                <input [value]="tx.hash.substring(0, 4) + '...' + tx.hash.substring(tx.hash.length - 4, tx.hash.length)" name="thor-address" [disabled]="true" />
 
           <!-- <button matSuffix mat-icon-button>
             <mat-icon *ngIf="tx.status === 'COMPLETE'">check_circle</mat-icon>

@@ -5,8 +5,7 @@ import { Asset } from '../../_classes/asset';
 import { Subscription } from 'rxjs';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { User } from 'src/app/_classes/user';
-import { Balance, Balances } from '@xchainjs/xchain-client';
-import { baseToAsset } from '@thorchain/asgardex-util';
+import { Balances } from '@xchainjs/xchain-client';
 import { AssetAndBalance } from 'src/app/_classes/asset-and-balance';
 
 
@@ -35,7 +34,6 @@ export class MarketsModalComponent implements OnInit, OnDestroy {
   markets: Market[] = [];
   marketListItems: AssetAndBalance[];
   filteredMarketListItems: AssetAndBalance[];
-  // userBalances: AssetBalance[];
   userBalances: Balances;
   subs: Subscription[];
   loading: boolean;
@@ -61,6 +59,9 @@ export class MarketsModalComponent implements OnInit, OnDestroy {
     const user$ = this.userService.user$.subscribe(
       (user) => {
         this.user = user;
+        if (!user) {
+          this.userBalances = [];
+        }
       }
     );
 
@@ -84,35 +85,7 @@ export class MarketsModalComponent implements OnInit, OnDestroy {
     // Sort first by user balances
     if (this.userBalances && this.marketListItems) {
 
-      const balMap: {[key: string]: Balance} = {};
-      this.userBalances.forEach((item) => {
-        balMap[`${item.asset.chain}.${item.asset.symbol}`] = item;
-      });
-
-      this.marketListItems = this.marketListItems.map((mItem) => {
-
-        if (balMap[`${mItem.asset.chain}.${mItem.asset.symbol}`]) {
-          return {
-            asset: mItem.asset,
-            balance: baseToAsset(balMap[`${mItem.asset.chain}.${mItem.asset.symbol}`].amount),
-          };
-        }
-        else {
-          return {
-            asset: mItem.asset,
-          };
-        }
-
-      });
-
-      this.marketListItems = this.marketListItems.sort((a, b) => {
-        if (!a.balance && !b.balance) { return 0; }
-        if (!a.balance) { return 1; }
-        if (!b.balance) { return -1; }
-        return (
-          b.balance.amount().toNumber() - a.balance.amount().toNumber()
-        );
-      });
+      this.marketListItems = this.userService.sortMarketsByUserBalance(this.userBalances, this.marketListItems);
       this.filteredMarketListItems = this.marketListItems;
     }
   }
@@ -121,13 +94,6 @@ export class MarketsModalComponent implements OnInit, OnDestroy {
   initList() {
 
     this.filteredMarketListItems = this.marketListItems;
-
-    if (this.user && this.user.clients) {
-      this.userService.fetchBalances();
-    } else {
-      this.userBalances = [];
-    }
-
     this.sortMarketsByUserBalance();
 
   }

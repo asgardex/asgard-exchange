@@ -1,17 +1,17 @@
 import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { MultiTransfer } from '@xchainjs/xchain-binance';
-import { assetAmount, assetToBase } from '@thorchain/asgardex-util';
+import { assetAmount, assetToBase } from '@xchainjs/xchain-util';
 import { Subscription } from 'rxjs';
 import { PoolAddressDTO } from 'src/app/_classes/pool-address';
 import { User } from 'src/app/_classes/user';
 import { TransactionConfirmationState } from 'src/app/_const/transaction-confirmation-state';
-import { BinanceService } from 'src/app/_services/binance.service';
 import { MidgardService } from 'src/app/_services/midgard.service';
 import { UserService } from 'src/app/_services/user.service';
-import { WalletConnectService } from 'src/app/_services/wallet-connect.service';
-import { environment } from 'src/environments/environment';
 import { TransactionStatusService, TxActions, TxStatus } from 'src/app/_services/transaction-status.service';
+import { Client as BinanceClient } from '@xchainjs/xchain-binance';
+import { Client as BitcoinClient } from '@xchainjs/xchain-bitcoin';
+import { Client as EthereumClient, ETH_DECIMAL } from '@xchainjs/xchain-ethereum/lib';
+import { EthUtilsService } from 'src/app/_services/eth-utils.service';
 
 export interface ConfirmDepositData {
   asset;
@@ -33,16 +33,21 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
   txState: TransactionConfirmationState;
   hash: string;
   subs: Subscription[];
+  error: string;
+
+  ethNetworkFee: number;
+  insufficientChainBalance: boolean;
+  loading: boolean;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: ConfirmDepositData,
     public dialogRef: MatDialogRef<ConfirmDepositModalComponent>,
-    private walletConnectService: WalletConnectService,
     private txStatusService: TransactionStatusService,
     private midgardService: MidgardService,
+    private ethUtilsService: EthUtilsService,
     private userService: UserService,
-    private binanceService: BinanceService
   ) {
+    this.loading = true;
     this.txState = TransactionConfirmationState.PENDING_CONFIRMATION;
     const user$ = this.userService.user$.subscribe(
       (user) => {
@@ -56,224 +61,223 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+
+    if (this.data.asset.chain === 'ETH') {
+      this.estimateEthGasPrice();
+    } else {
+      this.loading = false;
+    }
+
   }
 
   submitTransaction(): void {
     this.txState = TransactionConfirmationState.SUBMITTING;
 
-    this.midgardService.getProxiedPoolAddresses().subscribe(
+    this.midgardService.getInboundAddresses().subscribe(
       async (res) => {
 
-        const currentPools = res.current;
-
-        if (currentPools && currentPools.length > 0) {
-
-          const bnbPool = currentPools.find( (pool) => pool.chain === 'BNB' );
-          const btcPool = currentPools.find( (pool) => pool.chain === 'BTC' );
-
-          if (this.data.asset.chain === 'BNB') {
-
-            console.log('RUNE AMOUNT IS: ', assetToBase(assetAmount(this.data.runeAmount)).amount().toNumber());
-            console.log('ASSET AMOUNT IS: ', assetToBase(assetAmount(this.data.assetAmount)).amount().toNumber());
-
-            const outputs: MultiTransfer[] = [
-              {
-                to: bnbPool.address,
-                coins: [
-                  {
-                    asset: this.data.rune,
-                    amount: (this.data.user.type === 'keystore' || this.data.user.type === 'ledger')
-                      ? assetToBase(assetAmount(this.data.runeAmount))
-                      : assetToBase(assetAmount(this.data.runeAmount)),
-                  },
-                  {
-                    asset: this.data.asset,
-                    amount: (this.data.user.type === 'keystore' || this.data.user.type === 'ledger')
-                      ? assetToBase(assetAmount((this.data.assetAmount)))
-                      : assetToBase(assetAmount(this.data.assetAmount))
-                  },
-                ],
-              },
-            ];
-
-            const memo = `STAKE:BNB.${this.data.asset.symbol}`;
-
-            if (bnbPool) {
-              if (this.data.user.type === 'keystore' || this.data.user.type === 'ledger') {
-                this.singleChainBnbKeystoreTx(outputs, memo);
-              } else if (this.data.user.type === 'walletconnect') {
-                this.walletConnectTransaction(outputs, memo, bnbPool);
-              }
-            }
-
-          } else if (this.data.asset.chain === 'BTC') {
-            this.multichainKeystoreTx(btcPool, bnbPool);
-          }
-
+        if (res && res.length > 0) {
+          this.deposit(res);
         }
 
       }
     );
   }
 
-  async singleChainBnbKeystoreTx(outputs, memo: string) {
 
-    // const bncClient = this.binanceService.bncClient;
+  async deposit(pools: PoolAddressDTO[]) {
 
-    // await bncClient.initChain();
-
-    // if (this.data.user.type === 'ledger') {
-
-    //   bncClient.useLedgerSigningDelegate(
-    //     this.data.user.ledger,
-    //     () => this.txState = TransactionConfirmationState.PENDING_LEDGER_CONFIRMATION,
-    //     () => this.txState = TransactionConfirmationState.SUBMITTING,
-    //     (err) => {
-    //       this.txState = TransactionConfirmationState.ERROR;
-    //       console.error('useLedgerSigningDelegate error: ', err);
-    //     },
-    //     this.data.user.hdPath
-    //   );
-    // }
-
-    const binanceClient = this.data.user.clients.binance;
-    if (binanceClient) {
-
-      try {
-        const hash = await binanceClient.multiSend({transactions: outputs, memo});
-        this.txState = TransactionConfirmationState.SUCCESS;
-        this.hash = hash;
-        this.txStatusService.addTransaction({
-          chain: 'BNB',
-          hash: this.hash,
-          ticker: this.data.asset.ticker,
-          status: TxStatus.PENDING,
-          action: TxActions.DEPOSIT
-        });
-      } catch (error) {
-        console.error('error making transfer: ', error);
-        this.txState = TransactionConfirmationState.ERROR;
-      }
-
-    } else {
-      console.error('no binance client for user');
-    }
-
-  }
-
-  async multichainKeystoreTx(corePool: PoolAddressDTO, bnbPool: PoolAddressDTO) {
-    const binanceClient = this.data.user.clients.binance;
-    const bitcoinClient = this.data.user.clients.bitcoin;
-    const bitcoinAddress = await bitcoinClient.getAddress();
-    const binanceAddress = await binanceClient.getAddress();
+    const clients = this.data.user.clients;
     const asset = this.data.asset;
+    const thorClient = clients.thorchain;
+    const thorchainAddress = await thorClient.getAddress();
+    let hash = '';
 
-    const coreChainMemo = `STAKE:${asset.chain}.${asset.symbol}:${binanceAddress}`;
-    const bnbMemo = `STAKE:${asset.chain}.${asset.symbol}:${bitcoinAddress}`;
-
-    // send RUNE
-    try {
-      const hash = await binanceClient.transfer({
-        asset: this.data.rune,
-        amount: assetToBase(assetAmount(this.data.runeAmount)),
-        recipient: bnbPool.address,
-        memo: bnbMemo
-      });
-
-      this.hash = hash;
-      this.txStatusService.addTransaction({
-        chain: 'BNB',
-        hash: this.hash,
-        ticker: 'RUNE',
-        status: TxStatus.PENDING,
-        action: TxActions.DEPOSIT
-      });
-    } catch (error) {
-      console.error('error making transfer: ', error);
-      this.txState = TransactionConfirmationState.ERROR;
+    // get token address
+    const address = await this.userService.getTokenAddress(this.data.user, this.data.asset.chain);
+    if (!address || address === '') {
+      console.error('no address found');
       return;
     }
 
-    // send BTC
+    // find recipient pool
+    const recipientPool = pools.find( (pool) => pool.chain === this.data.asset.chain );
+    if (!recipientPool) {
+      console.error('no recipient pool found');
+      return;
+    }
+
+    // Deposit token
     try {
 
-      const feeRates = await bitcoinClient.getFeeRates();
+      // deposit using xchain
+      switch (this.data.asset.chain) {
+        case 'BNB':
+          const bnbClient = this.data.user.clients.binance;
+          hash = await this.binanceDeposit(bnbClient, thorchainAddress, recipientPool);
+          break;
 
-      const hash = await bitcoinClient.transfer({
-        amount: assetToBase(assetAmount(this.data.assetAmount)),
-        recipient: corePool.address,
-        memo: coreChainMemo,
-        feeRate: feeRates.average
-      });
+        case 'BTC':
+          const btcClient = this.data.user.clients.bitcoin;
+          hash = await this.bitcoinDeposit(btcClient, thorchainAddress, recipientPool);
+          break;
 
-      this.hash = hash;
-      this.txStatusService.addTransaction({
-        chain: 'BTC',
-        hash: this.hash,
-        ticker: 'BTC',
-        status: TxStatus.PENDING,
-        action: TxActions.DEPOSIT
-      });
-      this.txState = TransactionConfirmationState.SUCCESS;
+        case 'ETH':
+          const ethClient = this.data.user.clients.ethereum;
+          hash = await this.ethereumDeposit(ethClient, thorchainAddress, recipientPool);
+          break;
+
+        default:
+          console.error(`${this.data.asset.chain} does not match`);
+          return;
+      }
+
+      if (hash === '') {
+        console.error('no hash set');
+        return;
+      }
+
     } catch (error) {
-      console.error('error making transfer: ', error);
+      console.error('error making token transfer: ', error);
       this.txState = TransactionConfirmationState.ERROR;
+      this.error = error;
+      return;
     }
+
+    // deposit RUNE
+    try {
+      const runeMemo = `+:${asset.chain}.${asset.symbol}:${address}`;
+
+      const runeHash = await thorClient.deposit({
+        amount: assetToBase(assetAmount(this.data.runeAmount)),
+        memo: runeMemo,
+      });
+
+      this.hash = runeHash;
+      this.txStatusService.addTransaction({
+        chain: 'THOR',
+        hash: runeHash,
+        ticker: `${asset.ticker}-RUNE`,
+        status: TxStatus.PENDING,
+        action: TxActions.DEPOSIT,
+        symbol: asset.symbol,
+        isThorchainTx: true
+      });
+    } catch (error) {
+      console.error('error making RUNE transfer: ', error);
+      this.txState = TransactionConfirmationState.ERROR;
+      this.error = error;
+    }
+
+    this.txState = TransactionConfirmationState.SUCCESS;
 
   }
 
-  walletConnectTransaction(outputs: MultiTransfer[], memo: string, matchingPool: PoolAddressDTO) {
+  async ethereumDeposit(client: EthereumClient, thorchainAddress: string, recipientPool: PoolAddressDTO) {
+    try {
+      const asset = this.data.asset;
+      const targetTokenMemo = `+:${asset.chain}.${asset.symbol}:${thorchainAddress}`;
+      const hash = await this.ethUtilsService.callDeposit({
+        inboundAddress: recipientPool,
+        asset,
+        memo: targetTokenMemo,
+        amount: this.data.assetAmount,
+        ethClient: client
+      });
 
-    const sendOrder = this.walletConnectService.walletConnectGetSendOrderMsg({
-      fromAddress: this.data.user.wallet,
-      toAddress: matchingPool.address,
-      coins: outputs[0].coins
-    });
+      return hash;
+    } catch (error) {
+      throw(error);
+    }
+  }
 
-    const bncClient = this.binanceService.bncClient;
+  async binanceDeposit(client: BinanceClient, thorchainAddress: string, recipientPool: PoolAddressDTO): Promise<string> {
+    // deposit token
+    try {
 
-    /**
-     * TODO: clean up, this is used in confirm-swap-modal as well
-     */
-    bncClient
-      .getAccount(this.data.user.wallet)
-      .then(async (response) => {
-        if (!response) {
-          console.error('error getting response from getAccount');
-          return;
+      const asset = this.data.asset;
+      const targetTokenMemo = `+:${asset.chain}.${asset.symbol}:${thorchainAddress}`;
+      const hash = await client.transfer({
+        asset: {
+          chain: asset.chain,
+          symbol: asset.symbol,
+          ticker: asset.ticker
+        },
+        amount: assetToBase(assetAmount(this.data.assetAmount)),
+        recipient: recipientPool.address,
+        memo: targetTokenMemo,
+      });
+
+      return hash;
+    } catch (error) {
+      throw(error);
+    }
+  }
+
+  async bitcoinDeposit(client: BitcoinClient, thorchainAddress: string, recipientPool: PoolAddressDTO): Promise<string> {
+    // deposit token
+    try {
+      const asset = this.data.asset;
+      const targetTokenMemo = `+:${asset.chain}.${asset.symbol}:${thorchainAddress}`;
+      const feeRates = await client.getFeeRates();
+      const feeRate = feeRates.average;
+
+      const hash = await client.transfer({
+        asset: {
+          chain: this.data.asset.chain,
+          symbol: this.data.asset.symbol,
+          ticker: this.data.asset.ticker
+        },
+        amount: assetToBase(assetAmount(this.data.assetAmount)),
+        recipient: recipientPool.address,
+        memo: targetTokenMemo,
+        feeRate
+      });
+
+      return hash;
+    } catch (error) {
+      throw(error);
+    }
+  }
+
+  async estimateEthGasPrice() {
+
+    const user = this.data.user;
+    const sourceAsset = this.data.asset;
+
+    if (user && user.clients && user.clients.ethereum && user.clients.thorchain) {
+      const ethClient = user.clients.ethereum;
+      const thorClient = user.clients.thorchain;
+      const thorchainAddress = await thorClient.getAddress();
+      const ethBalances = await ethClient.getBalance();
+      const ethBalance = ethBalances[0];
+
+      // get inbound addresses
+      this.midgardService.getInboundAddresses().subscribe(
+        async (addresses) => {
+
+          const ethInbound = addresses.find( (inbound) => inbound.chain === 'ETH' );
+
+          const estimatedFeeWei = await this.ethUtilsService.estimateFee({
+            sourceAsset,
+            ethClient,
+            ethInbound,
+            inputAmount: this.data.assetAmount,
+            memo: `+:${sourceAsset.chain}.${sourceAsset.symbol}:${thorchainAddress}`
+          });
+
+          // this.ethNetworkFeeWei = estimatedFeeWei.toNumber();
+          this.ethNetworkFee = estimatedFeeWei.dividedBy(10 ** ETH_DECIMAL).toNumber();
+
+          this.insufficientChainBalance = estimatedFeeWei.isGreaterThan(ethBalance.amount.amount());
+
+          this.loading = false;
+
         }
+      );
 
-        const account = response.result;
-        const chainId = environment.network === 'testnet' ? 'Binance-Chain-Nile' : 'Binance-Chain-Tigris';
-        const tx = {
-          accountNumber: account.account_number.toString(),
-          sequence: account.sequence.toString(),
-          send_order: sendOrder,
-          chainId,
-          memo,
-        };
+    }
 
-        const res = await this.walletConnectService.walletConnectSendTx(tx, bncClient);
-
-        if (res) {
-          this.txState = TransactionConfirmationState.SUCCESS;
-
-          if (res.result && res.result.length > 0) {
-            this.hash = res.result[0].hash;
-            this.txStatusService.addTransaction({
-              chain: 'BNB',
-              hash: this.hash,
-              ticker: this.data.asset.ticker,
-              status: TxStatus.PENDING,
-              action: TxActions.DEPOSIT
-            });
-          }
-        }
-
-    })
-    .catch((error) => {
-      console.error('getAccount error: ', error);
-    });
   }
 
   closeDialog(transactionSucess?: boolean) {

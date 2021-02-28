@@ -708,10 +708,12 @@ input[type=number] {
 
 main {
   display: flex;
+  flex-flow: column;
   justify-content: center;
   align-items: center;
   padding: 45px 15px 100px;
   min-height: calc(100vh - 138px);
+  position: relative;
 
   .container-wrapper {
     border-radius: 20px;
@@ -914,4 +916,12 @@ main {
     border-bottom-right-radius: 20px;
     padding: 1rem;
   }
+}
+
+.mat-select-value {
+  color: white;
+}
+
+.slider {
+  width: 100%;
 }

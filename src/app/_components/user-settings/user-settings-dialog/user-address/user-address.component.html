@@ -20,7 +20,7 @@
     <label class="flxr flxr--align-center">
       {{chain}} Address
 
-      
+
     </label>
 
     <div class="flxr" style="width: 100%; align-items: center;">
@@ -39,7 +39,14 @@
 </div>
 
 <div mat-dialog-content>
-  <app-assets-list [assetListItems]="assets" [loading]="loading" [disabledAssetSymbol]="''" (selectAsset)="selectAsset($event)"></app-assets-list>
+  <app-assets-list
+    [assetListItems]="assets"
+    [loading]="loading"
+    [disabledAssetSymbol]="''"
+    [displayAddTokenButton]="chain === 'ETH'"
+    (selectAsset)="selectAsset($event)"
+    (addToken)="navigateToAddToken.emit()">
+  </app-assets-list>
 </div>
 
 <div class="bottom-actions" style="display: flex; margin-top: 30px;">

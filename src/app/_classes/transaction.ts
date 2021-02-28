@@ -1,6 +1,6 @@
 export class TransactionDTO {
   count: number;
-  txs: Transaction[];
+  actions: Transaction[];
 }
 
 export interface AssetAmount {
@@ -13,6 +13,11 @@ export interface TransactionDetail {
   memo: string;
   address: string;
   coins: AssetAmount[];
+  options: {
+    priceTarget: string;
+    withdrawBasisPoints: string;
+    asymmetry: string;
+  };
 }
 
 export class Transaction {
@@ -20,15 +25,9 @@ export class Transaction {
   pool: string;
   type: string; // TODO -> enum this
   status: string; // TODO -> enum this
-  in: TransactionDetail;
+  in: TransactionDetail[];
   out: TransactionDetail[];
   date: number;
-  gas: AssetAmount;
-  options: {
-    priceTarget: string;
-    withdrawBasisPoints: string;
-    asymmetry: string;
-  };
   height: string;
   events: {
     fee: string;

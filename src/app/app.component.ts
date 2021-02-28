@@ -69,10 +69,10 @@ export class AppComponent implements OnInit, OnDestroy {
       switchMap(() => this.midgardService.getLastBlock()),
       // catchError handles http throws
       catchError(error => of(error))
-    ).subscribe( async (res: LastBlock) => {
-
-      this.lastBlockService.setBlock(res.thorchain);
-
+    ).subscribe( async (res: LastBlock[]) => {
+      if (res.length > 0) {
+        this.lastBlockService.setBlock(res[0].thorchain);
+      }
     });
     this.subs.push(refreshInterval$);
   }

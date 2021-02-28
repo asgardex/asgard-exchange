@@ -1,0 +1,56 @@
+<div *ngIf="txState === 'PENDING_CONFIRMATION'">
+
+  <div style="padding: 1rem 1rem 0; margin-bottom: 0;" class="section-head-container">
+    <button (click)="back.next()" mat-icon-button>
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1 class="flxr">
+      <mat-icon>warning</mat-icon> Manual Memo
+    </h1>
+    <div style="width: 40px"></div>
+  </div>
+
+  <div mat-dialog-content>
+
+    <div style="padding: 1rem">
+      <div class="uni-input">
+        <label>Memo</label>
+        <textarea type="text" [ngModel]="memo" disabled></textarea>
+      </div>
+
+      <div class="uni-input" *ngIf="action != 'WITHDRAW' && action != 'LEAVE' && action != 'UNBOND'">
+        <label>Amount</label>
+        <input type="text" [value]="depositAmount" disabled />
+      </div>
+
+      <div class="uni-input" *ngIf="action == 'WITHDRAW' || action == 'LEAVE' || action === 'UNBOND'">
+        <label>Amount</label>
+        <input type="text" [value]="'0'" disabled>
+      </div>
+
+      <small>
+        <b>This area is for advanced users only!</b> <br />
+        You are about to submit a manual memo transaction. <br />
+        If your memo is incorrect, there is a risk of losing funds. <br />
+        <b>Asgardex is not liable for loss of funds due to submitting an incorrect memo.</b> <br />
+        Submit manual memos at your own risk.
+      </small>
+
+      <button (click)="submitTransaction()" mat-flat-button color="primary" class="main-action-btn">Submit</button>
+
+    </div>
+
+  </div>
+
+</div>
+
+<app-transaction-processing-modal
+  *ngIf="txState == 'SUBMITTING'"
+  transactionDetail="Depositing {{memo}}"
+  (closeDialog)="transactionSubmitted.next()">
+</app-transaction-processing-modal>
+
+<div *ngIf="txState === 'ERROR'" style="font-size: 0.8rem; padding: 2rem 0" class="flxr flxr--flow-col flxr--align-center">
+  <mat-icon>warning</mat-icon>
+  {{error}}
+</div>

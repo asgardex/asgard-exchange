@@ -1,7 +1,9 @@
 import { Component, Input, OnChanges } from '@angular/core';
-import { getPoolShare, PoolData, UnitData, baseAmount } from '@thorchain/asgardex-util';
-import { PoolDetail } from 'src/app/_classes/pool-detail';
-import { StakerPoolData } from 'src/app/_classes/staker-pool-data';
+import { getPoolShare, PoolData, UnitData } from '@thorchain/asgardex-util';
+import { baseAmount } from '@xchainjs/xchain-util';
+import { Asset } from 'src/app/_classes/asset';
+import { MemberPool } from 'src/app/_classes/member';
+import { PoolDTO } from 'src/app/_classes/pool';
 
 @Component({
   selector: 'app-staked-pool-list-item',
@@ -13,30 +15,33 @@ export class StakedPoolListItemComponent implements OnChanges {
   expanded: boolean;
 
   /**
-   * Stake Data
+   * Member Pool Data
    */
-  @Input() set stakeData(data: StakerPoolData) {
-    this._stakeData = data;
+  @Input() set memberPoolData(data: MemberPool) {
+    this._memberPoolData = data;
   }
-  get stakeData() {
-    return this._stakeData;
+  get memberPoolData() {
+    return this._memberPoolData;
   }
-  _stakeData: StakerPoolData;
+  _memberPoolData: MemberPool;
 
   /**
    * Pool Data
    */
-  @Input() set poolData(data: PoolDetail) {
+  @Input() set poolData(data: PoolDTO) {
     this._poolData = data;
+    this.setAsset();
   }
   get poolData() {
     return this._poolData;
   }
-  _poolData: PoolDetail;
+  _poolData: PoolDTO;
 
   pooledRune: number;
   pooledAsset: number;
   poolShare: number;
+
+  asset: Asset;
 
   constructor() {
     this.expanded = false;
@@ -50,13 +55,19 @@ export class StakedPoolListItemComponent implements OnChanges {
     this.expanded = !this.expanded;
   }
 
-  getPoolShare() {
+  setAsset(): void {
+    if (this.poolData) {
+      this.asset = new Asset(this.poolData.asset);
+    }
+  }
 
-    if (this.stakeData && this.poolData) {
+  getPoolShare(): void {
+
+    if (this.memberPoolData && this.poolData) {
 
       const unitData: UnitData = {
-        stakeUnits: baseAmount(this.stakeData.units),
-        totalUnits: baseAmount(this.poolData.poolUnits)
+        stakeUnits: baseAmount(this.memberPoolData.liquidityUnits),
+        totalUnits: baseAmount(this.poolData.units)
       };
 
       const poolData: PoolData = {
@@ -68,7 +79,7 @@ export class StakedPoolListItemComponent implements OnChanges {
 
       this.pooledRune = poolShare.rune.amount().div(10 ** 8).toNumber();
       this.pooledAsset = poolShare.asset.amount().div(10 ** 8).toNumber();
-      this.poolShare = Number(this.stakeData.units) / Number(this.poolData.poolUnits);
+      this.poolShare = Number(this.memberPoolData.liquidityUnits) / Number(this.poolData.units);
 
     }
 

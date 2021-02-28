@@ -1,7 +1,8 @@
 <div class="background-container">
   <app-header [(overlay)]="showUserSetting"></app-header>
-  
+
   <main *ngIf="isTestnet && !showReconnect && !showUserSetting">
+    <app-native-rune-prompt></app-native-rune-prompt>
     <router-outlet></router-outlet>
   </main>
 
@@ -18,9 +19,8 @@
   <main *ngIf="showReconnect">
     <app-reconnect-dialog [(reconnect)]="showReconnect" [keystore]="keystore"></app-reconnect-dialog>
   </main>
-  
+
   <footer>
-    
     <div class="footer-content">
       <span>Powered by THORChain. Everyone can participate, no one can manipulate. Support the initiative by tipping our THOR address: thor93fs8afye893jaljfw73hk6thgkbfh62hs</span>
     </div>

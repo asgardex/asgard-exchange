@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
-import { Chain } from '@thorchain/asgardex-util';
+import { Chain } from '@xchainjs/xchain-util';
 import { Subscription } from 'rxjs';
 import { AssetAndBalance } from 'src/app/_classes/asset-and-balance';
 import { User } from 'src/app/_classes/user';
@@ -19,9 +19,13 @@ export class UserSettingsDialogComponent implements OnInit, OnDestroy {
   binanceAddress: string;
   bitcoinAddress: string;
   thorAddress: string;
+  ethereumAddress: string;
   loading: boolean;
   pendingTxCount: number;
-  mode: 'ADDRESSES' | 'ADDRESS' | 'PENDING_TXS' | 'ASSET' | 'SEND' | 'CONFIRM_SEND'| 'PROCESSING' | 'SUCCESS';
+  mode: 'ADDRESSES' | 'ADDRESS' | 'PENDING_TXS'
+    | 'ASSET' | 'SEND' | 'CONFIRM_SEND' | 'UPGRADE_RUNE'
+    | 'CONFIRM_UPGRADE_RUNE' | 'VIEW_PHRASE' | 'DEPOSIT' | 'CONFIRM_DEPOSIT'
+    | 'ADDRESS_ADD_TOKEN' | 'PROCESSING' | 'SUCCESS' | 'CONFIRM_SEND';
   selectedAddress: string;
   selectedChain: Chain;
   selectedAsset: AssetAndBalance;
@@ -48,14 +52,25 @@ export class UserSettingsDialogComponent implements OnInit, OnDestroy {
           this.loading = true;
 
           this.user = user;
-          this.thorAddress = user.wallet;
 
-          if (this.user.clients && this.user.clients.binance) {
-            this.binanceAddress = await this.user.clients.binance.getAddress();
-          }
+          if (this.user.clients) {
 
-          if (this.user.clients && this.user.clients.bitcoin) {
-            this.bitcoinAddress = await this.user.clients.bitcoin.getAddress();
+            if (this.user.clients.binance) {
+              this.binanceAddress = await this.user.clients.binance.getAddress();
+            }
+
+            if (this.user.clients.bitcoin) {
+              this.bitcoinAddress = await this.user.clients.bitcoin.getAddress();
+            }
+
+            if (this.user.clients.thorchain) {
+              this.thorAddress = await this.user.clients.thorchain.getAddress();
+            }
+
+            if (this.user.clients.ethereum) {
+              this.ethereumAddress = await this.user.clients.ethereum.getAddress();
+            }
+
           }
 
           this.loading = false;
@@ -96,6 +111,12 @@ export class UserSettingsDialogComponent implements OnInit, OnDestroy {
     this.amountToSend = p.amount;
     this.recipient = p.recipientAddress;
     this.mode = 'CONFIRM_SEND';
+  }
+
+  confirmUpgradeRune(p: {amount: number}) {
+    this.amountToSend = p.amount;
+    this.mode = 'CONFIRM_UPGRADE_RUNE';
+    console.log(this.mode);
   }
 
   clearSelectedAsset() {

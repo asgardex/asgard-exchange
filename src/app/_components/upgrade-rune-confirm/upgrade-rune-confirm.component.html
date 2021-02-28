@@ -1,0 +1,48 @@
+<div *ngIf="txState == 'PENDING_CONFIRMATION' && asset">
+
+  <div style="padding: 1rem 1rem 0" class="section-head-container">
+    <button (click)="back.emit()" mat-icon-button>
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1 class="flxr">
+      Confirm Upgrade
+    </h1>
+    <div style="width: 40px"></div>
+  </div>
+
+  <div class="modal-head confirm-modal-head">
+
+    <div class="flxr flxr--just-space-between transaction-detail">
+
+      <div class="flxr flxr--align-center">
+        <div style="margin-right: 12px;" class="asset-icon-container flxr flxr--align-center">
+          <img *ngIf="asset.asset && asset.asset.iconPath" [src]="asset.asset.iconPath" appImgFallback />
+          <mat-icon *ngIf="!asset.asset.iconPath">help_outline</mat-icon>
+        </div>
+        <span style="margin-right: 8px; font-size: 20px">{{amount}}</span>
+      </div>
+
+      <span>{{asset.asset.ticker}}</span>
+
+    </div>
+
+    <small>
+      This RUNE is currently a {{asset.asset.chain}} token. <br />
+      By clicking the button below, you will be upgrading it off of the {{asset.asset.chain}} chain to native RUNE. Your native RUNE will show up in your RUNE wallet in user settings.
+    </small>
+
+    <button (click)="submitTransaction()" mat-flat-button color="accent" class="main-action-btn">Upgrade RUNE</button>
+
+  </div>
+
+</div>
+
+<app-transaction-processing-modal
+  *ngIf="txState === 'SUBMITTING' && asset"
+  transactionDetail="Sending {{asset.asset.ticker}}">
+</app-transaction-processing-modal>
+
+<div style="font-size: 0.8rem; padding: 2rem 0" class="flxr flxr--flow-col flxr--align-center" *ngIf="txState === 'ERROR'">
+  <mat-icon>warning</mat-icon>
+  There was an error processing the RUNE upgrade.
+</div>
