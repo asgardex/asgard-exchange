@@ -1,4 +1,4 @@
-.switch {
+.right-option {
   display: flex;
   flex-flow: row nowrap;
   -webkit-box-align: center;
@@ -33,9 +33,9 @@
     border: 2px solid #474E5D;
 
     &.active {
-      border: 2px solid #30F091;
+      border: 2px solid #28F4AE;
       font-weight: 500;
-      color: #33FF99;
+      color: #28F4AE;
     }
 
     &.left {
@@ -70,6 +70,24 @@
       font-size: 8px;
       position: absolute;
       color: #F3BA2F;
+    }
+  }
+
+  input {
+    background: transparent;
+    border: 2px solid #28F4AE;
+    color: #fff;
+    border-radius: 10px;
+    height: 48px;
+    padding: 0 20px;
+    min-width: 140px;
+
+    &::placeholder {
+      color: #fff;
+    }
+
+    &:focus {
+      outline: none;
     }
   }
 }

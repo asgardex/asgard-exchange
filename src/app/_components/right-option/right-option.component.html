@@ -1,5 +1,5 @@
-<div class="switch">
-  <div>
+<div class="right-option">
+  <div *ngIf="whichType == 'SWITCH'">
     <a class="left" [routerLink]="['/', 'swap']" [ngClass]="left.classList.contains('active') ? '' : 'inactive'" routerLinkActive="active" #left>
       <p class="left-inner">
         <span *ngIf="left.classList.contains('disable')" class="tag">tag</span>
@@ -12,5 +12,8 @@
         text
       </p>
     </a>
+  </div>
+  <div *ngIf="whichType == 'FIELD'">
+    <input type="text" placeholder="SERACH HERE ...">
   </div>
 </div>

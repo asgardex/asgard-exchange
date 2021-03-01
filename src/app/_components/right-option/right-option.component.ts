@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 
 @Component({
   selector: 'app-right-option',
@@ -7,7 +7,11 @@ import { Component, OnInit } from '@angular/core';
 })
 export class RightOptionComponent implements OnInit {
 
-  constructor() { }
+  @Input() whichType: 'SWITCH' | 'FIELD' | 'BUTTON' = 'SWITCH';
+
+  constructor() {
+    this.whichType
+  }
 
   ngOnInit(): void {
   }
