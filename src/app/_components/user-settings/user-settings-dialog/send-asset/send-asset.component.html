@@ -28,7 +28,7 @@
 
     <div class="flxr flxr--just-end flxr--align-center" style="height: 38px">
       <div>
-        <button mat-flat-button color="accent" [disabled]="!amountSpendable || recipientAddress.length < 12" (click)="confirmSend.next({amount: amount, recipientAddress: recipientAddress})">
+        <button mat-flat-button color="accent" [disabled]="!amountSpendable || recipientAddress.length < 12 || amount <= 0" (click)="confirmSend.next({amount: amount, recipientAddress: recipientAddress})">
           <span>Next</span>
         </button>
       </div>

@@ -103,7 +103,10 @@
 
       <div class="flxr flxr--just-end flxr--align-center" style="height: 38px">
         <div>
-          <button mat-flat-button color="accent" (click)="confirmSend()">
+          <button mat-flat-button color="accent" (click)="confirmSend()" [disabled]="(
+            (action === 'ADD' || action === 'SWAP' || action === 'BOND') && (!depositAmount || depositAmount <= 0)
+            || (action === 'UNBOND' && (!memoAmount || memoAmount < 0))
+            )">
             <span>Next</span>
           </button>
         </div>
