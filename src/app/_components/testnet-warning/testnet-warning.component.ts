@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { Chain } from '@xchainjs/xchain-util';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -8,6 +9,7 @@ import { environment } from 'src/environments/environment';
 })
 export class TestnetWarningComponent implements OnInit {
 
+  @Input() chain?: Chain | null;
   isTestnet: boolean;
 
   constructor() {
