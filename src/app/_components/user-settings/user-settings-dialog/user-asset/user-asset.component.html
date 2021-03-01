@@ -18,7 +18,7 @@
 
     <span *ngIf="asset" class="asset-balance">{{asset.balance.amount().toNumber()}} {{asset.asset.ticker}}</span>
     <div style="height: 17px">
-      <span class="usd-value" *ngIf="usdValue">≈ ${{usdValue | number:"0.0-2"}}</span>
+      <span class="usd-value" *ngIf="usdValue">approx ${{usdValue | number:"0.0-2"}}</span>
     </div>
 
   </div>
