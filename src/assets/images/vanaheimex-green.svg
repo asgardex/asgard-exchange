@@ -1,23 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="41px" height="46px" viewBox="0 0 41 46" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <!-- Generator: Sketch 52.5 (67469) - http://www.bohemiancoding.com/sketch -->
-    <title>Shape</title>
-    <desc>Created with Sketch.</desc>
-    <defs>
-        <linearGradient x1="100%" y1="0%" x2="0%" y2="100%" id="linearGradient-1">
-            <stop stop-color="#33FF99" offset="0%"></stop>
-            <stop stop-color="#00CCFF" offset="100%"></stop>
-        </linearGradient>
-    </defs>
-    <g id="VANAHEIM" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="VANAHEIMEX" transform="translate(-163.000000, -21.000000)" fill-rule="nonzero" stroke="url(#linearGradient-1)">
-            <g id="Navigation" transform="translate(165.000000, 20.000000)">
-                <g id="Logo">
-                    <g id="VANAHEIM">
-                        <path d="M0,45 L29.3207806,32.6510899 L20.0460775,23.2448114 L0,45 Z M10.7686333,13.8385328 L20.0460775,23.2448114 L36.614998,3 L10.7686333,13.8385328 Z" id="Shape"></path>
-                    </g>
-                </g>
-            </g>
-        </g>
-    </g>
+<svg width="38" height="43" viewBox="0 0 38 43" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M10.7686 11.8385L10.3819 10.9163L9.01844 11.4881L10.0567 12.5407L10.7686 11.8385ZM36.615 1L37.3889 1.63335L36.2283 0.0778022L36.615 1ZM0 43L-0.735404 42.3224L0.388146 43.9216L0 43ZM29.3208 30.6511L29.7089 31.5727L31.069 30.9999L30.0329 29.949L29.3208 30.6511ZM10.0567 12.5407L19.3341 21.947L20.758 20.5426L11.4806 11.1363L10.0567 12.5407ZM36.2283 0.0778022L10.3819 10.9163L11.1554 12.7607L37.0017 1.9222L36.2283 0.0778022ZM20.8199 21.8782L37.3889 1.63335L35.8411 0.366648L19.2722 20.6115L20.8199 21.8782ZM19.3107 20.5672L-0.735404 42.3224L0.735404 43.6776L20.7815 21.9224L19.3107 20.5672ZM0.388146 43.9216L29.7089 31.5727L28.9326 29.7295L-0.388146 42.0784L0.388146 43.9216ZM30.0329 29.949L20.7581 20.5427L19.334 21.9469L28.6087 31.3532L30.0329 29.949Z" fill="url(#paint0_linear)"/>
+<defs>
+<linearGradient id="paint0_linear" x1="18.3075" y1="-20" x2="-23.3002" y2="16.273" gradientUnits="userSpaceOnUse">
+<stop stop-color="#33FF99"/>
+<stop offset="1" stop-color="#00CCFF"/>
+</linearGradient>
+</defs>
 </svg>
