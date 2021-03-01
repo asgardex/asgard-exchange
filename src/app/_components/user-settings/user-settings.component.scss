@@ -2,11 +2,14 @@
   display: flex;
   flex-direction: column;
   width: 141px;
+  height: 43px;
   border-radius: 6px;
   text-transform: none;
   justify-content: flex-start;
   align-items: center;
-  padding: 11px;
+  padding: 2px;
+  border: none;
+  background: linear-gradient(45deg, #00CCFF 0%, #33FF99 100%);
 
   &.expanded {
     height: 170px;
@@ -16,38 +19,49 @@
     font-family: 'Roboto Mono';
     font-weight: 500;
     letter-spacing: -1px;
+    margin-top: 2px;
+    text-align: center;
+    cursor: pointer;
   }
 
-  .menu {
-    text-transform: uppercase;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 45px;
-    border-radius: 3px;
+  .menu-container {
     width: 100%;
-    cursor: pointer;
+    height: 100%;
+    border-radius: 6px;
+    padding: 7px;
+    background: #000B13;
 
-    &:hover {
-      background: #28F4AE;
+    .menu {
+      text-transform: uppercase;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 30px;
+      border-radius: 3px;
+      width: 100%;
+      cursor: pointer;
+      background: #000B13;
+
+      &:hover {
+        background: #28F4AE;
+
+        span {
+          color: #000B13;
+          font-weight: 700;
+        }
+
+        &.red {
+          background: #FF4954;
+        }
+      }
 
       span {
-        color: #000B13;
-        font-weight: 700;
+        color: #fff;
+        font-weight: 500;
+        font-size: 14px;
+        line-height: 20px;
+        text-align: center;
       }
-
-      &.red {
-        background: #FF4954;
-      }
-    }
-
-    span {
-      color: #fff;
-      font-weight: 500;
-      font-size: 14px;
-      line-height: 20px;
-      text-align: center;
     }
   }
-
 }

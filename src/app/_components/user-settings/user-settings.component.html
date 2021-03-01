@@ -1,24 +1,27 @@
 <div
-  *ngIf="user"
-  class="outline-btn expandable"
-  style="margin-right: 19px; position: absolute; top: 0; right: 96px;"
-  [ngClass]="{'expanded': showMenu}"
+*ngIf="user"
+class="outline-btn expandable"
+style="margin-right: 19px; position: absolute; top: 0; right: 96px;"
+[ngClass]="{'expanded': showMenu}"
 >
-  <div *ngIf="pendingTxCount <= 0" style="margin-bottom: 5px; cursor: pointer;" class="address" (click)="toggleMenu()">{{user.wallet.substring(0, 6)}}...{{user.wallet.substring(user.wallet.length - 4, user.wallet.length)}}</div>
-  <div *ngIf="showMenu" class="menu" (click)="openUserSettings()">
-    <span>Wallet</span>
+  <div class="menu-container">
+    <div *ngIf="pendingTxCount <= 0" class="address" (click)="toggleMenu()">{{user.wallet.substring(0, 6)}}...{{user.wallet.substring(user.wallet.length - 4, user.wallet.length)}}</div>
+    <div *ngIf="showMenu" style="margin-top: 5px;" class="menu" (click)="openUserSettings()">
+      <span>Wallet</span>
+    </div>
+    <div *ngIf="showMenu" class="menu">
+      <span>Transactions</span>
+    </div>
+    <div *ngIf="showMenu" class="menu">
+      <span>Settings</span>
+    </div>
+    <div *ngIf="showMenu" class="menu red">
+      <span>Disconnect</span>
+    </div>
+    <!-- <div *ngIf="pendingTxCount > 0" class="flxr flxr--align-center">
+      <span style="margin-right: 8px">{{pendingTxCount}} Pending</span>
+      <mat-progress-spinner class="light-spinner" mode="indeterminate" diameter="16" color="accent"></mat-progress-spinner>
+    </div> -->
   </div>
-  <div *ngIf="showMenu" class="menu">
-    <span>Transactions</span>
-  </div>
-  <div *ngIf="showMenu" class="menu">
-    <span>Settings</span>
-  </div>
-  <div *ngIf="showMenu" class="menu red">
-    <span>Disconnect</span>
-  </div>
-  <!-- <div *ngIf="pendingTxCount > 0" class="flxr flxr--align-center">
-    <span style="margin-right: 8px">{{pendingTxCount}} Pending</span>
-    <mat-progress-spinner class="light-spinner" mode="indeterminate" diameter="16" color="accent"></mat-progress-spinner>
-  </div> -->
 </div>
+
