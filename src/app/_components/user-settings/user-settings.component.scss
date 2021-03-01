@@ -12,6 +12,12 @@
     height: 170px;
   }
 
+  .address {
+    font-family: 'Roboto Mono';
+    font-weight: 500;
+    letter-spacing: -1px;
+  }
+
   .menu {
     text-transform: uppercase;
     display: flex;
@@ -23,8 +29,12 @@
     cursor: pointer;
 
     &:hover {
-      color: #000B13;
       background: #28F4AE;
+
+      span {
+        color: #000B13;
+        font-weight: 700;
+      }
 
       &.red {
         background: #FF4954;
@@ -32,6 +42,7 @@
     }
 
     span {
+      color: #fff;
       font-weight: 500;
       font-size: 14px;
       line-height: 20px;
