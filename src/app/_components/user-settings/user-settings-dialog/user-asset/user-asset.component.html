@@ -56,7 +56,7 @@
 
   </ul>
 
-  <app-testnet-warning></app-testnet-warning>
+  <app-testnet-warning *ngIf="asset && asset.asset && asset.asset.chain" [chain]="asset.asset.chain"></app-testnet-warning>
 
 </div>
 
