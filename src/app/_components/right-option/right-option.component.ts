@@ -9,9 +9,7 @@ export class RightOptionComponent implements OnInit {
 
   @Input() whichType: 'SWITCH' | 'FIELD' | 'BUTTON' = 'SWITCH';
 
-  constructor() {
-    this.whichType
-  }
+  constructor() { }
 
   ngOnInit(): void {
   }
