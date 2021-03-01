@@ -766,59 +766,6 @@ main {
     }
   }
 
-  nav {
-    display: flex;
-    flex-flow: row nowrap;
-    -webkit-box-align: center;
-    align-items: center;
-    justify-content: center;
-    height: 48px;
-
-    div {
-      display: flex;
-      border: 2px solid #0D1B23;
-      border-radius: 10px;
-    }
-
-    a {
-      display: flex;
-      flex-flow: row nowrap;
-      -webkit-box-align: center;
-      align-items: center;
-      -webkit-box-pack: center;
-      justify-content: center;
-      height: 48px;
-      outline: none;
-      cursor: pointer;
-      text-decoration: none;
-      color: #474E5D;
-      background-color: #000B12;
-      font-size: 14px;
-      font-family: Roboto;
-      border-radius: 10px;
-      text-transform: uppercase;
-      padding: 0 19px;
-      z-index: 0;
-
-      &.active {
-        border: 2px solid #30F091;
-        font-weight: 500;
-        color: #33FF99;
-      }
-
-      .pool {
-        position: relative;
-        .soon {
-          top: -8px;
-          font-family: 'Exo 2';
-          font-weight: 700;
-          font-size: 8px;
-          position: absolute;
-          color: #F3BA2F;
-        }
-      }
-    }
-  }
 }
 
 .section-head-container {

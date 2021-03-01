@@ -1,11 +1,16 @@
-<nav>
+<div class="switch">
   <div>
-    <a class="swap-wrapper" [routerLink]="['/', 'swap']" routerLinkActive="active">Swap</a>
-    <a class="pool-wrapper" [routerLink]="['/', 'pool']" routerLinkActive="active">
-      <p class="pool">
-        <span class="soon">soon</span>
-        Pool
+    <a class="left" [routerLink]="['/', 'swap']" [ngClass]="left.classList.contains('active') ? '' : 'inactive'" routerLinkActive="active" #left>
+      <p class="left-inner">
+        <span *ngIf="left.classList.contains('disable')" class="tag">tag</span>
+        text
+      </p>
+    </a>
+    <a class="right disable" [routerLink]="['/', 'pool']" [ngClass]="right.classList.contains('active') ? '' : 'inactive'" routerLinkActive="active" #right>
+      <p class="right-inner">
+        <span *ngIf="right.classList.contains('disable')" class="tag">tag</span>
+        text
       </p>
     </a>
   </div>
-</nav>
+</div>
