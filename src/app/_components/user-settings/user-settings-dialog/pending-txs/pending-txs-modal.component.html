@@ -23,11 +23,11 @@
                 <span>{{tx.action}}</span>
               </label>
 
-              <div class="flxr" style="width: 100%">
+              <div class="flxr flxr--align-center flxr--just-space-between" style="width: 100%">
 
-                <input [value]="tx.hash.substring(0, 4) + '...' + tx.hash.substring(tx.hash.length - 4, tx.hash.length)" name="thor-address" [disabled]="true" />
+                <span>{{tx.hash.substring(0, 4) + '...' + tx.hash.substring(tx.hash.length - 4, tx.hash.length)}}</span>
 
-                <button matSuffix mat-icon-button>
+                <button class="flxr flxr--align-center flxr--just-center" matSuffix mat-icon-button>
                   <mat-icon *ngIf="tx.status === 'COMPLETE'">check_circle</mat-icon>
                   <mat-progress-spinner *ngIf="tx.status === 'PENDING'" diameter="16" color="primary" mode="indeterminate"></mat-progress-spinner>
                 </button>
