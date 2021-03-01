@@ -15,7 +15,7 @@
 
       <div class="uni-input">
         <label>Password</label>
-        <input [(ngModel)]="keystorePassword" name="keystore-password" placeholder="Please Enter Password" type="password" />
+        <input [(ngModel)]="keystorePassword" name="keystore-password" placeholder="Please Enter Password" type="password" (keyup.enter)="initUnlock()" />
       </div>
 
     </div>
@@ -28,7 +28,7 @@
         <button style="margin-right: 6px" *ngIf="!keystoreConnecting" mat-flat-button (click)="forgetKeystore()" [disabled]="keystoreConnecting">
           <span>Forget Keystore</span>
         </button>
-        <button *ngIf="!keystoreConnecting" mat-flat-button color="accent" (click)="keystoreUnlockClicked()" [disabled]="keystoreConnecting">
+        <button *ngIf="!keystoreConnecting" mat-flat-button color="accent" (click)="initUnlock()" [disabled]="keystoreConnecting">
           <span>Unlock</span>
         </button>
         <mat-progress-spinner mode="indeterminate" diameter="30" *ngIf="keystoreConnecting"></mat-progress-spinner>
