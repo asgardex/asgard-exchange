@@ -26,44 +26,44 @@
           <div *ngIf="thorAddress" class="uni-input user-address" (click)="selectAddress(thorAddress, 'THOR')">
             <label>RUNE Address</label>
 
-            <div class="flxr flxr--align-center" style="width: 100%">
+            <div class="flxr flxr--align-center" style="width: 100%; padding: 0.75rem 0;">
               <div class="asset-icon-container">
                 <img class="asset-icon" src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/RUNE-B1A/logo.png" />
               </div>
-              <input [value]="thorAddress.substring(0, 8) + '...' + thorAddress.substring(thorAddress.length - 4, thorAddress.length)" name="rune-address" [disabled]="true" />
+              <span>{{thorAddress.substring(0, 8) + '...' + thorAddress.substring(thorAddress.length - 4, thorAddress.length)}}</span>
             </div>
           </div>
 
           <div *ngIf="bitcoinAddress" class="uni-input user-address" (click)="selectAddress(bitcoinAddress, 'BTC')">
             <label>Bitcoin Address</label>
 
-            <div class="flxr flxr--align-center" style="width: 100%">
+            <div class="flxr flxr--align-center" style="width: 100%; padding: 0.75rem 0;">
               <div class="asset-icon-container">
                 <img class="asset-icon" src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/BTCB-1DE/logo.png" />
               </div>
-              <input [value]="bitcoinAddress.substring(0, 8) + '...' + bitcoinAddress.substring(bitcoinAddress.length - 4, bitcoinAddress.length)" name="btc-address" [disabled]="true" />
+              <span>{{bitcoinAddress.substring(0, 8) + '...' + bitcoinAddress.substring(bitcoinAddress.length - 4, bitcoinAddress.length)}}</span>
             </div>
           </div>
 
           <div *ngIf="ethereumAddress" class="uni-input user-address" (click)="selectAddress(ethereumAddress, 'ETH')">
             <label>Ethereum Address</label>
 
-            <div class="flxr flxr--align-center" style="width: 100%">
+            <div class="flxr flxr--align-center" style="width: 100%l; padding: 0.75rem 0;">
               <div class="asset-icon-container">
                 <img class="asset-icon" src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png" />
               </div>
-              <input [value]="ethereumAddress.substring(0, 8) + '...' + ethereumAddress.substring(ethereumAddress.length - 4, ethereumAddress.length)" name="ethereum-address" [disabled]="true" />
+              <span>{{ethereumAddress.substring(0, 8) + '...' + ethereumAddress.substring(ethereumAddress.length - 4, ethereumAddress.length)}}</span>
             </div>
           </div>
 
           <div *ngIf="binanceAddress" class="uni-input user-address" (click)="selectAddress(binanceAddress, 'BNB')">
             <label>BNB Address</label>
 
-            <div class="flxr flxr--align-center" style="width: 100%">
+            <div class="flxr flxr--align-center" style="width: 100%; padding: 0.75rem 0;">
               <div class="asset-icon-container">
                 <img class="asset-icon" src="assets/images/token-icons/bnb.png" />
               </div>
-              <input [value]="binanceAddress.substring(0, 8 ) + '...' + binanceAddress.substring(binanceAddress.length - 4, binanceAddress.length)" name="binance-address" [disabled]="true" />
+              <span>{{binanceAddress.substring(0, 8 ) + '...' + binanceAddress.substring(binanceAddress.length - 4, binanceAddress.length)}}</span>
             </div>
           </div>
 
