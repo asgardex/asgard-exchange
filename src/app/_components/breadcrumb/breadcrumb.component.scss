@@ -1,0 +1,20 @@
+.breadcumber-container {
+  display: flex;
+
+  .path {
+    font-family: 'Roboto';
+    font-weight: 500;
+    text-transform: uppercase;
+    margin: 0 5px;
+
+  }
+
+  .path:nth-last-child(1) {
+    color: #28F4AE;
+    font-weight: 700;
+  }
+
+  .cursor {
+    font-family: 'PingFangSC';
+  }
+}

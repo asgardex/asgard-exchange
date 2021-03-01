@@ -1,16 +1,22 @@
 <div class="container-wrapper">
   <div class="container">
 
-    <div class="outline-btn" style="margin-bottom: 32px;">
+    <!-- <div class="outline-btn" style="margin-bottom: 32px;">
       <h1>Keystore Found</h1>
-      <!-- <div style="width: 40px"></div> -->
+    </div> -->
+
+    <div class="content-top">
+      <app-breadcrumb></app-breadcrumb>
+      <div class="top-right">
+        <app-right-option></app-right-option>
+      </div>
     </div>
 
     <div class="dialog-content">
       <div mat-dialog-content>
 
         <button style="cursor: auto; text-transform: uppercase; margin-bottom: 38px; padding: 10px;" class="uni-input uni-input--file" [disabled]="true">
-          <span>Reconnect from previous session</span>
+          <span>Reconnect from previous session?</span>
           <!-- <mat-icon [ngStyle]="{'color':'green'}">check</mat-icon> -->
         </button>
 

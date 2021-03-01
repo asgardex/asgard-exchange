@@ -70,6 +70,8 @@ import { NativeRunePromptModule } from './_components/native-rune-prompt/native-
 import { UpgradeRuneModule } from './_components/upgrade-rune/upgrade-rune.module';
 import { UpgradeRuneConfirmModule } from './_components/upgrade-rune-confirm/upgrade-rune-confirm.module';
 import { SochainService } from './_services/sochain.service';
+import { BreadcrumbComponent } from './_components/breadcrumb/breadcrumb.component';
+import { RightOptionComponent } from './_components/right-option/right-option.component';
 
 
 @NgModule({
@@ -98,6 +100,8 @@ import { SochainService } from './_services/sochain.service';
     DepositConfirmComponent,
     DepositFormComponent,
     UserAddressAddTokenComponent,
+    BreadcrumbComponent,
+    RightOptionComponent,
   ],
   imports: [
     AssetInputModule,

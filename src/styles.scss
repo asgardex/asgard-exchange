@@ -5,6 +5,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
 // Exo Font
 @import url('https://fonts.googleapis.com/css2?family=Exo+2&display=swap');
+// Other Fonts
+// @import './assets/fonts/fontImport.scss';
 
 
 // Custom Theming for Angular Material
@@ -755,6 +757,13 @@ main {
       font-size: 24px;
       line-height: 24px;
     }
+
+    .content-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 30px;
+    }
   }
 
   nav {
@@ -763,7 +772,6 @@ main {
     -webkit-box-align: center;
     align-items: center;
     justify-content: center;
-    margin-bottom: 31px;
     height: 48px;
 
     div {
