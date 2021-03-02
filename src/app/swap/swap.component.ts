@@ -276,8 +276,6 @@ export class SwapComponent implements OnInit, OnDestroy {
           asset: new Asset(pool.asset),
           assetPriceUSD: +pool.assetPriceUSD
         }))
-
-
         // filter out until we can add support
         .filter( (pool) => pool.asset.chain === 'BNB'
           || pool.asset.chain === 'THOR'

@@ -72,7 +72,6 @@ export class UserAddressComponent implements OnInit {
       this.assets = this.balances.reduce( (list: AssetAndBalance[], balance) => {
 
         const assetString = `${balance.asset.chain}.${balance.asset.symbol}`;
-        console.log('asset string is: ', assetString);
         const asset = new Asset(`${balance.asset.chain}.${balance.asset.symbol}`);
         let assetBalance: AssetAndBalance;
 
@@ -84,7 +83,6 @@ export class UserAddressComponent implements OnInit {
           };
         } else {
           const matchingPool = this.pools.find( (pool) => {
-            console.log('pool asset is: ', pool.asset);
             return pool.asset === assetString;
           });
 
@@ -94,8 +92,6 @@ export class UserAddressComponent implements OnInit {
             balance: baseToAsset(balance.amount)
           };
         }
-
-        console.log('assetbalance is: ', assetBalance);
 
         list.push(assetBalance);
         return list;
