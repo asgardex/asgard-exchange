@@ -69,6 +69,7 @@ import { NativeRunePromptModule } from './_components/native-rune-prompt/native-
 import { UpgradeRuneModule } from './_components/upgrade-rune/upgrade-rune.module';
 import { UpgradeRuneConfirmModule } from './_components/upgrade-rune-confirm/upgrade-rune-confirm.module';
 import { SochainService } from './_services/sochain.service';
+import { ThorchainPricesService } from './_services/thorchain-prices.service';
 
 
 @NgModule({
@@ -135,7 +136,8 @@ import { SochainService } from './_services/sochain.service';
     SlippageToleranceService,
     TransactionStatusService,
     EthUtilsService,
-    SochainService
+    SochainService,
+    ThorchainPricesService
   ],
   bootstrap: [AppComponent]
 })

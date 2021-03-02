@@ -5,7 +5,9 @@
       <label for="{{label}}Input">{{label}}</label>
       <label *ngIf="selectedAsset && balance">
         Balance: {{balance | number:"1.0-8"}} <br />
-        <span style="float: right; font-size: 0.6rem" *ngIf="usdValue">(<i>approx ${{usdValue | number:"1.0-0"}}</i>)</span>
+        <div style="height: 13px;">
+          <span style="float: right; font-size: 0.6rem" *ngIf="usdValue">(<i>approx ${{usdValue | number:"1.0-0"}}</i>)</span>
+        </div>
       </label>
     </div>
 

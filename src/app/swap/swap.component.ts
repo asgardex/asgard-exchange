@@ -26,11 +26,11 @@ import { MatDialog } from '@angular/material/dialog';
 import { ConfirmSwapModalComponent } from './confirm-swap-modal/confirm-swap-modal.component';
 import { User } from '../_classes/user';
 import { Balances } from '@xchainjs/xchain-client';
-import { CGCoinListItem, CoinGeckoService } from '../_services/coin-gecko.service';
 import { AssetAndBalance } from '../_classes/asset-and-balance';
 import { PoolDTO } from '../_classes/pool';
 import { SlippageToleranceService } from '../_services/slippage-tolerance.service';
 import { PoolAddressDTO } from '../_classes/pool-address';
+import { ThorchainPricesService } from '../_services/thorchain-prices.service';
 
 export enum SwapType {
   DOUBLE_SWAP = 'double_swap',
@@ -164,7 +164,6 @@ export class SwapComponent implements OnInit, OnDestroy {
   poolDetailSourceError: boolean;
 
   insufficientBnb: boolean;
-  coinGeckoList: CGCoinListItem[];
   selectableMarkets: AssetAndBalance[];
 
   /**
@@ -178,8 +177,8 @@ export class SwapComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private midgardService: MidgardService,
     private binanceService: BinanceService,
-    private cgService: CoinGeckoService,
-    private slipLimitService: SlippageToleranceService) {
+    private slipLimitService: SlippageToleranceService,
+    private thorchainPricesService: ThorchainPricesService) {
 
     this.selectedSourceAsset = new Asset('THOR.RUNE');
     this.ethContractApprovalRequired = false;
@@ -221,7 +220,6 @@ export class SwapComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.getConstants();
     this.getBinanceFees();
-    this.getCoinGeckoCoinList();
     this.getPools();
     this.getEthRouter();
   }
@@ -271,11 +269,15 @@ export class SwapComponent implements OnInit, OnDestroy {
       (res) => {
 
         const availablePools = res.filter( (pool) => pool.status === 'available' );
-        const poolNames = availablePools.map( (pool) => pool.asset );
-        const sortedByName = poolNames.sort();
-        this.selectableMarkets = sortedByName.map((poolName) => ({
-          asset: new Asset(poolName),
+
+        this.selectableMarkets = availablePools
+        .sort( (a, b) => a.asset.localeCompare(b.asset) )
+        .map((pool) => ({
+          asset: new Asset(pool.asset),
+          assetPriceUSD: +pool.assetPriceUSD
         }))
+
+
         // filter out until we can add support
         .filter( (pool) => pool.asset.chain === 'BNB'
           || pool.asset.chain === 'THOR'
@@ -286,19 +288,13 @@ export class SwapComponent implements OnInit, OnDestroy {
         // Keeping RUNE at top by default
         this.selectableMarkets.unshift({
           asset: new Asset('THOR.RUNE'),
+          assetPriceUSD: this.thorchainPricesService.estimateRunePrice(availablePools)
         });
       },
       (err) => console.error('error fetching pools:', err)
     );
   }
 
-  getCoinGeckoCoinList() {
-
-    this.cgService.getCoinList().subscribe( (res) => {
-      this.coinGeckoList = res;
-    });
-
-  }
 
   async checkContractApproved() {
 

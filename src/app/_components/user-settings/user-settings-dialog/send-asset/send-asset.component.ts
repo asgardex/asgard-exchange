@@ -2,7 +2,6 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angu
 import { Subscription } from 'rxjs';
 import { AssetAndBalance } from 'src/app/_classes/asset-and-balance';
 import { User } from 'src/app/_classes/user';
-import { CGCoinListItem, CoinGeckoService } from 'src/app/_services/coin-gecko.service';
 import { UserService } from 'src/app/_services/user.service';
 
 @Component({
@@ -29,9 +28,8 @@ export class SendAssetComponent implements OnInit, OnDestroy {
   amountSpendable: boolean;
   user: User;
   subs: Subscription[];
-  coinGeckoList: CGCoinListItem[];
 
-  constructor(private userService: UserService, private cgService: CoinGeckoService) {
+  constructor(private userService: UserService) {
     this.recipientAddress = '';
     this.back = new EventEmitter<null>();
     this.confirmSend = new EventEmitter<{amount: number, recipientAddress: string}>();
@@ -51,16 +49,6 @@ export class SendAssetComponent implements OnInit, OnDestroy {
       this.subs = [balances$];
 
     }
-
-    this.getCoinGeckoCoinList();
-
-  }
-
-  getCoinGeckoCoinList() {
-
-    this.cgService.getCoinList().subscribe( (res) => {
-      this.coinGeckoList = res;
-    });
 
   }
 

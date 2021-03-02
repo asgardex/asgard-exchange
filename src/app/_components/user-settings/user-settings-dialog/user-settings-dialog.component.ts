@@ -3,7 +3,9 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { Chain } from '@xchainjs/xchain-util';
 import { Subscription } from 'rxjs';
 import { AssetAndBalance } from 'src/app/_classes/asset-and-balance';
+import { PoolDTO } from 'src/app/_classes/pool';
 import { User } from 'src/app/_classes/user';
+import { MidgardService } from 'src/app/_services/midgard.service';
 import { TransactionStatusService } from 'src/app/_services/transaction-status.service';
 import { UserService } from 'src/app/_services/user.service';
 
@@ -31,13 +33,15 @@ export class UserSettingsDialogComponent implements OnInit, OnDestroy {
   selectedAsset: AssetAndBalance;
   amountToSend: number;
   recipient: string;
+  pools: PoolDTO[];
 
   constructor(
     private userService: UserService,
     private txStatusService: TransactionStatusService,
+    private midgardService: MidgardService,
     public dialogRef: MatDialogRef<UserSettingsDialogComponent>
   ) {
-
+    this.pools = [];
     this.pendingTxCount = 0;
     this.mode = 'ADDRESSES';
 
@@ -85,6 +89,11 @@ export class UserSettingsDialogComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.getPools();
+  }
+
+  getPools() {
+    this.midgardService.getPools().subscribe( (res) => this.pools = res );
   }
 
   selectAddress(address: string, chain: Chain) {
