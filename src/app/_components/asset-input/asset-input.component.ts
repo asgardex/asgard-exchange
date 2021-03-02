@@ -3,7 +3,6 @@ import { Asset } from 'src/app/_classes/asset';
 import { MarketsModalComponent } from '../markets-modal/markets-modal.component';
 import { MatDialog } from '@angular/material/dialog';
 import { UserService } from 'src/app/_services/user.service';
-import { CGCoinListItem, CoinGeckoService } from 'src/app/_services/coin-gecko.service';
 import { AssetAndBalance } from 'src/app/_classes/asset-and-balance';
 
 @Component({
@@ -53,51 +52,41 @@ export class AssetInputComponent implements OnInit {
   @Input() disabledMarketSelect: boolean;
   @Input() loading: boolean;
   @Input() error: boolean;
-  @Input() set coinGeckoList(list: CGCoinListItem[]) {
-    this._coinGeckoList = list;
-    if (this._coinGeckoList) {
-      this.checkUsdBalance();
-    }
+  @Input() set selectableMarkets(markets: AssetAndBalance[]) {
+    this._selectableMarkets = markets;
+    this.checkUsdBalance();
   }
-  get coinGeckoList() {
-    return this._coinGeckoList;
+  get selectableMarkets() {
+    return this._selectableMarkets;
   }
-  _coinGeckoList: CGCoinListItem[];
-
-  @Input() selectableMarkets: AssetAndBalance[];
+  _selectableMarkets: AssetAndBalance[];
 
   usdValue: number;
 
-  constructor(private dialog: MatDialog, private userService: UserService, private cgService: CoinGeckoService) {
+  constructor(private dialog: MatDialog, private userService: UserService) {
   }
 
   ngOnInit(): void {
   }
 
-  checkUsdBalance() {
+  checkUsdBalance(): void {
 
-    if (this.selectedAsset && this.balance && this.coinGeckoList) {
-      const id = this.cgService.getCoinIdBySymbol(this.selectedAsset.ticker, this.coinGeckoList);
-
-      if (id) {
-
-        this.cgService.getCurrencyConversion(id).subscribe(
-          (res) => {
-            for (const [_key, value] of Object.entries(res)) {
-              this.usdValue = this.balance * value.usd;
-            }
-          }
-        );
-
-      }
+    if (!this.balance || !this.selectableMarkets) {
+      return;
     }
+
+    const targetPool = this.selectableMarkets.find( (market) => `${market.asset.chain}.${market.asset.ticker}` === `${this.selectedAsset.chain}.${this.selectedAsset.ticker}` );
+    if (!targetPool || !targetPool.assetPriceUSD) {
+      return;
+    }
+    this.usdValue = targetPool.assetPriceUSD * this.balance;
   }
 
-  updateAssetUnits(val) {
+  updateAssetUnits(val): void {
     this.assetUnitChange.emit(val);
   }
 
-  setMax() {
+  setMax(): void {
 
     if (this.balance) {
       const max = this.userService.maximumSpendableBalance(this.selectedAsset, this.balance);
@@ -106,7 +95,7 @@ export class AssetInputComponent implements OnInit {
 
   }
 
-  launchMarketsModal() {
+  launchMarketsModal(): void {
 
     const dialogRef = this.dialog.open(
       MarketsModalComponent,

@@ -96,6 +96,7 @@
   *ngIf="mode === 'ADDRESS'"
   [chain]="selectedChain"
   [address]="selectedAddress"
+  [pools]="pools"
   (back)="clearSelectedAddress()"
   (navigateToAsset)="selectAsset($event)"
   (navigateToAddToken)="mode = 'ADDRESS_ADD_TOKEN'">

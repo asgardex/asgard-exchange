@@ -96,9 +96,10 @@
         *ngIf="action != 'WITHDRAW' && action != 'LEAVE' && action != 'UNBOND'"
         label="Input"
         [(selectedAsset)]="asset.asset"
+        [balance]="asset.balance.amount().toNumber()"
         [(assetUnit)]="depositAmount"
         [disabledMarketSelect]="true"
-        [coinGeckoList]="coinGeckoList">
+        [selectableMarkets]="[asset]">
       </app-asset-input>
 
       <div class="flxr flxr--just-end flxr--align-center" style="height: 38px">

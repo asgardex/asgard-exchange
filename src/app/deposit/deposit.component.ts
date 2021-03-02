@@ -14,7 +14,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDepositModalComponent } from './confirm-deposit-modal/confirm-deposit-modal.component';
 import { User } from '../_classes/user';
 import { Balances } from '@xchainjs/xchain-client';
-import { CGCoinListItem, CoinGeckoService } from '../_services/coin-gecko.service';
 import { AssetAndBalance } from '../_classes/asset-and-balance';
 
 @Component({
@@ -89,7 +88,6 @@ export class DepositComponent implements OnInit, OnDestroy {
   assetBalance: number;
 
   user: User;
-  coinGeckoList: CGCoinListItem[];
   insufficientBnb: boolean;
   subs: Subscription[];
   selectableMarkets: AssetAndBalance[];
@@ -103,7 +101,6 @@ export class DepositComponent implements OnInit, OnDestroy {
     private router: Router,
     private route: ActivatedRoute,
     private midgardService: MidgardService,
-    private cgService: CoinGeckoService
   ) {
     this.rune = new Asset('THOR.RUNE');
 
@@ -152,7 +149,6 @@ export class DepositComponent implements OnInit, OnDestroy {
 
     });
 
-    this.getCoinGeckoCoinList();
     this.getPools();
     this.getEthRouter();
 
@@ -186,12 +182,6 @@ export class DepositComponent implements OnInit, OnDestroy {
 
   }
 
-  getCoinGeckoCoinList() {
-    this.cgService.getCoinList().subscribe( (res) => {
-      this.coinGeckoList = res;
-    });
-  }
-
   updateRuneAmount() {
 
     const runeAmount = getValueOfAssetInRune(assetToBase(assetAmount(this.assetAmount)), this.assetPoolData);
@@ -218,10 +208,9 @@ export class DepositComponent implements OnInit, OnDestroy {
   getPools() {
     this.midgardService.getPools().subscribe(
       (res) => {
-        const poolNames = res.map( (pool) => pool.asset );
-        const sortedByName = poolNames.sort();
-        this.selectableMarkets = sortedByName.map((poolName) => ({
-          asset: new Asset(poolName),
+        this.selectableMarkets = res.sort( (a, b) => a.asset.localeCompare(b.asset) ).map((pool) => ({
+          asset: new Asset(pool.asset),
+          assetPriceUSD: +pool.assetPriceUSD
         }))
         // filter out until we can add support
         .filter( (pool) => pool.asset.chain === 'BNB'

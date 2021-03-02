@@ -8,6 +8,8 @@ import { User } from 'src/app/_classes/user';
 import { CopyService } from 'src/app/_services/copy.service';
 import { ExplorerPathsService } from 'src/app/_services/explorer-paths.service';
 import { UserService } from 'src/app/_services/user.service';
+import { PoolDTO } from 'src/app/_classes/pool';
+import { ThorchainPricesService } from 'src/app/_services/thorchain-prices.service';
 
 @Component({
   selector: 'app-user-address',
@@ -18,6 +20,7 @@ export class UserAddressComponent implements OnInit {
 
   @Input() address: string;
   @Input() chain: Chain;
+  @Input() pools: PoolDTO[];
   @Output() back: EventEmitter<null>;
   @Output() navigateToAsset: EventEmitter<AssetAndBalance>;
   @Output() navigateToAddToken: EventEmitter<null>;
@@ -29,7 +32,12 @@ export class UserAddressComponent implements OnInit {
   loading: boolean;
   explorerPath: string;
 
-  constructor(private userService: UserService, private copyService: CopyService, private explorerPathsService: ExplorerPathsService) {
+  constructor(
+    private userService: UserService,
+    private copyService: CopyService,
+    private explorerPathsService: ExplorerPathsService,
+    private thorchainPricesService: ThorchainPricesService
+  ) {
     this.back = new EventEmitter<null>();
     this.navigateToAsset = new EventEmitter<AssetAndBalance>();
     this.navigateToAddToken = new EventEmitter<null>();
@@ -44,25 +52,11 @@ export class UserAddressComponent implements OnInit {
       (balances) => {
 
         if (balances) {
-
           this.balances = balances.filter( (balance) => balance.asset.chain === this.chain );
-          this.assets = this.balances.reduce( (list, balance) => {
-
-
-            const asset = new Asset(`${balance.asset.chain}.${balance.asset.symbol}`);
-            console.log('asset is: ', asset);
-            const assetBalance = {
-              asset,
-              balance: baseToAsset(balance.amount)
-            };
-            list.push(assetBalance);
-            return list;
-
-          }, []);
-
-          this.loading = false;
-
         }
+
+        this.createAssetList();
+
       }
     );
 
@@ -70,7 +64,44 @@ export class UserAddressComponent implements OnInit {
 
     this.subs = [balances$];
 
+  }
 
+  createAssetList() {
+    if (this.balances && this.pools) {
+
+      this.assets = this.balances.reduce( (list: AssetAndBalance[], balance) => {
+
+        const assetString = `${balance.asset.chain}.${balance.asset.symbol}`;
+        const asset = new Asset(`${balance.asset.chain}.${balance.asset.symbol}`);
+        let assetBalance: AssetAndBalance;
+
+        if (asset.ticker === 'RUNE') {
+          assetBalance = {
+            asset,
+            assetPriceUSD: this.thorchainPricesService.estimateRunePrice(this.pools) ?? 0,
+            balance: baseToAsset(balance.amount)
+          };
+        } else {
+          const matchingPool = this.pools.find( (pool) => {
+            return pool.asset === assetString;
+          });
+
+          assetBalance = {
+            asset,
+            assetPriceUSD: matchingPool ? +matchingPool.assetPriceUSD : 0,
+            balance: baseToAsset(balance.amount)
+          };
+        }
+
+        list.push(assetBalance);
+        return list;
+
+      }, []);
+
+
+      this.loading = false;
+
+    }
   }
 
   setExplorerPath() {
