@@ -8,9 +8,9 @@
     <div class="dialog-content">
       <div class="content-top">
         <app-breadcrumb></app-breadcrumb>
-        <div class="top-right">
+        <!-- <div class="top-right">
           <app-right-option></app-right-option>
-        </div>
+        </div> -->
       </div>
 
       <div mat-dialog-content>
@@ -24,7 +24,7 @@
           <app-arrow></app-arrow>
         </div>
 
-        <app-text-field [(textOfField)]="keystorePassword" mode="Double" type="Password" label="Password" name="keystore-password"></app-text-field>
+        <app-text-field [(textOfField)]="keystorePassword" mode="Single" type="Password" label="Password" name="keystore-password"></app-text-field>
 
         <!-- <div class="uni-input">
           <label>Password</label>
