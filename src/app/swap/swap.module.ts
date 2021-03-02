@@ -32,6 +32,7 @@ import { from } from 'rxjs';
 
 import { ApproveEthContractModule } from '../_components/approve-eth-contract/approve-eth-contract.module';
 import { DirectivesModule } from '../_directives/directives.module';
+import { ArrowModule } from '../_components/arrow/arrow.module';
 
 @NgModule({
   declarations: [
@@ -60,6 +61,7 @@ import { DirectivesModule } from '../_directives/directives.module';
     TransactionLedgerConfirmModalModule,
     DirectivesModule,
     ApproveEthContractModule,
+    ArrowModule,
     RouterModule.forChild([
       {
         path: '',

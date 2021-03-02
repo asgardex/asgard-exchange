@@ -5,25 +5,29 @@
       <h1>Keystore Found</h1>
     </div> -->
 
-    <div class="content-top">
-      <app-breadcrumb></app-breadcrumb>
-      <div class="top-right">
-        <app-right-option></app-right-option>
-      </div>
-    </div>
-
     <div class="dialog-content">
+      <div class="content-top">
+        <app-breadcrumb></app-breadcrumb>
+        <div class="top-right">
+          <app-right-option></app-right-option>
+        </div>
+      </div>
+
       <div mat-dialog-content>
 
-        <button style="cursor: auto; text-transform: uppercase; margin-bottom: 38px; padding: 10px;" class="uni-input uni-input--file" [disabled]="true">
+        <button style="cursor: auto; text-transform: uppercase; padding: 10px;" class="uni-input uni-input--file" [disabled]="true">
           <span>Reconnect from previous session?</span>
           <!-- <mat-icon [ngStyle]="{'color':'green'}">check</mat-icon> -->
         </button>
 
+        <div>
+          <app-arrow></app-arrow>
+        </div>
+
         <div class="uni-input">
           <label>Password</label>
           <input class="password" [(ngModel)]="keystorePassword" name="keystore-password"
-            placeholder="__________________________" type="password" />
+            placeholder="_______________________________________" type="password" />
         </div>
 
       </div>

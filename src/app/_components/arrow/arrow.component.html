@@ -1,0 +1,7 @@
+<div class="arrow-container">
+  <button class="reverse-transaction"
+          (click)="reverseTransaction()"
+          [disabled]="!selectedSourceAsset || !selectedTargetAsset || seperator">
+    <span class="arrow-down">⭣</span>
+  </button>
+</div>
