@@ -16,12 +16,14 @@
       color: #000B12;
       cursor: pointer;
     }
+
+    &--active {
+      color: #28F4AE;
+      font-weight: 500;
+    }
+
   }
 
-  .path:last-of-type {
-    color: #28F4AE;
-    font-weight: 700;
-  }
 
   .cursor {
     background: #28F4AE;

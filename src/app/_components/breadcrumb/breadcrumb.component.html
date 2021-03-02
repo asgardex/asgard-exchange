@@ -1,18 +1,14 @@
 <div class="breadcumber-container">
-  <div class="path">
-    TEXT
-  </div>
-  <div>
-    >
-  </div>
-  <div class="path">
-    TEXT
-  </div>
-  <div>
-    >
-  </div>
-  <div class="path">
-    TEXT
+  <ng-container class="" *ngFor="let p of path">
+    <div class="path">
+      {{p}}
+    </div>
+    <div>
+      >
+    </div>
+  </ng-container>
+  <div class="path path--active">
+    {{message}}
   </div>
   <div class="cursor" #cursor></div>
 </div>

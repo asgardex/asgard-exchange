@@ -14,11 +14,12 @@ footer {
   padding: 15px 15px;
 
   .footer-content {
-	width: 100%;
-	display: flex;
-	color: #4B5261;
+    width: 100%;
+    display: flex;
+    color: #4B5261;
     justify-content: center;
     align-items: center;
+    margin-top: 44px;
 
     @media (min-width: 768px) {
       flex-flow: row;

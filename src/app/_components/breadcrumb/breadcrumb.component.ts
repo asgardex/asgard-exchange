@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 
 
 @Component({
@@ -9,6 +9,8 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 export class BreadcrumbComponent implements OnInit {
 
   @ViewChild('cursor') cursor;
+  @Input() path: Array<string> = ["TEXT"];
+  @Input() message: string = "TEXT";
 
   constructor() { }
 
