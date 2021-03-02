@@ -24,15 +24,17 @@
           <app-arrow></app-arrow>
         </div>
 
-        <div class="uni-input">
+        <app-text-field [(textOfField)]="keystorePassword" mode="Double" type="Password" label="Password" name="keystore-password"></app-text-field>
+
+        <!-- <div class="uni-input">
           <label>Password</label>
           <input class="password" [(ngModel)]="keystorePassword" name="keystore-password"
             placeholder="_______________________________________" type="password" />
-        </div>
+        </div> -->
 
       </div>
 
-      <div class="bottom-actions" style="margin: 183px 0 0 0; display: flex;">
+      <div class="bottom-actions" style="display: flex;">
         <div style="width: 50%;">
           <button class="close-btn" style="margin-right: 6px;" *ngIf="!keystoreConnecting" (click)="forgetKeystore()"
             [disabled]="keystoreConnecting">

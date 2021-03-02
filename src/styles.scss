@@ -209,6 +209,8 @@ button {
     overflow: hidden;
 
     .bottom-actions {
+      position: initial;
+      padding: 0;
       margin-top: 30px;
       margin-bottom: 0;
     }
@@ -763,6 +765,15 @@ main {
       align-items: center;
       justify-content: space-between;
       margin-bottom: 30px;
+      height: 48px;
+    }
+
+    .bottom-actions {
+      position: absolute;
+      padding: 0 50px;
+      right: 0;
+      bottom: 50px;
+      width: 100%;
     }
   }
 

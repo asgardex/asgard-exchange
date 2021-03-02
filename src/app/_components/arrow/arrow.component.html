@@ -1,7 +1,8 @@
 <div class="arrow-container">
-  <button class="reverse-transaction"
+  <button class="arrow-btn"
           (click)="reverseTransaction()"
-          [disabled]="!selectedSourceAsset || !selectedTargetAsset || seperator">
+          [ngClass]="{'not-btn': seperator}"
+          [disabled]="seperator">
     <span class="arrow-down">⭣</span>
   </button>
 </div>

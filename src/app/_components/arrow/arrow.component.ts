@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 
 @Component({
   selector: 'app-arrow',
@@ -7,9 +7,7 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ArrowComponent implements OnInit {
 
-  selectedSourceAsset: boolean;
-  selectedTargetAsset: boolean;
-  seperator: boolean = true;
+  @Input() seperator: boolean = true;
 
   constructor() { }
 

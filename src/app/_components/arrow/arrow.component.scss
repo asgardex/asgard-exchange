@@ -3,4 +3,26 @@
   justify-content: center;
   align-items: center;
   height: 38px;
+
+  .arrow-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 51px;
+    height: 28px;
+    margin: 5px auto;
+    border-radius: 6px;
+
+    &:hover {
+      background: #2c2f36;
+    }
+    &:disabled {
+      background: none;
+    }
+  }
+
+  .not-btn {
+    cursor: initial;
+  }
+
 }

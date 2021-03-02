@@ -1,20 +1,31 @@
 .breadcumber-container {
   display: flex;
+  align-items: center;
 
   .path {
     font-family: 'Roboto';
     font-weight: 500;
     text-transform: uppercase;
     margin: 0 5px;
+    font-size: 14px;
+    padding: 2px;
 
+    &:hover {
+      border-radius: 2px;
+      background-color: #28F4AE;
+      color: #000B12;
+      cursor: pointer;
+    }
   }
 
-  .path:nth-last-child(1) {
+  .path:last-of-type {
     color: #28F4AE;
     font-weight: 700;
   }
 
   .cursor {
-    font-family: 'PingFangSC';
+    background: #28F4AE;
+    width: 8px;
+    height: 16px;
   }
 }

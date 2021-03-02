@@ -1,0 +1,25 @@
+.text-field-input {
+  .field {
+    font-family: 'Roboto Mono';
+    color: #32FA96;
+    font-size: 22px;
+    line-height: 30px;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+
+    &::placeholder {
+      color: #32FA96;
+    }
+  }
+}
+
+.bottom-border {
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.no-top-border {
+  border-top-right-radius: 0;
+  border-top-left-radius: 0;
+  border-top: 0;
+}

@@ -11,20 +11,8 @@
           [selectableMarkets]="selectableMarkets">
         </app-asset-input>
 
-        <!-- Deleted for the new design -->
-        <!-- <div style="height: 30px;"></div> -->
-        <div class="flxr flxr--align-center flxr--just-center">
-          <button class="reverse-transaction" (click)="reverseTransaction()"
-            [disabled]="!selectedSourceAsset || !selectedTargetAsset">
-            <!-- <img [class.disabled]="!selectedSourceAsset || !selectedTargetAsset" style="height: 34px; width: 10px;" src="assets/icons/arrow.svg" /> -->
-            <!-- <mat-icon [class.disabled]="!selectedSourceAsset || !selectedTargetAsset"
-              style="font-size: 14px; height: 40px; color: #30F091;" class="to-btn-icon">arrow_downward</mat-icon> -->
-            <span class="arrow-down">⭣</span>
-          </button>
-        </div>
-
         <div>
-          <app-arrow></app-arrow>
+          <app-arrow [seperator]="!selectedSourceAsset || !selectedTargetAsset"></app-arrow>
         </div>
 
         <!-- TARGET -->

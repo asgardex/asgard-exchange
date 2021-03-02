@@ -72,6 +72,8 @@ import { UpgradeRuneConfirmModule } from './_components/upgrade-rune-confirm/upg
 import { SochainService } from './_services/sochain.service';
 import { BreadcrumbComponent } from './_components/breadcrumb/breadcrumb.component';
 import { RightOptionComponent } from './_components/right-option/right-option.component';
+import { ArrowModule } from './_components/arrow/arrow.module';
+import { TextFieldModule } from './_components/text-field/text-field.module';
 
 
 @NgModule({
@@ -127,6 +129,8 @@ import { RightOptionComponent } from './_components/right-option/right-option.co
     AppRoutingModule,
     TransactionSuccessModalModule,
     DirectivesModule,
+    ArrowModule,
+    TextFieldModule
   ],
   providers: [
     BinanceService,
