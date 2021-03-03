@@ -33,6 +33,9 @@ import { from } from 'rxjs';
 import { ApproveEthContractModule } from '../_components/approve-eth-contract/approve-eth-contract.module';
 import { DirectivesModule } from '../_directives/directives.module';
 import { ArrowModule } from '../_components/arrow/arrow.module';
+import { RightOptionComponent } from '../_components/right-option/right-option.component';
+import { BreadcrumbModule } from '../_components/breadcrumb/breadcrumb.module';
+import { TagModule } from '../_components/tag/tag.module';
 
 @NgModule({
   declarations: [
@@ -44,7 +47,8 @@ import { ArrowModule } from '../_components/arrow/arrow.module';
     ConnectErrorComponent,
     // LedgerConnectComponent,
     KeystoreCreateComponent,
-    // UserSettingsDialogComponent
+    // UserSettingsDialogComponent,
+    RightOptionComponent
   ],
   imports: [
     CommonModule,
@@ -62,6 +66,8 @@ import { ArrowModule } from '../_components/arrow/arrow.module';
     DirectivesModule,
     ApproveEthContractModule,
     ArrowModule,
+    BreadcrumbModule,
+    TagModule,
     RouterModule.forChild([
       {
         path: '',

@@ -1,0 +1,48 @@
+.tag-container {
+  border-radius: 3px;
+
+  .tag-field {
+    border-radius: 3px;
+    padding: 0 5px;
+
+    span {
+      text-transform: uppercase;
+      font-size: 11px;
+      line-height: 20px;
+      font-weight: 400;
+    }
+  }
+
+  &.outline {
+    background: linear-gradient(to top right,#00CCFF, #33FF99);
+    padding: 1px;
+
+    .tag-field {
+      background: #000B12;
+
+      span {
+        color: #fff;
+      }
+    }
+  }
+
+  &.green {
+    background: #28F4AF;
+
+    .tag-field {
+      span {
+        color: #000B12;
+      }
+    }
+  }
+
+  &.dark {
+    background: #000B12;
+
+    .tag-field {
+      span {
+        color: #fff;
+      }
+    }
+  }
+}

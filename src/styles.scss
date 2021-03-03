@@ -149,7 +149,7 @@ button {
     // background-color: rgb(44, 47, 54);
     // background-color: rgba(255, 255, 255, 0.04);
     // padding: 2rem;
-    margin-top: 31px;
+    // margin-top: 31px;
     display: flex;
     flex-flow: column;
   }
@@ -162,7 +162,7 @@ button {
 
   .keystore-content {
     margin: auto;
-    width: 397px;
+    // width: 397px;
     height: 365px;
     background-color: #0D1B23;
     border: 1px solid #0D1B23;
@@ -209,10 +209,9 @@ button {
     overflow: hidden;
 
     .bottom-actions {
-      position: initial;
+      bottom: 0;
+      margin: 0;
       padding: 0;
-      margin-top: 30px;
-      margin-bottom: 0;
     }
   }
 
@@ -258,7 +257,7 @@ button {
   align-items: center;
   -webkit-box-pack: justify;
   justify-content: space-between;
-  padding: 20px;
+  padding: 20px 18px;
   margin-top: 0px;
   opacity: 1;
   width: 100% !important;
@@ -321,13 +320,14 @@ button {
   }
 
   &--file {
-    background-color: #32FA96;
-    color: #000;
+    background-color: #0D1B23;
+    color: #fff;
     flex-flow: row;
     justify-content: center;
     align-items: center;
 
     span {
+      text-transform: uppercase;
       font-weight: 700;
       line-height: 32px;
       font-size: 18px;
@@ -385,6 +385,10 @@ button {
     &::placeholder {
       color: #32FA96;
     }
+  }
+
+  &.notice {
+    justify-content: space-between;
   }
 }
 
@@ -586,7 +590,7 @@ input[type=number] {
 
   &.graident-btn {
     background-color: #0cf;
-    background-image: linear-gradient(to top right,#0cf,#3f9);
+    background: linear-gradient(to top right,#00CCFF, #33FF99);
   }
 
   &.spinner {
@@ -692,8 +696,9 @@ input[type=number] {
 }
 
 .swap-details {
-  width: 354px;
+  width: 100%;
   margin: 14px auto;
+  padding: 0 20px;
 }
 
 .disabled-list {
@@ -722,9 +727,13 @@ main {
   .container-wrapper {
     border-radius: 20px;
     padding: 2px;
-    background: linear-gradient(45deg, #FFFD00 0%, #F625F0 49.98%, #01F6EE 100%);
+    background: linear-gradient(to top right,#00CCFF, #33FF99);
     width: 730px;
     height: 629px;
+
+    &.upgrade {
+      background: linear-gradient(45deg, #FFFD00 0%, #F625F0 49.98%, #01F6EE 100%);
+    }
 
     &.pending {
       background: unset;

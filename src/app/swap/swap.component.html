@@ -2,7 +2,28 @@
   <div class="container">
     <div *ngIf="!targetMarketShow && !sourceMarketShow && !overlayShow && !confirmShow">
 
-      <div class="main-container" style="position: relative;">
+      <div class="main-container">
+
+        <div class="content-top">
+          <app-breadcrumb [path]="['asgardex', 'swap']" message="connect"></app-breadcrumb>
+          <div class="top-right">
+            <!-- <app-right-option></app-right-option> -->
+            <div class="right-option">
+              <a class="left" [routerLink]="['/', 'swap']" [ngClass]="left.classList.contains('active') ? '' : 'inactive'" routerLinkActive="active" #left>
+                <p class="left-inner">
+                  <span *ngIf="left.classList.contains('disable')" class="tag">SOON</span>
+                  SWAP
+                </p>
+              </a>
+              <a class="right disable" [ngClass]="right.classList.contains('active') ? '' : 'inactive'" routerLinkActive="active" #right>
+                <p class="right-inner">
+                  <span *ngIf="right.classList.contains('disable')" class="tag">SOON</span>
+                  POOL
+                </p>
+              </a>
+            </div>
+          </div>
+        </div>
 
         <!-- SOURCE -->
         <app-asset-input label="Send" [(overlay)]="sourceMarketShow" [(selectedAsset)]="selectedSourceAsset"
@@ -65,7 +86,7 @@
         </div> -->
 
         <!-- please connect button -->
-        <div>
+        <div class="bottom-actions">
           <button *ngIf="(user && balances)" (click)="openConfirmationDialog()" class="next-btn graident-btn"
             style="margin-top: 18px;" [disabled]="formInvalid()">
             <span>Swap</span>

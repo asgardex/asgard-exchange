@@ -11,8 +11,7 @@ export class ArrowComponent implements OnInit {
 
   constructor() { }
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
   reverseTransaction() {
 

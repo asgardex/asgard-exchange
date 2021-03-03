@@ -59,3 +59,105 @@
 .reverse-transaction .to-btn-icon {
   margin-bottom: 0px;
 }
+
+// General Variables for this component
+$border-radius: 10px;
+$right-option-height: 48px;
+$default-padding: 20px;
+$default-border: 2px;
+$default-font-size: 14px;
+
+.right-option {
+  display: flex;
+  flex-flow: row nowrap;
+  -webkit-box-align: center;
+  align-items: center;
+  justify-content: center;
+  height: $right-option-height;
+
+  div {
+    display: flex;
+    border-radius: $border-radius;
+  }
+
+  a {
+    display: flex;
+    flex-flow: row nowrap;
+    -webkit-box-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    justify-content: center;
+    height: $right-option-height;
+    outline: none;
+    cursor: pointer;
+    text-decoration: none;
+    color: #474E5D;
+    background-color: #000B12;
+    font-size: $default-font-size;
+    font-family: Roboto;
+    border-radius: $border-radius;
+    text-transform: uppercase;
+    padding: 0 $default-padding;
+    z-index: 0;
+    border: $default-border solid #474E5D;
+
+    &.active {
+      border: $default-border solid #28F4AE;
+      font-weight: 500;
+      color: #28F4AE;
+    }
+
+    &.left {
+      position: relative;
+
+      &.active {
+        margin-right: -$default-padding;
+        z-index: 2;
+      }
+
+      &.inactive {
+        padding-right: 2*$default-padding - $default-border;
+      }
+    }
+
+    &.right {
+      position: relative;
+
+      &.active {
+        margin-left: -$default-padding;
+      }
+
+      &.inactive {
+        padding-left: 2*$default-padding - $default-border;
+      }
+    }
+
+    .tag {
+      top: 4px;
+      font-family: 'Exo 2';
+      font-weight: 700;
+      font-size: $default-font-size/1.75;
+      position: absolute;
+      color: #F3BA2F;
+    }
+  }
+
+  input {
+    background: transparent;
+    border: $default-border solid #28F4AE;
+    color: #fff;
+    border-radius: $border-radius;
+    height: $right-option-height;
+    padding: 0 $default-padding;
+    min-width: 140px;
+
+    &::placeholder {
+      color: #fff;
+    }
+
+    &:focus {
+      outline: none;
+    }
+  }
+}
+

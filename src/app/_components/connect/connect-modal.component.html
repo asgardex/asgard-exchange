@@ -21,11 +21,15 @@
 <div style="height: 100%;">
 
   <div *ngIf="!connectionMethod">
-    <div class="modal-head">
+    <!-- <div class="modal-head">
       <div class="wallet-title outline-btn">
         <h1 mat-dialog-title>Connect to wallet</h1>
       </div>
+    </div> -->
+    <div class="content-top">
+      <app-breadcrumb [path]="['asgardex', 'connect']" message="select"></app-breadcrumb>
     </div>
+
     <div>
       <div class="keystore-content" mat-dialog-content>
 

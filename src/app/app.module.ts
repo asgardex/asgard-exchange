@@ -31,6 +31,10 @@ import { AssetsListModule } from './_components/assets-list/assets-list.module';
 import { AssetInputModule } from './_components/asset-input/asset-input.module';
 import { TransactionProcessingModalModule } from './_components/transaction-processing-modal/transaction-processing-modal.module';
 import { DirectivesModule } from './_directives/directives.module';
+import { ArrowModule } from './_components/arrow/arrow.module';
+import { TextFieldModule } from './_components/text-field/text-field.module';
+import { BreadcrumbModule } from './_components/breadcrumb/breadcrumb.module';
+import { TagModule } from './_components/tag/tag.module';
 
 /** SERVICES */
 import { BinanceService } from './_services/binance.service';
@@ -70,11 +74,6 @@ import { NativeRunePromptModule } from './_components/native-rune-prompt/native-
 import { UpgradeRuneModule } from './_components/upgrade-rune/upgrade-rune.module';
 import { UpgradeRuneConfirmModule } from './_components/upgrade-rune-confirm/upgrade-rune-confirm.module';
 import { SochainService } from './_services/sochain.service';
-import { BreadcrumbComponent } from './_components/breadcrumb/breadcrumb.component';
-import { RightOptionComponent } from './_components/right-option/right-option.component';
-import { ArrowModule } from './_components/arrow/arrow.module';
-import { TextFieldModule } from './_components/text-field/text-field.module';
-
 
 @NgModule({
   declarations: [
@@ -102,8 +101,9 @@ import { TextFieldModule } from './_components/text-field/text-field.module';
     DepositConfirmComponent,
     DepositFormComponent,
     UserAddressAddTokenComponent,
-    BreadcrumbComponent,
-    RightOptionComponent,
+    // TagComponent,
+    // BreadcrumbComponent,
+    // RightOptionComponent,
   ],
   imports: [
     AssetInputModule,
@@ -130,7 +130,9 @@ import { TextFieldModule } from './_components/text-field/text-field.module';
     TransactionSuccessModalModule,
     DirectivesModule,
     ArrowModule,
-    TextFieldModule
+    TextFieldModule,
+    BreadcrumbModule,
+    TagModule
   ],
   providers: [
     BinanceService,
