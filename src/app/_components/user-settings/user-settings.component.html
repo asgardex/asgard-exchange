@@ -15,7 +15,7 @@ style="margin-right: 19px; position: absolute; top: 0; right: 96px;"
     <div *ngIf="showMenu" class="menu">
       <span>Settings</span>
     </div>
-    <div *ngIf="showMenu" class="menu red">
+    <div *ngIf="showMenu" class="menu red" (click)="disconnect()">
       <span>Disconnect</span>
     </div>
     <!-- <div *ngIf="pendingTxCount > 0" class="flxr flxr--align-center">

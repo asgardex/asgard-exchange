@@ -55,7 +55,7 @@
             </ng-template>
           </div>
           <!-- total fee and slip -->
-          <div class="flxr flxr--just-space-between">
+          <!-- <div class="flxr flxr--just-space-between">
             <span class="tx-detail-label">Total Fee:</span>
             <span
               *ngIf="basePrice && selectedTargetAsset && selectedSourceAsset && runeTransactionFee && binanceTransferFeeDisplay, else nothingFee">{{binanceTransferFeeDisplay | number:"0.0-6"}}
@@ -63,21 +63,33 @@
             <ng-template #nothingFee>
               <span>...</span>
             </ng-template>
-          </div>
+          </div> -->
           <!-- <div class="flxr flxr--just-space-between">
           <span class="tx-detail-label"></span>
           <span *ngIf="basePrice && selectedTargetAsset && selectedSourceAsset && runeTransactionFee && binanceTransferFeeDisplay">{{runeTransactionFee}} Rune</span>
         </div> -->
-          <div class="flxr flxr--just-space-between">
+
+          <!-- <div class="flxr flxr--just-space-between">
             <span class="tx-detail-label">Slip:</span>
             <span
               *ngIf="basePrice && selectedTargetAsset && selectedSourceAsset && runeTransactionFee && binanceTransferFeeDisplay, else nothingSlip">{{slip | percent:"0.2-4" }}</span>
             <ng-template #nothingSlip>
               <span>...</span>
             </ng-template>
+          </div> -->
+          <div class="flxr flxr--just-space-between">
+            <span class="tx-detail-label">Slip:</span>
+            <span *ngIf="slip">{{slip | percent:"0.2-4" }}</span>
+            <span *ngIf="!slip">...</span>
           </div>
-          <span style="display: block; color: #FF4954; font-size: 14px; margin-top: 5px;">Disclaimer: I’m a BETA product.
-            Don’t swap/deposit large</span>
+
+          <div class="flxr flxr--just-space-between">
+            <span>Settings:</span>
+            <span>{{slippageTolerance}}% slip tolerance <span>(click to adjust)</span></span>
+          </div>
+
+          <!-- <span style="display: block; color: #FF4954; font-size: 14px; margin-top: 5px;">Disclaimer: I’m a BETA product.
+            Don’t swap/deposit large</span> -->
         </div>
         <!-- <div class="tag">
         <div class="tag-contents">

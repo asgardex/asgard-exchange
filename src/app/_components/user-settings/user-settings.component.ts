@@ -1,9 +1,9 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 import { User } from 'src/app/_classes/user';
 import { TransactionStatusService } from 'src/app/_services/transaction-status.service';
 import { UserSettingsDialogComponent } from './user-settings-dialog/user-settings-dialog.component';
+import { UserService } from 'src/app/_services/user.service';
 
 @Component({
   selector: 'app-user-settings',
@@ -24,7 +24,7 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
   @Output() overlayChange = new EventEmitter<boolean>();
   showMenu: boolean;
 
-  constructor(private dialog: MatDialog, private txStatusService: TransactionStatusService) {
+  constructor(private txStatusService: TransactionStatusService, private userService: UserService) {
     this.pendingTxCount = 0;
     this.showMenu = false;
     const pendingTx$ = this.txStatusService.txs$.subscribe(
@@ -39,11 +39,12 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
   }
 
   openUserSettings() {
-    // this.dialog.open(
-    //   UserSettingsDialogComponent,
-    //   this.modalDimensions
-    // );
-    this.overlayChange.emit(!this.overlay)
+    this.overlayChange.emit(!this.overlay);
+  }
+
+  disconnect() {
+    this.userService.setUser(null);
+    this.overlayChange.emit(!this.overlay);
   }
 
   toggleMenu() {
