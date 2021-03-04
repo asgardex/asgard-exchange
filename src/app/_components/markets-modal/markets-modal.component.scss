@@ -17,3 +17,14 @@
     // border: 2px solid transparent;
     // border-radius: 20px;
 }
+
+.search-input {
+  color: white;
+  text-transform: uppercase;
+  font-size: 14px;
+  font-weight: 500;
+
+  &::placeholder {
+    color: white;
+  }
+}

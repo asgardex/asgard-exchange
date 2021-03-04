@@ -1,13 +1,25 @@
 
 <div class="overlay-of-content">
 
-  <div class="modal-head">
+  <!-- <div class="modal-head"> -->
     <!-- <h1 mat-dialog-title>Select a token</h1> -->
 
-    <div class="uni-input" style="height: 48px; padding: 0 17px">
+    <!-- <div class="uni-input" style="height: 48px; padding: 0 17px">
       <input class="search" [(ngModel)]="searchTerm" name="keystore-password" placeholder="Search" />
+    </div> -->
+  <!-- </div> -->
+
+  <div class="content-top">
+    <app-breadcrumb [path]="['asgardex', 'swap', 'SEARCH ASSET']" message="TYPE IN THE FIELD"></app-breadcrumb>
+    <div class="top-right">
+      <div class="right-option">
+        <div class="uni-input" style="height: 48px; width: 140px !important; padding: 0 17px">
+          <input class="search-input" [(ngModel)]="searchTerm" name="keystore-password" placeholder="search here..." />
+        </div>
+      </div>
     </div>
   </div>
+
   <div>
     <div mat-dialog-content>
 
@@ -23,7 +35,7 @@
   </div>
 
   <!-- close dialog -->
-  <div class="bottom-actions" style="margin: 30px 0;">
+  <div class="bottom-actions">
     <button class="close-btn" aria-label="Close Markets Dialog" (click)="closeDialog()">
       <span>close</span>
     </button>

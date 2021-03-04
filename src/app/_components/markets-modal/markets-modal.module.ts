@@ -10,6 +10,7 @@ import { AssetsListModule } from '../assets-list/assets-list.module';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { BreadcrumbModule } from '../breadcrumb/breadcrumb.module';
 
 
 @NgModule({
@@ -20,7 +21,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     CommonModule,
     MatProgressSpinnerModule,
     FormsModule,
-    AssetsListModule
+    AssetsListModule,
+    BreadcrumbModule
   ],
   exports: [MarketsModalComponent]
 })
