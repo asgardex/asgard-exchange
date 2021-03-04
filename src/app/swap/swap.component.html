@@ -99,8 +99,8 @@
 
         <!-- please connect button -->
         <div class="bottom-actions">
-          <button *ngIf="(user && balances)" (click)="openConfirmationDialog()" class="next-btn graident-btn"
-            style="margin-top: 18px;" [disabled]="formInvalid()">
+          <button (click)="openConfirmationDialog()" class="next-btn graident-btn"
+            style="margin-top: 18px;" [disabled]="formInvalid() || !balances">
             <span>Swap</span>
           </button>
           <app-connect *ngIf="!user" [(overlay)]="overlayShow"></app-connect>

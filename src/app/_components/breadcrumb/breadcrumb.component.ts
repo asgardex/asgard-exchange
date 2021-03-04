@@ -11,6 +11,7 @@ export class BreadcrumbComponent implements OnInit {
   @ViewChild('cursor') cursor;
   @Input() path: Array<string> = ["TEXT"];
   @Input() message: string = "TEXT";
+  @Input() isError: boolean = false ;
 
   constructor() { }
 

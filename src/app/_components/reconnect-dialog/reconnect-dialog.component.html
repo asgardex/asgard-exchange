@@ -7,7 +7,7 @@
 
     <div class="dialog-content">
       <div class="content-top">
-        <app-breadcrumb [path]="['asgard', 'connect', 'keystore fonud']" message="enter password or forget"></app-breadcrumb>
+        <app-breadcrumb [path]="['asgard', 'connect', 'keystore fonud']" [isError]="keystoreError" [message]="keystoreError ? 'Keystore Login Incorrect' : 'enter password or forget'"></app-breadcrumb>
         <!-- <div class="top-right">
           <app-right-option></app-right-option>
         </div> -->
@@ -42,9 +42,9 @@
           </button>
         </div>
         <div style="width: 50%;">
-          <div>
+          <!-- <div>
             <span *ngIf="keystoreError" style="font-size: 0.8rem; color: #2172e5">Keystore Login Incorrect</span>
-          </div>
+          </div> -->
           <div style="margin-left: 12px;">
             <button class="next-btn" *ngIf="!keystoreConnecting" (click)="keystoreUnlockClicked()"
               [disabled]="keystoreConnecting || !keystorePassword">

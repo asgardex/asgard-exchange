@@ -20,14 +20,26 @@
     &--active {
       color: #28F4AE;
       font-weight: 500;
+
     }
 
   }
-
 
   .cursor {
     background: #28F4AE;
     width: 8px;
     height: 16px;
   }
+
+  &.error {
+
+    .path--active {
+      color: #FF4954 !important;
+    }
+
+    .cursor {
+      background: #FF4954;
+    }
+  }
+
 }
