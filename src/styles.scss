@@ -729,7 +729,14 @@ main {
     padding: 2px;
     background: linear-gradient(to top right,#00CCFF, #33FF99);
     width: 730px;
-    height: 629px;
+    height: 632px;
+
+    .tag-space {
+
+      &--between {
+        margin: 0 10px;
+      }
+    }
 
     &.upgrade {
       background: linear-gradient(45deg, #FFFD00 0%, #F625F0 49.98%, #01F6EE 100%);

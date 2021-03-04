@@ -3,5 +3,5 @@
     <img *ngIf="iconPath" [src]="iconPath" appImgFallback />
     <mat-icon *ngIf="!iconPath">help_outline</mat-icon>
   </div>
-  <span style="font-size: 20px">{{ticker}}</span>
+  <span style="font-size: 20px">{{chain}}.{{ticker}}</span>
 </div>

@@ -1,8 +1,44 @@
 .swap-input {
   flex-flow: row;
   min-height: 112px;
-  border: 2px solid #0D1B23;
+  border: 2px solid #0d1b23;
   background-color: transparent;
+  height: 113px;
+
+  &--inner {
+    height: 100%;
+    width: 100%;
+  }
+
+  .label-wrapper {
+    position: relative;
+  }
+
+  input {
+    font-size: 22px;
+    font-weight: 500;
+    font-family: "Roboto Mono";
+    color: #32fa96;
+    width: 179px;
+    line-height: 30px;
+  }
+
+  .expand-more {
+    font-size: 30px;
+    height: 28px;
+    color: #30f091;
+  }
+
+  &.disable {
+    border-color: #474e5d;
+
+    .launch-markets-btn,
+    .label-title,
+    .expand-more,
+    .usd-est {
+      color: #474e5d;
+    }
+  }
 }
 
 .label-title {
@@ -14,7 +50,15 @@
 
 .priceInput {
   &::placeholder {
-    color: #32FA96;
+    color: #32fa96;
+  }
+
+  &.disable {
+    color: #474e5d;
+
+    &::placeholder {
+      color: #474e5d;
+    }
   }
 }
 
@@ -63,10 +107,9 @@
   color: #fff;
   padding: 4px 8px;
   border-radius: 3px;
-  border: 1px solid #30F091;
+  border: 1px solid #30f091;
 
   &:hover {
-    color: #30F091;
+    color: #30f091;
   }
 }
-

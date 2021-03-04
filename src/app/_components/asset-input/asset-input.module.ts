@@ -9,6 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { IconTickerModule } from '../icon-ticker/icon-ticker.module';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { TagModule } from '../tag/tag.module';
 
 
 @NgModule({
@@ -20,7 +21,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     MarketsModalModule,
     IconTickerModule,
     MatProgressSpinnerModule,
-    MatIconModule
+    MatIconModule,
+    TagModule
   ],
   exports: [AssetInputComponent]
 })

@@ -5,7 +5,7 @@
       <div class="main-container">
 
         <div class="content-top">
-          <app-breadcrumb [path]="['asgardex', 'swap']" message="connect"></app-breadcrumb>
+          <app-breadcrumb [path]="['asgardex', 'swap']" [message]="user ? 'prepare' : 'connect wallet'"></app-breadcrumb>
           <div class="top-right">
             <!-- <app-right-option></app-right-option> -->
             <div class="right-option">
@@ -27,7 +27,7 @@
 
         <!-- SOURCE -->
         <app-asset-input label="Send" [(overlay)]="sourceMarketShow" [(selectedAsset)]="selectedSourceAsset"
-          [(assetUnit)]="sourceAssetUnit" [balance]="sourceBalance" [disableInput]="user ? false : true"
+          [(assetUnit)]="sourceAssetUnit" [balance]="sourceBalance" [disableInput]="user ? false : true" [disableUser]="user ? false : true"
           [disabledAssetSymbol]="selectedTargetAsset ? selectedTargetAsset.symbol : null" [coinGeckoList]="coinGeckoList"
           [selectableMarkets]="selectableMarkets">
         </app-asset-input>
@@ -41,10 +41,10 @@
           [(selectedAsset)]="selectedTargetAsset" [(assetUnit)]="targetAssetUnitDisplay" [balance]="targetBalance"
           [disableInput]="true" [disabledAssetSymbol]="selectedSourceAsset ? selectedSourceAsset.symbol : null"
           [loading]="calculatingTargetAsset" [hideMax]="true" [error]="poolDetailTargetError || poolDetailSourceError"
-          [coinGeckoList]="coinGeckoList" [selectableMarkets]="selectableMarkets">
+          [coinGeckoList]="coinGeckoList" [selectableMarkets]="selectableMarkets" [disableUser]="user ? false : true">
         </app-asset-input>
 
-        <div class="swap-details">
+        <div class="swap-details" *ngIf="user">
           <div class="flxr flxr--just-space-between">
             <span class="tx-detail-label">Price:</span>
             <span

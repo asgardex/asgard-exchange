@@ -36,6 +36,7 @@ export class AssetInputComponent implements OnInit {
 
   @Input() label: string;
   @Input() disableInput?: boolean;
+  @Input() disableUser?: boolean;
   @Input() disabledAssetSymbol: string;
 
   /**
@@ -81,10 +82,10 @@ export class AssetInputComponent implements OnInit {
   }
 
   checkUsdBalance() {
-    
+
     if (this.selectedAsset && this.balance && this.coinGeckoList) {
       const id = this.cgService.getCoinIdBySymbol(this.selectedAsset.ticker, this.coinGeckoList);
-      
+
       if (id) {
         this.cgService.getCurrencyConversion(id).subscribe(
           (res) => {
@@ -104,24 +105,30 @@ export class AssetInputComponent implements OnInit {
 
     if (this.selectedAsset && this.coinGeckoList) {
       const id = this.cgService.getCoinIdBySymbol(this.selectedAsset.ticker, this.coinGeckoList);
-        
+
       if (id) {
         this.cgService.getCurrencyConversion(id).subscribe(
           (res) => {
             console.log(res);
-  
+
             for (const [_key, value] of Object.entries(res)) {
               this.assetUsd = value.usd;
             }
           }
         );
-  
+
       }
     }
   }
 
   updateAssetUnits(val) {
     this.assetUnitChange.emit(val);
+  }
+
+  getMax() {
+    if (this.balance) {
+      return this.userService.maximumSpendableBalance(this.selectedAsset, this.balance);
+    }
   }
 
   setMax() {
@@ -142,7 +149,7 @@ export class AssetInputComponent implements OnInit {
         }
       }
     );
-    
+
 
     // const dialogRef = this.dialog.open(
     //   MarketsModalComponent,
