@@ -226,7 +226,8 @@ button {
     }
 
     .disclaimer {
-      margin-top: 13px;
+      margin-top: 14px;
+      margin-left: 22px;
     }
 
     .uni-input {
@@ -625,8 +626,8 @@ input[type=number] {
 .disclaimer {
   font-size: 14px;
   line-height: 24px;
-  color: #F3BA2F;
-  text-align: center;
+  color: #FFF;
+  text-align: left;
 }
 
 .mat-progress-spinner, .mat-spinner {
@@ -790,6 +791,20 @@ main {
       right: 0;
       bottom: 50px;
       width: 100%;
+
+      &.two-btn {
+        display: flex;
+
+        .right-btn, .left-btn {
+          flex: 0 0 calc(50% - 5px);
+        }
+
+        // divider between two buttons
+        .divider {
+          width: 10px;
+        }
+      }
+
     }
   }
 

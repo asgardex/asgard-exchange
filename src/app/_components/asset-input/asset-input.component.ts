@@ -75,7 +75,7 @@ export class AssetInputComponent implements OnInit {
   usdValue: number;
   assetUsd: number;
 
-  constructor(private dialog: MatDialog, private userService: UserService, private cgService: CoinGeckoService) {
+  constructor(private userService: UserService, private cgService: CoinGeckoService) {
   }
 
   ngOnInit(): void {
@@ -138,6 +138,12 @@ export class AssetInputComponent implements OnInit {
       this.assetUnitChange.emit(max);
     }
 
+  }
+
+  emptyInput() {
+    this.assetUnit = 0;
+    this.selectedAsset = undefined;
+    this.balance = 0;
   }
 
   launchMarketsModal() {

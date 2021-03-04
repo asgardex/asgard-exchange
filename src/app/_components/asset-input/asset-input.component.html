@@ -29,7 +29,7 @@
         placeholder="0.0"
         type="number"
         [disabled]="disableInput"
-        [ngClass]="disableUser" />
+        [ngClass]="{'disable': disableUser}" />
 
       <button *ngIf="!selectedAsset" class="launch-markets-btn" (click)="launchMarketsModal()">
         <div class="flxr flxr--align-center asset-selector select-token">

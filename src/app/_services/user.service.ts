@@ -21,6 +21,7 @@ import { catchError, switchMap, takeUntil } from 'rxjs/operators';
 import { AssetAndBalance } from '../_classes/asset-and-balance';
 import { MidgardService } from './midgard.service';
 import { ethers } from 'ethers';
+import * as EventEmitter from 'events';
 
 export interface MidgardData<T> {
   key: string;
@@ -36,6 +37,7 @@ export class UserService {
   private _user: User;
   private userSource = new BehaviorSubject<User>(null);
   user$ = this.userSource.asObservable();
+  userPurge:EventEmitter = new EventEmitter();
 
   private marketsSource = new BehaviorSubject<Market[]>([]);
   markets$ = this.marketsSource.asObservable();
@@ -61,6 +63,8 @@ export class UserService {
     if (user) {
       this.fetchBalances();
     }
+    if (user == undefined)
+      this.userPurge.emit('')
   }
 
   async setMarkets() {

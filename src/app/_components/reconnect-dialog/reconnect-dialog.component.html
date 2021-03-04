@@ -34,18 +34,16 @@
 
       </div>
 
-      <div class="bottom-actions" style="display: flex;">
-        <div style="width: 50%;">
-          <button class="close-btn" style="margin-right: 6px;" *ngIf="!keystoreConnecting" (click)="forgetKeystore()"
+      <div class="bottom-actions two-btn">
+        <div class="left-btn">
+          <button class="close-btn" *ngIf="!keystoreConnecting" (click)="forgetKeystore()"
             [disabled]="keystoreConnecting">
             <span>Forget Keystore</span>
           </button>
         </div>
-        <div style="width: 50%;">
-          <!-- <div>
-            <span *ngIf="keystoreError" style="font-size: 0.8rem; color: #2172e5">Keystore Login Incorrect</span>
-          </div> -->
-          <div style="margin-left: 12px;">
+        <div class="divider"></div>
+        <div class="right-btn">
+          <div>
             <button class="next-btn" *ngIf="!keystoreConnecting" (click)="keystoreUnlockClicked()"
               [disabled]="keystoreConnecting || !keystorePassword">
               <span>Unlock</span>
