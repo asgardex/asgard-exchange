@@ -23,6 +23,7 @@
             </button>
           </div>
 
+          <!-- THORChain -->
           <div *ngIf="thorAddress" class="uni-input user-address" (click)="selectAddress(thorAddress, 'THOR')">
             <label>RUNE Address</label>
 
@@ -34,6 +35,7 @@
             </div>
           </div>
 
+          <!-- Bitcoin -->
           <div *ngIf="bitcoinAddress" class="uni-input user-address" (click)="selectAddress(bitcoinAddress, 'BTC')">
             <label>Bitcoin Address</label>
 
@@ -45,6 +47,7 @@
             </div>
           </div>
 
+          <!-- Ethereum -->
           <div *ngIf="ethereumAddress" class="uni-input user-address" (click)="selectAddress(ethereumAddress, 'ETH')">
             <label>Ethereum Address</label>
 
@@ -56,6 +59,7 @@
             </div>
           </div>
 
+          <!-- Binance -->
           <div *ngIf="binanceAddress" class="uni-input user-address" (click)="selectAddress(binanceAddress, 'BNB')">
             <label>BNB Address</label>
 
@@ -64,6 +68,18 @@
                 <img class="asset-icon" src="assets/images/token-icons/bnb.png" />
               </div>
               <span>{{binanceAddress.substring(0, 8 ) + '...' + binanceAddress.substring(binanceAddress.length - 4, binanceAddress.length)}}</span>
+            </div>
+          </div>
+
+          <!-- Litecoin -->
+          <div *ngIf="litecoinAddress" class="uni-input user-address" (click)="selectAddress(litecoinAddress, 'LTC')">
+            <label>Litecoin Address</label>
+
+            <div class="flxr flxr--align-center" style="width: 100%; padding: 0.75rem 0;">
+              <div class="asset-icon-container">
+                <img class="asset-icon" src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/litecoin/info/logo.png" />
+              </div>
+              <span>{{litecoinAddress.substring(0, 8) + '...' + litecoinAddress.substring(litecoinAddress.length - 4, litecoinAddress.length)}}</span>
             </div>
           </div>
 

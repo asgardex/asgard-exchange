@@ -19,13 +19,15 @@
   [action]="action"
   [depositAmount]="depositAmount"
   (back)="onBack()"
-  (transactionSubmitted)="depositState = 'TX_SUBMITTED'">
+  (transactionSubmitted)="transactionSubmitted($event)">
 </app-deposit-confirm>
 
 <div *ngIf="depositState === 'TX_SUBMITTED'">
 
   <app-transaction-success-modal
-    (closeDialog)="depositState = 'FORM'">
+    (closeDialog)="depositState = 'FORM'"
+    [hash]="txHash"
+    [chain]="asset.asset.chain">
   </app-transaction-success-modal>
 
 </div>

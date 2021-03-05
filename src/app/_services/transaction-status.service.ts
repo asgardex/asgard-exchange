@@ -92,6 +92,8 @@ export class TransactionStatusService {
           this.pollBtcTx(pendingTx);
         } else if (pendingTx.chain === 'ETH') {
           this.pollEthTx(pendingTx);
+        } else if (pendingTx.chain === 'LTC') {
+          this.pollLtcTx(pendingTx);
         }
 
       }
@@ -197,7 +199,31 @@ export class TransactionStatusService {
         // This kills the request if the user closes the component
         takeUntil(this.killTxPolling[tx.hash]),
         // switchMap cancels the last request, if no response have been received since last tick
-        switchMap(() => this.sochainService.getTransaction({txID: tx.hash, network})),
+        switchMap(() => this.sochainService.getTransaction({txID: tx.hash, network, chain: 'BTC'})),
+        // sochain returns 404 when not found
+        // this allows timer to continue polling
+        retryWhen(errors => errors.pipe(delay(10000), take(10)))
+      ).subscribe( async (res: SochainTxResponse) => {
+
+        if (res.status === 'success' && res.data && res.data.confirmations > 0) {
+          this.updateTxStatus(tx.hash, TxStatus.COMPLETE);
+          this.userService.fetchBalances();
+          this.killTxPolling[tx.hash].next();
+        }
+
+      });
+  }
+
+  pollLtcTx(tx: Tx) {
+
+    const network = environment.network === 'testnet' ? 'testnet' : 'mainnet';
+
+    timer(0, 15000)
+      .pipe(
+        // This kills the request if the user closes the component
+        takeUntil(this.killTxPolling[tx.hash]),
+        // switchMap cancels the last request, if no response have been received since last tick
+        switchMap(() => this.sochainService.getTransaction({txID: tx.hash, network, chain: 'LTC'})),
         // sochain returns 404 when not found
         // this allows timer to continue polling
         retryWhen(errors => errors.pipe(delay(10000), take(10)))

@@ -99,7 +99,8 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
     // Source asset is not RUNE
     if (this.swapData.sourceAsset.chain === 'BNB'
       || this.swapData.sourceAsset.chain === 'BTC'
-      || this.swapData.sourceAsset.chain === 'ETH') {
+      || this.swapData.sourceAsset.chain === 'ETH'
+      || this.swapData.sourceAsset.chain === 'LTC') {
 
       this.midgardService.getInboundAddresses().subscribe(
         async (res) => {
@@ -142,29 +143,9 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
     const bitcoinClient = this.swapData.user.clients.bitcoin;
     const thorClient = this.swapData.user.clients.thorchain;
     const ethClient = this.swapData.user.clients.ethereum;
-    const bitcoinAddress = await bitcoinClient.getAddress();
-    const binanceAddress = await binanceClient.getAddress();
-    const runeAddress = await thorClient.getAddress();
-    const ethAddress = await ethClient.getAddress();
+    const litecoinClient = this.swapData.user.clients.litecoin;
 
-    let targetAddress = '';
-
-    switch (this.swapData.targetAsset.chain) {
-      case 'BTC':
-        targetAddress = bitcoinAddress;
-        break;
-
-      case 'BNB':
-        targetAddress = binanceAddress;
-        break;
-
-      case 'THOR':
-        targetAddress = runeAddress;
-        break;
-
-      case 'ETH':
-        targetAddress = ethAddress;
-    }
+    const targetAddress = await this.userService.getTokenAddress(this.swapData.user, this.swapData.targetAsset.chain);
 
     const floor = this.slipLimitService.getSlipLimitFromAmount(this.swapData.outputValue);
 
@@ -294,6 +275,39 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
         this.error = error;
         this.txState = TransactionConfirmationState.ERROR;
       }
+
+    } else if (this.swapData.sourceAsset.chain === 'LTC') {
+
+      try {
+        const fee = await litecoinClient.getFeesWithMemo(memo);
+        const feeRates = await litecoinClient.getFeeRates();
+        const toBase = assetToBase(assetAmount(amountNumber));
+        const amount = toBase.amount().minus(fee.average.amount());
+
+        const hash = await litecoinClient.transfer({
+          amount: baseAmount(amount),
+          recipient: matchingPool.address,
+          memo,
+          feeRate: feeRates.average
+        });
+
+        this.hash = hash;
+        this.txStatusService.addTransaction({
+          chain: 'LTC',
+          hash: this.hash,
+          ticker: 'LTC',
+          status: TxStatus.PENDING,
+          action: TxActions.SWAP,
+          isThorchainTx: true,
+          symbol: this.swapData.sourceAsset.symbol,
+        });
+        this.txState = TransactionConfirmationState.SUCCESS;
+      } catch (error) {
+        console.error('error making transfer: ', error);
+        this.error = error;
+        this.txState = TransactionConfirmationState.ERROR;
+      }
+
 
     }
 

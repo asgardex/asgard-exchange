@@ -10,6 +10,7 @@ export class ExplorerPathsService {
   bitcoinExplorerUrl: string;
   thorchainExplorerUrl: string;
   ethereumExplorerUrl: string;
+  litecoinExplorerUrl: string;
 
   constructor() {
     this.binanceExplorerUrl = environment.network === 'testnet'
@@ -27,6 +28,11 @@ export class ExplorerPathsService {
     this.ethereumExplorerUrl = environment.network === 'testnet'
       ? 'https://ropsten.etherscan.io'
       : 'https://etherscan.io';
+
+
+    this.litecoinExplorerUrl = environment.network === 'testnet'
+      ? 'https://tltc.bitaps.com'
+      : 'https://ltc.bitaps.com';
 
   }
 }
