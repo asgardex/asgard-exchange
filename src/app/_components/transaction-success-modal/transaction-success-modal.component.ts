@@ -19,6 +19,7 @@ export class TransactionSuccessModalComponent implements OnInit {
   bitcoinExplorerUrl: string;
   ethereumExplorerUrl: string;
   thorchainExplorerUrl: string;
+  litecoinExplorerUrl: string;
 
   constructor(private explorerPathsService: ExplorerPathsService) {
     this.closeDialog = new EventEmitter<null>();
@@ -26,6 +27,7 @@ export class TransactionSuccessModalComponent implements OnInit {
     this.bitcoinExplorerUrl = `${this.explorerPathsService.bitcoinExplorerUrl}/tx`;
     this.ethereumExplorerUrl = `${this.explorerPathsService.ethereumExplorerUrl}/tx`;
     this.thorchainExplorerUrl = `${this.explorerPathsService.thorchainExplorerUrl}/txs`;
+    this.litecoinExplorerUrl = `${this.explorerPathsService.litecoinExplorerUrl}`;
   }
 
   ngOnInit(): void {

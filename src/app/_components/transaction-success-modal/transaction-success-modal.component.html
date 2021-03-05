@@ -15,6 +15,7 @@
       <a target="_blank" *ngIf="hash && chain === 'BNB'" [href]="binanceExplorerUrl + '/' + hash">View on BNC Explorer</a>
       <a target="_blank" *ngIf="hash && chain === 'BTC'" [href]="bitcoinExplorerUrl + '/' + hash">View on BTC Explorer</a>
       <a target="_blank" *ngIf="hash && chain === 'ETH'" [href]="ethereumExplorerUrl + '/' + hash">View on ETH Explorer</a>
+      <a target="_blank" *ngIf="hash && chain === 'LTC'" [href]="litecoinExplorerUrl + '/' + hash">View on LTC Explorer</a>
     </div>
 
     <button (click)="closeDialog.emit()" mat-flat-button color="primary" class="main-action-btn">Close</button>

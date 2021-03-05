@@ -1,12 +1,10 @@
 import { Injectable } from '@angular/core';
 import { AvailableClients, User } from '../_classes/user';
 import {
-  Client as binanceClient,
-  BinanceClient,
+  Client as BinanceClient,
 } from '@thorchain/asgardex-binance';
-import { Market, MarketResponse } from '../_classes/market';
 import { environment } from 'src/environments/environment';
-import { Asset } from '../_classes/asset';
+import { Asset, checkSummedAsset } from '../_classes/asset';
 import { Balance, Balances } from '@xchainjs/xchain-client';
 import { BncClient } from '@binance-chain/javascript-sdk/lib/client';
 import {
@@ -37,9 +35,6 @@ export class UserService {
   private userSource = new BehaviorSubject<User>(null);
   user$ = this.userSource.asObservable();
 
-  private marketsSource = new BehaviorSubject<Market[]>([]);
-  markets$ = this.marketsSource.asObservable();
-
   private userBalancesSource = new BehaviorSubject<Balances>(null);
   userBalances$ = this.userBalancesSource.asObservable();
 
@@ -49,7 +44,7 @@ export class UserService {
 
   constructor(private midgardService: MidgardService) {
 
-    this.asgardexBncClient = new binanceClient({
+    this.asgardexBncClient = new BinanceClient({
       network: (environment.network) === 'testnet' ? 'testnet' : 'mainnet',
     });
 
@@ -63,31 +58,16 @@ export class UserService {
     }
   }
 
-  async setMarkets() {
-    const res: MarketResponse = await this.asgardexBncClient.getMarkets({});
-    if (res.status === 200) {
-      const markets = res.result.map( (dto) => new Market(dto) );
-      this.marketsSource.next(markets);
-    }
-  }
-
-  async getMarkets(): Promise<Market[]> {
-    const res: MarketResponse = await this.asgardexBncClient.getMarkets({});
-    if (res.status === 200) {
-      const markets = res.result.map( (dto) => new Market(dto) );
-      return markets;
-    }
-  }
-
   async fetchBalances(): Promise<void> {
     let balances: Balances = [];
 
     for (const [key, _value] of Object.entries(this._user.clients)) {
 
-      const client = this._user.clients[key];
       let clientBalances;
 
       if (key === 'binance') {
+
+        const client = this._user.clients.binance;
         const bncClient: BncClient = await client.getBncClient();
         const address = await client.getAddress();
         const bncBalances = await bncClient.getBalance(address);
@@ -107,19 +87,21 @@ export class UserService {
 
       } else if (key === 'ethereum') {
 
+        const client = this._user.clients.ethereum;
+
         // ETH
         clientBalances = await client.getBalance();
 
         const ethAddress = await client.getAddress();
-        const assetsToQuery: Asset[] = [];
+        const assetsToQuery: {chain: Chain, ticker: string, symbol: string}[] = [];
 
         /**
          * Add ETH RUNE
          */
         assetsToQuery.push(
           (environment.network === 'testnet')
-          ? new Asset(`ETH.RUNE-${'0xd601c6A3a36721320573885A8d8420746dA3d7A0'.toUpperCase()}`)
-          : new Asset(`ETH.RUNE-${'0x3155BA85D5F96b2d030a4966AF206230e46849cb'.toUpperCase()}`)
+          ? new Asset(`ETH.RUNE-${'0xd601c6A3a36721320573885A8d8420746dA3d7A0'}`)
+          : new Asset(`ETH.RUNE-${'0x3155BA85D5F96b2d030a4966AF206230e46849cb'}`)
         );
 
         /**
@@ -130,29 +112,26 @@ export class UserService {
           .filter( (ethPool) => ethPool.asset.indexOf('-') >= 0 );
 
         for (const token of ethTokenPools) {
-          assetsToQuery.push(new Asset(token.asset));
+          const tokenAsset = checkSummedAsset(token.asset);
+          assetsToQuery.push(tokenAsset);
         }
 
         /**
          * Check localstorage for user-added tokens
          */
-        const userAddedTokens = JSON.parse(localStorage.getItem(`${ethAddress}_user_added`)) || [];
+        const userAddedTokens: string[] = JSON.parse(localStorage.getItem(`${ethAddress}_user_added`)) || [];
         for (const token of userAddedTokens) {
-          assetsToQuery.push(new Asset(token));
+          const tokenAsset = checkSummedAsset(token);
+          assetsToQuery.push(tokenAsset);
         }
 
-        for (const asset of assetsToQuery) {
-          const assetAddress = asset.symbol.slice(asset.ticker.length + 1);
-          const strip0x = assetAddress.substr(2);
-          const checkSummedAddress = ethers.utils.getAddress(strip0x);
-          const tokenAsset = {chain: asset.chain, ticker: asset.ticker, symbol: `${asset.ticker}-${checkSummedAddress}`};
-          const tokenBalance = await client.getBalance(ethAddress, tokenAsset);
-          tokenBalance[0].asset = asset;
-          clientBalances.push(...tokenBalance);
-        }
+        console.log('assetsToQuery: ', assetsToQuery);
 
+        const tokenBalances = await client.getBalance(ethAddress, assetsToQuery);
+        clientBalances.push(...tokenBalances);
 
       } else {
+        const client = this._user.clients[key];
         clientBalances = await client.getBalance();
       }
       balances = [...balances, ...clientBalances];
@@ -275,6 +254,14 @@ export class UserService {
       case 'ETH':
         const ethClient = clients.ethereum;
         return await ethClient.getAddress();
+
+      case 'LTC':
+        const litcoinClient = clients.litecoin;
+        return await litcoinClient.getAddress();
+
+      case 'THOR':
+        const thorClient = clients.thorchain;
+        return await thorClient.getAddress();
 
       default:
         console.error(`${chain} does not match getting token address`);

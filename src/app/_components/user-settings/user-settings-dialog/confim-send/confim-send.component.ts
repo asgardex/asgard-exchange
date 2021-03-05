@@ -192,7 +192,36 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
         });
         this.transactionSuccessful.next();
 
+      } else if (this.asset.asset.chain === 'LTC') {
+        const litecoinClient = this.user.clients.litecoin;
 
+        try {
+
+          const feeRates = await litecoinClient.getFeeRates();
+          const fees = await litecoinClient.getFees();
+          const toBase = assetToBase(assetAmount(this.amount));
+          const amount = toBase.amount().minus(fees.average.amount());
+
+          const hash = await litecoinClient.transfer({
+            amount: baseAmount(amount),
+            recipient: this.recipientAddress,
+            feeRate: feeRates.average
+          });
+
+          this.txStatusService.addTransaction({
+            chain: 'LTC',
+            hash,
+            ticker: 'LTC',
+            symbol: this.asset.asset.symbol,
+            status: TxStatus.PENDING,
+            action: TxActions.SEND,
+            isThorchainTx: false
+          });
+          this.transactionSuccessful.next();
+        } catch (error) {
+          console.error('error making transfer: ', error);
+          this.txState = TransactionConfirmationState.ERROR;
+        }
       }
 
     }

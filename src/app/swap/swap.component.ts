@@ -281,6 +281,7 @@ export class SwapComponent implements OnInit, OnDestroy {
           || pool.asset.chain === 'THOR'
           || pool.asset.chain === 'BTC'
           || pool.asset.chain === 'ETH'
+          || pool.asset.chain === 'LTC'
         );
 
         // Keeping RUNE at top by default

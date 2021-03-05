@@ -21,6 +21,7 @@ export class DepositComponent implements OnInit {
   memo: string;
   withdrawAmount: number; // percentage associated with WITHDRAW
   memoAmount: number; // this is used for UNBOND
+  txHash: string;
 
   constructor() {
     this.back = new EventEmitter();
@@ -35,6 +36,11 @@ export class DepositComponent implements OnInit {
 
   ngOnInit(): void {
 
+  }
+
+  transactionSubmitted(hash: string) {
+    this.txHash = hash;
+    this.depositState = 'TX_SUBMITTED';
   }
 
   confirm() {

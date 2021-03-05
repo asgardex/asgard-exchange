@@ -6,6 +6,7 @@ import { Client as binanceClient, } from '@xchainjs/xchain-binance';
 import { Client as bitcoinClient, } from '@xchainjs/xchain-bitcoin';
 import { Client as thorchainClient, } from '@xchainjs/xchain-thorchain';
 import { Client as ethereumClient } from '@xchainjs/xchain-ethereum/lib';
+import { Client as litecoinClient } from '@xchainjs/xchain-litecoin';
 
 @Injectable({
   providedIn: 'root'
@@ -32,6 +33,7 @@ export class KeystoreService {
       etherscanApiKey: environment.etherscanKey,
       infuraCreds: {projectId: environment.infuraProjectId}
     });
+    const userLtcClient = new litecoinClient({network, phrase});
 
     return new User({
       type: 'keystore',
@@ -41,7 +43,8 @@ export class KeystoreService {
         binance: userBinanceClient,
         bitcoin: userBtcClient,
         thorchain: userThorchainClient,
-        ethereum: userEthereumClient
+        ethereum: userEthereumClient,
+        litecoin: userLtcClient
       }
     });
   }

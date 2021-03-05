@@ -11,6 +11,7 @@ import { TransactionStatusService, TxActions, TxStatus } from 'src/app/_services
 import { Client as BinanceClient } from '@xchainjs/xchain-binance';
 import { Client as BitcoinClient } from '@xchainjs/xchain-bitcoin';
 import { Client as EthereumClient, ETH_DECIMAL } from '@xchainjs/xchain-ethereum/lib';
+import { Client as LitecoinClient } from '@xchainjs/xchain-litecoin';
 import { EthUtilsService } from 'src/app/_services/eth-utils.service';
 
 export interface ConfirmDepositData {
@@ -122,6 +123,11 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
           hash = await this.bitcoinDeposit(btcClient, thorchainAddress, recipientPool);
           break;
 
+        case 'LTC':
+          const ltcClient = this.data.user.clients.litecoin;
+          hash = await this.litecoinDeposit(ltcClient, thorchainAddress, recipientPool);
+          break;
+
         case 'ETH':
           const ethClient = this.data.user.clients.ethereum;
           hash = await this.ethereumDeposit(ethClient, thorchainAddress, recipientPool);
@@ -215,6 +221,32 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
   }
 
   async bitcoinDeposit(client: BitcoinClient, thorchainAddress: string, recipientPool: PoolAddressDTO): Promise<string> {
+    // deposit token
+    try {
+      const asset = this.data.asset;
+      const targetTokenMemo = `+:${asset.chain}.${asset.symbol}:${thorchainAddress}`;
+      const feeRates = await client.getFeeRates();
+      const feeRate = feeRates.average;
+
+      const hash = await client.transfer({
+        asset: {
+          chain: this.data.asset.chain,
+          symbol: this.data.asset.symbol,
+          ticker: this.data.asset.ticker
+        },
+        amount: assetToBase(assetAmount(this.data.assetAmount)),
+        recipient: recipientPool.address,
+        memo: targetTokenMemo,
+        feeRate
+      });
+
+      return hash;
+    } catch (error) {
+      throw(error);
+    }
+  }
+
+  async litecoinDeposit(client: LitecoinClient, thorchainAddress: string, recipientPool: PoolAddressDTO): Promise<string> {
     // deposit token
     try {
       const asset = this.data.asset;
