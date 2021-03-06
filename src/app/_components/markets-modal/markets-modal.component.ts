@@ -7,6 +7,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { User } from 'src/app/_classes/user';
 import { Balances } from '@xchainjs/xchain-client';
 import { AssetAndBalance } from 'src/app/_classes/asset-and-balance';
+import { OverlaysService } from 'src/app/_services/overlays.service';
 
 
 @Component({
@@ -50,8 +51,7 @@ export class MarketsModalComponent implements OnInit, OnDestroy {
 
   constructor(
     private userService: UserService,
-    // @Inject(MAT_DIALOG_DATA) public data: { disabledAssetSymbol: string, selectableMarkets: AssetAndBalance[] },
-    // public dialogRef: MatDialogRef<MarketsModalComponent>
+    public overlaysService: OverlaysService
   ) {
 
     // this.marketListItems = this.selectableMarkets;
@@ -110,14 +110,16 @@ export class MarketsModalComponent implements OnInit, OnDestroy {
       console.log(item)
       if (this.disabledAssetSymbol != item.symbol) {
         this.selectedAssetChange.emit(item);
-        this.overlay = false;
-        this.overlayChange.emit(this.overlay);
+        // this.overlay = false;
+        // this.overlayChange.emit(this.overlay);
+        this.overlaysService.setCurrentSwapView('Swap');
       }
     }
   }
 
   closeDialog() {
-    this.overlay = false;
-    this.overlayChange.emit(this.overlay);
+    // this.overlay = false;
+    // this.overlayChange.emit(this.overlay);
+    this.overlaysService.setCurrentSwapView('Swap');
   }
 }

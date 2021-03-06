@@ -49,6 +49,7 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
   ethNetworkFee: number;
   insufficientChainBalance: boolean;
   loading: boolean;
+  slippageTolerance: number;
 
   @Input() swapData: SwapData;
 
@@ -76,7 +77,11 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
       }
     );
 
-    this.subs = [user$];
+    const slippageTolerange$ = this.slipLimitService.slippageTolerance$.subscribe(
+      (limit) => this.slippageTolerance = limit
+    );
+
+    this.subs = [user$, slippageTolerange$];
 
   }
 

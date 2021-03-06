@@ -6,6 +6,7 @@ import { UserService } from 'src/app/_services/user.service';
 import { CGCoinListItem, CoinGeckoService } from 'src/app/_services/coin-gecko.service';
 import { AssetAndBalance } from 'src/app/_classes/asset-and-balance';
 import { userInfo } from 'os';
+import { OverlaysService } from 'src/app/_services/overlays.service';
 
 @Component({
   selector: 'app-asset-input',
@@ -52,8 +53,7 @@ export class AssetInputComponent implements OnInit {
   _balance: number;
 
   @Input() hideMax: boolean;
-  @Input() overlay: boolean;
-  @Output() overlayChange = new EventEmitter<boolean>();
+  @Input() isSource: boolean;
 
   @Input() disabledMarketSelect: boolean;
   @Input() loading: boolean;
@@ -75,7 +75,7 @@ export class AssetInputComponent implements OnInit {
   usdValue: number;
   assetUsd: number;
 
-  constructor(private userService: UserService, private cgService: CoinGeckoService) {
+  constructor(private userService: UserService, private cgService: CoinGeckoService, public overlayService: OverlaysService) {
   }
 
   ngOnInit(): void {
@@ -151,7 +151,10 @@ export class AssetInputComponent implements OnInit {
     this.userService.user$.subscribe(
       async (user) => {
         if(user) {
-          this.overlayChange.emit(!this.overlay);
+          if(this.isSource)
+            this.overlayService.setCurrentSwapView('SourceAsset')
+          else
+            this.overlayService.setCurrentSwapView('TargetAsset')
         }
       }
     );

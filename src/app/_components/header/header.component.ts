@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, SimpleChange } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { User } from 'src/app/_classes/user';
+import { OverlaysService } from 'src/app/_services/overlays.service';
 import { UserService } from 'src/app/_services/user.service';
 import { environment } from 'src/environments/environment';
 
@@ -25,7 +26,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
   @Output() overlayChange = new EventEmitter<boolean>();
 
-  constructor(private userService: UserService) {
+  constructor(private userService: UserService, public overlaysService: OverlaysService) {
     this.isTestnet = environment.network === 'testnet' ? true : false;
 
     const user$ = this.userService.user$.subscribe(

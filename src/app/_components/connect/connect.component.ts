@@ -4,6 +4,7 @@ import { UserService } from 'src/app/_services/user.service';
 import { environment } from 'src/environments/environment';
 import { Subscription } from 'rxjs';
 import { WalletConnectService } from 'src/app/_services/wallet-connect.service';
+import { OverlaysService } from 'src/app/_services/overlays.service';
 
 
 @Component({
@@ -19,10 +20,7 @@ export class ConnectComponent implements OnInit {
   //   minWidth: '260px'
   // };
 
-  constructor(private dialog: MatDialog, private walletConnectService: WalletConnectService) { }
-
-  @Input() overlay: boolean;
-  @Output() overlayChange = new EventEmitter<boolean>();
+  constructor(private dialog: MatDialog, private walletConnectService: WalletConnectService, public overlaysService: OverlaysService) { }
 
   ngOnInit(): void {
     this.walletConnectService.initWalletConnect();
@@ -33,7 +31,8 @@ export class ConnectComponent implements OnInit {
     //   ConnectModal,
     //   this.modalDimensions
     // );
-    this.overlayChange.emit(true);
+    // this.overlayChange.emit(true);
+    this.overlaysService.setCurrentSwapView('Connect');
   }
 
 }
@@ -61,7 +60,8 @@ export class ConnectModal implements OnDestroy {
   constructor(
     // public dialogRef: MatDialogRef<ConnectModal>,
     private walletConnectService: WalletConnectService,
-    private userService: UserService
+    private userService: UserService,
+    public overlaysService: OverlaysService
   ) {
     this.isTestnet = environment.network === 'testnet' ? true : false;
 
@@ -76,9 +76,6 @@ export class ConnectModal implements OnDestroy {
     this.subs = [user$];
 
   }
-
-  @Input() overlay: boolean;
-  @Output() overlayChange = new EventEmitter<boolean>();
 
   setSelectedChain(chain: 'BNB' | 'BTC') {
     this.selectedChain = chain;
@@ -106,7 +103,8 @@ export class ConnectModal implements OnDestroy {
 
   close() {
     // this.dialogRef.close();
-    this.overlayChange.emit(false);
+    // this.overlayChange.emit(false);
+    this.overlaysService.setCurrentSwapView('Swap')
   }
 
   ngOnDestroy() {

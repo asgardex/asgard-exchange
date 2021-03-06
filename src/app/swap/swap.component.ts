@@ -31,6 +31,7 @@ import { AssetAndBalance } from '../_classes/asset-and-balance';
 import { PoolDTO } from '../_classes/pool';
 import { SlippageToleranceService } from '../_services/slippage-tolerance.service';
 import { PoolAddressDTO } from '../_classes/pool-address';
+import { OverlaysService } from '../_services/overlays.service';
 
 export enum SwapType {
   DOUBLE_SWAP = 'double_swap',
@@ -181,7 +182,6 @@ export class SwapComponent implements OnInit, OnDestroy {
   insufficientBnb: boolean;
   coinGeckoList: CGCoinListItem[];
   selectableMarkets: AssetAndBalance[];
-  overlayShow: boolean;
   targetMarketShow: boolean;
   sourceMarketShow: boolean;
   swapData: SwapData;
@@ -199,17 +199,19 @@ export class SwapComponent implements OnInit, OnDestroy {
     private midgardService: MidgardService,
     private binanceService: BinanceService,
     private cgService: CoinGeckoService,
-    private slipLimitService: SlippageToleranceService) {
+    private slipLimitService: SlippageToleranceService,
+    public overlaysService: OverlaysService) {
 
     this.selectedSourceAsset = new Asset('THOR.RUNE');
     this.ethContractApprovalRequired = false;
     this.selectableMarkets = undefined;
     // Just in case at the begining There is no Source Asset yet.
     // this.selectedSourceAsset = new Asset(`BNB.${this.runeSymbol}`);
-    this.overlayShow = false;
-    this.targetMarketShow = false;
-    this.sourceMarketShow = false;
-    this.confirmShow = false;
+    this.overlaysService.setCurrentSwapView('Swap');
+    // this.overlayShow = false;
+    // this.targetMarketShow = false;
+    // this.sourceMarketShow = false;
+    // this.confirmShow = false;
 
     const balances$ = this.userService.userBalances$.subscribe(
       (balances) => {

@@ -1,23 +1,25 @@
 <div class="background-container">
-  <app-header [(overlay)]="showUserSetting"></app-header>
+  <app-header></app-header>
 
-  <main *ngIf="isTestnet && !showReconnect && !showUserSetting">
+  {{overlaysService.getCurrentView()}}
+
+  <main *ngIf="isTestnet && overlaysService.getCurrentView() == 'Swap'">
     <!-- <app-native-rune-prompt></app-native-rune-prompt> -->
     <router-outlet></router-outlet>
   </main>
 
-  <main *ngIf="!isTestnet">
+  <!-- <main *ngIf="!isTestnet">
     <div>
       Multichain Coming Soon.
     </div>
+  </main> -->
+
+  <main *ngIf="overlaysService.getCurrentView() == 'User Setting'">
+    <app-user-settings-dialog></app-user-settings-dialog>
   </main>
 
-  <main *ngIf="showUserSetting">
-    <app-user-settings-dialog [(userSetting)]="showUserSetting"></app-user-settings-dialog>
-  </main>
-
-  <main *ngIf="showReconnect">
-    <app-reconnect-dialog [(reconnect)]="showReconnect" [keystore]="keystore"></app-reconnect-dialog>
+  <main *ngIf="overlaysService.getCurrentView() == 'Reconnect'">
+    <app-reconnect-dialog [keystore]="keystore"></app-reconnect-dialog>
   </main>
 
   <footer>

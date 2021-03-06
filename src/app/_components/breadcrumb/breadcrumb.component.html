@@ -1,6 +1,6 @@
 <div class="breadcumber-container" [ngClass]="{'error': isError}">
   <ng-container class="" *ngFor="let p of path">
-    <div class="path">
+    <div [routerLink]="['/swap']" class="path">
       {{p}}
     </div>
     <div>

@@ -1,9 +1,8 @@
 <div class="container-wrapper">
   <div class="container">
-    <div *ngIf="!targetMarketShow && !sourceMarketShow && !overlayShow && !confirmShow">
+    <div *ngIf="this.overlaysService.getCurrentSwapView() === 'Swap'">
 
       <div class="main-container">
-
         <div class="content-top">
           <app-breadcrumb [path]="['asgardex', 'swap']" [message]="user ? 'prepare' : 'connect wallet'"></app-breadcrumb>
           <div class="top-right">
@@ -26,7 +25,7 @@
         </div>
 
         <!-- SOURCE -->
-        <app-asset-input label="Send" [(overlay)]="sourceMarketShow" [(selectedAsset)]="selectedSourceAsset"
+        <app-asset-input label="Send" [isSource]="true" [(selectedAsset)]="selectedSourceAsset"
           [(assetUnit)]="sourceAssetUnit" [balance]="sourceBalance" [disableInput]="user ? false : true" [disableUser]="user ? false : true"
           [disabledAssetSymbol]="selectedTargetAsset ? selectedTargetAsset.symbol : null" [coinGeckoList]="coinGeckoList"
           [selectableMarkets]="selectableMarkets">
@@ -37,7 +36,7 @@
         </div>
 
         <!-- TARGET -->
-        <app-asset-input [label]="selectedTargetAsset ? 'Receive (est.)' : 'Receive'" [(overlay)]="targetMarketShow"
+        <app-asset-input [label]="selectedTargetAsset ? 'Receive (est.)' : 'Receive'" [isSource]="false"
           [(selectedAsset)]="selectedTargetAsset" [(assetUnit)]="targetAssetUnitDisplay" [balance]="targetBalance"
           [disableInput]="true" [disabledAssetSymbol]="selectedSourceAsset ? selectedSourceAsset.symbol : null"
           [loading]="calculatingTargetAsset" [hideMax]="true" [error]="poolDetailTargetError || poolDetailSourceError"
@@ -55,7 +54,7 @@
             </ng-template>
           </div>
           <!-- total fee and slip -->
-          <!-- <div class="flxr flxr--just-space-between">
+          <div class="flxr flxr--just-space-between">
             <span class="tx-detail-label">Total Fee:</span>
             <span
               *ngIf="basePrice && selectedTargetAsset && selectedSourceAsset && runeTransactionFee && binanceTransferFeeDisplay, else nothingFee">{{binanceTransferFeeDisplay | number:"0.0-6"}}
@@ -63,7 +62,7 @@
             <ng-template #nothingFee>
               <span>...</span>
             </ng-template>
-          </div> -->
+          </div>
           <!-- <div class="flxr flxr--just-space-between">
           <span class="tx-detail-label"></span>
           <span *ngIf="basePrice && selectedTargetAsset && selectedSourceAsset && runeTransactionFee && binanceTransferFeeDisplay">{{runeTransactionFee}} Rune</span>
@@ -103,30 +102,30 @@
             style="margin-top: 18px;" [disabled]="formInvalid() || !balances">
             <span>Swap</span>
           </button>
-          <app-connect *ngIf="!user" [(overlay)]="overlayShow"></app-connect>
+          <app-connect *ngIf="!user"></app-connect>
         </div>
 
       </div>
     </div>
 
-    <div class="overlay-container overlay-connect-wallet" *ngIf="targetMarketShow">
-      <app-markets-modal [(overlay)]="targetMarketShow"
+    <div class="overlay-container overlay-connect-wallet" *ngIf="overlaysService.getCurrentSwapView() == 'TargetAsset'">
+      <app-markets-modal
         [(selectedAsset)]="selectedTargetAsset" [selectableMarkets]="selectableMarkets"
         [disabledAssetSymbol]="selectedSourceAsset ? selectedSourceAsset.symbol : null"></app-markets-modal>
     </div>
 
-    <div class="overlay-container overlay-connect-wallet" *ngIf="sourceMarketShow">
-      <app-markets-modal [(overlay)]="sourceMarketShow"
+    <div class="overlay-container overlay-connect-wallet" *ngIf="overlaysService.getCurrentSwapView() == 'SourceAsset'">
+      <app-markets-modal
         [(selectedAsset)]="selectedSourceAsset" [selectableMarkets]="selectableMarkets"
         [disabledAssetSymbol]="selectedTargetAsset ? selectedTargetAsset.symbol : null"></app-markets-modal>
     </div>
 
-    <div class="overlay-container overlay-connect-wallet" *ngIf="overlayShow">
-      <app-connect-modal [(overlay)]="overlayShow"></app-connect-modal>
+    <div class="overlay-container overlay-connect-wallet" *ngIf="overlaysService.getCurrentSwapView() == 'Connect'">
+      <app-connect-modal></app-connect-modal>
     </div>
 
-    <div class="overlay-container" *ngIf="confirmShow">
-      <app-confirm-swap-modal *ngIf="swapData" [swapData]="swapData" [(overlay)]="confirmShow">
+    <div class="overlay-container" *ngIf="overlaysService.getCurrentSwapView() == 'Confirm'">
+      <app-confirm-swap-modal *ngIf="swapData" [swapData]="swapData">
       </app-confirm-swap-modal>
     </div>
   </div>

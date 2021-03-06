@@ -7,6 +7,7 @@ import { LastBlockService } from 'src/app/_services/last-block.service';
 import { MidgardService } from 'src/app/_services/midgard.service';
 import { ReconnectDialogComponent } from './_components/reconnect-dialog/reconnect-dialog.component';
 import { environment } from 'src/environments/environment';
+import { OverlaysService } from './_services/overlays.service';
 
 @Component({
   selector: 'app-root',
@@ -18,19 +19,52 @@ export class AppComponent implements OnInit, OnDestroy {
   killPolling: Subject<void> = new Subject();
   subs: Subscription[];
   isTestnet: boolean;
-  showUserSetting: boolean;
-  showReconnect: boolean;
+  showSwap: boolean;
+  _showUserSetting: boolean;
+  _showReconnect: boolean;
   keystore: any;
+
+  // get showUserSetting() {
+  //   return this.overlaysService.getCurrentView() === 'User Setting'
+  // }
+  // set showUserSetting(val: boolean) {
+  //   if(val === true)
+  //     this.overlaysService.setCurrentView('User Setting')
+  //   if (val === false)
+  //     this.overlaysService.setCurrentView('Testnet')
+  // }
+
+  // get showReconnect() {
+  //   return this.overlaysService.getCurrentView() === 'Reconnect'
+  // }
+  // set showReconnect(val: boolean) {
+  //   console.log('show connect again :', val)
+  //   if(val === true)
+  //     this.overlaysService.setCurrentView('Reconnect')
+  //   if (val === false)
+  //     this.overlaysService.setCurrentView('Testnet')
+  // }
+
+  // get isTestnet() {
+  //   return this.overlaysService.getCurrentView() === 'Testnet'
+  // }
+  // set isTestnet(val: boolean) {
+  //   if(val === true)
+  //     this.overlaysService.setCurrentView('Testnet')
+  // }
+
 
   constructor(
     // private dialog: MatDialog,
     private midgardService: MidgardService,
     private lastBlockService: LastBlockService,
+    public overlaysService: OverlaysService
   ) {
     this.subs = [];
     this.isTestnet = (environment.network === 'testnet');
-    this.showUserSetting = false;
-    this.showReconnect = false
+    this.overlaysService.setCurrentView('Swap')
+    // this.showUserSetting = false;
+    // this.showReconnect = false
   }
 
   ngOnInit(): void {
@@ -46,7 +80,8 @@ export class AppComponent implements OnInit, OnDestroy {
 
   openReconnectDialog() {
     //TODO: this needs to be shown every time keystroke has been find
-    this.showReconnect = true;
+    // this.showReconnect = true;
+    this.overlaysService.setCurrentView('Reconnect')
     // this.dialog.open(
     //   ReconnectDialogComponent,
     //   {

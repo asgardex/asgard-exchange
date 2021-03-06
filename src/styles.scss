@@ -178,9 +178,9 @@ button {
     padding-bottom: 31px;
   }
 
-  .bottom-actions {
-    margin: 30px 0;
-  }
+  // .bottom-actions {
+  //   margin: 30px 0;
+  // }
 
   h1 {
     font-size: 1rem;
@@ -193,7 +193,7 @@ button {
 
 .overlay-container {
   position: absolute;
-  width: 500px;
+  width: 730px;
   min-height: 632px;
   top: -2px;
   left: -2px;
@@ -700,6 +700,8 @@ input[type=number] {
   width: 100%;
   margin: 14px auto;
   padding: 0 20px;
+  font-size: 14px;
+  font-weight: 400;
 }
 
 .disabled-list {
