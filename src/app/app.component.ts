@@ -7,7 +7,7 @@ import { LastBlockService } from 'src/app/_services/last-block.service';
 import { MidgardService } from 'src/app/_services/midgard.service';
 import { ReconnectDialogComponent } from './_components/reconnect-dialog/reconnect-dialog.component';
 import { environment } from 'src/environments/environment';
-import { OverlaysService } from './_services/overlays.service';
+import { OverlaysService, MainViewsEnum } from './_services/overlays.service';
 
 @Component({
   selector: 'app-root',
@@ -53,16 +53,22 @@ export class AppComponent implements OnInit, OnDestroy {
   //     this.overlaysService.setCurrentView('Testnet')
   // }
 
+  currentView: MainViewsEnum;
+  currentViewType = MainViewsEnum;
+
 
   constructor(
     // private dialog: MatDialog,
     private midgardService: MidgardService,
     private lastBlockService: LastBlockService,
-    public overlaysService: OverlaysService
+    private overlaysService: OverlaysService
   ) {
     this.subs = [];
     this.isTestnet = (environment.network === 'testnet');
-    this.overlaysService.setCurrentView('Swap')
+    // this.overlaysService.setCurrentView('Swap')
+    this.overlaysService.currentView.subscribe(val => {
+      this.currentView = val;
+    })
     // this.showUserSetting = false;
     // this.showReconnect = false
   }
@@ -81,7 +87,8 @@ export class AppComponent implements OnInit, OnDestroy {
   openReconnectDialog() {
     //TODO: this needs to be shown every time keystroke has been find
     // this.showReconnect = true;
-    this.overlaysService.setCurrentView('Reconnect')
+    // this.overlaysService.setCurrentView('Reconnect')
+    this.overlaysService.setCurrentView(MainViewsEnum.Reconnect)
     // this.dialog.open(
     //   ReconnectDialogComponent,
     //   {

@@ -16,6 +16,7 @@ import {
   assetToBase,
   assetAmount,
 } from '@xchainjs/xchain-util';
+import { OverlaysService } from 'src/app/_services/overlays.service';
 
 
 export interface SwapData {
@@ -63,7 +64,8 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
     private txStatusService: TransactionStatusService,
     private userService: UserService,
     private slipLimitService: SlippageToleranceService,
-    private ethUtilsService: EthUtilsService
+    private ethUtilsService: EthUtilsService,
+    public overlaysService: OverlaysService
   ) {
     this.loading = true;
     this.txState = TransactionConfirmationState.PENDING_CONFIRMATION;
@@ -108,8 +110,9 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
   }
 
   closeDialog(transactionSucess?: boolean) {
-    this.overlayChange.emit(!this.overlay);
+    // this.overlayChange.emit(!this.overlay);
     // this.dialogRef.close(transactionSucess);
+    this.overlaysService.setCurrentSwapView('Swap');
   }
 
   submitTransaction() {

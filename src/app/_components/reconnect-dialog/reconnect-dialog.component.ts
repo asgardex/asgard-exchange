@@ -1,7 +1,7 @@
 import { Component, Inject, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { KeystoreService } from 'src/app/_services/keystore.service';
-import { OverlaysService } from 'src/app/_services/overlays.service';
+import { OverlaysService, MainViewsEnum } from 'src/app/_services/overlays.service';
 import { UserService } from 'src/app/_services/user.service';
 
 @Component({
@@ -49,7 +49,7 @@ export class ReconnectDialogComponent implements OnInit {
       localStorage.setItem('keystore', JSON.stringify(this.keystore));
       const user = await this.keystoreService.unlockKeystore(this.keystore, this.keystorePassword);
       this.userService.setUser(user);
-      this.overlayService.setCurrentView('Swap');
+      this.overlayService.setCurrentView(MainViewsEnum.Swap);
     } catch (error) {
       this.keystoreConnecting = false;
       this.keystoreError = true;
@@ -58,7 +58,7 @@ export class ReconnectDialogComponent implements OnInit {
   }
 
   forgetKeystore() {
-    this.overlayService.setCurrentView('Swap');
+    this.overlayService.setCurrentView(MainViewsEnum.Swap);
     localStorage.clear();
   }
 

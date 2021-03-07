@@ -1,28 +1,38 @@
 import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 
+export type MainViews = 'Reconnect' | 'User Setting' | 'Swap';
+export type SwapViews = 'Swap' | 'TargetAsset' | 'SourceAsset' | 'Connect' | 'Confirm';
+export enum MainViewsEnum {
+  Swap = 'Swap',
+  Reconnect = 'Reconnect',
+  UserSetting = 'User Setting'
+}
 @Injectable({
   providedIn: 'root'
 })
 export class OverlaysService {
 
-  private currentView: 'Reconnect' | 'User Setting' | 'Swap';
-  private innerSwapView: 'Swap' | 'TargetAsset' | 'SourceAsset' | 'Connect' | 'Confirm';
+  private currentViewSource = new BehaviorSubject<MainViewsEnum>(MainViewsEnum.Swap);
+  currentView = this.currentViewSource.asObservable();
+
+  private innerSwapView: SwapViews;
 
   constructor() { }
 
   getCurrentView() {
-    return this.currentView;
+    return this.currentViewSource;
   }
 
-  setCurrentView(val: 'Reconnect' | 'User Setting' | 'Swap') {
-    this.currentView = val;
+  setCurrentView(val: MainViewsEnum) {
+    this.currentViewSource.next(val);
   }
 
   getCurrentSwapView() {
     return this.innerSwapView;
   }
 
-  setCurrentSwapView(val: 'Swap' | 'TargetAsset' | 'SourceAsset' | 'Connect' | 'Confirm') {
+  setCurrentSwapView(val: SwapViews) {
     this.innerSwapView = val;
   }
 
