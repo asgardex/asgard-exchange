@@ -6,21 +6,7 @@
         <div class="content-top">
           <app-breadcrumb [path]="['asgardex', 'swap']" [message]="user ? 'prepare' : 'connect wallet'"></app-breadcrumb>
           <div class="top-right">
-            <!-- <app-right-option></app-right-option> -->
-            <div class="right-option">
-              <a class="left" [routerLink]="['/', 'swap']" [ngClass]="left.classList.contains('active') ? '' : 'inactive'" routerLinkActive="active" #left>
-                <p class="left-inner">
-                  <span *ngIf="left.classList.contains('disable')" class="tag">SOON</span>
-                  SWAP
-                </p>
-              </a>
-              <a class="right disable" [ngClass]="right.classList.contains('active') ? '' : 'inactive'" routerLinkActive="active" #right>
-                <p class="right-inner">
-                  <span *ngIf="right.classList.contains('disable')" class="tag">SOON</span>
-                  POOL
-                </p>
-              </a>
-            </div>
+            <app-right-option [switchField]="{right: {text: 'Pool', tag: 'Soon', disable: true}, left: {text: 'Swap', tag: 'Soon', disable: false}}"></app-right-option>
           </div>
         </div>
 
