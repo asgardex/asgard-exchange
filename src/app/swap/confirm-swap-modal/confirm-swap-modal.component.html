@@ -11,12 +11,12 @@
         <div
           *ngIf="txState === 'SUBMITTING'"
         >
-          <h1>TRANSACTION PROCESSING</h1>
+          <app-breadcrumb [path]="['asgardex', 'swap']" message="TRANSACTION PROCESSING"></app-breadcrumb>
         </div>
         <div
           *ngIf="txState === 'SUCCESS'"
         >
-          <h1>TRANSACTION PROCESSING</h1>
+          <app-breadcrumb [path]="['asgardex', 'swap']" message="SUCCESS"></app-breadcrumb>
         </div>
       </div>
 
@@ -31,8 +31,7 @@
         </div> -->
         <div class="swap-input uni-input confirm-box">
           <div class="label-box">
-            <div>Send</div>
-            <div>Balance: {{ swapData.balance }}</div>
+            <div>Send<span style="color: #474E5D;"> ({{ swapData.balance | number:"1.0-8" }} balance)</span></div>
           </div>
 
           <div class="input-box">
@@ -55,6 +54,7 @@
                 <app-icon-ticker
                   [iconPath]="swapData.sourceAsset.iconPath"
                   [ticker]="swapData.sourceAsset.ticker"
+                  [chain]="swapData.sourceAsset.chain"
                 >
                 </app-icon-ticker>
                 <!-- <mat-icon *ngIf="!disabledMarketSelect" style="font-size: 30px; height: 28px; color: #30F091">expand_more</mat-icon> -->
@@ -118,6 +118,7 @@
                 <app-icon-ticker
                   [iconPath]="swapData.targetAsset.iconPath"
                   [ticker]="swapData.targetAsset.ticker"
+                  [chain]="swapData.targetAsset.chain"
                 >
                 </app-icon-ticker>
                 <!-- <mat-icon *ngIf="!disabledMarketSelect" style="font-size: 30px; height: 28px; color: #30F091">expand_more</mat-icon> -->
@@ -187,7 +188,6 @@
           <div class="divider"></div>
           <div class="right-btn">
             <button
-              style="background-color: #f3ba2f !important"
               (click)="submitTransaction()"
               class="next-btn"
             >
@@ -196,20 +196,17 @@
           </div>
         </ng-container>
         <ng-container *ngIf="txState === 'SUBMITTING'">
-          <div class="bottom-actions">
             <button
-            style="background-color: #00ccff !important"
-            class="next-btn"
-            aria-label="TRANSACTION PROCESSING…"
+              class="next-btn"
+              aria-label="TRANSACTION PROCESSING…"
+              disabled
             >
-              <span>TRANSACTION PROCESSING…</span>
+              <span>PLEASE WAIT…</span>
             </button>
-          </div>
         </ng-container>
-        <ng-container *ngIf="txState === 'SUBMITTING'">
+        <ng-container *ngIf="txState === 'SUCCESS'">
             <button
               class="close-btn"
-              aria-label="TRANSACTION PROCESSING…"
               (click)="closeDialog()"
             >
               <span>close</span>

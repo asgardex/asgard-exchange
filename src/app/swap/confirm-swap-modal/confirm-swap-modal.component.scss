@@ -30,17 +30,25 @@
 
 .confirm-box {
     flex-flow: column;
-    max-height: 112px;
+    max-height: 113px;
+    min-height: 113px;
+    font-size: 14px;
 
     .label-box {
-        display: flex;
-        width: 100%;
-        justify-content: space-between;
+      display: flex;
+      width: 100%;
+      line-height: 24px;
     }
 
     .input-box {
         display: flex;
         padding: 2px 0;
+        width: 100%;
+
+        .priceInput {
+          font-size: 22px;
+          line-height: 30px;
+        }
 
         .launch-markets-btn {
             padding-right: 0;
