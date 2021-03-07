@@ -17,6 +17,8 @@ import {
   assetAmount,
 } from '@xchainjs/xchain-util';
 import { MainViewsEnum, OverlaysService } from 'src/app/_services/overlays.service';
+import { number } from 'yargs';
+import { ExplorerPathsService } from 'src/app/_services/explorer-paths.service';
 
 
 export interface SwapData {
@@ -57,6 +59,11 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
   @Input() overlay: boolean;
   @Output() overlayChange = new EventEmitter<boolean>();
 
+  binanceExplorerUrl: string;
+  bitcoinExplorerUrl: string;
+  ethereumExplorerUrl: string;
+  thorchainExplorerUrl: string;
+
   constructor(
     // @Inject(MAT_DIALOG_DATA) public swapData: SwapData,
     // public dialogRef: MatDialogRef<ConfirmSwapModalComponent>,
@@ -65,7 +72,8 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private slipLimitService: SlippageToleranceService,
     private ethUtilsService: EthUtilsService,
-    public overlaysService: OverlaysService
+    public overlaysService: OverlaysService,
+    private explorerPathsService: ExplorerPathsService
   ) {
     this.loading = true;
     this.txState = TransactionConfirmationState.PENDING_CONFIRMATION;
@@ -84,6 +92,12 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
     );
 
     this.subs = [user$, slippageTolerange$];
+
+    //Adding explorer URL here
+    this.binanceExplorerUrl = `${this.explorerPathsService.binanceExplorerUrl}/tx`;
+    this.bitcoinExplorerUrl = `${this.explorerPathsService.bitcoinExplorerUrl}/tx`;
+    this.ethereumExplorerUrl = `${this.explorerPathsService.ethereumExplorerUrl}/tx`;
+    this.thorchainExplorerUrl = `${this.explorerPathsService.thorchainExplorerUrl}/txs`;
 
   }
 
@@ -117,6 +131,11 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
 
   gotoWallet() {
     this.overlaysService.setCurrentView(MainViewsEnum.UserSetting)
+  }
+
+  noticeHandler(index: number) {
+    if(index === 0)
+      window.open("", "_blank");
   }
 
   submitTransaction() {

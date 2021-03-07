@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
 @Component({
   selector: 'app-notice',
@@ -7,9 +7,15 @@ import { Component, OnInit } from '@angular/core';
 })
 export class NoticeComponent implements OnInit {
 
+  @Input() tags: Array<string> = ['Text', 'Text'];
+  @Output() tagClicked = new EventEmitter();
+
   constructor() { }
 
   ngOnInit(): void {
   }
 
+  onTagClicked(index: number) {
+    this.tagClicked.next(index);
+  }
 }

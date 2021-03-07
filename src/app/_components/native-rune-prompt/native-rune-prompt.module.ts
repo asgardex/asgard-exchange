@@ -7,18 +7,19 @@ import { AssetsListModule } from '../assets-list/assets-list.module';
 import { UpgradeRuneModule } from '../upgrade-rune/upgrade-rune.module';
 import { UpgradeRuneConfirmModule } from '../upgrade-rune-confirm/upgrade-rune-confirm.module';
 import { TransactionSuccessModalModule } from '../transaction-success-modal/transaction-success-modal.module';
+import { NotificationComponent } from '../notification/notification.component';
 
 
 
 @NgModule({
-  declarations: [NativeRunePromptComponent, NativeRunePromptModalComponent],
+  declarations: [NativeRunePromptComponent, NativeRunePromptModalComponent, NotificationComponent],
   imports: [
     CommonModule,
     MatIconModule,
     AssetsListModule,
     UpgradeRuneModule,
     UpgradeRuneConfirmModule,
-    TransactionSuccessModalModule
+    TransactionSuccessModalModule,
   ],
   exports: [NativeRunePromptComponent]
 })

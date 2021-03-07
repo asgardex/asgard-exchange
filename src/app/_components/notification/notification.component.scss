@@ -1,0 +1,32 @@
+.notification-wrapper {
+  width: 730px;
+  height: 42px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #FFFD00 0%, #F625F0 49.98%, #01F6EE 100%);
+  padding: 2px;
+
+  .notification {
+    border-radius: 6px;
+    background: #0D1B23;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    &:hover {
+      background: linear-gradient(90deg, #01F6EE 0%, #F625F0 47.94%, #FFFB00 100%);
+
+      .notification-text {
+        color: #000B12;
+      }
+    }
+
+
+    .notification-text {
+      font-weight: 700;
+      font-size: 14px;
+      color: #fff;
+    }
+  }
+}

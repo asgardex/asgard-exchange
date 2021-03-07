@@ -1,1 +1,9 @@
-<p>notice works!</p>
+<div class="notice-container">
+  <div class="text-content">
+    <ng-content select="[text]"></ng-content>
+  </div>
+  <div class="tags">
+    <app-tag class="left" (click)="onTagClicked(0)"><ng-content select="[tag_one]"></ng-content></app-tag>
+    <app-tag class="right" (click)="onTagClicked(1)"><ng-content select="[tag_two]"></ng-content></app-tag>
+  </div>
+</div>

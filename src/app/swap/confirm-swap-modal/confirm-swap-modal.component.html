@@ -173,9 +173,19 @@
             ">
             Disclaimer: I’m a BETA product. Don’t swap/deposit large</span> -->
         </div>
-        <div *ngIf="txState === 'SUCCESS'">
-          {{hash}}
-          <app-notice></app-notice>
+        <div style="margin-top: 38px;" *ngIf="txState === 'SUCCESS'">
+          <app-notice [tags]="['Copy', 'Explorer']" (tagClicked)="noticeHandler($event)">
+            <span text >{{hash}}</span>
+            <div tag_one>
+              <span>COPY</span>
+            </div>
+            <div tag_two>
+              <a target="_blank" style="text-decoration: none; color: inherit;" *ngIf=" swapData.sourceAsset.chain === 'THOR'" [href]="thorchainExplorerUrl + '/' + hash">Explore</a>
+              <a target="_blank" style="text-decoration: none; color: inherit;" *ngIf=" swapData.sourceAsset.chain === 'BNB'" [href]="binanceExplorerUrl + '/' + hash">Explore</a>
+              <a target="_blank" style="text-decoration: none; color: inherit;" *ngIf="hash && swapData.sourceAsset.chain === 'BTC'" [href]="bitcoinExplorerUrl + '/' + hash">Explore</a>
+              <a target="_blank" style="text-decoration: none; color: inherit;" *ngIf="hash && swapData.sourceAsset.chain === 'ETH'" [href]="ethereumExplorerUrl + '/' + hash">Explore</a>
+            </div>
+          </app-notice>
         </div>
       <!-- </div> -->
 

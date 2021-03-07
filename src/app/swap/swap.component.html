@@ -4,7 +4,7 @@
 
       <div class="main-container">
         <div class="content-top">
-          <app-breadcrumb [path]="['asgardex', 'swap']" [message]="user ? 'prepare' : 'connect wallet'"></app-breadcrumb>
+          <app-breadcrumb [path]="['asgardex', 'swap']" [isError]="(slip * 100) > slippageTolerance" [message]="getMessage()"></app-breadcrumb>
           <div class="top-right">
             <app-right-option [switchField]="{right: {text: 'Pool', tag: 'Soon', disable: true}, left: {text: 'Swap', tag: 'Soon', disable: false}}"></app-right-option>
           </div>
@@ -64,7 +64,7 @@
           </div> -->
           <div class="flxr flxr--just-space-between">
             <span class="tx-detail-label">Slip:</span>
-            <span *ngIf="slip">{{slip | percent:"0.2-4" }}</span>
+            <span *ngIf="slip" [ngStyle]="{'color': (slip * 100) > slippageTolerance ? '#FF4954' : 'inherit'}">{{slip | percent:"0.2-4" }}</span>
             <span *ngIf="!slip">...</span>
           </div>
 

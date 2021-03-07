@@ -352,8 +352,17 @@ export class SwapComponent implements OnInit, OnDestroy {
         && (this.sourceAssetUnit > this.userService.maximumSpendableBalance(this.selectedSourceAsset, this.sourceBalance)))
       || !this.user || !this.balances
       || this.ethContractApprovalRequired
-      || (this.slip * 100) > this.slippageTolerance
+      // || (this.slip * 100) > this.slippageTolerance
       || (this.selectedSourceAsset.chain === 'BNB' && this.insufficientBnb); // source is BNB and not enough funds to cover fee
+  }
+
+  getMessage() {
+    let message = '';
+    if(this.user)
+      message = (this.slip * 100) > this.slippageTolerance ? 'ready with high slip' : 'prepare';
+    else
+      message = 'connect wallet';
+    return message
   }
 
   openConfirmationDialog() {

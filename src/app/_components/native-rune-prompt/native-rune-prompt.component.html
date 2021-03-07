@@ -2,12 +2,12 @@
 
 <div (click)="launchModal()" id="upgrade-prompt" *ngIf="nonNativeRuneAssets.length > 0">
   <div class="flxr flxr--align-center">
-    <mat-icon style="margin-right: 8px;">warning</mat-icon>
-    <small>
+    <!-- <mat-icon style="margin-right: 8px;">warning</mat-icon> -->
+    <app-notification>
       <span *ngFor="let asset of nonNativeRuneAssets; let i = index">
         {{asset.asset.chain}}.RUNE<span *ngIf="i == 0 && nonNativeRuneAssets.length > 1">,</span>
       </span>
-      <span> detected. Upgrade to Native RUNE.</span>
-    </small>
+      <span> detected... Upgrade to THOR.RUNE</span>
+    </app-notification>
   </div>
 </div>

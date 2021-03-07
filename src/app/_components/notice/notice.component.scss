@@ -1,0 +1,26 @@
+.notice-container {
+  background: #28F4AF;
+  color: #000B12;
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 6px;
+  height: 56px;
+
+  .text-content {
+    width: 80%;
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 32px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .tags {
+    width: 20%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+  }
+}

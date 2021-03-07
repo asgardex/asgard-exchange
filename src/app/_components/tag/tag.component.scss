@@ -5,12 +5,14 @@
     border-radius: 3px;
     padding: 0 5px;
     cursor: pointer;
+    text-transform: uppercase;
+    font-size: 11px;
+    line-height: 20px;
+    font-weight: 400;
 
-    span {
-      text-transform: uppercase;
-      font-size: 11px;
-      line-height: 20px;
-      font-weight: 400;
+    a {
+      text-decoration: none;
+      color: inherit;
     }
   }
 
@@ -20,10 +22,8 @@
 
     .tag-field {
       background: #000B12;
+      color: #fff;
 
-      span {
-        color: #fff;
-      }
     }
   }
 
@@ -31,9 +31,7 @@
     background: #28F4AF;
 
     .tag-field {
-      span {
-        color: #000B12;
-      }
+      color: #000B12;
     }
   }
 
@@ -41,9 +39,7 @@
     background: #000B12;
 
     .tag-field {
-      span {
-        color: #fff;
-      }
+      color: #fff;
     }
   }
 }
