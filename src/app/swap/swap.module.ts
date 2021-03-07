@@ -36,6 +36,7 @@ import { ArrowModule } from '../_components/arrow/arrow.module';
 import { RightOptionComponent } from '../_components/right-option/right-option.component';
 import { BreadcrumbModule } from '../_components/breadcrumb/breadcrumb.module';
 import { TagModule } from '../_components/tag/tag.module';
+import { NoticeModule } from '../_components/notice/notice.module';
 
 @NgModule({
   declarations: [
@@ -68,6 +69,7 @@ import { TagModule } from '../_components/tag/tag.module';
     ArrowModule,
     BreadcrumbModule,
     TagModule,
+    NoticeModule,
     RouterModule.forChild([
       {
         path: '',

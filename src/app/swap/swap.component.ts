@@ -404,8 +404,9 @@ export class SwapComponent implements OnInit, OnDestroy {
 
                     console.log(this.swapData);
 
-                    this.overlaysService.setCurrentSwapView('Confirm')
                   }
+
+                  this.overlaysService.setCurrentSwapView('Confirm')
                 }
               );
 

@@ -74,6 +74,8 @@ import { NativeRunePromptModule } from './_components/native-rune-prompt/native-
 import { UpgradeRuneModule } from './_components/upgrade-rune/upgrade-rune.module';
 import { UpgradeRuneConfirmModule } from './_components/upgrade-rune-confirm/upgrade-rune-confirm.module';
 import { SochainService } from './_services/sochain.service';
+import { NoticeComponent } from './_components/notice/notice.component';
+import { NoticeModule } from './_components/notice/notice.module';
 
 @NgModule({
   declarations: [
@@ -132,7 +134,8 @@ import { SochainService } from './_services/sochain.service';
     ArrowModule,
     TextFieldModule,
     BreadcrumbModule,
-    TagModule
+    TagModule,
+    NoticeModule
   ],
   providers: [
     BinanceService,

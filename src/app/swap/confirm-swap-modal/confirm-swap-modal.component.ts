@@ -16,7 +16,7 @@ import {
   assetToBase,
   assetAmount,
 } from '@xchainjs/xchain-util';
-import { OverlaysService } from 'src/app/_services/overlays.service';
+import { MainViewsEnum, OverlaysService } from 'src/app/_services/overlays.service';
 
 
 export interface SwapData {
@@ -113,6 +113,10 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
     // this.overlayChange.emit(!this.overlay);
     // this.dialogRef.close(transactionSucess);
     this.overlaysService.setCurrentSwapView('Swap');
+  }
+
+  gotoWallet() {
+    this.overlaysService.setCurrentView(MainViewsEnum.UserSetting)
   }
 
   submitTransaction() {

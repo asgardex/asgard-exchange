@@ -44,7 +44,7 @@
             <span class="tx-detail-label">Total Fee:</span>
             <span
               *ngIf="basePrice && selectedTargetAsset && selectedSourceAsset && runeTransactionFee && binanceTransferFeeDisplay, else nothingFee">{{binanceTransferFeeDisplay | number:"0.0-6"}}
-              BNB + {{runeTransactionFee}} Rune</span>
+              BNB + 1 Rune</span>
             <ng-template #nothingFee>
               <span>...</span>
             </ng-template>

@@ -20,7 +20,6 @@
         </div>
       </div>
 
-      <div>
         <!-- <div *ngIf="loading" class="flxr flxr--align-center" style="height: 53px">
           <mat-progress-spinner diameter="16" color="primary" mode="indeterminate"></mat-progress-spinner>
         </div>
@@ -31,7 +30,9 @@
         </div> -->
         <div class="swap-input uni-input confirm-box">
           <div class="label-box">
-            <div>Send<span style="color: #474E5D;"> ({{ swapData.balance | number:"1.0-8" }} balance)</span></div>
+            <div *ngIf="txState == 'PENDING_CONFIRMATION'">Send<span style="color: #474E5D;"> ({{ swapData.balance | number:"1.0-8" }} balance)</span></div>
+            <div *ngIf="txState == 'SUBMITTING'">Sending</div>
+            <div *ngIf="txState == 'SUCCESS'">Sent</div>
           </div>
 
           <div class="input-box">
@@ -51,6 +52,7 @@
 
             <button class="launch-markets-btn" [disabled]="true">
               <div class="flxr flxr--align-center asset-selector">
+                <app-tag style="margin: 0 10px;" (click)="gotoWallet()" *ngIf="txState == 'SUCCESS'">Wallet</app-tag>
                 <app-icon-ticker
                   [iconPath]="swapData.sourceAsset.iconPath"
                   [ticker]="swapData.sourceAsset.ticker"
@@ -62,7 +64,7 @@
             </button>
           </div>
 
-          <span class="usd-est" *ngIf="true"
+          <span class="usd-est" *ngIf="txState == 'PENDING_CONFIRMATION'"
             >${{
               swapData.inputValue * swapData.sourceAssetPrice | number: ".2-3"
             }}
@@ -81,62 +83,61 @@
         </div>
 
         <span>{{swapData.sourceAsset.ticker}}</span> -->
-      </div>
 
       <!-- <div class="flxr">
       <mat-icon style="margin-left: 4px; margin-bottom: 12px;" class="to-btn-icon disabled">arrow_downward</mat-icon>
       </div> -->
 
-      <div>
         <!-- <div style="margin-right: 12px;" class="asset-icon-container flxr flxr--align-center">
           <img *ngIf="swapData.targetAsset.iconPath" [src]="swapData.targetAsset.iconPath" />
           <mat-icon *ngIf="!swapData.targetAsset.iconPath">help_outline</mat-icon>
         </div>
         <span style="margin-right: 8px; font-size: 20px">{{swapData.outputValue}}</span> -->
-        <div class="swap-input uni-input confirm-box">
-          <div class="label-box">
-            <div>Receive (est.)</div>
-          </div>
-
-          <div class="input-box">
-            <input
-              class="priceInput"
-              style="
-                font-size: 22px;
-                font-weight: 500;
-                font-family: 'Roboto Mono';
-                color: #32fa96;
-              "
-              [ngModel]="swapData.outputValue"
-              placeholder="0.0"
-              type="number"
-              [disabled]="true"
-            />
-
-            <button class="launch-markets-btn" [disabled]="true">
-              <div class="flxr flxr--align-center asset-selector">
-                <app-icon-ticker
-                  [iconPath]="swapData.targetAsset.iconPath"
-                  [ticker]="swapData.targetAsset.ticker"
-                  [chain]="swapData.targetAsset.chain"
-                >
-                </app-icon-ticker>
-                <!-- <mat-icon *ngIf="!disabledMarketSelect" style="font-size: 30px; height: 28px; color: #30F091">expand_more</mat-icon> -->
-              </div>
-            </button>
-          </div>
-          <!-- <span class="usd-est" *ngIf="true">${{swapData.outputValue * swapData.targetAssetPrice | number: '.2-3'}} USD</span> -->
+      <div class="swap-input uni-input confirm-box">
+        <div class="label-box">
+          <div *ngIf="txState == 'PENDING_CONFIRMATION'">Receive <span style="color: #474E5D;">(est.)</span></div>
+          <div *ngIf="txState == 'SUBMITTING'">Receiving <span style="color: #474E5D;">(est.)</span></div>
+          <div *ngIf="txState == 'SUCCESS'">Received <span style="color: #474E5D;">(est.)</span></div>
         </div>
+
+        <div class="input-box">
+          <input
+            class="priceInput"
+            style="
+              font-size: 22px;
+              font-weight: 500;
+              font-family: 'Roboto Mono';
+              color: #32fa96;
+            "
+            [ngModel]="swapData.outputValue"
+            placeholder="0.0"
+            type="number"
+            [disabled]="true"
+          />
+
+          <button class="launch-markets-btn" [disabled]="true">
+            <div class="flxr flxr--align-center asset-selector">
+              <app-tag style="margin: 0 10px;" (click)="gotoWallet()" *ngIf="txState == 'SUCCESS'">Wallet</app-tag>
+              <app-icon-ticker
+                [iconPath]="swapData.targetAsset.iconPath"
+                [ticker]="swapData.targetAsset.ticker"
+                [chain]="swapData.targetAsset.chain"
+              >
+              </app-icon-ticker>
+              <!-- <mat-icon *ngIf="!disabledMarketSelect" style="font-size: 30px; height: 28px; color: #30F091">expand_more</mat-icon> -->
+            </div>
+          </button>
+        </div>
+        <span class="usd-est" *ngIf="txState == 'PENDING_CONFIRMATION'">${{swapData.outputValue.toNumber() * swapData.targetAssetPrice | number: '.2-3'}} USD</span>
       </div>
 
       <!-- <span>{{swapData.targetAsset.ticker}}</span> -->
-    </div>
 
     <!-- <span style="font-style: italic; font-size: 12px; color: rgb(195, 197, 203)">Output is estimated</span> -->
 
     <div>
       <!-- <div mat-dialog-content class="confirm-modal-content"> -->
-        <div class="swap-details">
+        <div class="swap-details" *ngIf="txState === 'PENDING_CONFIRMATION'">
           <div class="flxr flxr--just-space-between">
             <span class="tx-detail-label">Price:</span>
             <span
@@ -150,7 +151,7 @@
             <span class="tx-detail-label">Total Fee:</span>
             <span
               >{{ swapData.bnbFee | number: "0.0-6" }} BNB +
-              {{ swapData.runeFee }} Rune</span
+              1 Rune</span
             >
           </div>
 
@@ -171,6 +172,10 @@
               margin-top: 5px;
             ">
             Disclaimer: I’m a BETA product. Don’t swap/deposit large</span> -->
+        </div>
+        <div *ngIf="txState === 'SUCCESS'">
+          {{hash}}
+          <app-notice></app-notice>
         </div>
       <!-- </div> -->
 
