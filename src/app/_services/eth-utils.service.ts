@@ -4,11 +4,12 @@ import { ethers } from 'ethers';
 import { PoolAddressDTO } from '../_classes/pool-address';
 import { TCRopstenAbi } from '../_abi/thorchain.abi.js';
 import { Client, ETH_DECIMAL } from '@xchainjs/xchain-ethereum/lib';
-import { assetAmount, assetToBase } from '@xchainjs/xchain-util';
+import { assetAmount, assetToBase, baseAmount } from '@xchainjs/xchain-util';
 import BigNumber from 'bignumber.js';
 import { erc20ABI } from '../_abi/erc20.abi';
 import { environment } from '../../environments/environment';
 import { ethRUNERopsten } from '../_abi/erc20RUNE.abi';
+import { MidgardService } from './midgard.service';
 
 export type EstimateFeeParams = {
   sourceAsset: Asset,
@@ -34,7 +35,7 @@ const testnetBasketABI = [{"inputs":[],"stateMutability":"nonpayable","type":"co
 })
 export class EthUtilsService {
 
-  constructor() { }
+  constructor(private midgardService: MidgardService) { }
 
   async estimateFee({sourceAsset, ethClient, ethInbound, inputAmount, memo}: EstimateFeeParams): Promise<BigNumber> {
 
@@ -124,6 +125,19 @@ export class EthUtilsService {
 
     return hash;
 
+  }
+
+  async checkContractApproved(ethClient: Client, asset: Asset): Promise<boolean> {
+    const addresses = await this.midgardService.getInboundAddresses().toPromise();
+    const ethInbound = addresses.find( (inbound) => inbound.chain === 'ETH' );
+    if (!ethInbound) {
+      console.error('no eth inbound address found');
+      return;
+    }
+    const assetAddress = asset.symbol.slice(asset.ticker.length + 1);
+    const strip0x = (assetAddress.toUpperCase().indexOf('0X') === 0) ? assetAddress.substr(2) : assetAddress;
+    const isApproved = await ethClient.isApproved(ethInbound.router, strip0x, baseAmount(1));
+    return isApproved;
   }
 
   async getTestnetRune(ethClient: Client) {

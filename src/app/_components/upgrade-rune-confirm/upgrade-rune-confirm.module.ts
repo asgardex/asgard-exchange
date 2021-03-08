@@ -5,6 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { TransactionProcessingModalModule } from '../transaction-processing-modal/transaction-processing-modal.module';
 import { MatButtonModule } from '@angular/material/button';
 import { DirectivesModule } from 'src/app/_directives/directives.module';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 
 
@@ -15,7 +16,8 @@ import { DirectivesModule } from 'src/app/_directives/directives.module';
     MatIconModule,
     MatButtonModule,
     TransactionProcessingModalModule,
-    DirectivesModule
+    DirectivesModule,
+    MatProgressSpinnerModule
   ],
   exports: [UpgradeRuneConfirmComponent]
 })
