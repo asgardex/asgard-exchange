@@ -83,6 +83,18 @@
             </div>
           </div>
 
+          <!-- Bitcoin Cash -->
+          <div *ngIf="bchAddress" class="uni-input user-address" (click)="selectAddress(bchAddress, 'BCH')">
+            <label>Bitcoin Cash Address</label>
+
+            <div class="flxr flxr--align-center" style="width: 100%; padding: 0.75rem 0;">
+              <div class="asset-icon-container">
+                <img class="asset-icon" src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/bitcoincash/info/logo.png" />
+              </div>
+              <span>{{bchAddress.substring(0, 8) + '...' + bchAddress.substring(bchAddress.length - 4, bchAddress.length)}}</span>
+            </div>
+          </div>
+
           <div class="flxr flxr--just-end">
             <button style="margin-right: 6px" mat-flat-button (click)="mode = 'VIEW_PHRASE'">
               <mat-icon>visibility</mat-icon>

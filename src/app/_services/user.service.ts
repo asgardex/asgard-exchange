@@ -251,6 +251,10 @@ export class UserService {
         const btcClient = clients.bitcoin;
         return await btcClient.getAddress();
 
+      case 'BCH':
+        const bchClient = clients.bitcoinCash;
+        return await bchClient.getAddress();
+
       case 'ETH':
         const ethClient = clients.ethereum;
         return await ethClient.getAddress();
