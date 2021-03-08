@@ -65,15 +65,19 @@ export class UpgradeRuneConfirmComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    if (this.asset.asset.chain === 'BNB') {
-      const bnbBalance = this.userService.findBalance(this.balances, new Asset('BNB.BNB'));
-      this.insufficientChainBalance = bnbBalance < 0.000375;
-      this.loading = false;
-    } else if (this.asset.asset.chain === 'ETH') {
-      this.estimateEthGasPrice();
-    } else {
-      console.error('no chain match: ', this.asset?.asset);
+
+    if (this.asset) {
+      if (this.asset.asset.chain === 'BNB') {
+        const bnbBalance = this.userService.findBalance(this.balances, new Asset('BNB.BNB'));
+        this.insufficientChainBalance = bnbBalance < 0.000375;
+        this.loading = false;
+      } else if (this.asset.asset.chain === 'ETH') {
+        this.estimateEthGasPrice();
+      } else {
+        console.error('no chain match: ', this.asset?.asset);
+      }
     }
+
   }
 
   async estimateEthGasPrice() {
