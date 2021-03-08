@@ -206,15 +206,15 @@ export class UserService {
 
     const balMap: {[key: string]: Balance} = {};
     userBalances.forEach((item) => {
-      balMap[`${item.asset.chain}.${item.asset.symbol}`] = item;
+      balMap[`${item.asset.chain}.${item.asset.symbol}`.toUpperCase()] = item;
     });
 
     marketListItems = marketListItems.map((mItem) => {
 
-      if (balMap[`${mItem.asset.chain}.${mItem.asset.symbol}`]) {
+      if (balMap[`${mItem.asset.chain}.${mItem.asset.symbol}`.toUpperCase()]) {
         return {
           asset: mItem.asset,
-          balance: baseToAsset(balMap[`${mItem.asset.chain}.${mItem.asset.symbol}`].amount),
+          balance: baseToAsset(balMap[`${mItem.asset.chain}.${mItem.asset.symbol}`.toUpperCase()].amount),
         };
       }
       else {
