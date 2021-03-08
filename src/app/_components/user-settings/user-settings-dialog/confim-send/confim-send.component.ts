@@ -168,7 +168,8 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
           const strip0x = assetAddress.substr(2);
           const checkSummedAddress = ethers.utils.getAddress(strip0x);
           const tokenContract = new ethers.Contract(checkSummedAddress, erc20ABI, wallet);
-          decimal = await tokenContract.decimals().toNumber();
+          const decimals = await tokenContract.decimals();
+          decimal = decimals.toNumber();
         }
 
         const hash = await ethClient.transfer({
