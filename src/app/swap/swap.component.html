@@ -22,7 +22,7 @@
         </div>
 
         <!-- TARGET -->
-        <app-asset-input [label]="selectedTargetAsset ? 'Receive (est.)' : 'Receive'" [isSource]="false"
+        <app-asset-input label="Receive" [isSource]="false"
           [(selectedAsset)]="selectedTargetAsset" [(assetUnit)]="targetAssetUnitDisplay" [balance]="targetBalance"
           [disableInput]="true" [disabledAssetSymbol]="selectedSourceAsset ? selectedSourceAsset.symbol : null"
           [loading]="calculatingTargetAsset" [hideMax]="true" [error]="poolDetailTargetError || poolDetailSourceError"

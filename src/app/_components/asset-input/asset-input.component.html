@@ -1,7 +1,7 @@
 <div class="swap-input uni-input" [ngClass]="{'disable': disableUser}">
   <div class="swap-input--inner">
     <div class="flxr flxr--just-space-between label-wrapper">
-      <label class="label-title" for="{{label}}Input">{{label}}<span style="color: #474E5D;" *ngIf="selectedAsset && balance && !disableUser && !disableInput"> ({{balance | number:"1.0-8"}} balance)</span></label>
+      <label class="label-title" for="{{label}}Input">{{label}}<span style="color: #474E5D;" *ngIf="selectedAsset && balance && !disableUser && !disableInput"> ({{balance | number:"1.0-8"}} balance)</span><span *ngIf="!isSource" style="color: #474E5D;"> (est.)</span></label>
     </div>
     <!-- <label style="color: #fff; font-size: 14px; font-weight: 500; text-align: right; margin-right: 8px;" *ngIf="selectedAsset && balance && !disableInput">
       Balance: {{balance | number:"1.0-8"}} <br />
@@ -42,8 +42,8 @@
         MAX
       </button> -->
 
-      <div class="tag-space--between">
-        <app-tag (click)="setMax()" *ngIf="balance && balance > 0 && balance != assetUnit && !hideMax && getMax() !== assetUnit">MAX</app-tag>
+      <div class="tag-space--between" *ngIf="balance && balance > 0 && balance != assetUnit && !hideMax && getMax() !== assetUnit">
+        <app-tag (click)="setMax()">MAX</app-tag>
       </div>
 
       <button *ngIf="selectedAsset" class="launch-markets-btn" (click)="launchMarketsModal()" [disabled]="disabledMarketSelect">

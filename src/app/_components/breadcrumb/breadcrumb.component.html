@@ -1,8 +1,14 @@
 <div class="breadcumber-container" [ngClass]="{'error': isError}">
   <ng-container *ngFor="let p of path">
-    <div class="path" [ngClass]="{'disable': p.disable}" (click)="p.disable ? false : changePath(p)">
+    <div class="path" [ngClass]="{'disable': p.disable}" (click)="navHandler(p)">
       {{p.name}}
     </div>
+    <div>
+      >
+    </div>
+  </ng-container>
+  <ng-container *ngIf="backName">
+    <div class="path" (click)="backFunc.emit()">{{backName}}</div>
     <div>
       >
     </div>

@@ -50,7 +50,7 @@ header {
       margin: 0 0 2px 1px;
     }
 
-    .testnet {
+    .tag {
       position: absolute;
       right: 0;
       top: -10px;
@@ -59,6 +59,7 @@ header {
       line-height: 13.2px;
       text-align: right;
       color: var(--primary-default);
+      letter-spacing: 0.75px;
     }
   }
 

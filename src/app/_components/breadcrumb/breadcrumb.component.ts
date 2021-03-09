@@ -1,11 +1,12 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, Output, ViewChild, EventEmitter } from '@angular/core';
 import { OverlaysService, MainViewsEnum, SwapViews } from 'src/app/_services/overlays.service';
 
 export type Path = {
   name: string,
   disable?: boolean,
   mainView?: string,
-  swapView?: SwapViews
+  swapView?: SwapViews,
+  backFunc?: boolean
 }
 
 @Component({
@@ -18,9 +19,13 @@ export class BreadcrumbComponent implements OnInit {
   @ViewChild('cursor') cursor;
   @Input() path: Array<Object> = [{'name': 'TEXT', 'mainView': 'Swap', 'swapView': 'Swap', disable: false}];
   @Input() message: string = "TEXT";
-  @Input() isError: boolean = false ;
+  @Input() isError: boolean = false;
+  @Input() backName?: string = null;
+  @Output() backFunc: EventEmitter<null>;
 
-  constructor(private overlaysService: OverlaysService) { }
+  constructor(private overlaysService: OverlaysService) {
+    this.backFunc = new EventEmitter<null>();
+  }
 
   ngAfterViewInit() {
     setInterval( () => {
@@ -45,4 +50,9 @@ export class BreadcrumbComponent implements OnInit {
       this.overlaysService.setCurrentView(MainViewsEnum.UserSetting)
   }
 
+  navHandler(path: Path) {
+    if(!path.disable) {
+      path.backFunc ? this.backFunc.emit() : this.changePath(path)
+    }
+  }
 }
