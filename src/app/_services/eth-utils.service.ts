@@ -10,6 +10,7 @@ import { erc20ABI } from '../_abi/erc20.abi';
 import { environment } from '../../environments/environment';
 import { ethRUNERopsten } from '../_abi/erc20RUNE.abi';
 import { MidgardService } from './midgard.service';
+import { Client as EthClient } from '@xchainjs/xchain-ethereum';
 
 export type EstimateFeeParams = {
   sourceAsset: Asset,
@@ -76,6 +77,25 @@ export class EthUtilsService {
     const minimumWeiCost = prices.average.amount().multipliedBy(estimateGas.toNumber());
 
     return minimumWeiCost;
+  }
+
+  async maximumSpendableBalance(ethParams: {asset: Asset, balance: number, client: EthClient}) {
+
+    const {asset, balance, client } = ethParams;
+
+    if (asset.chain === 'ETH' && asset.symbol === 'ETH') {
+        const estimate = await client.estimateFeesWithGasPricesAndLimits({
+          asset,
+          amount: assetToBase(assetAmount(balance)),
+          recipient: '0x8b09ee8b5e96c6412e36ba02e98497efe48a29be' // dummy value only used to estimate ETH transfer
+        });
+        const toEther = ethers.utils.formatEther(estimate.fees.fastest.amount().toNumber());
+        const max = balance - (+toEther);
+        return (max >= 0) ? max : 0;
+    } else {
+      return balance;
+    }
+
   }
 
   async callDeposit({inboundAddress, asset, memo, ethClient, amount}: CallDepositParams): Promise<string> {
