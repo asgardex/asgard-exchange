@@ -65,7 +65,7 @@ export class EthUtilsService {
       checkSummedAddress,
 
       // Amount
-      assetToBase(assetAmount(inputAmount, decimal)).amount().toString(),
+      assetToBase(assetAmount(inputAmount, decimal)).amount().toFixed(),
 
       // Memo
       memo
@@ -112,7 +112,7 @@ export class EthUtilsService {
       const params = [
         inboundAddress.address, // vault
         checkSummedAddress, // asset
-        assetToBase(assetAmount(amount, decimal.toNumber())).amount().toString(), // amount
+        assetToBase(assetAmount(amount, decimal.toNumber())).amount().toFixed(), // amount
         memo
       ];
 

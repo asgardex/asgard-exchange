@@ -192,7 +192,7 @@ export class UserService {
   findBalance(balances: Balances, asset: Asset) {
 
     if (balances && asset) {
-      const match = balances.find( (balance) => `${balance.asset.chain}.${balance.asset.symbol}`.toUpperCase() === `${asset.chain}.${asset.symbol}` );
+      const match = balances.find( (balance) => `${balance.asset.chain}.${balance.asset.symbol}`.toUpperCase() === `${asset.chain}.${asset.symbol}`.toUpperCase() );
 
       if (match) {
         return baseToAsset(match.amount).amount().toNumber();
