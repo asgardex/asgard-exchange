@@ -6,17 +6,17 @@
         <div
           *ngIf="txState === 'PENDING_CONFIRMATION'"
         >
-          <app-breadcrumb [path]="['asgardex', 'swap']" message="confirm"></app-breadcrumb>
+          <app-breadcrumb [path]="[{name: 'asgardex', swapView: 'Swap', mainView: 'Swap'}, {name: 'Swap', swapView: 'Swap', mainView: 'Swap'}]" message="confirm"></app-breadcrumb>
         </div>
         <div
           *ngIf="txState === 'SUBMITTING'"
         >
-          <app-breadcrumb [path]="['asgardex', 'swap']" message="TRANSACTION PROCESSING"></app-breadcrumb>
+          <app-breadcrumb [path]="[{name: 'asgardex', swapView: 'Swap', mainView: 'Swap'}, {name: 'Swap', swapView: 'Swap', mainView: 'Swap'}]" message="TRANSACTION PROCESSING"></app-breadcrumb>
         </div>
         <div
           *ngIf="txState === 'SUCCESS'"
         >
-          <app-breadcrumb [path]="['asgardex', 'swap']" message="SUCCESS"></app-breadcrumb>
+          <app-breadcrumb [path]="[{name: 'asgardex', swapView: 'Swap', mainView: 'Swap'}, {name: 'Swap', swapView: 'Swap', mainView: 'Swap'}]" message="SUCCESS"></app-breadcrumb>
         </div>
       </div>
 

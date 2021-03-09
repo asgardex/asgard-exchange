@@ -16,7 +16,7 @@ export class OverlaysService {
   private currentViewSource = new BehaviorSubject<MainViewsEnum>(MainViewsEnum.Swap);
   currentView = this.currentViewSource.asObservable();
 
-  private innerSwapView: SwapViews;
+  private innerSwapView: SwapViews = 'Swap';
 
   constructor() { }
 
@@ -28,11 +28,17 @@ export class OverlaysService {
     this.currentViewSource.next(val);
   }
 
+  setViews(mainView: MainViewsEnum, swapView: SwapViews) {
+    this.currentViewSource.next(mainView);
+    this.innerSwapView = swapView;
+  }
+
   getCurrentSwapView() {
     return this.innerSwapView;
   }
 
   setCurrentSwapView(val: SwapViews) {
+    console.log('set is called', val)
     this.innerSwapView = val;
   }
 

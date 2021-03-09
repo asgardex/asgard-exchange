@@ -67,6 +67,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.isTestnet = (environment.network === 'testnet');
     // this.overlaysService.setCurrentView('Swap')
     this.overlaysService.currentView.subscribe(val => {
+      console.log('change is called')
       this.currentView = val;
     })
     // this.showUserSetting = false;
@@ -88,7 +89,7 @@ export class AppComponent implements OnInit, OnDestroy {
     //TODO: this needs to be shown every time keystroke has been find
     // this.showReconnect = true;
     // this.overlaysService.setCurrentView('Reconnect')
-    this.overlaysService.setCurrentView(MainViewsEnum.Reconnect)
+    this.overlaysService.setCurrentView(MainViewsEnum.Reconnect);
     // this.dialog.open(
     //   ReconnectDialogComponent,
     //   {

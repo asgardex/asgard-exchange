@@ -1,7 +1,7 @@
 <div class="breadcumber-container" [ngClass]="{'error': isError}">
-  <ng-container class="" *ngFor="let p of path">
-    <div [routerLink]="['/swap']" class="path">
-      {{p}}
+  <ng-container *ngFor="let p of path">
+    <div class="path" [ngClass]="{'disable': p.disable}" (click)="p.disable ? false : changePath(p)">
+      {{p.name}}
     </div>
     <div>
       >

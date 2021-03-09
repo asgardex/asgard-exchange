@@ -1,5 +1,12 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { OverlaysService, MainViewsEnum, SwapViews } from 'src/app/_services/overlays.service';
 
+export type Path = {
+  name: string,
+  disable?: boolean,
+  mainView?: string,
+  swapView?: SwapViews
+}
 
 @Component({
   selector: 'app-breadcrumb',
@@ -9,11 +16,11 @@ import { Component, Input, OnInit, ViewChild } from '@angular/core';
 export class BreadcrumbComponent implements OnInit {
 
   @ViewChild('cursor') cursor;
-  @Input() path: Array<string> = ["TEXT"];
+  @Input() path: Array<Object> = [{'name': 'TEXT', 'mainView': 'Swap', 'swapView': 'Swap', disable: false}];
   @Input() message: string = "TEXT";
   @Input() isError: boolean = false ;
 
-  constructor() { }
+  constructor(private overlaysService: OverlaysService) { }
 
   ngAfterViewInit() {
     setInterval( () => {
@@ -27,6 +34,11 @@ export class BreadcrumbComponent implements OnInit {
   }
 
   ngOnInit(): void {
+  }
+
+  changePath(path: Path) {
+    if (path.mainView == 'Swap')
+      this.overlaysService.setViews(MainViewsEnum.Swap, path.swapView);
   }
 
 }

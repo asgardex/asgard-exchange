@@ -207,7 +207,7 @@ export class SwapComponent implements OnInit, OnDestroy {
     this.selectableMarkets = undefined;
     // Just in case at the begining There is no Source Asset yet.
     // this.selectedSourceAsset = new Asset(`BNB.${this.runeSymbol}`);
-    this.overlaysService.setCurrentSwapView('Swap');
+    // this.overlaysService.setCurrentSwapView('Swap');
     // this.overlayShow = false;
     // this.targetMarketShow = false;
     // this.sourceMarketShow = false;

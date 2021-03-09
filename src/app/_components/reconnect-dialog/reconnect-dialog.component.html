@@ -7,7 +7,7 @@
 
     <div class="dialog-content">
       <div class="content-top">
-        <app-breadcrumb [path]="['asgard', 'connect', 'keystore fonud']" [isError]="keystoreError" [message]="keystoreError ? 'Keystore Login Incorrect' : 'enter password or forget'"></app-breadcrumb>
+        <app-breadcrumb [path]="[{name: 'asgardex', swapView: 'Swap', mainView: 'Swap'}, {name: 'connect', swapView: 'Connect', mainView: 'Swap'}, {name: 'keystore fonud', disable: true}]" [isError]="keystoreError" [message]="keystoreError ? 'Keystore Login Incorrect' : 'enter password or forget'"></app-breadcrumb>
         <!-- <div class="top-right">
           <app-right-option></app-right-option>
         </div> -->

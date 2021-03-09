@@ -10,7 +10,7 @@
     font-size: 14px;
     padding: 2px;
 
-    &:hover {
+    &:hover:not(.disable,&--active) {
       border-radius: 2px;
       background-color: var(--primary-default);
       color: #000B12;
