@@ -81,10 +81,8 @@ export class MarketsModalComponent implements OnInit, OnDestroy {
 
 
   initList() {
-
     this.filteredMarketListItems = this.marketListItems;
     this.sortMarketsByUserBalance();
-
   }
 
   ngOnDestroy() {

@@ -1,4 +1,6 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Balances } from '@xchainjs/xchain-client';
+import { ETH_DECIMAL } from '@xchainjs/xchain-ethereum';
 import { assetAmount, assetToBase } from '@xchainjs/xchain-util';
 import { Subscription } from 'rxjs';
 import { Asset } from 'src/app/_classes/asset';
@@ -27,6 +29,10 @@ export class UpgradeRuneConfirmComponent implements OnInit, OnDestroy {
   subs: Subscription[];
   hash: string;
   runeBalance: number;
+  insufficientChainBalance: boolean;
+  balances: Balances;
+  ethNetworkFee: number;
+  loading: boolean;
 
   constructor(
     private midgardService: MidgardService,
@@ -34,6 +40,8 @@ export class UpgradeRuneConfirmComponent implements OnInit, OnDestroy {
     private txStatusService: TransactionStatusService,
     private ethUtilsService: EthUtilsService
   ) {
+    this.loading = true;
+    this.insufficientChainBalance = false;
     this.back = new EventEmitter<null>();
     this.transactionSuccessful = new EventEmitter<string>();
     this.txState = TransactionConfirmationState.PENDING_CONFIRMATION;
@@ -44,6 +52,7 @@ export class UpgradeRuneConfirmComponent implements OnInit, OnDestroy {
 
     const balances$ = this.userService.userBalances$.subscribe(
       (balances) => {
+        this.balances = balances;
         const runeBalance = this.userService.findBalance(balances, new Asset('THOR.RUNE'));
         if (runeBalance) {
           this.runeBalance = runeBalance;
@@ -56,6 +65,53 @@ export class UpgradeRuneConfirmComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+
+    if (this.asset) {
+      if (this.asset.asset.chain === 'BNB') {
+        const bnbBalance = this.userService.findBalance(this.balances, new Asset('BNB.BNB'));
+        this.insufficientChainBalance = bnbBalance < 0.000375;
+        this.loading = false;
+      } else if (this.asset.asset.chain === 'ETH') {
+        this.estimateEthGasPrice();
+      } else {
+        console.error('no chain match: ', this.asset?.asset);
+      }
+    }
+
+  }
+
+  async estimateEthGasPrice() {
+    const user = this.user;
+    const thorchainClient = this.user.clients.thorchain;
+    const thorAddress = await thorchainClient.getAddress();
+
+    if (user && user.clients && user.clients.ethereum) {
+
+      const ethClient = user.clients.ethereum;
+      const ethBalances = await ethClient.getBalance();
+      const ethBalance = ethBalances[0];
+
+      // get inbound addresses
+      this.midgardService.getInboundAddresses().subscribe(
+        async (addresses) => {
+
+          const ethInbound = addresses.find( (inbound) => inbound.chain === 'ETH' );
+          const estimatedFeeWei = await this.ethUtilsService.estimateFee({
+            sourceAsset: this.asset.asset,
+            ethClient,
+            ethInbound,
+            inputAmount: this.amount,
+            memo: `SWITCH:${thorAddress}`
+          });
+
+          this.ethNetworkFee = estimatedFeeWei.dividedBy(10 ** ETH_DECIMAL).toNumber();
+          this.insufficientChainBalance = estimatedFeeWei.isGreaterThan(ethBalance.amount.amount());
+          this.loading = false;
+
+        }
+      );
+
+    }
   }
 
   submitTransaction() {

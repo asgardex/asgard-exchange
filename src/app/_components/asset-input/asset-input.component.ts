@@ -1,16 +1,19 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { Asset } from 'src/app/_classes/asset';
 import { MarketsModalComponent } from '../markets-modal/markets-modal.component';
 import { MatDialog } from '@angular/material/dialog';
 import { UserService } from 'src/app/_services/user.service';
 import { AssetAndBalance } from 'src/app/_classes/asset-and-balance';
+import { EthUtilsService } from 'src/app/_services/eth-utils.service';
+import { User } from 'src/app/_classes/user';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-asset-input',
   templateUrl: './asset-input.component.html',
   styleUrls: ['./asset-input.component.scss']
 })
-export class AssetInputComponent implements OnInit {
+export class AssetInputComponent implements OnInit, OnDestroy {
 
   /**
    * Selected Asset
@@ -62,8 +65,14 @@ export class AssetInputComponent implements OnInit {
   _selectableMarkets: AssetAndBalance[];
 
   usdValue: number;
+  user: User;
+  subs: Subscription[];
 
-  constructor(private dialog: MatDialog, private userService: UserService) {
+  constructor(private dialog: MatDialog, private userService: UserService, private ethUtilsService: EthUtilsService) {
+    const user$ = this.userService.user$.subscribe(
+      (user) => this.user = user
+    );
+    this.subs = [user$];
   }
 
   ngOnInit(): void {
@@ -86,12 +95,35 @@ export class AssetInputComponent implements OnInit {
     this.assetUnitChange.emit(val);
   }
 
-  setMax(): void {
+  async setMax(): Promise<void> {
+
+    this.loading = true;
 
     if (this.balance) {
-      const max = this.userService.maximumSpendableBalance(this.selectedAsset, this.balance);
-      this.assetUnitChange.emit(max);
+      let max: number;
+      if (this.selectedAsset.chain === 'ETH') {
+        if (this.user && this.user.clients) {
+          max = await this.ethUtilsService.maximumSpendableBalance({
+            asset: this.selectedAsset,
+            client: this.user.clients.ethereum,
+            balance: this.balance
+          });
+        } else {
+          console.error('no user clients found: ', this.user);
+          max = 0;
+        }
+      } else {
+        max = this.userService.maximumSpendableBalance(this.selectedAsset, this.balance);
+      }
+
+      if (max) {
+        this.assetUnitChange.emit(max);
+      } else {
+        console.error('max undefined');
+      }
     }
+
+    this.loading = false;
 
   }
 
@@ -118,6 +150,12 @@ export class AssetInputComponent implements OnInit {
 
     });
 
+  }
+
+  ngOnDestroy() {
+    for (const sub of this.subs) {
+      sub.unsubscribe();
+    }
   }
 
 }

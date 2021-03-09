@@ -321,7 +321,6 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
 
     if (user && user.clients && user.clients.ethereum) {
 
-
       const ethClient = user.clients.ethereum;
       const targetAddress = await ethClient.getAddress();
       const ethBalances = await ethClient.getBalance();

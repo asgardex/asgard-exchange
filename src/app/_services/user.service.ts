@@ -192,7 +192,7 @@ export class UserService {
   findBalance(balances: Balances, asset: Asset) {
 
     if (balances && asset) {
-      const match = balances.find( (balance) => `${balance.asset.chain}.${balance.asset.symbol}` === `${asset.chain}.${asset.symbol}` );
+      const match = balances.find( (balance) => `${balance.asset.chain}.${balance.asset.symbol}`.toUpperCase() === `${asset.chain}.${asset.symbol}`.toUpperCase() );
 
       if (match) {
         return baseToAsset(match.amount).amount().toNumber();
@@ -206,15 +206,15 @@ export class UserService {
 
     const balMap: {[key: string]: Balance} = {};
     userBalances.forEach((item) => {
-      balMap[`${item.asset.chain}.${item.asset.symbol}`] = item;
+      balMap[`${item.asset.chain}.${item.asset.symbol}`.toUpperCase()] = item;
     });
 
     marketListItems = marketListItems.map((mItem) => {
 
-      if (balMap[`${mItem.asset.chain}.${mItem.asset.symbol}`]) {
+      if (balMap[`${mItem.asset.chain}.${mItem.asset.symbol}`.toUpperCase()]) {
         return {
           asset: mItem.asset,
-          balance: baseToAsset(balMap[`${mItem.asset.chain}.${mItem.asset.symbol}`].amount),
+          balance: baseToAsset(balMap[`${mItem.asset.chain}.${mItem.asset.symbol}`.toUpperCase()].amount),
         };
       }
       else {
