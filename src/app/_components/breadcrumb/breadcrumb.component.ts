@@ -39,6 +39,10 @@ export class BreadcrumbComponent implements OnInit {
   changePath(path: Path) {
     if (path.mainView == 'Swap')
       this.overlaysService.setViews(MainViewsEnum.Swap, path.swapView);
+    else if(path.mainView == 'Reconnect')
+      this.overlaysService.setCurrentView(MainViewsEnum.Reconnect)
+    else if(path.mainView == 'User Setting')
+      this.overlaysService.setCurrentView(MainViewsEnum.UserSetting)
   }
 
 }

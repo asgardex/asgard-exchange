@@ -38,7 +38,6 @@ export class OverlaysService {
   }
 
   setCurrentSwapView(val: SwapViews) {
-    console.log('set is called', val)
     this.innerSwapView = val;
   }
 
