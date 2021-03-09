@@ -1,14 +1,14 @@
 .text-field-input {
   .field {
     font-family: 'Roboto Mono';
-    color: #32FA96;
+    color: var(--primary-default);
     font-size: 22px;
     line-height: 30px;
     font-weight: 500;
     letter-spacing: 1.5px;
 
     &::placeholder {
-      color: #32FA96;
+      color: var(--primary-default);
     }
   }
 }

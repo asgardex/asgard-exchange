@@ -43,7 +43,7 @@
       background: #000B13;
 
       &:hover {
-        background: #28F4AE;
+        background: var(--primary-default);
 
         span {
           color: #000B13;

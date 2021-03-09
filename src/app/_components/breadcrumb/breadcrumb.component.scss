@@ -12,13 +12,13 @@
 
     &:hover {
       border-radius: 2px;
-      background-color: #28F4AE;
+      background-color: var(--primary-default);
       color: #000B12;
       cursor: pointer;
     }
 
     &--active {
-      color: #28F4AE;
+      color: var(--primary-default);
       font-weight: 500;
 
     }
@@ -30,7 +30,7 @@
   }
 
   .cursor {
-    background: #28F4AE;
+    background: var(--primary-default);
     width: 8px;
     height: 16px;
   }

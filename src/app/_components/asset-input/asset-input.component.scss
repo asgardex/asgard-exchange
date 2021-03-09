@@ -18,7 +18,7 @@
     font-size: 22px;
     font-weight: 500;
     font-family: "Roboto Mono";
-    color: #32fa96;
+    color: var(--primary-default);
     width: 179px;
     line-height: 30px;
   }
@@ -26,7 +26,7 @@
   .expand-more {
     font-size: 30px;
     height: 28px;
-    color: #30f091;
+    color: var(--primary-default);
   }
 
   &.disable {
@@ -50,7 +50,7 @@
 
 .priceInput {
   &::placeholder {
-    color: #32fa96;
+    color: var(--primary-default);
   }
 
   &.disable {

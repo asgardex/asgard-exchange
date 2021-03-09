@@ -20,6 +20,15 @@
 // $asgard-exchange-primary: mat-palette($mat-indigo);
 // $asgard-exchange-accent: mat-palette($mat-pink, A200, A100, A400);
 
+//Colors
+:root {
+  --primary-default: #28F4AE;
+  --primary-graident-bottom-left: #00CCFF;
+  --primary-graident-top-right: #33FF99;
+}
+
+
+
 $uniswap-primary: (
   50: rgba(21, 163, 111, 0.44),
   contrast: (
@@ -365,26 +374,26 @@ button {
     font-weight: 500;
     font-size: 16px;
     text-transform: uppercase;
-    color: #33FF99;
+    color: var(--primary-default);
     width: 100%;
     padding: 0;
     margin: 0 auto;
 
     &::placeholder {
-      color: #32FA96;
+      color: var(--primary-default);
     }
   }
 
   .password {
     font-family: 'Roboto Mono';
-    color: #32FA96;
+    color: var(--primary-default);
     font-size: 22px;
     line-height: 30px;
     font-weight: 500;
     letter-spacing: 1.5px;
 
     &::placeholder {
-      color: #32FA96;
+      color: var(--primary-default);
     }
   }
 
@@ -409,7 +418,7 @@ button {
 
 .priceInput {
   &::placeholder {
-    color: #32FA96;
+    color: var(--primary-default);
   }
 }
 
@@ -545,8 +554,8 @@ input[type=number] {
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 2px solid #32FE9B;
-  color: #32FE9B;
+  border: 2px solid var(--primary-default);
+  color: var(--primary-default);
   text-transform: uppercase;
   border-radius: 10px;
   height: 48px;
@@ -600,7 +609,7 @@ input[type=number] {
     align-items: center;
 
     .mat-progress-spinner circle, .mat-spinner circle {
-      stroke: #32FA96;
+      stroke: var(--primary-default);
     }
   }
 
@@ -730,7 +739,7 @@ main {
   .container-wrapper {
     border-radius: 20px;
     padding: 2px;
-    background: linear-gradient(to top right,#00CCFF, #33FF99);
+    background: linear-gradient(to top right, var(--primary-graident-bottom-left), var(--primary-graident-top-right));
     width: 730px;
     height: 632px;
 

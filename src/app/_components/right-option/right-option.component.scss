@@ -40,9 +40,9 @@ $default-font-size: 14px;
     border: $default-border solid #474E5D;
 
     &.active {
-      border: $default-border solid #28F4AE;
+      border: $default-border solid var(--primary-default);
       font-weight: 500;
-      color: #28F4AE;
+      color: var(--primary-default);
     }
 
     &.left {
@@ -82,7 +82,7 @@ $default-font-size: 14px;
 
   input {
     background: transparent;
-    border: $default-border solid #28F4AE;
+    border: $default-border solid var(--primary-default);
     color: #fff;
     border-radius: $border-radius;
     height: $right-option-height;
