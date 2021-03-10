@@ -45,7 +45,7 @@
         MAX
       </button> -->
 
-      <div class="tag-space--between" *ngIf="balance && balance > 0 && balance != assetUnit && !hideMax && getMax() !== assetUnit">
+      <div class="tag-space--between" style="margin-right: 8px;" *ngIf="balance && balance > 0 && balance != assetUnit && !hideMax && getMax() !== assetUnit">
         <app-tag (click)="setMax()">MAX</app-tag>
       </div>
 
