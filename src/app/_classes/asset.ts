@@ -48,6 +48,9 @@ export class Asset {
           this.iconPath = 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/RUNE-B1A/logo.png';
           break;
 
+        case 'BCH':
+          this.iconPath = 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/bitcoincash/info/logo.png';
+          break;
 
         default:
           break;

@@ -23,6 +23,7 @@ export class UserSettingsDialogComponent implements OnInit, OnDestroy {
   thorAddress: string;
   ethereumAddress: string;
   litecoinAddress: string;
+  bchAddress: string;
   loading: boolean;
   pendingTxCount: number;
   mode: 'ADDRESSES' | 'ADDRESS' | 'PENDING_TXS'
@@ -61,6 +62,7 @@ export class UserSettingsDialogComponent implements OnInit, OnDestroy {
             this.thorAddress = await this.user.clients.thorchain.getAddress();
             this.ethereumAddress = await this.user.clients.ethereum.getAddress();
             this.litecoinAddress = await this.user.clients.litecoin.getAddress();
+            this.bchAddress = await this.user.clients.bitcoinCash.getAddress();
           }
 
           this.loading = false;

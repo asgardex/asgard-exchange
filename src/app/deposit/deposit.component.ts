@@ -217,7 +217,8 @@ export class DepositComponent implements OnInit, OnDestroy {
           || pool.asset.chain === 'THOR'
           || pool.asset.chain === 'BTC'
           || pool.asset.chain === 'ETH'
-          || pool.asset.chain === 'LTC');
+          || pool.asset.chain === 'LTC'
+          || pool.asset.chain === 'BCH');
       },
       (err) => console.error('error fetching pools:', err)
     );

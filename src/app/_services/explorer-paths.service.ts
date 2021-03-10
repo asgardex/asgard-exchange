@@ -8,6 +8,7 @@ export class ExplorerPathsService {
 
   binanceExplorerUrl: string;
   bitcoinExplorerUrl: string;
+  bchExplorerUrl: string;
   thorchainExplorerUrl: string;
   ethereumExplorerUrl: string;
   litecoinExplorerUrl: string;
@@ -33,6 +34,10 @@ export class ExplorerPathsService {
     this.litecoinExplorerUrl = environment.network === 'testnet'
       ? 'https://tltc.bitaps.com'
       : 'https://ltc.bitaps.com';
+
+    this.bchExplorerUrl = environment.network === 'testnet'
+      ? 'https://explorer.bitcoin.com/tbch'
+      : 'https://explorer.bitcoin.com/bch';
 
   }
 }

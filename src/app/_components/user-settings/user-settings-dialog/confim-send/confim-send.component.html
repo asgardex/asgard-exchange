@@ -46,4 +46,9 @@
   transactionDetail="Sending {{asset.asset.ticker}}">
 </app-transaction-processing-modal>
 
+<div style="font-size: 0.8rem; padding: 2rem 0" class="flxr flxr--flow-col flxr--align-center" *ngIf="txState === 'ERROR'">
+  <mat-icon>warning</mat-icon>
+  There was an error processing the RUNE upgrade.<br />
+  {{error}}
+</div>
 

@@ -70,6 +70,7 @@ import { UpgradeRuneModule } from './_components/upgrade-rune/upgrade-rune.modul
 import { UpgradeRuneConfirmModule } from './_components/upgrade-rune-confirm/upgrade-rune-confirm.module';
 import { SochainService } from './_services/sochain.service';
 import { ThorchainPricesService } from './_services/thorchain-prices.service';
+import { HaskoinService } from './_services/haskoin.service';
 
 
 @NgModule({
@@ -137,7 +138,8 @@ import { ThorchainPricesService } from './_services/thorchain-prices.service';
     TransactionStatusService,
     EthUtilsService,
     SochainService,
-    ThorchainPricesService
+    ThorchainPricesService,
+    HaskoinService
   ],
   bootstrap: [AppComponent]
 })
