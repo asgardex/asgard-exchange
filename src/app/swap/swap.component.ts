@@ -358,8 +358,10 @@ export class SwapComponent implements OnInit, OnDestroy {
 
   getMessage() {
     let message = '';
-    if(this.user)
+    if(this.user && this.balances)
       message = (this.slip * 100) > this.slippageTolerance ? 'ready with high slip' : 'prepare';
+    else if(this.user && !this.balances)
+      message = "LOADING BALANCE"
     else
       message = 'connect wallet';
     return message
