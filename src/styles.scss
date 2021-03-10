@@ -580,6 +580,11 @@ input[type=number] {
   border-radius: 6px;
   height: 56px;
 
+  &:disabled {
+    background-color: #0D1B23;
+    background-image: unset;
+  }
+
   span {
     text-transform: uppercase;
     font-weight: 700;

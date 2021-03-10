@@ -36,7 +36,7 @@
 
       <div class="bottom-actions two-btn">
         <div class="left-btn">
-          <button class="close-btn" *ngIf="!keystoreConnecting" (click)="forgetKeystore()"
+          <button class="close-btn" (click)="forgetKeystore()"
             [disabled]="keystoreConnecting">
             <span>Forget Keystore</span>
           </button>
@@ -44,12 +44,10 @@
         <div class="divider"></div>
         <div class="right-btn">
           <div>
-            <button class="next-btn" *ngIf="!keystoreConnecting" (click)="keystoreUnlockClicked()"
+            <button class="next-btn" (click)="keystoreUnlockClicked()"
               [disabled]="keystoreConnecting || !keystorePassword">
-              <span>Unlock</span>
-            </button>
-            <button *ngIf="keystoreConnecting" class="next-btn spinner">
-              <mat-progress-spinner mode="indeterminate" diameter="30"></mat-progress-spinner>
+              <span *ngIf="!keystoreConnecting">Unlock</span>
+              <span *ngIf="keystoreConnecting">Unlocking...</span>
             </button>
           </div>
         </div>
