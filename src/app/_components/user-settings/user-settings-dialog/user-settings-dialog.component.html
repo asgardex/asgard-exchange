@@ -15,7 +15,7 @@
     </nav>
   </div> -->
   <div class="content-top">
-    <app-breadcrumb [path]="[{name: 'asgardex', swapView: 'Swap', mainView: 'Swap'}, {name: 'wallets', disable: true}]" message="Select"></app-breadcrumb>
+    <app-breadcrumb [path]="[{name: 'asgardex', swapView: 'Swap', mainView: 'Swap'}, {name: 'wallets', disable: true}]" message="Select" (backFunc)="clearSelectedAddress()"></app-breadcrumb>
     <div class="top-right">
     </div>
   </div>

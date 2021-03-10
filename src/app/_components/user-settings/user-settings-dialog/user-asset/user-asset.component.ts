@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Chain } from '@xchainjs/xchain-util';
 import { AssetAndBalance } from 'src/app/_classes/asset-and-balance';
 import { CoinGeckoService } from 'src/app/_services/coin-gecko.service';
 import { CopyService } from 'src/app/_services/copy.service';
@@ -41,6 +42,22 @@ export class UserAssetComponent implements OnInit {
       });
     }
 
+  }
+
+  getIconPath(chain: Chain): string {
+    switch (chain) {
+      case 'BNB':
+        return 'assets/images/token-icons/bnb.png';
+
+      case 'BTC':
+        return 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/BTCB-1DE/logo.png';
+
+      case 'ETH':
+        return 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png';
+
+      case 'THOR':
+        return 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/RUNE-B1A/logo.png';
+    }
   }
 
   getUsdPrice(id: string) {

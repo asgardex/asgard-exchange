@@ -15,45 +15,36 @@
   </div>
 </div> -->
 
-<div class="modal-head">
-  <div *ngIf="address && chain" class="uni-input user-address">
-    <label class="flxr flxr--align-center">
-      {{chain}} Address
-
-
-    </label>
-
-    <div class="flxr" style="width: 100%; align-items: center;">
-      <input class="wallet-address" [value]="address" name="address" [disabled]="true" style="padding: 0;" />
-      <button matSuffix mat-icon-button aria-label="BNB Address" (click)="copyToClipboard(address)">
-        <mat-icon matSuffix (click)="copyToClipboard(address)">content_copy</mat-icon>
-      </button>
-      <a class="explorer-link" [href]="explorerPath" target="_blank">
-        <mat-icon style="font-size: 20px;">link</mat-icon>
-      </a>
-    </div>
-
-    <!-- <app-testnet-warning></app-testnet-warning> -->
-
+<div class="content-middle">
+  <div class="modal-head" style="margin-bottom: 20px;">
+    <app-notice [tags]="['Copy', 'Explorer']">
+      <span text >{{address}}</span>
+      <div tag_one (click)="copyToClipboard(address)">
+        <span>COPY</span>
+      </div>
+      <div tag_two>
+        <a target="_blank" style="text-decoration: none; color: inherit;" [href]="explorerPath">Explore</a>
+      </div>
+    </app-notice>
   </div>
-</div>
 
-<div mat-dialog-content>
-  <app-assets-list
-    [assetListItems]="assets"
-    [loading]="loading"
-    [disabledAssetSymbol]="''"
-    [displayAddTokenButton]="chain === 'ETH'"
-    (selectAsset)="selectAsset($event)"
-    (addToken)="navigateToAddToken.emit()">
-  </app-assets-list>
+  <div class="expandable" mat-dialog-content>
+    <app-assets-list
+      [assetListItems]="assets"
+      [loading]="loading"
+      [disabledAssetSymbol]="''"
+      [displayAddTokenButton]="chain === 'ETH'"
+      (selectAsset)="selectAsset($event)"
+      (addToken)="navigateToAddToken.emit()">
+    </app-assets-list>
+  </div>
 </div>
 
 <div class="bottom-actions" style="display: flex; margin-top: 30px;">
   <div style="width: 50%;">
     <div style="margin-right: 6px;">
       <button class="close-btn" (click)="back.emit()">
-        <span>⭠ SETTINGS</span>
+        <span>⭠ WALLET</span>
       </button>
     </div>
   </div>

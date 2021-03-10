@@ -4,8 +4,8 @@
   </button>
 </div> -->
 
-<div class="modal-head">
-  <div *ngIf="address" class="uni-input user-address">
+<div class="modal-head" style="margin-bottom: 20px;">
+  <!-- <div *ngIf="address" class="uni-input user-address">
     <label class="flxr flxr--align-center">
       {{asset.asset.ticker}} Address
 
@@ -22,29 +22,60 @@
       </a>
     </div>
 
-    <!-- <app-testnet-warning></app-testnet-warning> -->
+    <app-testnet-warning></app-testnet-warning>
 
-  </div>
+  </div> -->
+  <app-notice [tags]="['Copy', 'Explorer']">
+    <span text >{{address}}</span>
+    <div tag_one (click)="copyToClipboard()">
+      <span>COPY</span>
+    </div>
+    <div tag_two>
+      <a target="_blank" style="text-decoration: none; color: inherit;" [href]="">Explore</a>
+    </div>
+  </app-notice>
 </div>
 
-<div mat-dialog-content style="height: 365px;">
+<div mat-dialog-content class="content-middle-lower">
 
-  <div class="flxr flxr--flow-col flxr--just-center flxr--align-center">
+  <div class="left-content">
+    <div *ngIf="address" style="display: flex; background: #fff; justify-content: center; align-items: center; border-radius: 6px; overflow: hidden;">
+        <qrcode [qrdata]="address" [width]="288" [errorCorrectionLevel]="'M'" [elementType]="'svg'"></qrcode>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="right-content">
+    <div class="balance">
+      <img *ngIf="getIconPath(asset.asset.chain)" class="asset-icon" [src]="getIconPath(asset.asset.chain)" appImgFallback />
+      <div class="amount">
+        <span class="mono">1,000,000</span>
+        <div class="usd-val"><span class="mono">~$2,333,333</span> USD</div>
+      </div>
+    </div>
+    <div class="tx-history">
+
+    </div>
+  </div>
+
+
+  <!-- <div class="flxr flxr--flow-col flxr--just-center flxr--align-center"> -->
     <!-- <div style="width: 40px; margin-bottom: 1rem;">
       <img *ngIf="asset && asset.asset && asset.asset.iconPath" class="asset-icon" [src]="asset && asset.asset && asset.asset.iconPath" style="max-width: 100%;" />
     </div> -->
 
-    <div *ngIf="address" style="text-align: center">
-      <qrcode [qrdata]="address" [width]="365" [errorCorrectionLevel]="'M'" [elementType]="'svg'"></qrcode>
+    <!-- <div *ngIf="address" style="text-align: left"> -->
+      <!-- <qrcode [qrdata]="address" [width]="288" [errorCorrectionLevel]="'M'" [elementType]="'svg'"></qrcode> -->
       <!-- <span style="font-size: 0.8rem">{{address}}</span> -->
-    </div>
+    <!-- </div> -->
 
     <!-- <span *ngIf="asset" class="asset-balance">{{asset.balance.amount().toNumber()}} {{asset.asset.ticker}}</span>
     <div style="height: 17px">
       <span class="usd-value" *ngIf="usdValue">≈ ${{usdValue | number:"0.0-2"}}</span>
     </div> -->
 
-  </div>
+  <!-- </div> -->
 
   <!-- <ul class="actions flxr flxr--just-center">
     <li class="action flxr flxr--flow-col">

@@ -4,6 +4,7 @@ import { Chain } from '@xchainjs/xchain-util';
 import { Subscription } from 'rxjs';
 import { AssetAndBalance } from 'src/app/_classes/asset-and-balance';
 import { User } from 'src/app/_classes/user';
+import { MainViewsEnum, OverlaysService } from 'src/app/_services/overlays.service';
 import { TransactionStatusService } from 'src/app/_services/transaction-status.service';
 import { UserService } from 'src/app/_services/user.service';
 
@@ -38,6 +39,7 @@ export class UserSettingsDialogComponent implements OnInit, OnDestroy {
   constructor(
     private userService: UserService,
     private txStatusService: TransactionStatusService,
+    private overlaysService: OverlaysService
     // public dialogRef: MatDialogRef<UserSettingsDialogComponent>
   ) {
 
@@ -139,7 +141,7 @@ export class UserSettingsDialogComponent implements OnInit, OnDestroy {
   }
 
   close() {
-    this.userSettingChange.emit(false);
+    this.overlaysService.setViews(MainViewsEnum.Swap, 'Swap')
   }
 
   ngOnDestroy(): void {
