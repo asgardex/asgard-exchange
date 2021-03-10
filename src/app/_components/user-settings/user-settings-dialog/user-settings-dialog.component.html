@@ -1,7 +1,7 @@
 <div class="container-wrapper"
   [ngClass]="{'pending': mode === 'CONFIRM_SEND', 'success': mode === 'SUCCESS', 'submit': mode === 'PROCESSING'}">
 <div class="container">
-  <div class="modal-head" *ngIf="mode === 'ADDRESSES' || mode === 'PENDING_TXS'">
+  <!-- <div class="modal-head" *ngIf="mode === 'ADDRESSES' || mode === 'PENDING_TXS'">
     <nav>
       <div>
         <a [ngClass]="{'active': mode === 'ADDRESSES'}" (click)="mode = 'ADDRESSES'"
@@ -13,6 +13,11 @@
           transactions </a>
       </div>
     </nav>
+  </div> -->
+  <div class="content-top">
+    <app-breadcrumb [path]="[{name: 'asgardex', swapView: 'Swap', mainView: 'Swap'}, {name: 'wallets', disable: true}]" message="Select"></app-breadcrumb>
+    <div class="top-right">
+    </div>
   </div>
   <div>
     <div mat-dialog-content *ngIf="mode === 'ADDRESSES'">
@@ -35,7 +40,7 @@
             </button>
           </div> -->
 
-          <div *ngIf="thorAddress" class="uni-input user-address" (click)="selectAddress(thorAddress, 'THOR')">
+          <!-- <div *ngIf="thorAddress" class="uni-input user-address" (click)="selectAddress(thorAddress, 'THOR')">
             <label>RUNE Address</label>
 
             <div class="flxr flxr--align-center" style="width: 100%">
@@ -44,7 +49,7 @@
               </div>
               <input [value]="thorAddress.substring(0, 8) + '...' + thorAddress.substring(thorAddress.length - 4, thorAddress.length)" name="rune-address" [disabled]="true" />
             </div>
-          </div>
+          </div> -->
 
           <!-- <div *ngIf="bitcoinAddress" class="uni-input user-address" (click)="selectAddress(bitcoinAddress, 'BTC')">
 
@@ -58,6 +63,19 @@
 
           </div> -->
 
+          <div class="w-address" *ngIf="thorAddress" (click)="selectAddress(thorAddress, 'THOR')">
+            <div class="icon-addr">
+              <div class="asset-icon-container">
+                <img class="asset-icon"
+                  src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/RUNE-B1A/logo.png" />
+              </div>
+              <label>THOR</label>
+            </div>
+            <div class="addr">
+              <input [value]="thorAddress.substring(0, 12) + '...' + thorAddress.substring(thorAddress.length - 12, thorAddress.length)" name="rune-address" [disabled]="true" />
+            </div>
+          </div>
+
           <div class="w-address" *ngIf="bitcoinAddress" (click)="selectAddress(bitcoinAddress, 'BTC')">
             <div class="icon-addr">
               <div class="asset-icon-container">
@@ -67,7 +85,7 @@
               <label>BTC</label>
             </div>
             <div class="addr">
-              <input [value]="bitcoinAddress" name="btc-address" [disabled]="true" />
+              <input [value]="bitcoinAddress.substring(0, 12) + '...' + bitcoinAddress.substring(bitcoinAddress.length - 12, bitcoinAddress.length)" name="btc-address" [disabled]="true" />
             </div>
           </div>
 
@@ -79,7 +97,7 @@
               <label>BNB</label>
             </div>
             <div class="addr">
-              <input [value]="binanceAddress" name="binance-address" [disabled]="true" />
+              <input [value]="binanceAddress.substring(0, 12) + '...' + binanceAddress.substring(binanceAddress.length - 12, binanceAddress.length)" name="binance-address" [disabled]="true" />
             </div>
           </div>
 
@@ -126,21 +144,12 @@
 
 
     <!-- close dialog -->
-    <div class="bottom-actions" style="display: flex; margin-top: 30px;"
-      *ngIf="mode === 'ADDRESSES' || mode === 'PENDING_TXS'">
-      <div style="width: 50%;">
-        <div style="margin-right: 6px;">
-          <button class="close-btn" (click)="close()">
-            <span>⭠ swap</span>
-          </button>
-        </div>
-      </div>
-      <div style="width: 50%;">
-        <div style="margin-left: 6px;">
-          <button class="next-btn" aria-label="Close Connect Wallet Dialog" (click)="disconnect()">
-            <span>close wallet</span>
-          </button>
-        </div>
+    <div class="bottom-actions"
+        *ngIf="mode === 'ADDRESSES' || mode === 'PENDING_TXS'">
+      <div>
+        <button class="close-btn" (click)="close()">
+          <span>close</span>
+        </button>
       </div>
     </div>
   </div>

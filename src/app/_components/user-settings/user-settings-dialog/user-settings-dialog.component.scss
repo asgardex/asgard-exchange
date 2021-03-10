@@ -28,7 +28,7 @@
   &:hover {
     // border: 1px solid white;
     background: #28F4AF;
-    
+
     label, input {
       color: #000;
     }
@@ -55,21 +55,21 @@
     margin-right: 8px;
   }
 
-  .addr input {
-    text-align: right;
-    width: 230px;
-    background-color: transparent;
-    border: none;
-    color: #414856;
-    font-weight: 700;
-    font-size: 22px;
-    line-height: 30px;
-    text-overflow: ellipsis;
-  }
-
   .addr {
-    width: 250px;
+    width: 300px;
     margin-left: 45px;
+
+    input {
+      text-align: right;
+      width: 100%;
+      background-color: transparent;
+      border: none;
+      color: #414856;
+      font-weight: 700;
+      font-size: 22px;
+      line-height: 30px;
+      text-overflow: ellipsis;
+    }
   }
 
   .icon-addr {
@@ -79,7 +79,7 @@
 
   &:hover {
     background: #28F4AF;
-    
+
     label, input {
       color: #000 !important;
     }
