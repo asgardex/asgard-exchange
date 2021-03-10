@@ -253,7 +253,11 @@ export class UserService {
 
       case 'BCH':
         const bchClient = clients.bitcoinCash;
-        return await bchClient.getAddress();
+        const address = await bchClient.getAddress();
+
+        // bch testnet addresses look like bchtest:qpmhkjgp89d8uuyl3je5gw09kgsr5t4ndyj9mzvrcm
+        // the colon interferes with the THORChain memo, and needs to be removed
+        return address.indexOf(':') > 0 ? address.split(':')[1] : address;
 
       case 'ETH':
         const ethClient = clients.ethereum;
