@@ -24,6 +24,9 @@ export class TextFieldComponent implements OnInit {
   @Input() labelTwo: string = 'TEXT';
   @Input() nameTwo: string;
 
+  @Input() disable: boolean = false;
+  @Input() disableTwo: boolean = false;
+
   constructor() { }
 
   ngOnInit(): void {

@@ -17,7 +17,8 @@
       (ngModelChange)="updateFieldText($event)"
       [name]="name"
       placeholder="_______________________________________"
-      [type]="type" />
+      [type]="type"
+      [disabled]="disable" />
   </div>
   <div class="text-field-input uni-input" [ngClass]="{'no-top-border': mode == 'Double'}">
     <label>{{labelTwo}}</label>
@@ -26,6 +27,7 @@
       (ngModelChange)="updateFieldTextTwo($event)"
       [name]="nameTwo"
       placeholder="_______________________________________"
-      [type]="typeTwo" />
+      [type]="typeTwo"
+      [disabled]="disableTwo" />
   </div>
 </div>

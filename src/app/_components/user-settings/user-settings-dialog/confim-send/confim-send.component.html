@@ -1,9 +1,9 @@
 <div>
 
-  <div>
-    <!-- <button (click)="back.emit()" mat-icon-button>
+  <!-- <div>
+    <button (click)="back.emit()" mat-icon-button>
       <mat-icon>arrow_back</mat-icon>
-    </button> -->
+    </button>
     <div *ngIf="txState === 'PENDING_CONFIRMATION'" class="outline-btn" style="width: 139px; border-color: #F3BA2F; color: #F3BA2F;" >
       <h1>
         Confirm Send
@@ -15,10 +15,10 @@
     <div *ngIf="txState === 'SUCCESS'" class="outline-btn" style="border-color: #fff; color: #fff; width: 259px;">
       <h1>TRANSACTION PROCESSING</h1>
     </div>
-    <!-- <div style="width: 40px"></div> -->
-  </div>
+    <div style="width: 40px"></div>
+  </div> -->
 
-  <div class="modal-head confirm-modal-head" style="margin-top: 31px;">
+  <div class="modal-head confirm-modal-head">
 
     <!-- <div class="flxr flxr--just-space-between transaction-detail">
 
@@ -47,43 +47,48 @@
       [disabledMarketSelect]="true">
     </app-asset-input>
 
-    <div class="uni-input" style="margin-top: 38px;">
+    <!-- <div class="uni-input" style="margin-top: 38px;">
       <label>Recipient Address</label>
       <textarea class="password" [(ngModel)]="recipientAddress" name="recipient-address" [disabled]="true"></textarea>
-    </div>
+    </div> -->
 
-    <div style="padding: 14px;">
+    <app-arrow></app-arrow>
+
+    <app-text-field  type="Text" mode="Double" typeTwo="text" label="Recipient Address" labelTwo="Memo" [(textOfField)]="recipientAddress" [disable]="true" [disableTwo]="true"></app-text-field>
+
+    <!-- <div style="padding: 14px;">
       <span style="color: #F3BA2F; font-size: 14px; line-height: 24px;">You’re sending TESTNET BNB. Make sure your recipient’s address is a TESTNET address.</span>
-    </div>
+    </div> -->
 
   </div>
 
 </div>
 
-<div *ngIf="txState === 'PENDING_CONFIRMATION' && asset" class="bottom-actions" style="display: flex; margin-top: 41px;">
-  <div style="flex: 1 1 0;" >
-    <div style="margin-right: 6px;">
+<div class="bottom-actions two-btn" *ngIf="txState === 'PENDING_CONFIRMATION' && asset">
+  <div class="right-btn">
+    <div>
       <button class="close-btn" (click)="back.emit()">
         <span>cancel</span>
       </button>
     </div>
   </div>
-  <div style="flex: 1 1 0;">
-    <div style="margin-left: 6px;">
-      <button (click)="submitTransaction()" class="next-btn" style="background-color: #F3BA2F !important;">
+  <div class="divider"></div>
+  <div class="left-btn">
+    <div>
+      <button (click)="submitTransaction()" class="next-btn">
         <span>confirm</span>
       </button>
     </div>
   </div>
 </div>
-<div class="bottom-actions" style="display: flex; margin-top: 41px;" *ngIf="txState === 'SUBMITTING' && asset">
+<div class="bottom-actions" *ngIf="txState === 'SUBMITTING' && asset">
   <div style="width: 100%;">
     <button style="background-color: #00CCFF !important;" class="next-btn" aria-label="TRANSACTION PROCESSING…">
       <span>TRANSACTION PROCESSING…</span>
     </button>
   </div>
 </div>
-<div class="bottom-actions" style="display: flex; margin-top: 41px;" *ngIf="txState === 'SUCCESS' && asset">
+<div class="bottom-actions" *ngIf="txState === 'SUCCESS' && asset">
   <div style="width: 100%;">
     <button class="close-btn" aria-label="TRANSACTION PROCESSING…" (click)="back.emit()">
       <span>close</span>

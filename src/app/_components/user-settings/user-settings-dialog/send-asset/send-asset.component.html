@@ -1,36 +1,42 @@
-<div style="margin-bottom: 31px;">
-  <!-- <button (click)="back.next()" mat-icon-button>
+<!-- <div style="margin-bottom: 31px;">
+  <button (click)="back.next()" mat-icon-button>
     <mat-icon>arrow_back</mat-icon>
-  </button> -->
+  </button>
   <div class="outline-btn" style="width: 105px;">
     <h1 *ngIf="asset && asset.asset && asset.asset.ticker" class="flxr">
       Send {{asset.asset.ticker}}
     </h1>
   </div>
-  <!-- <div style="width: 40px"></div> -->
-</div>
+  <div style="width: 40px"></div>
+</div> -->
 
 <div mat-dialog-content *ngIf="asset">
 
   <div>
-    <app-asset-input
-      label="Input"
-      [(selectedAsset)]="asset.asset"
-      [(assetUnit)]="amount"
-      [balance]="asset.balance.amount().toNumber()"
-      [disabledAssetSymbol]="asset.asset.symbol"
-      [disabledMarketSelect]="true"
-      [coinGeckoList]="coinGeckoList">
-    </app-asset-input>
+    <div>
+      <app-asset-input
+        label="Send"
+        [isSource]="true"
+        [(selectedAsset)]="asset.asset"
+        [(assetUnit)]="amount"
+        [balance]="asset.balance.amount().toNumber()"
+        [disabledAssetSymbol]="asset.asset.symbol"
+        [disabledMarketSelect]="true"
+        [coinGeckoList]="coinGeckoList">
+      </app-asset-input>
+    </div>
 
-    <div class="uni-input" style="margin-top: 38px; height: 125px;">
+    <app-arrow></app-arrow>
+    <!-- <div class="uni-input" style="margin-top: 38px; height: 125px;">
       <label>Recipient Address</label>
       <textarea class="password" [(ngModel)]="recipientAddress" name="recipient-address" placeholder="_______________________" ></textarea>
-    </div>
+    </div> -->
 
-    <div class="disclaimer">
+    <app-text-field  type="Text" mode="Double" typeTwo="text" label="Recipient Address" labelTwo="Memo" [(textOfField)]="recipientAddress"></app-text-field>
+
+    <!-- <div class="disclaimer">
       <span style="color: #F3BA2F; font-size: 14px; line-height: 24px;">You’re sending TESTNET BNB. Make sure your recipient’s address is a TESTNET address.</span>
-    </div>
+    </div> -->
 
   </div>
 
