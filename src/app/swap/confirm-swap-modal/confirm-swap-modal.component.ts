@@ -10,7 +10,7 @@ import { TransactionStatusService, TxActions, TxStatus } from 'src/app/_services
 import { SlippageToleranceService } from 'src/app/_services/slippage-tolerance.service';
 import BigNumber from 'bignumber.js';
 import { ETH_DECIMAL } from '@xchainjs/xchain-ethereum/lib';
-import { EthUtilsService } from 'src/app/_services/eth-utils.service.js';
+import { EthUtilsService } from 'src/app/_services/eth-utils.service';
 import {
   baseAmount,
   assetToBase,
