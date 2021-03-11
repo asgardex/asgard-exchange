@@ -1,0 +1,45 @@
+<div class="modal-head confirm-modal-head">
+  <h1 mat-dialog-title>Approve Contract</h1>
+
+  <div>
+
+    <small>
+      <span>Approve {{data.asset.ticker}} to be used by</span> <br />
+      <span>THORChain smart contract</span> <br />
+      <span>{{data.contractAddress}}</span>
+    </small>
+
+  </div>
+
+</div>
+
+<div style="clear: both">
+  <div mat-dialog-content class="confirm-modal-content">
+
+    <div>
+
+      <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
+        <span class="tx-detail-label">Estimated ETH Fee</span>
+        <span *ngIf="fee">{{ (fee) | number:"0.0-6"}} ETH</span>
+        <span *ngIf="!fee"> - ETH</span>
+      </div>
+
+      <div *ngIf="loading" style="width: 100%; height: 56px; margin-top: 1rem;" class="flxr flxr--just-center flxr--align-center">
+        <mat-progress-spinner mode="indeterminate" diameter="30"></mat-progress-spinner>
+      </div>
+
+      <button *ngIf="!loading" (click)="approve()" mat-flat-button color="primary" class="main-action-btn" [disabled]="insufficientEthBalance">
+        <span *ngIf="!insufficientEthBalance">Approve</span>
+        <span *ngIf="insufficientEthBalance">Insufficient ETH</span>
+      </button>
+
+    </div>
+
+    <!-- close dialog -->
+    <div mat-dialog-actions class="dialog-actions">
+      <button mat-icon-button aria-label="Close Markets Dialog" (click)="closeDialog()" mat-dialog-close>
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+</div>

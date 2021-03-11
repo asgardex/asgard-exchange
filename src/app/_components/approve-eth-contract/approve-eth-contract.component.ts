@@ -1,9 +1,11 @@
 import { Component, Input, OnDestroy, OnInit, Output, EventEmitter } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { Asset } from '@xchainjs/xchain-util';
 import { Subscription } from 'rxjs';
 import { User } from 'src/app/_classes/user';
 import { TransactionStatusService } from 'src/app/_services/transaction-status.service';
 import { UserService } from 'src/app/_services/user.service';
+import { ApproveEthContractModalComponent } from './approve-eth-contract-modal/approve-eth-contract-modal.component';
 
 @Component({
   selector: 'app-approve-eth-contract',
@@ -21,7 +23,7 @@ export class ApproveEthContractComponent implements OnInit, OnDestroy {
   isApprovedTxHash: string;
   approving: boolean;
 
-  constructor(private userService: UserService, private txStatusService: TransactionStatusService) {
+  constructor(private userService: UserService, private txStatusService: TransactionStatusService, private dialog: MatDialog) {
 
     this.approved = new EventEmitter<null>();
     this.approving = false;
@@ -44,21 +46,28 @@ export class ApproveEthContractComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
   }
 
-  async approve() {
-    console.log('approve clicked');
+  openConfirmationDialog() {
+    const dialogRef = this.dialog.open(
+      ApproveEthContractModalComponent,
+      {
+        minWidth: '260px',
+        maxWidth: '420px',
+        width: '50vw',
+        data: {
+          contractAddress: this.contractAddress,
+          asset: this.asset
+        }
+      }
+    );
 
-    if (this.contractAddress && this.user && this.asset) {
+    dialogRef.afterClosed().subscribe( (isApprovedTxHash: string) => {
 
-      const assetAddress = this.asset.symbol.slice(this.asset.ticker.length + 1);
-      const strip0x = assetAddress.substr(2);
-      const approve = await this.user.clients.ethereum.approve(this.contractAddress, strip0x);
+      if (isApprovedTxHash) {
+        this.isApprovedTxHash = isApprovedTxHash;
+        this.approving = true;
+      }
 
-      this.isApprovedTxHash = approve.hash;
-      this.txStatusService.pollEthContractApproval(approve.hash);
-      this.approving = true;
-
-    }
-
+    });
   }
 
   ngOnDestroy(): void {
