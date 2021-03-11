@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ethers } from 'ethers';
 import { PoolAddressDTO } from '../_classes/pool-address';
-import { TCRopstenAbi } from '../_abi/thorchain.abi.js';
+import { TCRopstenAbi } from '../_abi/thorchain.abi';
 import { Client, ETH_DECIMAL } from '@xchainjs/xchain-ethereum/lib';
 import { assetAmount, assetToBase, baseAmount } from '@xchainjs/xchain-util';
 import BigNumber from 'bignumber.js';
