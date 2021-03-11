@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ApproveEthContractComponent } from './approve-eth-contract.component';
+import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 
 describe('ApproveEthContractComponent', () => {
   let component: ApproveEthContractComponent;
@@ -9,7 +10,10 @@ describe('ApproveEthContractComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [ ApproveEthContractComponent ],
-      imports: [ HttpClientTestingModule ]
+      imports: [ HttpClientTestingModule, MatDialogModule ],
+      providers: [
+        { provide: MAT_DIALOG_DATA, useValue: {} },
+      ],
     })
     .compileComponents();
   });
