@@ -4,7 +4,7 @@
     <a [routerLink]="['/', 'pool']" routerLinkActive="active">Pool</a>
   </nav>
 
-  <div style="position: relative;">
+  <div class="relative">
 
     <!-- SOURCE -->
     <app-asset-input
@@ -16,7 +16,7 @@
       [selectableMarkets]="selectableMarkets">
     </app-asset-input>
 
-    <div class="flxr flxr--align-center flxr--just-center">
+    <div class="flex justify-between items-center">
       <button class="reverse-transaction" (click)="reverseTransaction()" [disabled]="!selectedSourceAsset || !selectedTargetAsset">
         <mat-icon [class.disabled]="!selectedSourceAsset || !selectedTargetAsset" class="to-btn-icon">arrow_downward</mat-icon>
       </button>
@@ -36,22 +36,22 @@
       [selectableMarkets]="selectableMarkets">
     </app-asset-input>
 
-    <div *ngIf="selectedTargetAsset && selectedSourceAsset" class="flxr flxr--just-space-between swap-details">
+    <div *ngIf="selectedTargetAsset && selectedSourceAsset" class="flex justify-between swap-details">
       <span>Price:</span>
       <span *ngIf="basePrice">{{basePrice | number:"1.2-6"}} {{selectedSourceAsset.ticker}} per {{selectedTargetAsset.ticker}}</span>
       <span *ngIf="!basePrice">-</span>
     </div>
 
-    <div *ngIf="selectedTargetAsset && selectedSourceAsset" class="flxr flxr--just-space-between swap-details">
+    <div *ngIf="selectedTargetAsset && selectedSourceAsset" class="flex justify-between swap-details">
       <span class="tx-detail-label">Slip</span>
       <span *ngIf="slip">{{slip | percent:"0.2-4" }}</span>
       <span *ngIf="!slip">-</span>
     </div>
 
-    <div class="flxr">
+    <div class="flex">
       <app-approve-eth-contract
         *ngIf="ethContractApprovalRequired && ethInboundAddress && selectedSourceAsset"
-        style="width: 50%; margin-right: 8px;"
+        class="w-1/2 mr-2"
         [contractAddress]="ethInboundAddress.router"
         [asset]="selectedSourceAsset"
         (approved)="contractApproved()">
@@ -62,7 +62,7 @@
         mat-flat-button
         color="primary"
         [disabled]="formInvalid()"
-        [ngStyle]="{'width': ethContractApprovalRequired ? '50%' : '100%'}"
+        [ngClass]="ethContractApprovalRequired ? 'w-1/2' : 'w-full'"
       >
         {{mainButtonText()}}
       </button>
@@ -70,15 +70,15 @@
 
     <!-- <div class="tag" *ngIf="basePrice && selectedTargetAsset && selectedSourceAsset">
       <div class="tag-contents">
-        <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
+        <div class="flex justify-between" style="margin-bottom: 6px;">
           <span class="tx-detail-label">Total Fee</span>
           <span>{{binanceTransferFeeDisplay | number:"0.0-6"}} BNB</span>
         </div>
-        <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
+        <div class="flex justify-between" style="margin-bottom: 6px;">
           <span class="tx-detail-label"></span>
           <span>{{runeTransactionFee}} Rune</span>
         </div>
-        <div class="flxr flxr--just-space-between">
+        <div class="flex justify-between">
           <span class="tx-detail-label">Slip</span>
           <span>{{slip | percent:"0.2-4" }}</span>
         </div>

@@ -13,22 +13,22 @@
 
 </div>
 
-<div style="clear: both">
+<div class="clear-both">
   <div mat-dialog-content class="confirm-modal-content">
 
     <div>
 
-      <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
+      <div class="flex justify-between mb-2">
         <span class="tx-detail-label">Estimated ETH Fee</span>
         <span *ngIf="fee">{{ (fee) | number:"0.0-6"}} ETH</span>
         <span *ngIf="!fee"> - ETH</span>
       </div>
 
-      <div *ngIf="loading" style="width: 100%; height: 56px; margin-top: 1rem;" class="flxr flxr--just-center flxr--align-center">
+      <div *ngIf="loading" style="height: 56px;" class="flex justify-center items-center w-full mt-4">
         <mat-progress-spinner mode="indeterminate" diameter="30"></mat-progress-spinner>
       </div>
 
-      <button *ngIf="!loading" (click)="approve()" mat-flat-button color="primary" class="main-action-btn" [disabled]="insufficientEthBalance">
+      <button *ngIf="!loading" (click)="approve()" mat-flat-button color="primary" class="main-action-btn w-full" [disabled]="insufficientEthBalance">
         <span *ngIf="!insufficientEthBalance">Approve</span>
         <span *ngIf="insufficientEthBalance">Insufficient ETH</span>
       </button>

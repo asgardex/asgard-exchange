@@ -5,7 +5,7 @@
   <div>
     <div mat-dialog-content>
 
-      <div style="padding: 0 1rem 1rem">
+      <div class="px-4 pb-4">
         <div *ngIf="loading" class="icon-container">
 
           <mat-progress-spinner mode="indeterminate" diameter="60"></mat-progress-spinner>
@@ -17,7 +17,7 @@
           <app-slippage-tolerance></app-slippage-tolerance>
 
           <div>
-            <button (click)="mode = 'PENDING_TXS'" class="pending-tx-btn flxr flxr--align-center" style="padding-left: 0;">
+            <button (click)="mode = 'PENDING_TXS'" class="pending-tx-btn flex items-center pl-0">
               Transactions ({{pendingTxCount}} Pending)
               <mat-icon>keyboard_arrow_right</mat-icon>
             </button>
@@ -27,7 +27,7 @@
           <div *ngIf="thorAddress" class="uni-input user-address" (click)="selectAddress(thorAddress, 'THOR')">
             <label>RUNE Address</label>
 
-            <div class="flxr flxr--align-center" style="width: 100%; padding: 0.75rem 0;">
+            <div class="flex items-center w-full py-3">
               <div class="asset-icon-container">
                 <img class="asset-icon" src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/RUNE-B1A/logo.png" />
               </div>
@@ -39,7 +39,7 @@
           <div *ngIf="bitcoinAddress" class="uni-input user-address" (click)="selectAddress(bitcoinAddress, 'BTC')">
             <label>Bitcoin Address</label>
 
-            <div class="flxr flxr--align-center" style="width: 100%; padding: 0.75rem 0;">
+            <div class="flex items-center w-full py-3">
               <div class="asset-icon-container">
                 <img class="asset-icon" src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/BTCB-1DE/logo.png" />
               </div>
@@ -51,7 +51,7 @@
           <div *ngIf="ethereumAddress" class="uni-input user-address" (click)="selectAddress(ethereumAddress, 'ETH')">
             <label>Ethereum Address</label>
 
-            <div class="flxr flxr--align-center" style="width: 100%l; padding: 0.75rem 0;">
+            <div class="flex items-center w-full py-3">
               <div class="asset-icon-container">
                 <img class="asset-icon" src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png" />
               </div>
@@ -63,7 +63,7 @@
           <div *ngIf="binanceAddress" class="uni-input user-address" (click)="selectAddress(binanceAddress, 'BNB')">
             <label>BNB Address</label>
 
-            <div class="flxr flxr--align-center" style="width: 100%; padding: 0.75rem 0;">
+            <div class="flex items-center w-full py-3">
               <div class="asset-icon-container">
                 <img class="asset-icon" src="assets/images/token-icons/bnb.png" />
               </div>
@@ -75,7 +75,7 @@
           <div *ngIf="litecoinAddress" class="uni-input user-address" (click)="selectAddress(litecoinAddress, 'LTC')">
             <label>Litecoin Address</label>
 
-            <div class="flxr flxr--align-center" style="width: 100%; padding: 0.75rem 0;">
+            <div class="flex items-center w-full py-3">
               <div class="asset-icon-container">
                 <img class="asset-icon" src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/litecoin/info/logo.png" />
               </div>
@@ -87,7 +87,7 @@
           <div *ngIf="bchAddress" class="uni-input user-address" (click)="selectAddress(bchAddress, 'BCH')">
             <label>Bitcoin Cash Address</label>
 
-            <div class="flxr flxr--align-center" style="width: 100%; padding: 0.75rem 0;">
+            <div class="flex items-center w-full py-3">
               <div class="asset-icon-container">
                 <img class="asset-icon" src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/bitcoincash/info/logo.png" />
               </div>
@@ -95,11 +95,12 @@
             </div>
           </div>
 
-          <div class="flxr flxr--just-end">
-            <button style="margin-right: 6px" mat-flat-button (click)="mode = 'VIEW_PHRASE'">
+          <div class="flex justify-end">
+            <button mat-flat-button (click)="mode = 'VIEW_PHRASE'">
               <mat-icon>visibility</mat-icon>
               View Phrase
             </button>
+            <span class="w-2"></span>
             <button (click)="disconnect()" mat-flat-button color="primary">Disconnect</button>
           </div>
 

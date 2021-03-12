@@ -1,6 +1,6 @@
 <div class="container">
 
-  <div style="padding: 1rem 1rem 0" class="section-head-container">
+  <div class="section-head-container pt-4 px-4">
     <h1>Keystore Found</h1>
     <div style="width: 40px"></div>
   </div>
@@ -15,17 +15,23 @@
 
       <div class="uni-input">
         <label>Password</label>
-        <input [(ngModel)]="keystorePassword" name="keystore-password" placeholder="Please Enter Password" type="password" (keyup.enter)="initUnlock()" />
+        <input
+          [(ngModel)]="keystorePassword"
+          name="keystore-password"
+          placeholder="Please Enter Password"
+          type="password"
+          (keyup.enter)="initUnlock()"
+          class="focus:outline-none focus:ring-0" />
       </div>
 
     </div>
 
-    <div class="flxr flxr--just-space-between flxr--align-center" style="height: 38px">
+    <div class="flex justify-between items-center" style="height: 38px">
       <div>
         <span *ngIf="keystoreError" style="font-size: 0.8rem; color: #2172e5">Keystore Login Incorrect</span>
       </div>
       <div>
-        <button style="margin-right: 6px" *ngIf="!keystoreConnecting" mat-flat-button (click)="forgetKeystore()" [disabled]="keystoreConnecting">
+        <button class="mb-2" *ngIf="!keystoreConnecting" mat-flat-button (click)="forgetKeystore()" [disabled]="keystoreConnecting">
           <span>Forget Keystore</span>
         </button>
         <button *ngIf="!keystoreConnecting" mat-flat-button color="accent" (click)="initUnlock()" [disabled]="keystoreConnecting">

@@ -1,8 +1,8 @@
-<div style="padding: 1rem 1rem 0" class="section-head-container">
+<div class="section-head-container pt-4 px-4">
   <button (click)="back.emit()" mat-icon-button>
     <mat-icon>arrow_back</mat-icon>
   </button>
-  <h1 class="flxr">
+  <h1 class="flex">
     <div class="asset-icon-container">
       <img *ngIf="iconPath" class="asset-icon" [src]="iconPath" />
     </div>
@@ -17,7 +17,7 @@
 
 <div class="modal-head">
   <div *ngIf="address && chain" class="uni-input user-address">
-    <label class="flxr flxr--align-center">
+    <label class="flex items-center">
       {{chain}} Address
 
       <a class="explorer-link" [href]="explorerPath" target="_blank">
@@ -25,7 +25,7 @@
       </a>
     </label>
 
-    <div class="flxr" style="width: 100%">
+    <div class="flex w-full">
       <textarea [value]="address" name="address" [disabled]="true"></textarea>
       <button matSuffix mat-icon-button aria-label="Copy To Clipboard" (click)="copyToClipboard(address)">
         <mat-icon matSuffix (click)="copyToClipboard(address)">content_copy</mat-icon>

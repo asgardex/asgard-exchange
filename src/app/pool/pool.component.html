@@ -5,24 +5,25 @@
     <a [routerLink]="['/', 'pool']" routerLinkActive="active">Pool</a>
   </nav>
 
-  <div style="position: relative;">
+  <div class="relative">
 
-    <div style="margin: -12px 0 24px; float: left; width: 100%;">
-      <a [routerLink]="['/', 'deposit', 'BTC.BTC']" class="main-action-btn" mat-flat-button color="primary">
+    <div class="float-left w-full" style="margin: -12px 0 24px">
+      <a [routerLink]="['/', 'deposit', 'BTC.BTC']" class="main-action-btn w-full" mat-flat-button color="primary">
         Add Liquidity
       </a>
       <a
         *ngIf="createablePools && createablePools.length > 0"
         [routerLink]="['/', 'create-pool']"
         [queryParams]="{pool: createablePools[0]}"
-        style="float: right; text-decoration: none; color: white; font-size: 0.8rem; margin-top: 8px;"
+        class="float-right text-white mt-3"
+        style="text-decoration: none; font-size: 0.8rem;"
       >
         Create Pool
       </a>
     </div>
 
-    <div class="section-label flxr flxr--align-center flxr--just-space-between">
-      <span style="margin-right: 6px;">Your liquidity</span>
+    <div class="section-label flex items-center justify-between">
+      <span class="mr-2">Your liquidity</span>
       <button class="refresh-indicator" *ngIf="user && !loading" (click)="getAccountPools()" mat-icon-button aria-label="Refresh your liquidity">
         <mat-icon style="font-size: 1.2rem;">refresh</mat-icon>
       </button>
@@ -37,13 +38,13 @@
 
     <app-staked-pools-list *ngIf="user && pools && memberPools" [pools]="pools" [memberPools]="memberPools"></app-staked-pools-list>
 
-    <div *ngIf="user && (!pools || !memberPools)" style="float: left; width: 100%; height: 140px" class="flxr flxr--just-center flxr--align-center">
+    <div *ngIf="user && (!pools || !memberPools)" style="height: 140px" class="flex justify-center items-center float-left w-full">
 
         <div *ngIf="!userPoolError">
           <mat-progress-spinner color="primary" mode="indeterminate" diameter="30"></mat-progress-spinner>
         </div>
 
-        <div style="font-size: 0.8rem" class="flxr flxr--flow-col flxr--align-center" *ngIf="userPoolError">
+        <div class="flex flex-col items-center text-xs" *ngIf="userPoolError">
           <mat-icon>warning</mat-icon>
           Error fetching user pools
         </div>

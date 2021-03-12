@@ -1,8 +1,8 @@
-<div style="padding: 1rem 1rem 0; margin-bottom: 0;" class="section-head-container">
+<div class="section-head-container pt-4 px-4 mb-0">
   <button (click)="back.next()" mat-icon-button>
     <mat-icon>arrow_back</mat-icon>
   </button>
-  <h1 *ngIf="asset && asset.asset && asset.asset.ticker" class="flxr">
+  <h1 *ngIf="asset && asset.asset && asset.asset.ticker" class="flex">
     Upgrade to Native RUNE
   </h1>
   <div style="width: 40px"></div>
@@ -10,7 +10,7 @@
 
 <div mat-dialog-content *ngIf="asset">
 
-  <div style="padding: 1rem">
+  <div class="p4">
     <app-asset-input
       label="Input"
       [(selectedAsset)]="asset.asset"
@@ -25,7 +25,7 @@
       You can upgrade it to Native RUNE, which will show up in your RUNE wallet in user settings.
     </small>
 
-    <div class="flxr flxr--just-end flxr--align-center" style="height: 38px; margin-top: 1rem;">
+    <div class="flex justify-end items-center mt-4" style="height: 38px;">
       <div>
         <button
           mat-flat-button

@@ -1,8 +1,8 @@
-<div style="padding: 1rem 1rem 0; margin-bottom: 0;" class="section-head-container">
+<div class="section-head-container pt-4 px-4 mb-0">
   <button (click)="back.next()" mat-icon-button>
     <mat-icon>arrow_back</mat-icon>
   </button>
-  <h1 *ngIf="chain" class="flxr">
+  <h1 *ngIf="chain" class="flex">
     Add {{chain}} Token
   </h1>
   <div style="width: 40px"></div>
@@ -10,14 +10,14 @@
 
 <div mat-dialog-content>
 
-  <div *ngIf="!error" style="padding: 1rem">
+  <div *ngIf="!error" class="p-4">
 
     <div class="uni-input">
       <label>Token Contract Address</label>
       <input [(ngModel)]="tokenAddress" name="custom-token-address" placeholder="Enter {{chain}} Token Address" />
     </div>
 
-    <div class="flxr flxr--just-end flxr--align-center" style="height: 38px">
+    <div class="flex justify-end items-center" style="height: 38px">
       <div>
         <button *ngIf="!loading" mat-flat-button color="accent" [disabled]="tokenAddress.length < 40 || tokenAddress.length > 42 || !ethClient || !chainAddress || !chain" (click)="addToken()">
           <span>Add Token</span>
