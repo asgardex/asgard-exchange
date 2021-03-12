@@ -1,9 +1,10 @@
-<div style="padding: 1rem 1rem 0; margin-bottom: 0;" class="section-head-container">
+<div class="section-head-container pt-4 px-4 mb-0">
   <button (click)="back.next()" mat-icon-button>
     <mat-icon>arrow_back</mat-icon>
   </button>
-  <h1 class="flxr">
-    <mat-icon>warning</mat-icon> Manual Memo
+  <h1 class="flex items-center">
+    <mat-icon>warning</mat-icon>
+    <span class="w-2"></span> Manual Memo
   </h1>
   <div style="width: 40px"></div>
 </div>
@@ -12,7 +13,7 @@
 
   <div>
 
-    <div style="padding: 1rem">
+    <div class="p-4">
       <div class="uni-input">
         <label>Memo</label>
         <textarea type="text" [ngModel]="memo" [disabled]="true"></textarea>
@@ -21,7 +22,7 @@
 
     <div class="memo-form" style="border-top: 1px solid #2c2f36; border-bottom: 1px solid #2c2f36">
 
-      <div style="padding: 1rem">
+      <div class="p-4">
 
         <div class="uni-input">
           <label>Action</label>
@@ -90,7 +91,7 @@
 
     </div>
 
-    <div style="padding: 1rem">
+    <div class="p-4">
 
       <app-asset-input
         *ngIf="action != 'WITHDRAW' && action != 'LEAVE' && action != 'UNBOND'"
@@ -102,7 +103,7 @@
         [selectableMarkets]="[asset]">
       </app-asset-input>
 
-      <div class="flxr flxr--just-end flxr--align-center" style="height: 38px">
+      <div class="flex justify-end items-center" style="height: 38px">
         <div>
           <button mat-flat-button color="accent" (click)="confirmSend()" [disabled]="(
             (action === 'ADD' || action === 'SWAP' || action === 'BOND') && (!depositAmount || depositAmount <= 0)

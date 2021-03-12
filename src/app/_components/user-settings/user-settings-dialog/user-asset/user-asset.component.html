@@ -1,18 +1,18 @@
-<div style="padding: 1rem 1rem 0; margin-bottom: 0;" class="section-head-container">
+<div class="section-head-container pt-4 px-4 mb-0">
   <button (click)="back.emit()" mat-icon-button>
     <mat-icon>arrow_back</mat-icon>
   </button>
 </div>
 
-<div class="modal-head" style="padding-top: 0">
+<div class="modal-head pt-0">
 
-  <div class="flxr flxr--flow-col flxr--just-center flxr--align-center">
-    <div style="width: 40px; margin-bottom: 1rem;">
+  <div class="flex flex-col justify-center items-center">
+    <div class="mb-4" style="width: 40px;">
       <img *ngIf="asset && asset.asset && asset.asset.iconPath" class="asset-icon" [src]="asset && asset.asset && asset.asset.iconPath" appImgFallback style="max-width: 100%;" />
     </div>
 
-    <div *ngIf="address" style="text-align: center">
-      <qrcode [qrdata]="address" [width]="256" [errorCorrectionLevel]="'M'" [elementType]="'svg'"></qrcode>
+    <div *ngIf="address" class="flex flex-col justify-center">
+      <qrcode class="flex justify-center mb-2" [qrdata]="address" [width]="256" [errorCorrectionLevel]="'M'" [elementType]="'svg'"></qrcode>
       <span style="font-size: 0.8rem">{{address}}</span>
     </div>
 
@@ -23,15 +23,15 @@
 
   </div>
 
-  <ul class="actions flxr flxr--just-center">
-    <li class="action flxr flxr--flow-col">
+  <ul class="actions flex justify-center">
+    <li class="action flex flex-col">
       <button mat-mini-fab color="primary" aria-label="Send" (click)="send.emit()">
         <mat-icon>upgrade</mat-icon>
       </button>
       Send
     </li>
 
-    <li class="action flxr flxr--flow-col flxr--align-center">
+    <li class="action flex flex-col items-center">
       <button mat-mini-fab color="primary" aria-label="Copy" (click)="copyToClipboard()">
         <mat-icon>content_copy</mat-icon>
       </button>
@@ -39,7 +39,7 @@
     </li>
 
     <!-- NATIVE RUNE DEPOSIT -->
-    <li *ngIf="asset && asset.asset.chain === 'THOR' && asset.asset.ticker === 'RUNE'" class="action flxr flxr--flow-col flxr--align-center">
+    <li *ngIf="asset && asset.asset.chain === 'THOR' && asset.asset.ticker === 'RUNE'" class="action flex flex-col items-center">
       <button mat-mini-fab color="primary" aria-label="Copy" (click)="deposit.emit()">
         <mat-icon>flash_on</mat-icon>
       </button>
@@ -47,7 +47,7 @@
     </li>
 
     <!-- UPGRADE BNB/ETH RUNE TO NATIVE RUNE -->
-    <li *ngIf="asset && (asset.asset.chain === 'BNB' || asset.asset.chain === 'ETH') && asset.asset.ticker === 'RUNE'" class="action flxr flxr--flow-col flxr--align-center">
+    <li *ngIf="asset && (asset.asset.chain === 'BNB' || asset.asset.chain === 'ETH') && asset.asset.ticker === 'RUNE'" class="action flex flex-col items-center">
       <button mat-mini-fab color="primary" aria-label="Copy" (click)="upgradeRune.emit()">
         <mat-icon>upgrade</mat-icon>
       </button>

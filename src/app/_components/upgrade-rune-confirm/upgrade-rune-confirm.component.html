@@ -1,10 +1,10 @@
 <div *ngIf="txState == 'PENDING_CONFIRMATION' && asset">
 
-  <div style="padding: 1rem 1rem 0" class="section-head-container">
+  <div class="section-head-container pt-4 px-4">
     <button (click)="back.emit()" mat-icon-button>
       <mat-icon>arrow_back</mat-icon>
     </button>
-    <h1 class="flxr">
+    <h1 class="flex">
       Confirm Upgrade
     </h1>
     <div style="width: 40px"></div>
@@ -12,10 +12,10 @@
 
   <div class="modal-head confirm-modal-head">
 
-    <div class="flxr flxr--just-space-between transaction-detail">
+    <div class="flex justify-between transaction-detail">
 
-      <div class="flxr flxr--align-center">
-        <div style="margin-right: 12px;" class="asset-icon-container flxr flxr--align-center">
+      <div class="flex items-center">
+        <div style="margin-right: 12px;" class="asset-icon-container flex items-center">
           <img *ngIf="asset.asset && asset.asset.iconPath" [src]="asset.asset.iconPath" appImgFallback />
           <mat-icon *ngIf="!asset.asset.iconPath">help_outline</mat-icon>
         </div>
@@ -31,11 +31,11 @@
       By clicking the button below, you will be upgrading it off of the {{asset.asset.chain}} chain to native RUNE. Your native RUNE will show up in your RUNE wallet in user settings.
     </small>
 
-    <div *ngIf="loading" style="width: 100%; height: 56px; margin-top: 1rem;" class="flxr flxr--just-center flxr--align-center">
+    <div *ngIf="loading" style="height: 56px;" class="flex justify-center items-center w-full mt-4">
       <mat-progress-spinner mode="indeterminate" diameter="30"></mat-progress-spinner>
     </div>
 
-    <button *ngIf="!loading" [disabled]="insufficientChainBalance" (click)="submitTransaction()" mat-flat-button color="accent" class="main-action-btn">
+    <button *ngIf="!loading" [disabled]="insufficientChainBalance" (click)="submitTransaction()" mat-flat-button color="accent" class="main-action-btn w-full">
       <span *ngIf="!insufficientChainBalance">Upgrade RUNE</span>
       <span *ngIf="insufficientChainBalance">Insufficient {{asset.asset.chain}} Balance</span>
     </button>
@@ -49,7 +49,7 @@
   transactionDetail="Sending {{asset.asset.ticker}}">
 </app-transaction-processing-modal>
 
-<div style="font-size: 0.8rem; padding: 2rem 0" class="flxr flxr--flow-col flxr--align-center" *ngIf="txState === 'ERROR'">
+<div class="flex flex-col items-center py-8 text-sm" *ngIf="txState === 'ERROR'">
   <mat-icon>warning</mat-icon>
   There was an error processing the RUNE upgrade.
 </div>

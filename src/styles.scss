@@ -1,3 +1,6 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=VT323&display=swap');
 
 // Custom Theming for Angular Material
@@ -80,11 +83,7 @@ body {
 body {
   width: 100vw;
   min-height: 100vh;
-  // background-position: 0px -30vh;
   background-repeat: repeat;
-  // background-color: slategray;
-  // background-image: url('assets/noisy-texture-transparent.png');
-  // background-image: radial-gradient(25% 50% at 75% 50%, rgba(33, 114, 229, 0.1) 0%, rgba(33, 36, 41, 0) 20%);
   color: white;
 }
 
@@ -128,13 +127,11 @@ button {
   box-shadow: none;
   border-radius: 8px !important;
   position: relative;
-  // background-color: #212A26;
   background-color: rgba(30, 36, 36, 1);
   color: white;
   overflow-x: hidden !important;
 
   .dialog-content {
-    // background-color: rgb(44, 47, 54);
     background-color: rgba(255, 255, 255, 0.04);
     padding: 2rem;
     display: flex;
@@ -143,7 +140,7 @@ button {
 
   .dialog-actions {
     position: absolute;
-    top: 0;
+    top: 10px;
     right: 10px;
   }
 
@@ -203,7 +200,6 @@ button {
     outline: none;
     border: none;
     flex: 1 1 auto;
-    font-size: 1rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -267,11 +263,8 @@ input[type=number] {
 
 .main-action-btn {
   color: white !important;
-  // background-color: rgb(255, 0, 122) !important;
-  width: 100%;
   margin-top: 1rem !important;
   padding: 10px !important;
-  // border-radius: 20px !important;
 
   &:disabled {
     // background-color:rgb(64, 68, 79) !important;
@@ -296,38 +289,6 @@ input[type=number] {
     }
   }
 
-}
-
-.flxr {
-  display: flex;
-
-  &--just-center {
-    justify-content: center;
-  }
-
-  &--just-space-between {
-    justify-content: space-between;
-  }
-
-  &--just-end {
-    justify-content: flex-end;
-  }
-
-  &--align-start {
-    align-items: flex-start;
-  }
-
-  &--align-center {
-    align-items: center;
-  }
-
-  &--align-end {
-    align-items: end;
-  }
-
-  &--flow-col {
-    flex-flow: column;
-  }
 }
 
 /**
@@ -451,7 +412,6 @@ main {
 }
 
 .confirm-modal-head {
-  // font-size: 20px;
 
   h1, .transaction-detail {
     font-size: 20px;

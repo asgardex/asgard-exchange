@@ -1,4 +1,4 @@
-<div class="heading-container flxr flxr--just-space-between flxr--align-end" >
+<div class="heading-container flex justify-between items-end" >
   <div class="list-title">
     Token Name
   </div>
@@ -9,7 +9,7 @@
 
 <div class="market-list-container">
 
-  <div *ngIf="loading" class="flxr flxr--align-center flxr--just-center" style="height: 100%; width: 100%">
+  <div *ngIf="loading" class="flex items-center justify-center w-full h-full">
     <mat-progress-spinner diameter="16" color="primary" mode="indeterminate"></mat-progress-spinner>
   </div>
 
@@ -22,18 +22,18 @@
         <mat-icon *ngIf="!item.asset.iconPath">help_outline</mat-icon>
       </div>
 
-      <div class="flxr flxr--just-space-between flxr--align-start" style="width:100%;">
-        <div class="flxr flxr--flow-col">
+      <div class="flex justify-between items-start w-full">
+        <div class="flex flex-col">
           <span class="market-list-item__symbol">{{item.asset.ticker}}</span>
           <span *ngIf="item.asset.chain === 'ETH' && item.asset.ticker !== 'ETH'" class="market-list-item__chain">{{item.asset.symbol.split('-')[1]}}</span>
           <span class="market-list-item__chain">{{item.asset.chain}}</span>
         </div>
-        <div *ngIf="item.balance" class="flxr flxr--flow-col flxr--just-end" style="text-align: right;">
+        <div *ngIf="item.balance" class="flex flex-col justify-end text-right">
           <span class="market-list-item__balance">{{item.balance.amount().toNumber()}}</span>
         </div>
       </div>
     </li>
-    <li *ngIf="displayAddTokenButton" class="flxr flxr--just-center flxr--align-center" style="padding: 1rem 0;">
+    <li *ngIf="displayAddTokenButton" class="flex justify-center items-center py-4">
       <button mat-flat-button color="accent" (click)="addToken.emit()">Add Token</button>
     </li>
   </ul>

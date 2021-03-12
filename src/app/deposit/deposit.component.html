@@ -8,7 +8,7 @@
     <div style="width: 40px"></div>
   </div>
 
-  <div style="position: relative;">
+  <div class="relative">
 
     <app-asset-input
       label="Input"
@@ -19,7 +19,7 @@
       [selectableMarkets]="selectableMarkets">
     </app-asset-input>
 
-    <div class="flxr flxr--align-center flxr--just-center">
+    <div class="flex items-center justify-center">
       <mat-icon [class.disabled]="true" class="to-btn-icon">add</mat-icon>
     </div>
 
@@ -34,10 +34,10 @@
       [disabledMarketSelect]="true">
     </app-asset-input>
 
-    <div class="flxr">
+    <div class="flex">
       <app-approve-eth-contract
         *ngIf="ethContractApprovalRequired"
-        style="width: 50%; margin-right: 8px;"
+        class="w-1/2 mr-2"
         [contractAddress]="ethRouter"
         [asset]="asset"
         (approved)="contractApproved()">
@@ -46,7 +46,7 @@
       <button
         (click)="openConfirmationDialog()"
         class="main-action-btn"
-        [ngStyle]="{'width': ethContractApprovalRequired ? '50%' : '100%'}"
+        [ngClass]="ethContractApprovalRequired ? 'w-1/2' : 'w-full'"
         mat-flat-button
         color="primary"
         [disabled]="formDisabled()"
@@ -58,7 +58,7 @@
 
     <div class="tag">
       <div class="tag-contents">
-        <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
+        <div class="flex justify-between mb-2">
           <span class="tx-detail-label">Total Fee</span>
           <span>1 RUNE + {{asset.ticker}} Network Gas</span>
         </div>

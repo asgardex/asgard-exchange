@@ -1,8 +1,8 @@
-<div style="padding: 1rem 1rem 0; margin-bottom: 0;" class="section-head-container">
+<div class="section-head-container pt-4 px-4 mb-0">
   <button (click)="back.next()" mat-icon-button>
     <mat-icon>arrow_back</mat-icon>
   </button>
-  <h1 class="flxr">
+  <h1 class="flex">
     View Wallet Phrase
   </h1>
   <div style="width: 40px"></div>
@@ -10,7 +10,7 @@
 
 <div mat-dialog-content>
 
-  <div style="padding: 1rem">
+  <div class="p-4">
 
     <div *ngIf="!passwordAccepted">
       <div class="uni-input">
@@ -18,7 +18,7 @@
         <input [(ngModel)]="keystorePassword" name="keystore-password" placeholder="Please Enter Password" type="password" />
       </div>
 
-      <div class="flxr flxr--just-space-between flxr--align-center" style="height: 38px">
+      <div class="flex justify-between items-center" style="height: 38px">
         <div>
           <span *ngIf="keystoreError" style="font-size: 0.8rem; color: #2172e5">Keystore Login Incorrect</span>
         </div>

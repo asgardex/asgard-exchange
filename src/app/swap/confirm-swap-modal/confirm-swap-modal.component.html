@@ -6,78 +6,83 @@
     <div class="modal-head confirm-modal-head">
       <h1 mat-dialog-title>Confirm Swap</h1>
 
-      <div class="flxr flxr--just-space-between transaction-detail">
+      <div class="flex justify-between transaction-detail">
 
-        <div class="flxr flxr--align-center">
-          <div style="margin-right: 12px;" class="asset-icon-container flxr flxr--align-center">
+        <div class="flex items-center">
+          <div class="asset-icon-container flex items-center mr-4">
             <img *ngIf="swapData.sourceAsset.iconPath" [src]="swapData.sourceAsset.iconPath" appImgFallback />
             <mat-icon *ngIf="!swapData.sourceAsset.iconPath">help_outline</mat-icon>
           </div>
-          <span style="margin-right: 8px; font-size: 20px">{{swapData.inputValue}}</span>
+          <span class="text-xl mr-2">{{swapData.inputValue}}</span>
         </div>
 
         <span>{{swapData.sourceAsset.ticker}}</span>
       </div>
 
-      <div class="flxr">
-        <mat-icon style="margin-left: 4px; margin-bottom: 12px;" class="to-btn-icon disabled">arrow_downward</mat-icon>
+      <div class="flex">
+        <mat-icon class="to-btn-icon disabled ml-1 mb-4">arrow_downward</mat-icon>
       </div>
 
-      <div class="flxr flxr--just-space-between transaction-detail">
+      <div class="flex justify-between transaction-detail">
 
-        <div class="flxr flxr--align-center">
-          <div style="margin-right: 12px;" class="asset-icon-container flxr flxr--align-center">
+        <div class="flex items-center">
+          <div class="asset-icon-container flex items-center mr-4">
             <img *ngIf="swapData.targetAsset.iconPath" [src]="swapData.targetAsset.iconPath" appImgFallback />
             <mat-icon *ngIf="!swapData.targetAsset.iconPath">help_outline</mat-icon>
           </div>
-          <span style="margin-right: 8px; font-size: 20px">{{swapData.outputValue}}</span>
+          <span class="text-xl mr-2">{{swapData.outputValue}}</span>
         </div>
 
         <span>{{swapData.targetAsset.ticker}}</span>
 
       </div>
 
-      <span style="font-style: italic; font-size: 12px; color: rgb(195, 197, 203)">Output is estimated</span>
+      <span class="italic text-gray-300 text-xs">Output is estimated</span>
 
     </div>
 
-    <div style="clear: both">
+    <div class="clear-both">
       <div mat-dialog-content class="confirm-modal-content">
 
         <div>
 
-          <!-- <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
+          <!-- <div class="flex justify-between" style="margin-bottom: 6px;">
             <span class="tx-detail-label">Price</span>
             <span>{{swapData.basePrice | number:"1.2-4"}} {{swapData.sourceAsset.ticker}} per {{swapData.targetAsset.ticker}}</span>
           </div> -->
 
-          <div *ngIf="swapData.sourceAsset.chain === 'BNB'" class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
+          <div *ngIf="swapData.sourceAsset.chain === 'BNB'" class="flex justify-between mb-2">
             <span class="tx-detail-label">Total Fee</span>
             <span>{{swapData.bnbFee | number:"0.0-6"}} BNB</span>
           </div>
 
-          <div *ngIf="swapData.sourceAsset.chain === 'ETH'" class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
+          <div *ngIf="swapData.sourceAsset.chain === 'ETH'" class="flex justify-between mb-2">
             <span class="tx-detail-label">Total Fee</span>
             <span *ngIf="ethNetworkFee">{{ (ethNetworkFee) | number:"0.0-6"}} ETH</span>
             <span *ngIf="!ethNetworkFee"> - ETH</span>
           </div>
 
-          <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
+          <div *ngIf="swapData.sourceAsset.chain === 'THOR'" class="flex justify-between mb-2">
+            <span class="tx-detail-label">Total Fee</span>
+            <span>1 Rune</span>
+          </div>
+
+          <div *ngIf="swapData.sourceAsset.chain !== 'THOR'" class="flex justify-between mb-2">
             <span class="tx-detail-label"></span>
             <span>1 Rune</span>
           </div>
 
-          <div class="flxr flxr--just-space-between">
+          <div class="flex justify-between">
             <span class="tx-detail-label">Slip</span>
             <span>{{swapData.slip | percent:"0.2-4"}}</span>
           </div>
         </div>
 
-        <div *ngIf="loading" style="width: 100%; height: 56px; margin-top: 1rem;" class="flxr flxr--just-center flxr--align-center">
+        <div *ngIf="loading" style="height: 56px;" class="flex justify-center items-center w-full mt-4">
           <mat-progress-spinner mode="indeterminate" diameter="30"></mat-progress-spinner>
         </div>
 
-        <button *ngIf="!loading" (click)="submitTransaction()" mat-flat-button color="primary" class="main-action-btn" [disabled]="insufficientChainBalance">
+        <button *ngIf="!loading" (click)="submitTransaction()" mat-flat-button color="primary" class="main-action-btn w-full" [disabled]="insufficientChainBalance">
           <span *ngIf="!insufficientChainBalance">Confirm Swap</span>
           <span *ngIf="insufficientChainBalance">Insufficient {{swapData.sourceAsset.chain}}</span>
         </button>
@@ -109,9 +114,9 @@
     (closeDialog)="closeDialog(true)">
   </app-transaction-success-modal>
 
-  <div style="font-size: 0.8rem; padding: 2rem 2rem;" class="flxr flxr--flow-col flxr--align-center" *ngIf="txState === 'ERROR'">
+  <div class="flex flex-col items-center p-8 text-sm" *ngIf="txState === 'ERROR'">
     <mat-icon>warning</mat-icon>
-    <span style="margin-top: 1rem;">
+    <span class="mt-4">
       {{error}}
     </span>
   </div>

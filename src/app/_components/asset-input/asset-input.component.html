@@ -1,30 +1,30 @@
 <div class="swap-input uni-input">
 
-  <div style="width: 100%;">
-    <div class="flxr flxr--just-space-between">
+  <div class="w-full">
+    <div class="flex justify-between">
       <label for="{{label}}Input">{{label}}</label>
       <label *ngIf="selectedAsset && balance">
         Balance: {{balance | number:"1.0-8"}} <br />
         <div style="height: 13px;">
-          <span style="float: right; font-size: 0.6rem" *ngIf="usdValue">(<i>approx ${{usdValue | number:"1.0-0"}}</i>)</span>
+          <span class="float-right text-xs h-4" *ngIf="usdValue">(<i>approx ${{usdValue | number:"1.0-0"}}</i>)</span>
         </div>
       </label>
     </div>
 
-    <div class="flxr flxr--just-space-between flxr--align-center">
+    <div class="flex justify-between items-center">
 
-      <div *ngIf="loading" class="flxr flxr--align-center" style="height: 53px">
+      <div *ngIf="loading" class="flex items-center" style="height: 53px">
         <mat-progress-spinner diameter="16" color="primary" mode="indeterminate"></mat-progress-spinner>
       </div>
 
-      <div *ngIf="!loading && error" class="flxr flxr--align-center" style="height: 53px">
+      <div *ngIf="!loading && error" class="flex items-center" style="height: 53px">
         <mat-icon style="font-size: 1rem; height: 18px;">warning</mat-icon>
         <span style="font-size: 0.8rem">Error fetching pool</span>
       </div>
 
       <input
         *ngIf="!loading && !error"
-        style="font-size: 1.4rem"
+        class="focus:outline-none focus:ring-0 text-2xl"
         [ngModel]="assetUnit"
         (ngModelChange)="updateAssetUnits($event)"
         id="{{label}}Input"
@@ -33,9 +33,9 @@
         type="number"
         [disabled]="disableInput" />
 
-      <div class="flxr flxr--align-center">
+      <div class="flex items-center">
 
-        <button *ngIf="!selectedAsset" color="primary" style="min-width: 160px;" mat-flat-button (click)="launchMarketsModal()">
+        <button class="focus:outline-none" *ngIf="!selectedAsset" color="primary" style="min-width: 160px;" mat-flat-button (click)="launchMarketsModal()">
           Select a token
           <mat-icon>expand_more</mat-icon>
         </button>
@@ -44,8 +44,8 @@
           MAX
         </button>
 
-        <button *ngIf="selectedAsset" class="launch-markets-btn" (click)="launchMarketsModal()" [disabled]="disabledMarketSelect">
-          <div class="flxr flxr--align-center asset-selector">
+        <button *ngIf="selectedAsset" class="launch-markets-btn focus:outline-none" (click)="launchMarketsModal()" [disabled]="disabledMarketSelect">
+          <div class="flex items-center asset-selector">
             <app-icon-ticker [iconPath]="selectedAsset.iconPath" [ticker]="selectedAsset.ticker"></app-icon-ticker>
             <mat-icon *ngIf="!disabledMarketSelect">expand_more</mat-icon>
           </div>
