@@ -1,12 +1,6 @@
 <div *ngIf="assetPoolData" class="container">
 
-  <div class="section-head-container">
-    <a [routerLink]="['/', 'pool']" mat-icon-button>
-      <mat-icon>arrow_back</mat-icon>
-    </a>
-    <h1>Add Liquidity</h1>
-    <div style="width: 40px"></div>
-  </div>
+  <app-section-head sectionTitle="Add Liquidity" [displayBackBtn]="true" (back)="back()"></app-section-head>
 
   <div class="relative">
 

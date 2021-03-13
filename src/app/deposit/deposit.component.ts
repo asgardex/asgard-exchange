@@ -284,6 +284,10 @@ export class DepositComponent implements OnInit, OnDestroy {
     });
   }
 
+  back(): void {
+    this.router.navigate(['/', 'pool']);
+  }
+
   ngOnDestroy() {
     for (const sub of this.subs) {
       sub.unsubscribe();
