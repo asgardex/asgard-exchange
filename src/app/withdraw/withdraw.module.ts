@@ -12,6 +12,7 @@ import { TransactionProcessingModalModule } from '../_components/transaction-pro
 import { IconTickerModule } from '../_components/icon-ticker/icon-ticker.module';
 import { TransactionLedgerConfirmModalModule } from '../_components/transaction-ledger-confirm-modal/transaction-ledger-confirm-modal.module';
 import { DirectivesModule } from '../_directives/directives.module';
+import { SectionHeadModule } from '../_components/section-head/section-head.module';
 
 
 @NgModule({
@@ -27,6 +28,7 @@ import { DirectivesModule } from '../_directives/directives.module';
     TransactionLedgerConfirmModalModule,
     IconTickerModule,
     DirectivesModule,
+    SectionHeadModule,
     RouterModule.forChild([
       {
         path: ':asset',

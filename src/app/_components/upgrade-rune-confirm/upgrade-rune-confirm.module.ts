@@ -6,6 +6,7 @@ import { TransactionProcessingModalModule } from '../transaction-processing-moda
 import { MatButtonModule } from '@angular/material/button';
 import { DirectivesModule } from 'src/app/_directives/directives.module';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { ModalSectionHeaderModule } from '../modal-section-header/modal-section-header.module';
 
 
 
@@ -17,7 +18,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     MatButtonModule,
     TransactionProcessingModalModule,
     DirectivesModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    ModalSectionHeaderModule
   ],
   exports: [UpgradeRuneConfirmComponent]
 })

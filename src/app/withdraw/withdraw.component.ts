@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { getPoolShare, getValueOfAssetInRune, getValueOfRuneInAsset, PoolData, UnitData } from '@thorchain/asgardex-util';
 import {
   baseAmount,
@@ -62,7 +62,8 @@ export class WithdrawComponent implements OnInit {
     private route: ActivatedRoute,
     private userService: UserService,
     private lastBlockService: LastBlockService,
-    private midgardService: MidgardService
+    private midgardService: MidgardService,
+    private router: Router
   ) {
 
     this.rune = new Asset(this.runeSymbol);
@@ -226,27 +227,11 @@ export class WithdrawComponent implements OnInit {
     });
   }
 
+  back() {
+    this.router.navigate(['/', 'pool']);
+  }
+
   getPoolDetail(asset: string) {
-    // this.midgardService.getPoolDetails([asset], 'simple').subscribe(
-    //   (res) => {
-
-    //     if (res && res.length > 0) {
-
-    //       this.assetPoolData = {
-    //         assetBalance: baseAmount(res[0].assetDepth),
-    //         runeBalance: baseAmount(res[0].runeDepth),
-    //       };
-    //       this.poolUnits = +res[0].poolUnits;
-
-    //       this.runeBasePrice = getValueOfAssetInRune(assetToBase(assetAmount(1)), this.assetPoolData).amount().div(10 ** 8).toNumber();
-    //       this.assetBasePrice = getValueOfRuneInAsset(assetToBase(assetAmount(1)), this.assetPoolData).amount().div(10 ** 8).toNumber();
-
-    //       this.calculate();
-
-    //     }
-    //   },
-    //   (err) => console.error('error getting pool detail: ', err)
-    // );
 
     this.midgardService.getPool(asset).subscribe(
       (res) => {

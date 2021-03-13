@@ -7,6 +7,7 @@ import { AssetsListModule } from '../assets-list/assets-list.module';
 import { UpgradeRuneModule } from '../upgrade-rune/upgrade-rune.module';
 import { UpgradeRuneConfirmModule } from '../upgrade-rune-confirm/upgrade-rune-confirm.module';
 import { TransactionSuccessModalModule } from '../transaction-success-modal/transaction-success-modal.module';
+import { ModalSectionHeaderModule } from '../modal-section-header/modal-section-header.module';
 
 
 
@@ -18,7 +19,8 @@ import { TransactionSuccessModalModule } from '../transaction-success-modal/tran
     AssetsListModule,
     UpgradeRuneModule,
     UpgradeRuneConfirmModule,
-    TransactionSuccessModalModule
+    TransactionSuccessModalModule,
+    ModalSectionHeaderModule
   ],
   exports: [NativeRunePromptComponent]
 })

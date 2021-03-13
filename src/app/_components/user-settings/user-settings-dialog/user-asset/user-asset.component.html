@@ -1,8 +1,4 @@
-<div class="section-head-container pt-4 px-4 mb-0">
-  <button (click)="back.emit()" mat-icon-button>
-    <mat-icon>arrow_back</mat-icon>
-  </button>
-</div>
+<app-modal-section-header [displayBackBtn]="true" (back)="back.emit()"></app-modal-section-header>
 
 <div class="modal-head pt-0">
 

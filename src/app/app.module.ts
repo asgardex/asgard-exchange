@@ -71,6 +71,7 @@ import { UpgradeRuneConfirmModule } from './_components/upgrade-rune-confirm/upg
 import { SochainService } from './_services/sochain.service';
 import { ThorchainPricesService } from './_services/thorchain-prices.service';
 import { HaskoinService } from './_services/haskoin.service';
+import { ModalSectionHeaderModule } from './_components/modal-section-header/modal-section-header.module';
 
 
 @NgModule({
@@ -123,6 +124,7 @@ import { HaskoinService } from './_services/haskoin.service';
     AppRoutingModule,
     TransactionSuccessModalModule,
     DirectivesModule,
+    ModalSectionHeaderModule
   ],
   providers: [
     BinanceService,

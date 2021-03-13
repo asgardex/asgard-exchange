@@ -1,16 +1,6 @@
 <div *ngIf="txState === 'PENDING_CONFIRMATION'">
 
-  <div class="section-head-container pt-4 px-4 mb-0">
-    <button (click)="back.next()" mat-icon-button>
-      <mat-icon>arrow_back</mat-icon>
-    </button>
-    <h1 class="flex items-center">
-      <mat-icon>warning</mat-icon>
-      <span class="w-2"></span>
-      Manual Memo
-    </h1>
-    <div style="width: 40px"></div>
-  </div>
+  <app-modal-section-header sectionTitle="Manual Memo" sectionTitleIcon="warning" [displayBackBtn]="true" (back)="back.emit()"></app-modal-section-header>
 
   <div mat-dialog-content>
 

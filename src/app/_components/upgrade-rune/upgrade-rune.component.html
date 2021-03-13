@@ -1,16 +1,8 @@
-<div class="section-head-container pt-4 px-4 mb-0">
-  <button (click)="back.next()" mat-icon-button>
-    <mat-icon>arrow_back</mat-icon>
-  </button>
-  <h1 *ngIf="asset && asset.asset && asset.asset.ticker" class="flex">
-    Upgrade to Native RUNE
-  </h1>
-  <div style="width: 40px"></div>
-</div>
+<app-modal-section-header sectionTitle="Upgrade to Native RUNE" [displayBackBtn]="true" (back)="back.next()"></app-modal-section-header>
 
 <div mat-dialog-content *ngIf="asset">
 
-  <div class="p4">
+  <div class="p-4">
     <app-asset-input
       label="Input"
       [(selectedAsset)]="asset.asset"

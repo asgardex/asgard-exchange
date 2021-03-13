@@ -1,9 +1,6 @@
 <div *ngIf="mode === 'SELECT_ASSET'">
-  <div class="section-head-container pt-4 px-4">
-    <h1 class="flex">
-      Non-native RUNE Assets
-    </h1>
-  </div>
+
+  <app-modal-section-header sectionTitle="Non-native RUNE Assets"></app-modal-section-header>
 
   <div mat-dialog-content>
     <app-assets-list [assetListItems]="assets" [loading]="loading" [disabledAssetSymbol]="''" (selectAsset)="selectAsset($event)"></app-assets-list>
