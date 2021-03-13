@@ -332,6 +332,10 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
 
   }
 
+  back() {
+    this.router.navigate(['/', 'pool']);
+  }
+
 
   contractApproved() {
     this.ethContractApprovalRequired = false;
