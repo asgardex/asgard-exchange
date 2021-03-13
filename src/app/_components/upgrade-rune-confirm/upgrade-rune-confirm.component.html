@@ -1,14 +1,6 @@
 <div *ngIf="txState == 'PENDING_CONFIRMATION' && asset">
 
-  <div class="section-head-container pt-4 px-4">
-    <button (click)="back.emit()" mat-icon-button>
-      <mat-icon>arrow_back</mat-icon>
-    </button>
-    <h1 class="flex">
-      Confirm Upgrade
-    </h1>
-    <div style="width: 40px"></div>
-  </div>
+  <app-modal-section-header sectionTitle="Confirm Upgrade" [displayBackBtn]="true" (back)="back.emit()"></app-modal-section-header>
 
   <div class="modal-head confirm-modal-head">
 
