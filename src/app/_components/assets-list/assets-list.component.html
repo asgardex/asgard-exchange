@@ -1,13 +1,13 @@
-<div class="heading-container flex justify-between items-end" >
-  <div class="list-title">
+<div class="heading-container flex justify-between items-center pb-4 px-4" >
+  <div class="font-medium">
     Token Name
   </div>
-  <span class="heading-balance__label">Balance</span>
+  <span class="heading-balance__label mr-2 text-gray-400 text-xs">BALANCE</span>
 </div>
 
-<div style="font-size: 0.7rem; color: #849e93; padding: 0 1rem .5rem">Upgrade to THOR.RUNE to access THORChain pools and more</div>
+<div class="text-xs text-gray-400 px-4 pb-2">Upgrade to THOR.RUNE to access THORChain pools</div>
 
-<div class="market-list-container">
+<div class="market-list-container relative w-full h-80 overflow-y-auto border-t border-gray-700">
 
   <div *ngIf="loading" class="flex items-center justify-center w-full h-full">
     <mat-progress-spinner diameter="16" color="primary" mode="indeterminate"></mat-progress-spinner>
@@ -15,23 +15,31 @@
 
   <ul *ngIf="!loading && assetListItems" class="market-list">
 
-    <li class="market-list-item" *ngFor="let item of assetListItems" (click)="selectAsset.emit(item.asset)" [class.disabled]="item.asset.symbol == disabledAssetSymbol">
+    <li *ngFor="let item of assetListItems"
+      class="flex items-center py-1 px-4 cursor-pointer hover:bg-white hover:bg-opacity-10 h-16"
+      [class.text-gray-600]="item.asset.symbol == disabledAssetSymbol"
+      (click)="selectAsset.emit(item.asset)"
+      [class.disabled]="item.asset.symbol == disabledAssetSymbol">
 
-      <div class="asset-icon-container">
+      <div class="asset-icon-container w-8 flex-shrink-0">
         <img *ngIf="item.asset.iconPath" class="asset-icon" [src]="item.asset.iconPath" appImgFallback />
         <mat-icon *ngIf="!item.asset.iconPath">help_outline</mat-icon>
       </div>
 
-      <div class="flex justify-between items-start w-full">
-        <div class="flex flex-col">
-          <span class="market-list-item__symbol">{{item.asset.ticker}}</span>
-          <span *ngIf="item.asset.chain === 'ETH' && item.asset.ticker !== 'ETH'" class="market-list-item__chain">{{item.asset.symbol.split('-')[1]}}</span>
-          <span class="market-list-item__chain">{{item.asset.chain}}</span>
+      <div class="flex flex-col flex-grow">
+
+        <div class="flex justify-between">
+          <span class="market-list-item__symbol font-medium">{{item.asset.ticker}}</span>
+          <div *ngIf="item.balance" class="flex flex-col justify-end text-right">
+            <span class="text-sm font-normal">{{item.balance.amount().toNumber()}}</span>
+          </div>
         </div>
-        <div *ngIf="item.balance" class="flex flex-col justify-end text-right">
-          <span class="market-list-item__balance">{{item.balance.amount().toNumber()}}</span>
-        </div>
+
+
+        <span *ngIf="item.asset.chain === 'ETH' && item.asset.ticker !== 'ETH'" class="text-xs text-gray-400">{{item.asset.symbol.split('-')[1]}}</span>
+        <span class="text-xs text-gray-400">{{item.asset.chain}}</span>
       </div>
+
     </li>
     <li *ngIf="displayAddTokenButton" class="flex justify-center items-center py-4">
       <button mat-flat-button color="accent" (click)="addToken.emit()">Add Token</button>
