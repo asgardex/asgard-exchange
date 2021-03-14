@@ -9,6 +9,7 @@ export class NoticeComponent implements OnInit {
 
   @Input() tags: Array<string> = ['Text', 'Text'];
   @Output() tagClicked = new EventEmitter();
+  @Input() isDouble: boolean = false;
 
   constructor() { }
 

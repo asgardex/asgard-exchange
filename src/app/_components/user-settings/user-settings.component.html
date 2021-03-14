@@ -12,7 +12,7 @@ style="margin-right: 19px; position: absolute; top: 0; right: 96px;"
     <div *ngIf="showMenu" class="menu">
       <span>Transactions</span>
     </div>
-    <div *ngIf="showMenu" class="menu">
+    <div *ngIf="showMenu" class="menu" (click)="openAccountSetting()">
       <span>Settings</span>
     </div>
     <div *ngIf="showMenu" class="menu red" (click)="disconnect()">

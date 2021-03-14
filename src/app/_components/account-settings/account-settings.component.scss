@@ -1,0 +1,56 @@
+.user-address {
+  cursor: pointer;
+  // border: 1px solid rgba(255, 255, 255, 0.02);
+
+  input {
+    cursor: pointer;
+  }
+
+  &:hover {
+    // border: 1px solid white;
+    background: #28F4AF;
+
+    label, input {
+      color: #000;
+    }
+  }
+}
+
+.list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-radius: 3px;
+  height: 49px;
+  cursor: pointer;
+
+  .left-sec {
+    text-transform: uppercase;
+    font-weight: 500;
+    font-size: 22px;
+    line-height: 30px;
+    flex: 1 1 auto;
+  }
+
+  .right-sec {
+    margin-left: 45px;
+
+    input {
+      text-align: right;
+      width: 100%;
+      background-color: transparent;
+      border: none;
+      color: #414856;
+      font-weight: 700;
+      font-size: 22px;
+      line-height: 30px;
+      text-overflow: ellipsis;
+    }
+  }
+
+  &:hover {
+    background: #28F4AF;
+    color: #000 !important;
+  }
+}

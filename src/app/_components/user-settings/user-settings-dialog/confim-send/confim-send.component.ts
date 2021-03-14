@@ -13,6 +13,8 @@ import { TransactionConfirmationState } from 'src/app/_const/transaction-confirm
 import { TransactionStatusService, TxActions, TxStatus } from 'src/app/_services/transaction-status.service';
 import { UserService } from 'src/app/_services/user.service';
 import { ethers } from 'ethers';
+import { CopyService } from 'src/app/_services/copy.service';
+import { ExplorerPathsService } from 'src/app/_services/explorer-paths.service';
 
 @Component({
   selector: 'app-confim-send',
@@ -26,17 +28,20 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
   @Input() recipientAddress: string;
   @Output() back: EventEmitter<null>;
   @Output() transactionSuccessful: EventEmitter<null>;
+  @Output() message: EventEmitter<string>;
 
   @Input() mode: 'ADDRESSES' | 'ADDRESS' | 'PENDING_TXS' | 'ASSET' | 'SEND' | 'CONFIRM_SEND'| 'PROCESSING' | 'SUCCESS';
   @Output() modeChange = new EventEmitter();
-  
+
   user: User;
   subs: Subscription[];
   txState: TransactionConfirmationState;
+  hash: string;
 
-  constructor(private userService: UserService, private txStatusService: TransactionStatusService) {
+  constructor(private userService: UserService, private txStatusService: TransactionStatusService, private copyService: CopyService, private explorerPathsService : ExplorerPathsService) {
     this.back = new EventEmitter<null>();
     this.transactionSuccessful = new EventEmitter<null>();
+    this.message = new EventEmitter<string>();
     this.txState = TransactionConfirmationState.PENDING_CONFIRMATION;
 
     const user$ = this.userService.user$.subscribe(
@@ -45,9 +50,32 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
 
     this.subs = [user$];
 
+    this.getExplorerPath()
   }
 
   ngOnInit(): void {
+  }
+
+  getExplorerPath() {
+    if (this.asset && this.asset.asset) {
+      let chain = this.asset.asset.chain;
+      switch (chain) {
+        case 'BTC':
+          return `${this.explorerPathsService.bitcoinExplorerUrl}/tx`;
+
+        case 'BNB':
+          return `${this.explorerPathsService.binanceExplorerUrl}/tx`;
+
+        case 'THOR':
+          return `${this.explorerPathsService.thorchainExplorerUrl}/txs`;
+
+        case 'ETH':
+          return `${this.explorerPathsService.ethereumExplorerUrl}/tx`;
+
+        default:
+          return '';
+      }
+    }
   }
 
   submitTransaction() {
@@ -59,6 +87,10 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
       this.submitKeystoreTransaction();
     }
 
+  }
+
+  copyToClipboard(hash: string) {
+    this.copyService.copyToClipboard(hash);
   }
 
   async submitKeystoreTransaction() {
@@ -85,6 +117,8 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
             recipient: this.recipientAddress,
           });
 
+          this.hash = hash;
+
           this.txStatusService.addTransaction({
             chain: 'THOR',
             hash,
@@ -110,6 +144,8 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
             amount: assetToBase(assetAmount(this.amount)),
             recipient: this.recipientAddress,
           });
+
+          this.hash = hash;
 
           this.txStatusService.addTransaction({
             chain: 'BNB',
@@ -142,6 +178,8 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
             recipient: this.recipientAddress,
             feeRate: feeRates.average
           });
+
+          this.hash = hash;
 
           this.txStatusService.addTransaction({
             chain: 'BTC',
@@ -184,6 +222,8 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
           amount: assetToBase(assetAmount(this.amount, decimal)),
           recipient: this.recipientAddress,
         });
+
+        this.hash = hash;
 
         this.txStatusService.addTransaction({
           chain: 'ETH',

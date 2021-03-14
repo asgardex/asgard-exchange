@@ -1,0 +1,55 @@
+<div class="container-wrapper">
+  <div class="container" *ngIf="mode === 'ACCOUNT'">
+    <div class="content-top">
+      <app-breadcrumb
+        [path]="[
+          { name: 'asgardex', swapView: 'Swap', mainView: 'Swap' },
+          { name: 'settings', disable: true }
+        ]"
+        message="select"
+      ></app-breadcrumb>
+      <div class="top-right"></div>
+    </div>
+    <div>
+      <div mat-dialog-content>
+        <div>
+          <div class="lists">
+            <div class="list-item" (click)="mode = 'SLIP'">
+              <div class="left-sec">
+                <span>slippage tolerance</span>
+              </div>
+              <div class="right-sec"></div>
+            </div>
+            <div class="list-item" (click)="mode = 'PHRASE'">
+              <div class="left-sec">
+                <span>seed phrase</span>
+              </div>
+              <div class="right-sec"></div>
+            </div>
+            <div class="list-item">
+              <div class="left-sec">
+                <span>conversion currency</span>
+              </div>
+              <div class="right-sec"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- close dialog -->
+      <div class="bottom-actions">
+        <div>
+          <button class="close-btn" (click)="close()">
+            <span>close</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <ng-container *ngIf="mode === 'PHRASE'">
+    <app-seed-phrase (close)="mode = 'ACCOUNT'"></app-seed-phrase>
+  </ng-container>
+  <ng-container *ngIf="mode === 'SLIP'">
+    <app-slippage-tolerance (close)="mode = 'ACCOUNT'"></app-slippage-tolerance>
+  </ng-container>
+</div>

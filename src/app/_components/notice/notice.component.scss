@@ -9,7 +9,7 @@
   height: 56px;
 
   .text-content {
-    width: 80%;
+    flex: 1 1 auto;
     font-weight: 700;
     font-size: 18px;
     line-height: 32px;
@@ -22,5 +22,19 @@
     display: flex;
     justify-content: flex-end;
     align-items: center;
+  }
+
+  &.double {
+    height: auto;
+    padding: 15px;
+
+    .tags {
+      flex-direction: column;
+
+      .left, .right {
+        align-self: flex-end;
+        margin: 5px 0;
+      }
+    }
   }
 }

@@ -1,15 +1,37 @@
-<!-- <div style="margin-bottom: 1rem;"> -->
-  <!-- <span style="font-size: 0.8rem; color: #C7D0CB;">
-    Slippage Tolerance
-  </span> -->
-
-  <!-- <div style="margin-top: 8px;" class="flxr"> -->
-    <!-- <button [class.active]="tolerance === 3 && !customTolerance" (click)="selectSlippage(3)">3%</button>
-    <button [class.active]="tolerance === 5 && !customTolerance" (click)="selectSlippage(5)">5%</button>
-    <button [class.active]="tolerance === 10 && !customTolerance" (click)="selectSlippage(10)">10%</button> -->
-
-    <div id="custom-tolerance" class="flxr" [class.active]="customTolerance">
-      <input id="custom-tolerance-input" [(ngModel)]="customTolerance" [placeholder]="tolerance" name="custom-tolerance" /> %
+<div class="container">
+  <div class="content-top">
+    <app-breadcrumb
+      [path]="[
+        { name: 'asgardex', swapView: 'Swap', mainView: 'Swap' },
+        { name: 'settings',  backFunc: true},
+        { name: 'slippage tolerance', disable: true}
+      ]"
+      message="select"
+      (backFunc)="close.emit()"
+    ></app-breadcrumb>
+    <div class="top-right"></div>
+  </div>
+  <div>
+    <div mat-dialog-content>
+      <div id="custom-tolerance" [class.active]="customTolerance">
+        <span class="custom-tolerance-label">Percentage</span>
+        <input id="custom-tolerance-input" [(ngModel)]="customTolerance" [placeholder]="tolerance" name="custom-tolerance" />
+      </div>
     </div>
-  <!-- </div> -->
-<!-- </div> -->
+
+    <!-- close dialog -->
+    <div class="bottom-actions two-btn">
+      <div class="left-btn">
+        <button class="close-btn" (click)="close.emit()">
+          <span>close</span>
+        </button>
+      </div>
+      <div class="divider"></div>
+      <div class="right-btn">
+        <button class="next-btn" [disabled]="tolerance == customTolerance || !customTolerance" (click)="setSlippage()">
+          <span>Save</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -76,6 +76,8 @@ import { UpgradeRuneConfirmModule } from './_components/upgrade-rune-confirm/upg
 import { SochainService } from './_services/sochain.service';
 import { NoticeComponent } from './_components/notice/notice.component';
 import { NoticeModule } from './_components/notice/notice.module';
+import { AccountSettingsComponent } from './_components/account-settings/account-settings.component';
+import { SeedPhraseComponent } from './_components/account-settings/seed-phrase/seed-phrase.component';
 
 @NgModule({
   declarations: [
@@ -103,6 +105,8 @@ import { NoticeModule } from './_components/notice/notice.module';
     DepositConfirmComponent,
     DepositFormComponent,
     UserAddressAddTokenComponent,
+    AccountSettingsComponent,
+    SeedPhraseComponent,
     // TagComponent,
     // BreadcrumbComponent,
     // RightOptionComponent,

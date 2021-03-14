@@ -20,6 +20,10 @@
     <app-reconnect-dialog [keystore]="keystore"></app-reconnect-dialog>
   </main>
 
+  <main *ngIf="currentView == currentViewType.AccountSetting">
+    <app-account-settings></app-account-settings>
+  </main>
+
   <footer>
     <div class="footer-content">
       <span>BETA product. Don’t swap/pool large. Powered by <a style="color: white; text-decoration: none;" href="https://t.me/thorchain_org" target="_blank">THORChain</a>. Everyone can participate, no one can manipulate.</span>

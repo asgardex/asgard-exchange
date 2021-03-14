@@ -1,4 +1,4 @@
-<div class="notice-container">
+<div class="notice-container" [ngClass]="{'double': isDouble}">
   <div class="text-content">
     <ng-content select="[text]"></ng-content>
   </div>

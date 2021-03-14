@@ -1,0 +1,56 @@
+<div class="container">
+  <div class="content-top">
+    <app-breadcrumb
+      [path]="[
+        { name: 'asgardex', swapView: 'Swap', mainView: 'Swap' },
+        { name: 'settings',  backFunc: true},
+        { name: 'seed phrase', disable: true}
+      ]"
+      message="enter password"
+      (backFunc)="close.emit()"
+    ></app-breadcrumb>
+    <div class="top-right"></div>
+  </div>
+  <div *ngIf="!passwordAccepted">
+    <div mat-dialog-content>
+      <app-text-field [(textOfField)]="keystorePassword" mode="Single" type="Password" label="Password" name="keystore-password"></app-text-field>
+    </div>
+
+    <!-- close dialog -->
+    <div class="bottom-actions two-btn">
+      <div class="left-btn">
+        <button class="close-btn" [disabled]="keystoreConnecting" (click)="close.emit()">
+          <span>close</span>
+        </button>
+      </div>
+      <div class="divider"></div>
+      <div class="right-btn">
+        <button class="next-btn" [disabled]="!keystorePassword || keystoreConnecting" (click)="unlock()">
+          <span *ngIf="!keystoreConnecting">Show</span>
+          <span *ngIf="keystoreConnecting">Connecting...</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="passwordAccepted">
+    <div mat-dialog-content>
+      <app-notice [isDouble]="true">
+        <p style="margin: 0;" text>{{phrase}}</p>
+        <div tag_one (click)="copyToClipboard()">
+          <span>COPY</span>
+        </div>
+        <div tag_two>
+          <span>Download</span>
+        </div>
+      </app-notice>
+    </div>
+
+    <div class="bottom-actions">
+      <div>
+        <button class="close-btn" (click)="close.emit()">
+          <span>close</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
