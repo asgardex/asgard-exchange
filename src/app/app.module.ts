@@ -24,6 +24,7 @@ import { TestnetWarningComponent } from './_components/testnet-warning/testnet-w
 import { UserAssetComponent } from './_components/user-settings/user-settings-dialog/user-asset/user-asset.component';
 import { SendAssetComponent } from './_components/user-settings/user-settings-dialog/send-asset/send-asset.component';
 import { UserAddressAddTokenComponent } from './_components/user-settings/user-settings-dialog/user-address-add-token/user-address-add-token.component';
+import { NativeRunePromptModalComponent } from './_components/native-rune-prompt/native-rune-prompt-modal/native-rune-prompt-modal.component';
 
 /** MODULES */
 import { AppRoutingModule } from './app-routing.module';
@@ -139,7 +140,8 @@ import { SeedPhraseComponent } from './_components/account-settings/seed-phrase/
     TextFieldModule,
     BreadcrumbModule,
     TagModule,
-    NoticeModule
+    NoticeModule,
+    NativeRunePromptModule
   ],
   providers: [
     BinanceService,

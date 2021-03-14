@@ -1,19 +1,23 @@
-<div *ngIf="mode === 'SELECT_ASSET'">
-  <div style="padding: 1rem 1rem 0" class="section-head-container">
-    <h1 class="flxr">
-      Non-native RUNE Assets
-    </h1>
-  </div>
+<div class="container-wrapper" *ngIf="mode === 'SELECT_ASSET'">
+  <div class="container">
+    <div class="main-container">
+      <div class="content-top">
+        <app-breadcrumb [path]="[{name: 'asgardex', swapView: 'Swap', mainView: 'Swap'}, {name: 'Upgrade Rune', disable: true}]" message="Prepare"></app-breadcrumb>
+        <div class="top-right">
+        </div>
+      </div>
 
-  <div mat-dialog-content>
-    <app-assets-list [assetListItems]="assets" [loading]="loading" [disabledAssetSymbol]="''" (selectAsset)="selectAsset($event)"></app-assets-list>
-  </div>
+      <div mat-dialog-content>
+        <app-assets-list [assetListItems]="assets" [loading]="loading" [disabledAssetSymbol]="''" (selectAsset)="selectAsset($event)"></app-assets-list>
+      </div>
+    </div>
 
-  <!-- close dialog -->
-  <div mat-dialog-actions class="dialog-actions">
-    <button mat-icon-button aria-label="Close Markets Dialog" (click)="dialogRef.close()" mat-dialog-close>
-      <mat-icon>close</mat-icon>
-    </button>
+    <!-- close dialog -->
+    <div class="bottom-actions">
+      <button class="next-btn" aria-label="Upgrade to Thorchain RUNE" (click)="close()">
+        <span>upgrade</span>
+      </button>
+    </div>
   </div>
 </div>
 
@@ -37,5 +41,5 @@
   [externalTx]="true"
   [chain]="selectedAsset.asset.chain"
   [hash]="successfulTxHash"
-  (closeDialog)="dialogRef.close()">
+  (closeDialog)="close()">
 </app-transaction-success-modal>

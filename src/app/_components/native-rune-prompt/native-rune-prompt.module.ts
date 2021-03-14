@@ -8,6 +8,7 @@ import { UpgradeRuneModule } from '../upgrade-rune/upgrade-rune.module';
 import { UpgradeRuneConfirmModule } from '../upgrade-rune-confirm/upgrade-rune-confirm.module';
 import { TransactionSuccessModalModule } from '../transaction-success-modal/transaction-success-modal.module';
 import { NotificationComponent } from '../notification/notification.component';
+import { BreadcrumbModule } from '../breadcrumb/breadcrumb.module';
 
 
 
@@ -20,7 +21,8 @@ import { NotificationComponent } from '../notification/notification.component';
     UpgradeRuneModule,
     UpgradeRuneConfirmModule,
     TransactionSuccessModalModule,
+    BreadcrumbModule
   ],
-  exports: [NativeRunePromptComponent]
+  exports: [NativeRunePromptComponent, NativeRunePromptModalComponent]
 })
 export class NativeRunePromptModule { }

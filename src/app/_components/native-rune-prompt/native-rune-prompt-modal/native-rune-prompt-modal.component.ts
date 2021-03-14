@@ -1,7 +1,8 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Asset } from 'src/app/_classes/asset';
 import { AssetAndBalance } from 'src/app/_classes/asset-and-balance';
+import { MainViewsEnum, OverlaysService } from 'src/app/_services/overlays.service';
+import { UserService } from 'src/app/_services/user.service';
 
 @Component({
   selector: 'app-native-rune-prompt-modal',
@@ -16,13 +17,44 @@ export class NativeRunePromptModalComponent implements OnInit {
   selectedAsset: AssetAndBalance;
   amountToSend: number;
   successfulTxHash: string;
+  nonNativeRuneAssets: AssetAndBalance[];
 
   constructor(
-    @Inject(MAT_DIALOG_DATA) public data: {assets: AssetAndBalance[]},
-    public dialogRef: MatDialogRef<NativeRunePromptModalComponent>,
+    private userService: UserService,
+    private overlaysService: OverlaysService
   ) {
+    this.nonNativeRuneAssets = [];
+
+    const balances$ = this.userService.userBalances$.subscribe(
+      (balances) => {
+
+        if (balances) {
+          const nonNativeRuneAssets = balances
+          // get ETH.RUNE and BNB.RUNE
+          .filter( (balance) => {
+
+            return (balance.asset.chain === 'BNB' && balance.asset.ticker === 'RUNE')
+              || (balance.asset.chain === 'ETH' && balance.asset.ticker === 'RUNE');
+
+          })
+          // filter out 0 amounts
+          .filter( balance => balance.amount.amount().isGreaterThan(0))
+          // create Asset
+          .map( (balance) => ({
+            asset: new Asset(`${balance.asset.chain}.${balance.asset.symbol}`)
+          }));
+
+          this.nonNativeRuneAssets = this.userService.sortMarketsByUserBalance(balances, nonNativeRuneAssets);
+
+        } else {
+          this.nonNativeRuneAssets = [];
+        }
+
+      }
+    );
+
     this.mode = 'SELECT_ASSET';
-    this.assets = data.assets;
+    this.assets = this.nonNativeRuneAssets;
   }
 
   ngOnInit(): void {
@@ -44,4 +76,7 @@ export class NativeRunePromptModalComponent implements OnInit {
     this.mode = 'CONFIRM';
   }
 
+  close() {
+    this.overlaysService.setCurrentView(MainViewsEnum.Swap);
+  }
 }
