@@ -3,6 +3,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 import { ExplorerPathsService } from 'src/app/_services/explorer-paths.service';
 import { TransactionStatusService, Tx } from 'src/app/_services/transaction-status.service';
+import { OverlaysService, MainViewsEnum } from 'src/app/_services/overlays.service';
 
 @Component({
   selector: 'app-pending-txs-modal',
@@ -22,7 +23,8 @@ export class PendingTxsModalComponent implements OnInit, OnDestroy {
   constructor(
     // public dialogRef: MatDialogRef<PendingTxsModalComponent>,
     private explorerPathsService: ExplorerPathsService,
-    private txStatusService: TransactionStatusService
+    private txStatusService: TransactionStatusService,
+    private overlaysService: OverlaysService
   ) {
 
     this.back = new EventEmitter<null>();
@@ -76,6 +78,7 @@ export class PendingTxsModalComponent implements OnInit, OnDestroy {
 
   close(): void {
     // this.dialogRef.close();
+    this.overlaysService.setCurrentView(MainViewsEnum.Swap);
   }
 
   ngOnDestroy() {

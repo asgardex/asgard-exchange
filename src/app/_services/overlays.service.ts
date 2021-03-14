@@ -8,7 +8,8 @@ export enum MainViewsEnum {
   Reconnect = 'Reconnect',
   UserSetting = 'User Setting',
   AccountSetting = 'Account Setting',
-  Upgrade = 'Upgrade'
+  Upgrade = 'Upgrade',
+  Transaction = 'Transaction'
 }
 @Injectable({
   providedIn: 'root'

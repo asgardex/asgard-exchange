@@ -481,6 +481,17 @@ button {
   background-color: #0D1B23;
   border-radius: 6px;
   padding: 10px;
+
+  &.disable {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .no-item {
+    font-size: 22px;
+    color: #414856;
+  }
 }
 
 .user-address {

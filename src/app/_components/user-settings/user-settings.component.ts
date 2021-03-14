@@ -59,6 +59,13 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
       this.overlaysService.setCurrentView(MainViewsEnum.AccountSetting);
   }
 
+  openTransaction() {
+    if (this.currentView == MainViewsEnum.Transaction)
+      this.overlaysService.setCurrentView(MainViewsEnum.Swap)
+    else
+      this.overlaysService.setCurrentView(MainViewsEnum.Transaction);
+  }
+
   disconnect() {
     this.userService.setUser(null);
     this.overlayChange.emit(false);

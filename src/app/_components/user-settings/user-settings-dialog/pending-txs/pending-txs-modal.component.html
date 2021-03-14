@@ -5,8 +5,46 @@
     <h1>Transactions</h1>
     <div style="width: 40px"></div>
   </div> -->
+<div class="container-wrapper">
+  <div class="container">
+    <div class="main-container">
+      <div class="content-top">
+        <app-breadcrumb [path]="[{name: 'asgardex', swapView: 'Swap', mainView: 'Swap'}, {name: 'transactions', disable: true}]" message="select"></app-breadcrumb>
+        <div class="top-right">
+        </div>
+      </div>
+      <div class="wallets" *ngIf="txs && txs.length > 0">
 
-<div class="transactions">
+        <div class="w-address" *ngFor="let tx of txs">
+          <div class="icon-addr">
+            <div class="asset-icon-container">
+              <img class="asset-icon"
+                src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/RUNE-B1A/logo.png" />
+            </div>
+            <label style="text-transform: uppercase;">{{tx.action}} <span style="color: #414856;">({{tx.chain}}.{{tx.ticker}})</span></label>
+          </div>
+          <div class="addr">
+            <input [value]="tx.hash.substring(0, 8) + '...' + tx.hash.substring(tx.hash.length - 8, tx.hash.length)" name="thor-address" [disabled]="true" />
+          </div>
+        </div>
+
+      </div>
+
+      <div class="wallets disable" *ngIf="txs.length == 0">
+        <span class="no-item" style="text-transform: uppercase;"><span class="mono">0</span> Transactions</span>
+      </div>
+
+      <div class="bottom-actions">
+        <button class="close-btn" (click)="close()">
+          <span>close</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- <div class="transactions">
 
 
   <ul *ngIf="txs && txs.length > 0" style="width: 100%;">
@@ -24,16 +62,16 @@
 
                 <input [value]="tx.hash.substring(0, 4) + '...' + tx.hash.substring(tx.hash.length - 4, tx.hash.length)" name="thor-address" [disabled]="true" />
 
-          <!-- <button matSuffix mat-icon-button>
+          <button matSuffix mat-icon-button>
             <mat-icon *ngIf="tx.status === 'COMPLETE'">check_circle</mat-icon>
             <mat-progress-spinner *ngIf="tx.status === 'PENDING'" diameter="16" color="primary" mode="indeterminate">
             </mat-progress-spinner>
-          </button> -->
+          </button>
 
         </div>
 
-        <!-- <span *ngIf="tx.action === 'Refund'" style="font-size: 0.6rem; font-style: italic">*Something went wrong
-          submitting your transaction on the network. Your transaction has been refunded.</span> -->
+        <span *ngIf="tx.action === 'Refund'" style="font-size: 0.6rem; font-style: italic">*Something went wrong
+          submitting your transaction on the network. Your transaction has been refunded.</span>
 
       </a>
 
@@ -44,7 +82,7 @@
     <span>No transactions found</span>
   </div>
 
-</div>
+</div> -->
 
 
 <!-- close dialog -->

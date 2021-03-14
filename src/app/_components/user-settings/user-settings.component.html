@@ -5,11 +5,11 @@ style="margin-right: 19px; position: absolute; top: 0; right: 96px;"
 [ngClass]="{'expanded': showMenu}"
 >
   <div class="menu-container">
-    <div *ngIf="pendingTxCount <= 0" class="address" (click)="toggleMenu()">{{user.wallet.substring(0, 6)}}...{{user.wallet.substring(user.wallet.length - 4, user.wallet.length)}}</div>
+    <div class="address" (click)="toggleMenu()">{{user.wallet.substring(0, 6)}}...{{user.wallet.substring(user.wallet.length - 4, user.wallet.length)}}</div>
     <div *ngIf="showMenu" style="margin-top: 5px;" class="menu" (click)="openUserSettings()">
       <span>Wallet</span>
     </div>
-    <div *ngIf="showMenu" class="menu">
+    <div *ngIf="showMenu" class="menu" (click)="openTransaction()">
       <span>Transactions</span>
     </div>
     <div *ngIf="showMenu" class="menu" (click)="openAccountSetting()">
