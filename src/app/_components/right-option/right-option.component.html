@@ -2,13 +2,13 @@
   <div *ngIf="whichType == 'SWITCH'">
     <a class="left" [routerLink]="['/', 'swap']" [ngClass]="[left.classList.contains('active') ? '' : 'inactive', switchField.left.disable ? 'disable' : '' ]" routerLinkActive="active" #left>
       <p class="left-inner">
-        <span *ngIf="left.classList.contains('disable')" class="tag">{{switchField.left.tag}}</span>
+        <span *ngIf="left.classList.contains('disable') && switchField.left.tag" class="tag">{{switchField.left.tag}}</span>
         {{switchField.left.text}}
       </p>
     </a>
     <a class="right" [routerLink]="['/', 'pool']" [ngClass]="[right.classList.contains('active') ? '' : 'inactive', switchField.right.disable ? 'disable' : '' ]" routerLinkActive="active" #right>
       <p class="right-inner">
-        <span *ngIf="right.classList.contains('disable')" class="tag">{{switchField.right.tag}}</span>
+        <span *ngIf="right.classList.contains('disable') && switchField.left.tag" class="tag">{{switchField.right.tag}}</span>
         {{switchField.right.text}}
       </p>
     </a>

@@ -37,12 +37,22 @@ $default-font-size: 14px;
     text-transform: uppercase;
     padding: 0 $default-padding;
     z-index: 0;
-    border: $default-border solid #474E5D;
+    border: $default-border solid #0d1b23;
 
     &.active {
       border: $default-border solid var(--primary-default);
       font-weight: 500;
       color: var(--primary-default);
+    }
+
+    &.disable {
+      border: $default-border solid #0d1b23;
+      color: #474E5D;
+
+    }
+
+    &.active.disable {
+      border: $default-border solid #474E5D;
     }
 
     &.left {
@@ -77,6 +87,7 @@ $default-font-size: 14px;
       font-size: $default-font-size/1.75;
       position: absolute;
       color: #F3BA2F;
+      pointer-events: none;
     }
   }
 

@@ -30,13 +30,14 @@
   }
 
   &.disable {
-    border-color: #474e5d;
+    border-color: #0d1b23;
 
     .launch-markets-btn,
     .label-title,
     .expand-more,
     .usd-est {
       color: #474e5d;
+      fill: #474e5d;
     }
   }
 }
@@ -89,6 +90,7 @@
   &:disabled {
     cursor: inherit;
   }
+
 }
 
 // .usd-est {

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="14px" height="23px" viewBox="0 0 14 23" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Scroll for more</title>
+    <g id="⚡-Active---VANAHEIMEX-→-ASGARDEX" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Views-(don't-use-to-code)" transform="translate(-713.000000, -462.000000)">
+            <g id="Content" transform="translate(353.000000, 106.000000)">
+                <g id="Items" transform="translate(51.000000, 130.000000)">
+                    <g id="Scroll-for-more" transform="translate(309.000000, 226.000000)">
+                        <rect id="Rectangle" fill="#000B12" x="0" y="0" width="14" height="23" rx="5"></rect>
+                        <rect id="Rectangle" fill="#414856" x="6" y="4" width="2" height="2" rx="1"></rect>
+                        <rect id="Rectangle-Copy-3" fill="#414856" x="6" y="8" width="2" height="2" rx="1"></rect>
+                        <rect id="Rectangle-Copy-4" fill="#414856" x="6" y="12" width="2" height="2" rx="1"></rect>
+                        <path d="M7.40407191,19.4993099 L10.8326466,16.0707353 C11.0558093,15.8475726 11.0558093,15.4857544 10.8326466,15.2625917 C10.6094839,15.039429 10.2476657,15.039429 10.024503,15.2625917 L7.0000001,18.2871183 L3.97549724,15.2625917 C3.75233454,15.039429 3.39051632,15.039429 3.16735362,15.2625917 C2.94419092,15.4857544 2.94419092,15.8475726 3.16735362,16.0707353 L6.59592829,19.4993099 C6.70309288,19.60648 6.84844257,19.666688 7.0000001,19.666688 C7.15155762,19.666688 7.29690732,19.60648 7.40407191,19.4993099 Z" id="Path" fill="#414856"></path>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
