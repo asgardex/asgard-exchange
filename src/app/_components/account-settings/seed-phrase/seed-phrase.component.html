@@ -6,8 +6,9 @@
         { name: 'settings',  backFunc: true},
         { name: 'seed phrase', disable: true}
       ]"
-      message="enter password"
+      [message]="passwordAccepted ? 'store safely' : keystoreError ? 'incorrect password' : keystorePassword ? 'ready' : 'enter password'"
       (backFunc)="close.emit()"
+      [isError]="keystoreError"
     ></app-breadcrumb>
     <div class="top-right"></div>
   </div>

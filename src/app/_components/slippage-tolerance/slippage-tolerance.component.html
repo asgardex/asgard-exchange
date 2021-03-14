@@ -6,7 +6,7 @@
         { name: 'settings',  backFunc: true},
         { name: 'slippage tolerance', disable: true}
       ]"
-      message="select"
+      [message]="tolerance == customTolerance || !customTolerance ? 'adjust' : 'ready'"
       (backFunc)="close.emit()"
     ></app-breadcrumb>
     <div class="top-right"></div>
