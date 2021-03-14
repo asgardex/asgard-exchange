@@ -6,7 +6,8 @@ export type Path = {
   disable?: boolean,
   mainView?: string,
   swapView?: SwapViews,
-  backFunc?: boolean
+  backFunc?: boolean,
+  call?: string
 }
 
 @Component({
@@ -22,9 +23,11 @@ export class BreadcrumbComponent implements OnInit {
   @Input() isError: boolean = false;
   @Input() backName?: string = null;
   @Output() backFunc: EventEmitter<null>;
+  @Output() funcCaller: EventEmitter<string>;
 
   constructor(private overlaysService: OverlaysService) {
     this.backFunc = new EventEmitter<null>();
+    this.funcCaller = new EventEmitter<string>();
   }
 
   ngAfterViewInit() {
@@ -52,7 +55,7 @@ export class BreadcrumbComponent implements OnInit {
 
   navHandler(path: Path) {
     if(!path.disable) {
-      path.backFunc ? this.backFunc.emit() : this.changePath(path)
+      path.backFunc ? this.backFunc.emit() : path.call ? this.funcCaller.emit(path.call) : this.changePath(path)
     }
   }
 }

@@ -23,7 +23,7 @@ export class UserSettingsDialogComponent implements OnInit, OnDestroy {
   ethereumAddress: string;
   loading: boolean;
   pendingTxCount: number;
-  mode: 'ADDRESSES' | 'ADDRESS' | 'PENDING_TXS'
+  _mode: 'ADDRESSES' | 'ADDRESS' | 'PENDING_TXS'
     | 'ASSET' | 'SEND' | 'CONFIRM_SEND' | 'UPGRADE_RUNE'
     | 'CONFIRM_UPGRADE_RUNE' | 'VIEW_PHRASE' | 'DEPOSIT' | 'CONFIRM_DEPOSIT'
     | 'ADDRESS_ADD_TOKEN' | 'PROCESSING' | 'SUCCESS' | 'CONFIRM_SEND';
@@ -32,6 +32,22 @@ export class UserSettingsDialogComponent implements OnInit, OnDestroy {
   selectedAsset: AssetAndBalance;
   amountToSend: number;
   recipient: string;
+  path: Array<any>;
+  message: string = "select";
+
+  get mode() {
+    return this._mode
+  }
+  set mode(val) {
+    if (val !== this._mode) {
+      this._mode = val
+      this.path = this.getPath();
+      if (val === 'SEND' || val === 'PENDING_TXS')
+        this.message = 'prepare'
+      else
+        this.message = 'select'
+    }
+  }
 
   @Input() userSetting: boolean;
   @Output() userSettingChange = new EventEmitter<boolean>();
@@ -87,6 +103,8 @@ export class UserSettingsDialogComponent implements OnInit, OnDestroy {
     });
 
     this.subs = [user$, txs$];
+
+    this.path = this.getPath();
   }
 
   ngOnInit(): void {
@@ -127,7 +145,7 @@ export class UserSettingsDialogComponent implements OnInit, OnDestroy {
   }
 
   transactionSuccessful() {
-    this.mode = 'PENDING_TXS';
+    this.mode = 'SUCCESS';
     this.amountToSend = null;
     this.recipient = null;
     this.selectedAsset = null;
@@ -142,6 +160,31 @@ export class UserSettingsDialogComponent implements OnInit, OnDestroy {
 
   close() {
     this.overlaysService.setViews(MainViewsEnum.Swap, 'Swap')
+  }
+
+  getPath() {
+    let path : Array<any> = [{name: 'asgardex', swapView: 'Swap', mainView: 'Swap'}];
+
+    // Might be in switch cases
+    if (this.mode === 'ADDRESSES')
+      path.push({name: 'wallet', disable: true})
+    else if (this.mode === 'ADDRESS')
+      path.push({name: 'wallet', call: 'wallet'}, {name: this.selectedChain, disable: true})
+    else if (this.mode === 'ASSET')
+      path.push({name: 'wallet', call: 'wallet'}, {name: this.selectedChain, call: 'address'}, {name: `${this.selectedChain}.${this.selectedAsset.asset.ticker}` , disable: true})
+    else if (this.mode === 'SEND')
+      path.push({name: 'wallet', call: 'wallet'}, {name: this.selectedChain, call: 'address'}, {name: `${this.selectedChain}.${this.selectedAsset.asset.ticker}`, call: 'asset'}, {name: 'send', disable: true})
+
+    return path
+  }
+
+  navCaller(nav) {
+    if (nav === 'wallet')
+      this.clearSelectedAddress();
+    else if (nav === 'address')
+      this.clearSelectedAsset()
+    else if (nav === 'asset')
+      this.mode = 'ASSET'
   }
 
   ngOnDestroy(): void {

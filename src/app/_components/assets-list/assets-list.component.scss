@@ -1,6 +1,13 @@
+.asset-list-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
 .market-list-container {
   position: relative;
-  height: 325px;
+  // height: 325px;
+  flex: 1 1 auto;
   width: 100%;
   overflow: auto;
   will-change: transform;
@@ -9,6 +16,27 @@
   background-color: #0D1B23;
   padding: 10px;
   border-radius: 6px;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.scroll-for-more {
+  font-size: 25px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0 0 6px 6px;
+  background-color: #0D1B23;
+  height: 47px;
+  color: #414856;
 }
 
 .market-list-item {

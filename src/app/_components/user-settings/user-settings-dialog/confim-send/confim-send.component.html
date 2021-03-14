@@ -54,8 +54,21 @@
 
     <app-arrow></app-arrow>
 
-    <app-text-field  type="Text" mode="Double" typeTwo="text" label="Recipient Address" labelTwo="Memo" [(textOfField)]="recipientAddress" [disable]="true" [disableTwo]="true"></app-text-field>
-
+    <app-text-field *ngIf="mode !== 'SUCCESS'"  type="Text" mode="Double" typeTwo="text" label="Recipient Address" labelTwo="Memo" [(textOfField)]="recipientAddress" [disable]="true" [disableTwo]="true"></app-text-field>
+    <app-text-field *ngIf="mode === 'SUCCESS'"  type="Text" mode="Single" label="Recipient Address" [(textOfField)]="recipientAddress" [disable]="true"></app-text-field>
+    {{mode}}
+    {{txState}}
+    <div style="margin-top: 38px;" *ngIf="mode === 'SUCCESS'">
+      <app-notice [tags]="['Copy', 'Explorer']">
+        <span text >{{hash}}</span>
+        <div tag_one (click)="copyToClipboard(hash)">
+          <span>COPY</span>
+        </div>
+        <div tag_two>
+          <a target="_blank" style="text-decoration: none; color: inherit;" [href]="getExplorerPath()">Explore</a>
+        </div>
+      </app-notice>
+    </div>
     <!-- <div style="padding: 14px;">
       <span style="color: #F3BA2F; font-size: 14px; line-height: 24px;">You’re sending TESTNET BNB. Make sure your recipient’s address is a TESTNET address.</span>
     </div> -->
@@ -83,14 +96,14 @@
 </div>
 <div class="bottom-actions" *ngIf="txState === 'SUBMITTING' && asset">
   <div style="width: 100%;">
-    <button style="background-color: #00CCFF !important;" class="next-btn" aria-label="TRANSACTION PROCESSING…">
-      <span>TRANSACTION PROCESSING…</span>
+    <button [disabled]="true" class="next-btn" aria-label="TRANSACTION PROCESSING…">
+      <span>PLEASE WAIT…</span>
     </button>
   </div>
 </div>
-<div class="bottom-actions" *ngIf="txState === 'SUCCESS' && asset">
+<div class="bottom-actions" *ngIf="mode === 'SUCCESS' && asset">
   <div style="width: 100%;">
-    <button class="close-btn" aria-label="TRANSACTION PROCESSING…" (click)="back.emit()">
+    <button class="close-btn" aria-label="CLOSE" (click)="back.emit()">
       <span>close</span>
     </button>
   </div>

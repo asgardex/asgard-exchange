@@ -48,10 +48,10 @@
 
   <div class="right-content">
     <div class="balance">
-      <img *ngIf="getIconPath(asset.asset.chain)" class="asset-icon" [src]="getIconPath(asset.asset.chain)" appImgFallback />
+      <img *ngIf="asset.asset.iconPath" class="asset-icon" [src]="asset.asset.iconPath" appImgFallback />
       <div class="amount">
-        <span class="mono">1,000,000</span>
-        <div class="usd-val"><span class="mono">~$2,333,333</span> USD</div>
+        <span class="mono">{{ asset.balance.amount().toNumber() | number: '.2-5' }}</span>
+        <div class="usd-val"><span class="mono">~$</span> USD</div>
       </div>
     </div>
     <div class="tx-history">

@@ -15,7 +15,7 @@
     </nav>
   </div> -->
   <div class="content-top">
-    <app-breadcrumb [path]="[{name: 'asgardex', swapView: 'Swap', mainView: 'Swap'}, {name: 'wallets', disable: true}]" message="Select" (backFunc)="clearSelectedAddress()"></app-breadcrumb>
+    <app-breadcrumb [path]="path" [message]="message" (funcCaller)="navCaller($event)"></app-breadcrumb>
     <div class="top-right">
     </div>
   </div>
@@ -123,7 +123,7 @@
 
     </div>
 
-    <app-pending-txs-modal *ngIf="mode === 'PENDING_TXS'" (back)="mode = 'ADDRESSES'"></app-pending-txs-modal>
+    <!-- <app-pending-txs-modal *ngIf="mode === 'PENDING_TXS'" (back)="mode = 'ADDRESSES'"></app-pending-txs-modal> -->
 
     <app-user-address *ngIf="mode === 'ADDRESS'" [chain]="selectedChain" [address]="selectedAddress"
       (back)="clearSelectedAddress()" (navigateToAsset)="selectAsset($event)">
@@ -134,12 +134,14 @@
     </app-user-asset>
 
     <app-send-asset *ngIf="mode === 'SEND'" [asset]="selectedAsset" (confirmSend)="confirmSend($event)"
-      (back)="mode = 'ADDRESSES'">
+      (back)="mode = 'ADDRESSES'"
+      (message)="message">
     </app-send-asset>
 
     <app-confim-send *ngIf="mode === 'CONFIRM_SEND' || mode === 'SUCCESS' || mode === 'PROCESSING'"
       [amount]="amountToSend" [recipientAddress]="recipient" [asset]="selectedAsset" (back)="mode = 'SEND'"
-      [(mode)]="mode" (transactionSuccessful)="transactionSuccessful()">
+      [(mode)]="mode" (transactionSuccessful)="transactionSuccessful()"
+      (message)="message">
     </app-confim-send>
 
 
