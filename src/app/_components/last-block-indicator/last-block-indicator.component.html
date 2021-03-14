@@ -1,9 +1,9 @@
 <div class="flex items-center justify-end">
-  <span *ngIf="lastBlock">{{lastBlock}}</span>
-  <span *ngIf="!lastBlock">000000</span>
-  <div id="indicator-container">
-    <span id="last-block-indicator"></span>
-    <div *ngIf="updating" class="spin"></div>
+  <span class="text-gray-400" *ngIf="lastBlock">{{lastBlock}}</span>
+  <span class="text-gray-400" *ngIf="!lastBlock">000000</span>
+  <div class="relative">
+    <span class="block relative rounded-full bg-green-500 ml-2 w-2 h-2"></span>
+    <div *ngIf="updating" style="border-bottom-color: rgb(21, 163, 111);" class="rounded-full absolute w-4 h-4 bottom-0 left-1 -mb-1 border-2 border-transparent animate-spin"></div>
   </div>
 </div>
 
