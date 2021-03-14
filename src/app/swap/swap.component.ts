@@ -31,7 +31,7 @@ import { AssetAndBalance } from '../_classes/asset-and-balance';
 import { PoolDTO } from '../_classes/pool';
 import { SlippageToleranceService } from '../_services/slippage-tolerance.service';
 import { PoolAddressDTO } from '../_classes/pool-address';
-import { OverlaysService } from '../_services/overlays.service';
+import { MainViewsEnum, OverlaysService } from '../_services/overlays.service';
 
 export enum SwapType {
   DOUBLE_SWAP = 'double_swap',
@@ -254,6 +254,10 @@ export class SwapComponent implements OnInit, OnDestroy {
     this.getCoinGeckoCoinList();
     this.getPools();
     this.getEthRouter();
+  }
+
+  goToSettings() {
+    this.overlaysService.setCurrentView(MainViewsEnum.AccountSetting);
   }
 
   isRune(asset: Asset): boolean {
