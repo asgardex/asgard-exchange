@@ -149,13 +149,13 @@
 
           <div *ngIf="swapData.sourceAsset.chain === 'BNB'" class="flex justify-between">
             <span class="tx-detail-label">Total Fee</span>
-            <span>{{swapData.bnbFee | number:"0.0-6"}} BNB</span>
+            <span>{{swapData.bnbFee | number:"0.0-6"}} BNB + 1 RUNE</span>
           </div>
 
           <div *ngIf="swapData.sourceAsset.chain === 'ETH'" class="flex justify-between">
             <span class="tx-detail-label">Total Fee</span>
-            <span *ngIf="ethNetworkFee">{{ (ethNetworkFee) | number:"0.0-6"}} ETH</span>
-            <span *ngIf="!ethNetworkFee"> - ETH</span>
+            <span *ngIf="ethNetworkFee">{{ (ethNetworkFee) | number:"0.0-6"}} ETH + 1 RUNE</span>
+            <span *ngIf="!ethNetworkFee"> - ETH + 1 RUNE</span>
           </div>
 
           <div *ngIf="swapData.sourceAsset.chain === 'THOR'" class="flex justify-between">
@@ -163,10 +163,10 @@
             <span>1 Rune</span>
           </div>
 
-          <div *ngIf="swapData.sourceAsset.chain !== 'THOR'" class="flex justify-between">
+          <!-- <div *ngIf="swapData.sourceAsset.chain !== 'THOR'" class="flex justify-between">
             <span class="tx-detail-label"></span>
             <span>1 Rune</span>
-          </div>
+          </div> -->
 
           <div class="flex justify-between">
             <span class="tx-detail-label">Slip:</span>
@@ -218,10 +218,11 @@
             <button
               (click)="submitTransaction()"
               class="next-btn"
-              [disabled]="insufficientChainBalance"
+              [disabled]="insufficientChainBalance || loading"
             >
-            <span *ngIf="!insufficientChainBalance">Confirm</span>
-            <span *ngIf="insufficientChainBalance">Insufficient {{swapData.sourceAsset.chain}}</span>
+              <span *ngIf="!insufficientChainBalance && !loading">Confirm</span>
+              <span *ngIf="insufficientChainBalance && !loading">Insufficient {{swapData.sourceAsset.chain}}</span>
+              <span *ngIf="loading">Loading...</span>
             </button>
           </div>
         </ng-container>
