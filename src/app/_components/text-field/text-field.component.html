@@ -1,32 +1,32 @@
 <div *ngIf="mode == 'Single'">
   <div class="text-field-input uni-input">
     <label>{{label}}</label>
-    <input class="field"
+    <input class="field focus:outline-none focus:ring-0"
       [ngModel]="textOfField"
       (ngModelChange)="updateFieldText($event)"
       [name]="name"
-      placeholder="_______________________________________"
-      [type]="type" />
+      [placeholder]="placeHolder[0]"
+      [type]="selectedType" />
   </div>
 </div>
 <div *ngIf="mode == 'Double'">
   <div class="text-field-input uni-input" [ngClass]="{'bottom-border': mode == 'Double'}">
     <label>{{label}}</label>
-    <input class="field"
+    <input class="field focus:outline-none focus:ring-0"
       [ngModel]="textOfField"
       (ngModelChange)="updateFieldText($event)"
       [name]="name"
-      placeholder="_______________________________________"
-      [type]="type"
+      [placeholder]="placeHolder[0]"
+      [type]="selectedType"
       [disabled]="disable" />
   </div>
   <div class="text-field-input uni-input" [ngClass]="{'no-top-border': mode == 'Double'}">
     <label>{{labelTwo}}</label>
-    <input class="field"
+    <input class="field focus:outline-none focus:ring-0"
       [ngModel]="textOfFieldTwo"
       (ngModelChange)="updateFieldTextTwo($event)"
       [name]="nameTwo"
-      placeholder="_______________________________________"
+      [placeholder]="placeHolder[1]"
       [type]="typeTwo"
       [disabled]="disableTwo" />
   </div>

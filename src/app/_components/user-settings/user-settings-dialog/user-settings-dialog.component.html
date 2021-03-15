@@ -118,22 +118,42 @@
 
     </div>
 
-    <app-user-address *ngIf="mode === 'ADDRESS'" [chain]="selectedChain" [address]="selectedAddress"
-      (back)="clearSelectedAddress()" (navigateToAsset)="selectAsset($event)">
+    <app-user-address
+      *ngIf="mode === 'ADDRESS'"
+      [chain]="selectedChain"
+      [address]="selectedAddress"
+      [pools]="pools"
+      (back)="clearSelectedAddress()"
+      (navigateToAsset)="selectAsset($event)"
+      (navigateToAddToken)="mode = 'ADDRESS_ADD_TOKEN'">
     </app-user-address>
 
-    <app-user-asset *ngIf="mode === 'ASSET'" [asset]="selectedAsset" [address]="selectedAddress"
-      (back)="clearSelectedAsset()" (send)="mode = 'SEND'">
+    <app-user-asset
+      *ngIf="mode === 'ASSET'"
+      [asset]="selectedAsset"
+      [address]="selectedAddress"
+      (back)="clearSelectedAsset()"
+      (send)="mode = 'SEND'"
+      (upgradeRune)="mode = 'UPGRADE_RUNE'"
+      (deposit)="mode = 'DEPOSIT'">
     </app-user-asset>
 
-    <app-send-asset *ngIf="mode === 'SEND'" [asset]="selectedAsset" (confirmSend)="confirmSend($event)"
+    <app-send-asset
+      *ngIf="mode === 'SEND'"
+      [asset]="selectedAsset"
+      (confirmSend)="confirmSend($event)"
       (back)="mode = 'ADDRESSES'"
       (message)="message">
     </app-send-asset>
 
-    <app-confim-send *ngIf="mode === 'CONFIRM_SEND' || mode === 'SUCCESS' || mode === 'PROCESSING'"
-      [amount]="amountToSend" [recipientAddress]="recipient" [asset]="selectedAsset" (back)="mode = 'SEND'"
-      [(mode)]="mode" (transactionSuccessful)="transactionSuccessful()"
+    <app-confim-send
+      *ngIf="mode === 'CONFIRM_SEND' || mode === 'SUCCESS' || mode === 'PROCESSING'"
+      [amount]="amountToSend"
+      [recipientAddress]="recipient"
+      [asset]="selectedAsset"
+      (back)="mode = 'SEND'"
+      [(mode)]="mode"
+      (transactionSuccessful)="transactionSuccessful()"
       (message)="message">
     </app-confim-send>
 

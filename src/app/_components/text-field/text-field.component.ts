@@ -9,7 +9,7 @@ export class TextFieldComponent implements OnInit {
   @Input() textOfField: string;
   @Output() textOfFieldChange = new EventEmitter<string>();
 
-  @Input() type: 'Password' | 'Text' = 'Text';
+  @Input() selectedType: 'Password' | 'Text' = 'Text';
   @Input() mode: 'Single' | 'Double' = 'Single';
 
   @Input() label: string = 'TEXT';
@@ -26,6 +26,8 @@ export class TextFieldComponent implements OnInit {
 
   @Input() disable: boolean = false;
   @Input() disableTwo: boolean = false;
+
+  @Input() placeHolder: string[] = ['_______________________________________', '_______________________________________'];
 
   constructor() { }
 

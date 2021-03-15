@@ -37,7 +37,7 @@
 
           <div class="input-box">
             <input
-              class="priceInput"
+              class="priceInput focus:outline-none"
               style="
                 font-size: 22px;
                 font-weight: 500;
@@ -51,7 +51,7 @@
             />
 
             <button class="launch-markets-btn" [disabled]="true">
-              <div class="flxr flxr--align-center asset-selector">
+              <div class="flex items-center asset-selector">
                 <app-tag style="margin: 0 10px;" (click)="gotoWallet()" *ngIf="txState == 'SUCCESS'">Wallet</app-tag>
                 <app-icon-ticker
                   [iconPath]="swapData.sourceAsset.iconPath"
@@ -102,7 +102,7 @@
 
         <div class="input-box">
           <input
-            class="priceInput"
+            class="priceInput focus:outline-none"
             style="
               font-size: 22px;
               font-weight: 500;
@@ -116,7 +116,7 @@
           />
 
           <button class="launch-markets-btn" [disabled]="true">
-            <div class="flxr flxr--align-center asset-selector">
+            <div class="flex items-center asset-selector">
               <app-tag style="margin: 0 10px;" (click)="gotoWallet()" *ngIf="txState == 'SUCCESS'">Wallet</app-tag>
               <app-icon-ticker
                 [iconPath]="swapData.targetAsset.iconPath"
@@ -138,7 +138,7 @@
     <div>
       <!-- <div mat-dialog-content class="confirm-modal-content"> -->
         <div class="swap-details" *ngIf="txState === 'PENDING_CONFIRMATION'">
-          <div class="flxr flxr--just-space-between">
+          <div class="flex justify-between">
             <span class="tx-detail-label">Price:</span>
             <span
               >{{ swapData.basePrice | number: "1.2-4" }}
@@ -147,33 +147,33 @@
             >
           </div>
 
-          <div *ngIf="swapData.sourceAsset.chain === 'BNB'" class="flex justify-between mb-2">
+          <div *ngIf="swapData.sourceAsset.chain === 'BNB'" class="flex justify-between">
             <span class="tx-detail-label">Total Fee</span>
             <span>{{swapData.bnbFee | number:"0.0-6"}} BNB</span>
           </div>
 
-          <div *ngIf="swapData.sourceAsset.chain === 'ETH'" class="flex justify-between mb-2">
+          <div *ngIf="swapData.sourceAsset.chain === 'ETH'" class="flex justify-between">
             <span class="tx-detail-label">Total Fee</span>
             <span *ngIf="ethNetworkFee">{{ (ethNetworkFee) | number:"0.0-6"}} ETH</span>
             <span *ngIf="!ethNetworkFee"> - ETH</span>
           </div>
 
-          <div *ngIf="swapData.sourceAsset.chain === 'THOR'" class="flex justify-between mb-2">
+          <div *ngIf="swapData.sourceAsset.chain === 'THOR'" class="flex justify-between">
             <span class="tx-detail-label">Total Fee</span>
             <span>1 Rune</span>
           </div>
 
-          <div *ngIf="swapData.sourceAsset.chain !== 'THOR'" class="flex justify-between mb-2">
+          <div *ngIf="swapData.sourceAsset.chain !== 'THOR'" class="flex justify-between">
             <span class="tx-detail-label"></span>
             <span>1 Rune</span>
           </div>
 
-          <div class="flxr flxr--just-space-between">
+          <div class="flex justify-between">
             <span class="tx-detail-label">Slip:</span>
             <span>{{ swapData.slip | percent: "0.2-4" }}</span>
           </div>
 
-          <div class="flxr flxr--just-space-between">
+          <div class="flex justify-between">
             <span>Settings:</span>
             <span>{{slippageTolerance}}% slip tolerance <span>(click to adjust)</span></span>
           </div>

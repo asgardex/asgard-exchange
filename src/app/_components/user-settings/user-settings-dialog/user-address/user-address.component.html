@@ -40,28 +40,25 @@
   </div>
 </div>
 
-<div class="bottom-actions" style="display: flex; margin-top: 30px;">
-  <div style="width: 50%;">
-    <div style="margin-right: 6px;">
-      <button class="close-btn" (click)="back.emit()">
-        <span>⭠ WALLET</span>
-      </button>
-    </div>
+<div class="bottom-actions two-btn" style="display: flex; margin-top: 30px;">
+  <div class="left-btn">
+    <button class="close-btn" (click)="back.emit()">
+      <span>⭠ WALLET</span>
+    </button>
   </div>
-  <div style="width: 50%;">
-    <div style="margin-left: 6px;">
-      <button class="next-btn" aria-label="Close Connect Wallet Dialog" (click)="refreshBalances()">
-        <span>refresh</span>
-      </button>
-    </div>
-    <div class="flex w-full">
-      <textarea [value]="address" name="address" [disabled]="true"></textarea>
-      <button matSuffix mat-icon-button aria-label="Copy To Clipboard" (click)="copyToClipboard(address)">
-        <mat-icon matSuffix (click)="copyToClipboard(address)">content_copy</mat-icon>
-      </button>
-    </div>
-
-    <app-testnet-warning [chain]="chain"></app-testnet-warning>
-
+  <div class="divider"></div>
+  <div class="right-btn">
+    <button class="next-btn" aria-label="Close Connect Wallet Dialog" (click)="refreshBalances()">
+      <span>refresh</span>
+    </button>
   </div>
 </div>
+
+<!-- <div class="flex w-full">
+  <textarea [value]="address" name="address" [disabled]="true"></textarea>
+  <button matSuffix mat-icon-button aria-label="Copy To Clipboard" (click)="copyToClipboard(address)">
+    <mat-icon matSuffix (click)="copyToClipboard(address)">content_copy</mat-icon>
+  </button>
+</div> -->
+
+<!-- <app-testnet-warning [chain]="chain"></app-testnet-warning> -->

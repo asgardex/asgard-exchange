@@ -3,7 +3,7 @@
 </div>
 <header>
   <h1>
-    <a class="flxr flxr--align-center" [routerLink]="['/', 'swap']">
+    <a class="flex items-center" [routerLink]="['/', 'swap']">
       <img style="width: 36.61px; height: 42px; margin-right: 8px" src="assets/images/vanaheimex-green.svg" />
       <span class="title">ASGARDEX
         <span class="tag">MAINNET</span>
@@ -14,7 +14,7 @@
   <div class="header-right">
     <app-user-settings *ngIf="user" [user]="user" [(overlay)]="overlay"></app-user-settings>
     <!-- <span id="testnet-indicator" *ngIf="isTestnet">Testnet</span> -->
-    <div class="flxr thorchain-indicator">
+    <div class="flex thorchain-indicator">
       <app-last-block-indicator></app-last-block-indicator>
     </div>
     <!-- <app-connect *ngIf="!user"></app-connect> -->

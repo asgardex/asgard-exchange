@@ -67,6 +67,7 @@ export class UserAddressComponent implements OnInit {
   }
 
   createAssetList() {
+    console.log(this.pools)
     if (this.balances && this.pools) {
 
       this.assets = this.balances.reduce( (list: AssetAndBalance[], balance) => {

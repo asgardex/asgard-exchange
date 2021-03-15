@@ -23,7 +23,6 @@ export class AssetInputComponent implements OnInit, OnDestroy {
   @Input() set selectedAsset(asset: Asset) {
     this._selectedAsset = asset;
     this.checkUsdBalance();
-    this.getAssetPrice();
   }
   get selectedAsset() {
     return this._selectedAsset;

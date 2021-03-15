@@ -1,6 +1,6 @@
 <div class="swap-input uni-input" [ngClass]="{'disable': disableUser}">
   <div class="swap-input--inner">
-    <div class="flxr flxr--just-space-between label-wrapper">
+    <div class="flex justify-between label-wrapper">
       <label class="label-title" for="{{label}}Input">{{label}}<span style="color: #474E5D;" *ngIf="selectedAsset && balance && !disableUser && !disableInput"> (<span class="mono">{{balance | number:"1.0-8"}}</span> balance)</span><span *ngIf="!isSource" style="color: #474E5D;"> (est.)</span></label>
     </div>
     <!-- <label style="color: #fff; font-size: 14px; font-weight: 500; text-align: right; margin-right: 8px;" *ngIf="selectedAsset && balance && !disableInput">
@@ -20,7 +20,7 @@
       </div>
 
       <input
-        class="priceInput"
+        class="priceInput focus:outline-none focus:ring-0"
         *ngIf="!loading && !error"
         [ngModel]="assetUnit"
         (ngModelChange)="updateAssetUnits($event)"
@@ -31,8 +31,8 @@
         [disabled]="disableInput"
         [ngClass]="{'disable': disableUser}" />
 
-      <button *ngIf="!selectedAsset" class="launch-markets-btn" (click)="launchMarketsModal()">
-        <div class="flxr flxr--align-center asset-selector select-token">
+      <button *ngIf="!selectedAsset" class="launch-markets-btn focus:outline-none" (click)="launchMarketsModal()">
+        <div class="flex items-center asset-selector select-token">
           <span style="font-size: 20px; line-height: 24px; margin-left: 10px;">SELECT</span>
           <!-- <mat-icon class="expand-more">expand_more</mat-icon> -->
           <div style="display: flex; margin-left: 10px;" *ngIf="!disabledMarketSelect">
@@ -52,7 +52,7 @@
       </div>
 
       <button *ngIf="selectedAsset" class="launch-markets-btn" (click)="launchMarketsModal()" [disabled]="disabledMarketSelect">
-        <div class="flxr flxr--align-center asset-selector">
+        <div class="flex items-center asset-selector">
           <app-icon-ticker [iconPath]="selectedAsset.iconPath" [ticker]="selectedAsset.ticker" [chain]="selectedAsset.chain"></app-icon-ticker>
           <!-- <mat-icon class="expand-more" *ngIf="!disabledMarketSelect">expand_more</mat-icon> -->
           <div style="display: flex; margin-left: 10px;" *ngIf="!disabledMarketSelect">
@@ -65,7 +65,7 @@
 
     </div>
 
-    <span class="usd-est">${{(assetUsd * assetUnit ? assetUsd * assetUnit : 0) | number: '.2-5' }} USD</span>
+    <span class="usd-est" *ngIf="usdValue">${{ usdValue | number:"1.0-0" }} USD</span>
 
   </div>
 

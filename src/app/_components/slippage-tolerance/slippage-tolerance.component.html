@@ -13,10 +13,7 @@
   </div>
   <div>
     <div mat-dialog-content>
-      <div id="custom-tolerance" [class.active]="customTolerance">
-        <span class="custom-tolerance-label">Percentage</span>
-        <input id="custom-tolerance-input" [(ngModel)]="customTolerance" [placeholder]="tolerance" name="custom-tolerance" />
-      </div>
+      <app-text-field [placeHolder]="tolerance" selectedType="Text" label="Percentage" [(textOfField)]="customTolerance" name="custom-tolerance"></app-text-field>
     </div>
 
     <!-- close dialog -->

@@ -1,7 +1,7 @@
 <div class="asset-list-container">
   <div class="market-list-container">
 
-    <div *ngIf="loading" class="flxr flxr--align-center flxr--just-center" style="height: 100%; width: 100%">
+    <div *ngIf="loading" class="flex items-center justify-center" style="height: 100%; width: 100%">
       <mat-progress-spinner diameter="16" color="primary" mode="indeterminate"></mat-progress-spinner>
     </div>
 
@@ -16,21 +16,21 @@
           <mat-icon *ngIf="!item.asset.iconPath">help_outline</mat-icon>
         </div>
 
-        <div class="flex flex-col flex-grow" style="width:100%;">
-          <div class="flex justify-between">
-            <span class="market-list-item__symbol">{{item.asset.ticker}}</span>
+        <div class="flex flex-grow justify-between" style="width:100%;">
+          <div class="flex">
+            <span class="market-list-item__symbol">{{item.asset.ticker}}.{{item.asset.chain}}</span>
           </div>
-          <div *ngIf="item.balance" class="flex flex-col justify-end text-right" style="text-align: right;">
+          <div *ngIf="item.balance" class="flex text-right" style="text-align: right;">
             <span class="market-list-item__balance">{{item.balance.amount().toNumber()}}</span>
           </div>
 
-          <span *ngIf="item.asset.chain === 'ETH' && item.asset.ticker !== 'ETH'" class="text-xs text-gray-400">{{item.asset.symbol.split('-')[1]}}</span>
-          <span class="text-xs text-gray-400">{{item.asset.chain}}</span>
+          <!-- <span *ngIf="item.asset.chain === 'ETH' && item.asset.ticker !== 'ETH'" class="text-xs text-gray-400">{{item.asset.symbol.split('-')[1]}}</span> -->
+          <!-- <span class="text-xs text-gray-400">{{item.asset.chain}}</span> -->
         </div>
       </li>
-      <li *ngIf="displayAddTokenButton" class="flex justify-center items-center py-4">
+      <!-- <li *ngIf="displayAddTokenButton" class="flex justify-center items-center py-4">
         <button mat-flat-button color="accent" (click)="addToken.emit()">Add Token</button>
-      </li>
+      </li> -->
     </ul>
 
   </div>

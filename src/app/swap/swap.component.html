@@ -14,11 +14,11 @@
         <!-- SOURCE -->
         <app-asset-input label="Send" [isSource]="true" [(selectedAsset)]="selectedSourceAsset"
           [(assetUnit)]="sourceAssetUnit" [balance]="sourceBalance" [disableInput]="user ? false : true" [disableUser]="user ? false : true"
-          [disabledAssetSymbol]="selectedTargetAsset ? selectedTargetAsset.symbol : null" [coinGeckoList]="coinGeckoList"
+          [disabledAssetSymbol]="selectedTargetAsset ? selectedTargetAsset.symbol : null"
           [selectableMarkets]="selectableMarkets">
         </app-asset-input>
 
-        <div (click)="reverseTransaction()" [disabled]="!selectedSourceAsset || !selectedTargetAsset">
+        <div (click)="reverseTransaction()">
           <app-arrow *ngIf="user" [seperator]="!selectedSourceAsset || !selectedTargetAsset"></app-arrow>
           <div *ngIf="!user" style="height: 38px;"></div>
         </div>
@@ -34,11 +34,11 @@
           [(selectedAsset)]="selectedTargetAsset" [(assetUnit)]="targetAssetUnitDisplay" [balance]="targetBalance"
           [disableInput]="true" [disabledAssetSymbol]="selectedSourceAsset ? selectedSourceAsset.symbol : null"
           [loading]="calculatingTargetAsset" [hideMax]="true" [error]="poolDetailTargetError || poolDetailSourceError"
-          [coinGeckoList]="coinGeckoList" [selectableMarkets]="selectableMarkets" [disableUser]="user ? false : true">
+          [selectableMarkets]="selectableMarkets" [disableUser]="user ? false : true">
         </app-asset-input>
 
         <div class="swap-details" *ngIf="user">
-          <div class="flxr flxr--just-space-between">
+          <div class="flex justify-between">
             <span class="tx-detail-label">Price:</span>
             <span
               *ngIf="basePrice && selectedTargetAsset && selectedSourceAsset, else noPrice">{{basePrice | number:"1.2-6"}}
@@ -48,7 +48,7 @@
             </ng-template>
           </div>
           <!-- total fee and slip -->
-          <div class="flxr flxr--just-space-between">
+          <div class="flex justify-between">
             <span class="tx-detail-label">Total Fee:</span>
             <span
               *ngIf="basePrice && selectedTargetAsset && selectedSourceAsset && runeTransactionFee && binanceTransferFeeDisplay, else nothingFee">{{binanceTransferFeeDisplay | number:"0.0-6"}}
@@ -57,12 +57,12 @@
               <span>...</span>
             </ng-template>
           </div>
-          <!-- <div class="flxr flxr--just-space-between">
+          <!-- <div class="flex justify-between">
           <span class="tx-detail-label"></span>
           <span *ngIf="basePrice && selectedTargetAsset && selectedSourceAsset && runeTransactionFee && binanceTransferFeeDisplay">{{runeTransactionFee}} Rune</span>
         </div> -->
 
-          <!-- <div class="flxr flxr--just-space-between">
+          <!-- <div class="flex justify-between">
             <span class="tx-detail-label">Slip:</span>
             <span
               *ngIf="basePrice && selectedTargetAsset && selectedSourceAsset && runeTransactionFee && binanceTransferFeeDisplay, else nothingSlip">{{slip | percent:"0.2-4" }}</span>
@@ -70,13 +70,13 @@
               <span>...</span>
             </ng-template>
           </div> -->
-          <div class="flxr flxr--just-space-between">
+          <div class="flex justify-between">
             <span class="tx-detail-label">Slip:</span>
             <span *ngIf="slip" [ngStyle]="{'color': (slip * 100) > slippageTolerance ? '#FF4954' : 'inherit'}">{{slip | percent:"0.2-4" }}</span>
             <span *ngIf="!slip">...</span>
           </div>
 
-          <div class="flxr flxr--just-space-between">
+          <div class="flex justify-between">
             <span>Settings:</span>
             <span (click)="goToSettings()">{{slippageTolerance}}% slip tolerance <span>(click to adjust)</span></span>
           </div>
