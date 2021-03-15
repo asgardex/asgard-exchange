@@ -33,7 +33,14 @@ export class AssetInputComponent implements OnInit, OnDestroy {
   /**
    * Asset Unit
    */
-  @Input() assetUnit: number;
+  _assetUnit: number;
+  @Input() set assetUnit(unit: number) {
+    this._assetUnit = unit;
+    this.checkUsdBalance();
+  }
+  get assetUnit() {
+    return this._assetUnit;
+  }
   @Output() assetUnitChange = new EventEmitter<number>();
 
   @Input() label: string;
@@ -46,7 +53,7 @@ export class AssetInputComponent implements OnInit, OnDestroy {
    */
   @Input() set balance(bal: number) {
     this._balance = bal;
-    this.checkUsdBalance();
+    this.updateUsdBalance();
   }
   get balance() {
     return this._balance;
@@ -68,6 +75,7 @@ export class AssetInputComponent implements OnInit, OnDestroy {
   }
   _selectableMarkets: AssetAndBalance[];
 
+  assetPriceUSD: number;
   usdValue: number;
   user: User;
   subs: Subscription[];
@@ -92,7 +100,12 @@ export class AssetInputComponent implements OnInit, OnDestroy {
     if (!targetPool || !targetPool.assetPriceUSD) {
       return;
     }
-    this.usdValue = targetPool.assetPriceUSD * this.balance;
+    this.assetPriceUSD = targetPool.assetPriceUSD;
+    this.usdValue = this.assetPriceUSD * this.assetUnit;
+  }
+
+  updateUsdBalance(): void {
+    this.usdValue = this.assetPriceUSD * this.assetUnit;
   }
 
   getMax() {
