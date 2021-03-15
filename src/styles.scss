@@ -1,3 +1,6 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=VT323&display=swap');
 // Roboto Mono Font from Google API
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap');
@@ -165,7 +168,7 @@ button {
 
   .dialog-actions {
     position: absolute;
-    top: 0;
+    top: 0px;
     right: 10px;
   }
 
@@ -301,7 +304,6 @@ button {
     outline: none;
     border: none;
     flex: 1 1 auto;
-    font-size: 1rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -545,11 +547,8 @@ input[type=number] {
 
 .main-action-btn {
   color: white !important;
-  // background-color: rgb(255, 0, 122) !important;
-  width: 100%;
   margin-top: 1rem !important;
   padding: 10px !important;
-  // border-radius: 20px !important;
 
   &:disabled {
     // background-color:rgb(64, 68, 79) !important;
@@ -673,38 +672,6 @@ input[type=number] {
 
 .mono {
   font-family: 'Roboto Mono' !important;
-}
-
-.flxr {
-  display: flex;
-
-  &--just-center {
-    justify-content: center;
-  }
-
-  &--just-space-between {
-    justify-content: space-between;
-  }
-
-  &--just-end {
-    justify-content: flex-end;
-  }
-
-  &--align-start {
-    align-items: flex-start;
-  }
-
-  &--align-center {
-    align-items: center;
-  }
-
-  &--align-end {
-    align-items: end;
-  }
-
-  &--flow-col {
-    flex-flow: column;
-  }
 }
 
 /**
@@ -841,27 +808,7 @@ main {
 
 }
 
-.section-head-container {
-  float: left;
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-
-  h1 {
-    outline: none;
-    text-decoration: none;
-    font-size: 20px;
-    font-weight: 500;
-    color: white;
-    margin: 0;
-  }
-
-}
-
 .confirm-modal-head {
-  // font-size: 20px;
 
   h1 {
     font-size: 20px;

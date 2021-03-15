@@ -4,6 +4,7 @@ import { UpgradeRuneComponent } from './upgrade-rune.component';
 import { MatIconModule } from '@angular/material/icon';
 import { AssetInputModule } from '../asset-input/asset-input.module';
 import { MatButtonModule } from '@angular/material/button';
+import { ModalSectionHeaderModule } from '../modal-section-header/modal-section-header.module';
 
 
 
@@ -13,7 +14,8 @@ import { MatButtonModule } from '@angular/material/button';
     CommonModule,
     MatIconModule,
     MatButtonModule,
-    AssetInputModule
+    AssetInputModule,
+    ModalSectionHeaderModule
   ],
   exports: [UpgradeRuneComponent]
 })

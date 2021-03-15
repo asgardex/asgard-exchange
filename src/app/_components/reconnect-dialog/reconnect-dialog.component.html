@@ -24,13 +24,7 @@
           <app-arrow></app-arrow>
         </div>
 
-        <app-text-field [(textOfField)]="keystorePassword" mode="Single" type="Password" label="Password" name="keystore-password"></app-text-field>
-
-        <!-- <div class="uni-input">
-          <label>Password</label>
-          <input class="password" [(ngModel)]="keystorePassword" name="keystore-password"
-            placeholder="_______________________________________" type="password" />
-        </div> -->
+        <app-text-field [(textOfField)]="keystorePassword" mode="Single" type="Password" label="Password" name="keystore-password" (keyup.enter)="initUnlock()"></app-text-field>
 
       </div>
 
@@ -44,7 +38,7 @@
         <div class="divider"></div>
         <div class="right-btn">
           <div>
-            <button class="next-btn" (click)="keystoreUnlockClicked()"
+            <button class="next-btn" (click)="initUnlock()"
               [disabled]="keystoreConnecting || !keystorePassword">
               <span *ngIf="!keystoreConnecting">Unlock</span>
               <span *ngIf="keystoreConnecting">Unlocking...</span>

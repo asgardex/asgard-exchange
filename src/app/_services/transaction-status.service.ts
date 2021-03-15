@@ -10,6 +10,7 @@ import { UserService } from './user.service';
 import { ethers } from 'ethers';
 import { environment } from 'src/environments/environment';
 import { SochainService, SochainTxResponse } from './sochain.service';
+import { HaskoinService, HaskoinTxResponse } from './haskoin.service';
 
 export const enum TxStatus {
   PENDING = 'PENDING',
@@ -56,7 +57,8 @@ export class TransactionStatusService {
     private userService: UserService,
     private midgardService: MidgardService,
     private binanceService: BinanceService,
-    private sochainService: SochainService
+    private sochainService: SochainService,
+    private haskoinService: HaskoinService
   ) {
     this._txs = [];
 
@@ -88,10 +90,12 @@ export class TransactionStatusService {
 
         if (pendingTx.chain === 'BNB') {
           this.pollBnbTx(pendingTx);
-        } else if (pendingTx.chain === 'BTC') {
-          this.pollBtcTx(pendingTx);
         } else if (pendingTx.chain === 'ETH') {
           this.pollEthTx(pendingTx);
+        } else if (pendingTx.chain === 'BTC' || pendingTx.chain === 'LTC') {
+          this.pollSochainTx(pendingTx);
+        } else if (pendingTx.chain === 'BCH') {
+          this.pollBchTx(pendingTx);
         }
 
       }
@@ -187,9 +191,29 @@ export class TransactionStatusService {
     });
   }
 
+  pollBchTx(tx: Tx) {
 
-  pollBtcTx(tx: Tx) {
+    timer(5000, 15000)
+    .pipe(
+      // This kills the request if the user closes the component
+      takeUntil(this.killTxPolling[tx.hash]),
+      // switchMap cancels the last request, if no response have been received since last tick
+      switchMap(() => this.haskoinService.getTx(tx.hash)),
+      retryWhen(errors => errors.pipe(delay(10000), take(10)))
+    ).subscribe( async (res: HaskoinTxResponse) => {
 
+      if (res && res.block && res.block.height && res.block.height > 0) {
+        this.updateTxStatus(tx.hash, TxStatus.COMPLETE);
+        this.userService.fetchBalances();
+        this.killTxPolling[tx.hash].next();
+      } else {
+        console.log('continue polling bch...', res);
+      }
+
+    });
+  }
+
+  pollSochainTx(tx: Tx) {
     const network = environment.network === 'testnet' ? 'testnet' : 'mainnet';
 
     timer(0, 15000)
@@ -197,7 +221,7 @@ export class TransactionStatusService {
         // This kills the request if the user closes the component
         takeUntil(this.killTxPolling[tx.hash]),
         // switchMap cancels the last request, if no response have been received since last tick
-        switchMap(() => this.sochainService.getTransaction({txID: tx.hash, network})),
+        switchMap(() => this.sochainService.getTransaction({txID: tx.hash, network, chain: tx.chain})),
         // sochain returns 404 when not found
         // this allows timer to continue polling
         retryWhen(errors => errors.pipe(delay(10000), take(10)))

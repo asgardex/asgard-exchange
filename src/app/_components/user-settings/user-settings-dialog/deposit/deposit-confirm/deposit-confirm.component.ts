@@ -18,7 +18,7 @@ export class DepositConfirmComponent implements OnInit, OnDestroy {
   @Input() action: ActionOptions;
   @Input() depositAmount: number;
   @Output() back = new EventEmitter<null>();
-  @Output() transactionSubmitted = new EventEmitter<null>();
+  @Output() transactionSubmitted = new EventEmitter<string>();
 
   user: User;
   hash: string;
@@ -68,7 +68,7 @@ export class DepositConfirmComponent implements OnInit, OnDestroy {
           symbol: 'RUNE'
         });
 
-        this.transactionSubmitted.next();
+        this.transactionSubmitted.next(hash);
 
       } catch (error) {
         console.error('error making RUNE transfer: ', error);

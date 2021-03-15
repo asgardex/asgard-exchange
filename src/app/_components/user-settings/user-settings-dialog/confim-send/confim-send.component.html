@@ -22,8 +22,8 @@
 
     <!-- <div class="flxr flxr--just-space-between transaction-detail">
 
-      <div class="flxr flxr--align-center">
-        <div style="margin-right: 12px;" class="asset-icon-container flxr flxr--align-center">
+      <div class="flex items-center">
+        <div style="margin-right: 12px;" class="asset-icon-container flex items-center">
           <img *ngIf="asset.asset && asset.asset.iconPath" [src]="asset.asset.iconPath" appImgFallback />
           <mat-icon *ngIf="!asset.asset.iconPath">help_outline</mat-icon>
         </div>
@@ -34,7 +34,7 @@
 
     </div>
 
-    <div class="flxr">
+    <div class="flex">
       <mat-icon style="margin-left: 4px; margin-bottom: 12px;" class="to-btn-icon disabled">arrow_downward</mat-icon>
     </div> -->
 
@@ -114,4 +114,9 @@
   transactionDetail="Sending {{asset.asset.ticker}}">
 </app-transaction-processing-modal> -->
 
+<!-- <div *ngIf="txState === 'ERROR'" class="flex flex-col items-center py-8 text-sm">
+  <mat-icon>warning</mat-icon>
+  There was an error processing the RUNE upgrade.<br />
+  {{error}}
+</div> -->
 

@@ -1,11 +1,3 @@
-<!-- <div class="heading-container flxr flxr--just-space-between flxr--align-end" >
-  <div class="list-title">
-    Token Name
-  </div>
-  <span class="heading-balance__label">Balance</span>
-</div> -->
-<!-- <div style="font-size: 0.7rem; color: #849e93; padding: 0 1rem .5rem">Upgrade to THOR.RUNE to access THORChain pools and more</div> -->
-
 <div class="asset-list-container">
   <div class="market-list-container">
 
@@ -15,24 +7,28 @@
 
     <ul *ngIf="!loading && assetListItems" class="market-list">
 
-      <li class="market-list-item" *ngFor="let item of assetListItems" (click)="selectAsset.emit(item.asset)" [class.disabled]="item.asset.symbol == disabledAssetSymbol">
+      <li class="market-list-item" *ngFor="let item of assetListItems"
+        (click)="selectAsset.emit(item.asset)"
+        [class.disabled]="item.asset.symbol == disabledAssetSymbol">
 
         <div class="asset-icon-container">
           <img *ngIf="item.asset.iconPath" class="asset-icon" [src]="item.asset.iconPath" appImgFallback />
           <mat-icon *ngIf="!item.asset.iconPath">help_outline</mat-icon>
         </div>
 
-        <div class="flxr flxr--just-space-between flxr--align-center" style="width:100%;">
-          <div class="flxr flxr--flow-col">
+        <div class="flex flex-col flex-grow" style="width:100%;">
+          <div class="flex justify-between">
             <span class="market-list-item__symbol">{{item.asset.ticker}}</span>
           </div>
-          <div *ngIf="item.balance" class="flxr flxr--flow-col flxr--just-end" style="text-align: right;">
+          <div *ngIf="item.balance" class="flex flex-col justify-end text-right" style="text-align: right;">
             <span class="market-list-item__balance">{{item.balance.amount().toNumber()}}</span>
-            <!-- <span class="market-list-item__chain">{{item.asset.chain}}</span> -->
           </div>
+
+          <span *ngIf="item.asset.chain === 'ETH' && item.asset.ticker !== 'ETH'" class="text-xs text-gray-400">{{item.asset.symbol.split('-')[1]}}</span>
+          <span class="text-xs text-gray-400">{{item.asset.chain}}</span>
         </div>
       </li>
-      <li *ngIf="displayAddTokenButton" class="flxr flxr--just-center flxr--align-center" style="padding: 1rem 0;">
+      <li *ngIf="displayAddTokenButton" class="flex justify-center items-center py-4">
         <button mat-flat-button color="accent" (click)="addToken.emit()">Add Token</button>
       </li>
     </ul>

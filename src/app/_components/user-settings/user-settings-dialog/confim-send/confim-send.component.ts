@@ -4,6 +4,7 @@ import {
   baseAmount,
   assetToBase,
   assetAmount,
+  Asset,
 } from '@xchainjs/xchain-util';
 import { Subscription } from 'rxjs';
 import { erc20ABI } from 'src/app/_abi/erc20.abi';
@@ -37,9 +38,11 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
   subs: Subscription[];
   txState: TransactionConfirmationState;
   hash: string;
+  error: string;
 
   constructor(private userService: UserService, private txStatusService: TransactionStatusService, private copyService: CopyService, private explorerPathsService : ExplorerPathsService) {
     this.back = new EventEmitter<null>();
+    this.error = '';
     this.transactionSuccessful = new EventEmitter<null>();
     this.message = new EventEmitter<string>();
     this.txState = TransactionConfirmationState.PENDING_CONFIRMATION;
@@ -106,31 +109,18 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
         }
 
         try {
-
           const fees = await client.getFees();
-          // const amount = this.amount - fees.average.amount().toNumber();
-          const test = assetToBase(assetAmount(this.amount)).amount().toNumber();
-
+          const amount = assetToBase(assetAmount(this.amount)).amount().toNumber();
           const hash = await client.transfer({
-            // amount: assetToBase(assetAmount(amount)),
-            amount: baseAmount(test - fees.average.amount().toNumber()),
+            amount: baseAmount(amount - fees.average.amount().toNumber()),
             recipient: this.recipientAddress,
           });
-
           this.hash = hash;
-
-          this.txStatusService.addTransaction({
-            chain: 'THOR',
-            hash,
-            ticker: this.asset.asset.ticker,
-            symbol: this.asset.asset.symbol,
-            status: TxStatus.COMPLETE,
-            action: TxActions.SEND,
-            isThorchainTx: true
-          });
+          this.pushTxStatus(hash, this.asset.asset, true);
           this.transactionSuccessful.next();
         } catch (error) {
           console.error('error making transfer: ', error);
+          this.error = error;
           this.txState = TransactionConfirmationState.ERROR;
         }
 
@@ -144,21 +134,12 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
             amount: assetToBase(assetAmount(this.amount)),
             recipient: this.recipientAddress,
           });
-
           this.hash = hash;
-
-          this.txStatusService.addTransaction({
-            chain: 'BNB',
-            hash,
-            ticker: this.asset.asset.ticker,
-            symbol: this.asset.asset.symbol,
-            status: TxStatus.COMPLETE,
-            action: TxActions.SEND,
-            isThorchainTx: false
-          });
+          this.pushTxStatus(hash, this.asset.asset, false);
           this.transactionSuccessful.next();
         } catch (error) {
           console.error('error making transfer: ', error);
+          this.error = error;
           this.txState = TransactionConfirmationState.ERROR;
         }
 
@@ -171,28 +152,42 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
           const feeRates = await bitcoinClient.getFeeRates();
           const fees = await bitcoinClient.getFees();
           const toBase = assetToBase(assetAmount(this.amount));
-          const amount = toBase.amount().minus(fees.average.amount());
+          const amount = toBase.amount().minus(fees.fast.amount());
 
           const hash = await bitcoinClient.transfer({
             amount: baseAmount(amount),
             recipient: this.recipientAddress,
             feeRate: feeRates.average
           });
-
           this.hash = hash;
-
-          this.txStatusService.addTransaction({
-            chain: 'BTC',
-            hash,
-            ticker: 'BTC',
-            symbol: this.asset.asset.symbol,
-            status: TxStatus.PENDING,
-            action: TxActions.SEND,
-            isThorchainTx: false
-          });
+          this.pushTxStatus(hash, this.asset.asset, false);
           this.transactionSuccessful.next();
         } catch (error) {
           console.error('error making transfer: ', error);
+          this.error = error;
+          this.txState = TransactionConfirmationState.ERROR;
+        }
+
+      } else if (this.asset.asset.chain === 'BCH') {
+
+        const bchClient = this.user.clients.bitcoinCash;
+
+        try {
+          const feeRates = await bchClient.getFeeRates();
+          const fees = await bchClient.getFees();
+          const toBase = assetToBase(assetAmount(this.amount));
+          const amount = toBase.amount().minus(fees.fastest.amount());
+          const hash = await bchClient.transfer({
+            amount: baseAmount(amount),
+            recipient: this.recipientAddress,
+            feeRate: feeRates.average
+          });
+          this.hash = hash;
+          this.pushTxStatus(hash, this.asset.asset, false);
+          this.transactionSuccessful.next();
+        } catch (error) {
+          console.error('error making transfer: ', error);
+          this.error = error;
           this.txState = TransactionConfirmationState.ERROR;
         }
 
@@ -210,37 +205,67 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
           const strip0x = assetAddress.substr(2);
           const checkSummedAddress = ethers.utils.getAddress(strip0x);
           const tokenContract = new ethers.Contract(checkSummedAddress, erc20ABI, wallet);
-          decimal = await tokenContract.decimals().toNumber();
+          const decimals = await tokenContract.decimals();
+          decimal = decimals.toNumber();
         }
 
-        const hash = await ethClient.transfer({
-          asset: {
-            chain: asset.chain,
-            symbol: asset.symbol,
-            ticker: asset.ticker
-          },
-          amount: assetToBase(assetAmount(this.amount, decimal)),
-          recipient: this.recipientAddress,
-        });
+        try {
+          const hash = await ethClient.transfer({
+            asset: {
+              chain: asset.chain,
+              symbol: asset.symbol,
+              ticker: asset.ticker
+            },
+            amount: assetToBase(assetAmount(this.amount, decimal)),
+            recipient: this.recipientAddress,
+          });
+          this.hash = hash;
+          this.pushTxStatus(hash, this.asset.asset, false);
+          this.transactionSuccessful.next();
+        } catch (error) {
+          console.error('error making transfer: ', error);
+          this.error = error;
+          this.txState = TransactionConfirmationState.ERROR;
+        }
 
-        this.hash = hash;
+      } else if (this.asset.asset.chain === 'LTC') {
+        const litecoinClient = this.user.clients.litecoin;
 
-        this.txStatusService.addTransaction({
-          chain: 'ETH',
-          hash,
-          ticker: asset.ticker,
-          status: TxStatus.PENDING,
-          action: TxActions.SEND,
-          isThorchainTx: false,
-          symbol: this.asset.asset.symbol,
-        });
-        this.transactionSuccessful.next();
+        try {
 
+          const feeRates = await litecoinClient.getFeeRates();
+          const fees = await litecoinClient.getFees();
+          const toBase = assetToBase(assetAmount(this.amount));
+          const amount = toBase.amount().minus(fees.fast.amount());
 
+          const hash = await litecoinClient.transfer({
+            amount: baseAmount(amount),
+            recipient: this.recipientAddress,
+            feeRate: feeRates.average
+          });
+          this.pushTxStatus(hash, this.asset.asset, false);
+          this.transactionSuccessful.next();
+        } catch (error) {
+          console.error('error making transfer: ', error);
+          this.error = error;
+          this.txState = TransactionConfirmationState.ERROR;
+        }
       }
 
     }
 
+  }
+
+  pushTxStatus(hash: string, asset: Asset, isThorchainTx: boolean) {
+    this.txStatusService.addTransaction({
+      chain: asset.chain,
+      ticker: asset.ticker,
+      status: TxStatus.PENDING,
+      action: TxActions.SEND,
+      symbol: asset.symbol,
+      isThorchainTx,
+      hash,
+    });
   }
 
   ngOnDestroy() {

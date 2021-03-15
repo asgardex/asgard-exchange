@@ -24,20 +24,6 @@
 //   color: rgb(195, 197, 203);
 // }
 
-// .tag {
-//   position: absolute;
-//   width: 100%;
-//   bottom: -130px;
-//   font-size: 14px;
-
-//   .tag-contents {
-//     background-color: rgba(0, 0, 0, 0.1);
-//     border-bottom-left-radius: 20px;
-//     border-bottom-right-radius: 20px;
-//     padding: 1rem;
-//   }
-// }
-
 .reverse-transaction {
   display: flex;
   justify-content: center;
@@ -54,7 +40,6 @@
     background: none;
   }
 }
-
 
 .reverse-transaction .to-btn-icon {
   margin-bottom: 0px;

@@ -75,10 +75,13 @@ import { NativeRunePromptModule } from './_components/native-rune-prompt/native-
 import { UpgradeRuneModule } from './_components/upgrade-rune/upgrade-rune.module';
 import { UpgradeRuneConfirmModule } from './_components/upgrade-rune-confirm/upgrade-rune-confirm.module';
 import { SochainService } from './_services/sochain.service';
-import { NoticeComponent } from './_components/notice/notice.component';
 import { NoticeModule } from './_components/notice/notice.module';
 import { AccountSettingsComponent } from './_components/account-settings/account-settings.component';
 import { SeedPhraseComponent } from './_components/account-settings/seed-phrase/seed-phrase.component';
+import { ThorchainPricesService } from './_services/thorchain-prices.service';
+import { HaskoinService } from './_services/haskoin.service';
+import { ModalSectionHeaderModule } from './_components/modal-section-header/modal-section-header.module';
+
 
 @NgModule({
   declarations: [
@@ -141,7 +144,8 @@ import { SeedPhraseComponent } from './_components/account-settings/seed-phrase/
     BreadcrumbModule,
     TagModule,
     NoticeModule,
-    NativeRunePromptModule
+    NativeRunePromptModule,
+    ModalSectionHeaderModule
   ],
   providers: [
     BinanceService,
@@ -156,7 +160,9 @@ import { SeedPhraseComponent } from './_components/account-settings/seed-phrase/
     SlippageToleranceService,
     TransactionStatusService,
     EthUtilsService,
-    SochainService
+    SochainService,
+    ThorchainPricesService,
+    HaskoinService
   ],
   bootstrap: [AppComponent]
 })

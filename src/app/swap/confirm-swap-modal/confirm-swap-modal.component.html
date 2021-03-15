@@ -147,12 +147,25 @@
             >
           </div>
 
-          <div class="flxr flxr--just-space-between">
-            <span class="tx-detail-label">Total Fee:</span>
-            <span
-              >{{ swapData.bnbFee | number: "0.0-6" }} BNB +
-              1 Rune</span
-            >
+          <div *ngIf="swapData.sourceAsset.chain === 'BNB'" class="flex justify-between mb-2">
+            <span class="tx-detail-label">Total Fee</span>
+            <span>{{swapData.bnbFee | number:"0.0-6"}} BNB</span>
+          </div>
+
+          <div *ngIf="swapData.sourceAsset.chain === 'ETH'" class="flex justify-between mb-2">
+            <span class="tx-detail-label">Total Fee</span>
+            <span *ngIf="ethNetworkFee">{{ (ethNetworkFee) | number:"0.0-6"}} ETH</span>
+            <span *ngIf="!ethNetworkFee"> - ETH</span>
+          </div>
+
+          <div *ngIf="swapData.sourceAsset.chain === 'THOR'" class="flex justify-between mb-2">
+            <span class="tx-detail-label">Total Fee</span>
+            <span>1 Rune</span>
+          </div>
+
+          <div *ngIf="swapData.sourceAsset.chain !== 'THOR'" class="flex justify-between mb-2">
+            <span class="tx-detail-label"></span>
+            <span>1 Rune</span>
           </div>
 
           <div class="flxr flxr--just-space-between">
@@ -205,8 +218,10 @@
             <button
               (click)="submitTransaction()"
               class="next-btn"
+              [disabled]="insufficientChainBalance"
             >
-              <span>confirm</span>
+            <span *ngIf="!insufficientChainBalance">Confirm</span>
+            <span *ngIf="insufficientChainBalance">Insufficient {{swapData.sourceAsset.chain}}</span>
             </button>
           </div>
         </ng-container>
@@ -274,12 +289,10 @@
   (closeDialog)="closeDialog(true)">
 </app-transaction-success-modal> -->
 
-  <div
-    style="font-size: 0.8rem; padding: 2rem 0"
-    class="flxr flxr--flow-col flxr--align-center"
-    *ngIf="txState === 'ERROR'"
-  >
+  <!-- <div class="flex flex-col items-center p-8 text-sm" *ngIf="txState === 'ERROR'">
     <mat-icon>warning</mat-icon>
-    {{ error }}
-  </div>
+    <span class="mt-4">
+      {{error}}
+    </span>
+  </div> -->
 </div>

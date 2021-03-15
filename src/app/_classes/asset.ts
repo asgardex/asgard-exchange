@@ -10,7 +10,7 @@ export class Asset {
   iconPath: string;
 
   constructor(poolName: string) {
-    const {chain, symbol, ticker } = this.getAssetFromString(poolName);
+    const { chain, symbol, ticker } = this._getAssetFromString(poolName);
     this.chain = chain;
     this.symbol = symbol;
     this.ticker = ticker;
@@ -28,17 +28,19 @@ export class Asset {
           this.iconPath = 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/BTCB-1DE/logo.png';
           break;
 
-        case 'BNB':
+        case 'LTC':
+          this.iconPath = 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/litecoin/info/logo.png';
+          break;
 
+        case 'BNB':
           if (ticker === 'BNB') {
             this.iconPath = 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/info/logo.png';
           }
-
           break;
 
         case 'ETH':
           if (this.symbol !== 'ETH') { // for ETH tokens
-            this.iconPath = this.setEthIconPath(symbol, ticker);
+            this.iconPath = this._setEthIconPath(symbol, ticker);
           }
           break;
 
@@ -46,6 +48,9 @@ export class Asset {
           this.iconPath = 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/RUNE-B1A/logo.png';
           break;
 
+        case 'BCH':
+          this.iconPath = 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/bitcoincash/info/logo.png';
+          break;
 
         default:
           break;
@@ -55,14 +60,14 @@ export class Asset {
 
   }
 
-  setEthIconPath(assetSymbol: string, assetTicker: string): string {
+  private _setEthIconPath(assetSymbol: string, assetTicker: string): string {
     const assetAddress = assetSymbol.slice(assetTicker.length + 1);
     const strip0x = assetAddress.substr(2);
     const checkSummedAddress = ethers.utils.getAddress(strip0x);
     return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${checkSummedAddress}/logo.png`;
   }
 
-  getAssetFromString(poolName: string): {
+  private _getAssetFromString(poolName: string): {
     chain: Chain;
     symbol: string;
     ticker: string;
@@ -86,3 +91,13 @@ export class Asset {
   }
 
 }
+
+export const checkSummedAsset = (poolName: string): {chain: Chain, ticker: string, symbol: string} => {
+  const asset = new Asset(poolName);
+  const assetAddress = asset.symbol.slice(asset.ticker.length + 1);
+  const strip0x = (assetAddress.substr(0, 2).toUpperCase() === '0X')
+    ? assetAddress.substr(2)
+    : assetAddress;
+  const checkSummedAddress = ethers.utils.getAddress(strip0x);
+  return  {chain: asset.chain, ticker: asset.ticker, symbol: `${asset.ticker}-${checkSummedAddress}`};
+};

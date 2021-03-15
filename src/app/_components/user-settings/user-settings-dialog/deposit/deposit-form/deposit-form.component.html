@@ -1,18 +1,10 @@
-<div style="padding: 1rem 1rem 0; margin-bottom: 0;" class="section-head-container">
-  <button (click)="back.next()" mat-icon-button>
-    <mat-icon>arrow_back</mat-icon>
-  </button>
-  <h1 class="flxr">
-    <mat-icon>warning</mat-icon> Manual Memo
-  </h1>
-  <div style="width: 40px"></div>
-</div>
+<app-modal-section-header sectionTitle="Manual Memo" sectionTitleIcon="warning" [displayBackBtn]="true" (back)="back.emit()"></app-modal-section-header>
 
 <div mat-dialog-content *ngIf="asset">
 
   <div>
 
-    <div style="padding: 1rem">
+    <div class="p-4">
       <div class="uni-input">
         <label>Memo</label>
         <textarea type="text" [ngModel]="memo" [disabled]="true"></textarea>
@@ -21,7 +13,7 @@
 
     <div class="memo-form" style="border-top: 1px solid #2c2f36; border-bottom: 1px solid #2c2f36">
 
-      <div style="padding: 1rem">
+      <div class="p-4">
 
         <div class="uni-input">
           <label>Action</label>
@@ -90,20 +82,24 @@
 
     </div>
 
-    <div style="padding: 1rem">
+    <div class="p-4">
 
       <app-asset-input
         *ngIf="action != 'WITHDRAW' && action != 'LEAVE' && action != 'UNBOND'"
         label="Input"
         [(selectedAsset)]="asset.asset"
+        [balance]="asset.balance.amount().toNumber()"
         [(assetUnit)]="depositAmount"
         [disabledMarketSelect]="true"
-        [coinGeckoList]="coinGeckoList">
+        [selectableMarkets]="[asset]">
       </app-asset-input>
 
-      <div class="flxr flxr--just-end flxr--align-center" style="height: 38px">
+      <div class="flex justify-end items-center" style="height: 38px">
         <div>
-          <button mat-flat-button color="accent" (click)="confirmSend()">
+          <button mat-flat-button color="accent" (click)="confirmSend()" [disabled]="(
+            (action === 'ADD' || action === 'SWAP' || action === 'BOND') && (!depositAmount || depositAmount <= 0)
+            || (action === 'UNBOND' && (!memoAmount || memoAmount < 0))
+            )">
             <span>Next</span>
           </button>
         </div>

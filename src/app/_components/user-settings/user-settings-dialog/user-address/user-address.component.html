@@ -2,7 +2,7 @@
   <button (click)="back.emit()" mat-icon-button>
     <mat-icon>arrow_back</mat-icon>
   </button>
-  <h1 class="flxr">
+  <h1 class="flex items-center text-white text-lg font-medium m-0">
     <div class="asset-icon-container">
       <img *ngIf="iconPath" class="asset-icon" [src]="iconPath" />
     </div>
@@ -54,5 +54,14 @@
         <span>refresh</span>
       </button>
     </div>
+    <div class="flex w-full">
+      <textarea [value]="address" name="address" [disabled]="true"></textarea>
+      <button matSuffix mat-icon-button aria-label="Copy To Clipboard" (click)="copyToClipboard(address)">
+        <mat-icon matSuffix (click)="copyToClipboard(address)">content_copy</mat-icon>
+      </button>
+    </div>
+
+    <app-testnet-warning [chain]="chain"></app-testnet-warning>
+
   </div>
 </div>

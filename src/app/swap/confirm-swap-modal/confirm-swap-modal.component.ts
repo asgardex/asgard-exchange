@@ -10,11 +10,12 @@ import { TransactionStatusService, TxActions, TxStatus } from 'src/app/_services
 import { SlippageToleranceService } from 'src/app/_services/slippage-tolerance.service';
 import BigNumber from 'bignumber.js';
 import { ETH_DECIMAL } from '@xchainjs/xchain-ethereum/lib';
-import { EthUtilsService } from 'src/app/_services/eth-utils.service.js';
+import { EthUtilsService } from 'src/app/_services/eth-utils.service';
 import {
   baseAmount,
   assetToBase,
   assetAmount,
+  Asset,
 } from '@xchainjs/xchain-util';
 import { MainViewsEnum, OverlaysService } from 'src/app/_services/overlays.service';
 import { number } from 'yargs';
@@ -145,7 +146,9 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
     // Source asset is not RUNE
     if (this.swapData.sourceAsset.chain === 'BNB'
       || this.swapData.sourceAsset.chain === 'BTC'
-      || this.swapData.sourceAsset.chain === 'ETH') {
+      || this.swapData.sourceAsset.chain === 'ETH'
+      || this.swapData.sourceAsset.chain === 'LTC'
+      || this.swapData.sourceAsset.chain === 'BCH') {
 
       this.midgardService.getInboundAddresses().subscribe(
         async (res) => {
@@ -188,29 +191,9 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
     const bitcoinClient = this.swapData.user.clients.bitcoin;
     const thorClient = this.swapData.user.clients.thorchain;
     const ethClient = this.swapData.user.clients.ethereum;
-    const bitcoinAddress = await bitcoinClient.getAddress();
-    const binanceAddress = await binanceClient.getAddress();
-    const runeAddress = await thorClient.getAddress();
-    const ethAddress = await ethClient.getAddress();
+    const litecoinClient = this.swapData.user.clients.litecoin;
 
-    let targetAddress = '';
-
-    switch (this.swapData.targetAsset.chain) {
-      case 'BTC':
-        targetAddress = bitcoinAddress;
-        break;
-
-      case 'BNB':
-        targetAddress = binanceAddress;
-        break;
-
-      case 'THOR':
-        targetAddress = runeAddress;
-        break;
-
-      case 'ETH':
-        targetAddress = ethAddress;
-    }
+    const targetAddress = await this.userService.getTokenAddress(this.swapData.user, this.swapData.targetAsset.chain);
 
     const floor = this.slipLimitService.getSlipLimitFromAmount(this.swapData.outputValue);
 
@@ -257,15 +240,7 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
         });
 
         this.hash = hash;
-        this.txStatusService.addTransaction({
-          chain: 'BNB',
-          hash: this.hash,
-          ticker: this.swapData.sourceAsset.ticker,
-          status: TxStatus.PENDING,
-          action: TxActions.SWAP,
-          isThorchainTx: true,
-          symbol: this.swapData.sourceAsset.symbol,
-        });
+        this.pushTxStatus(hash, this.swapData.sourceAsset);
         this.txState = TransactionConfirmationState.SUCCESS;
       } catch (error) {
         console.error('error making transfer: ', error);
@@ -280,7 +255,7 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
         const fee = await bitcoinClient.getFeesWithMemo(memo);
         const feeRates = await bitcoinClient.getFeeRates();
         const toBase = assetToBase(assetAmount(amountNumber));
-        const amount = toBase.amount().minus(fee.average.amount());
+        const amount = toBase.amount().minus(fee.fast.amount());
 
         const hash = await bitcoinClient.transfer({
           amount: baseAmount(amount),
@@ -290,15 +265,7 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
         });
 
         this.hash = hash;
-        this.txStatusService.addTransaction({
-          chain: 'BTC',
-          hash: this.hash,
-          ticker: 'BTC',
-          status: TxStatus.PENDING,
-          action: TxActions.SWAP,
-          isThorchainTx: true,
-          symbol: this.swapData.sourceAsset.symbol,
-        });
+        this.pushTxStatus(hash, this.swapData.sourceAsset);
         this.txState = TransactionConfirmationState.SUCCESS;
       } catch (error) {
         console.error('error making transfer: ', error);
@@ -325,15 +292,56 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
         });
 
         this.hash = hash.substr(2);
-        this.txStatusService.addTransaction({
-          chain: 'ETH',
-          hash,
-          ticker: 'ETH',
-          status: TxStatus.PENDING,
-          action: TxActions.SWAP,
-          isThorchainTx: true,
-          symbol: targetAsset.symbol,
+        this.pushTxStatus(hash, this.swapData.sourceAsset);
+        this.txState = TransactionConfirmationState.SUCCESS;
+      } catch (error) {
+        console.error('error making transfer: ', error);
+        this.error = error;
+        this.txState = TransactionConfirmationState.ERROR;
+      }
+
+    } else if (this.swapData.sourceAsset.chain === 'LTC') {
+
+      try {
+        const fee = await litecoinClient.getFeesWithMemo(memo);
+        const feeRates = await litecoinClient.getFeeRates();
+        const toBase = assetToBase(assetAmount(amountNumber));
+        const amount = toBase.amount().minus(fee.fast.amount());
+
+        const hash = await litecoinClient.transfer({
+          amount: baseAmount(amount),
+          recipient: matchingPool.address,
+          memo,
+          feeRate: feeRates.average
         });
+
+        this.hash = hash;
+        this.pushTxStatus(hash, this.swapData.sourceAsset);
+        this.txState = TransactionConfirmationState.SUCCESS;
+      } catch (error) {
+        console.error('error making transfer: ', error);
+        this.error = error;
+        this.txState = TransactionConfirmationState.ERROR;
+      }
+
+    } else if (this.swapData.sourceAsset.chain === 'BCH') {
+
+      try {
+        const bchClient = this.swapData.user.clients.bitcoinCash;
+        const fee = await bchClient.getFeesWithMemo(memo);
+        const feeRates = await bchClient.getFeeRates();
+        const toBase = assetToBase(assetAmount(amountNumber));
+        const amount = toBase.amount().minus(fee.fast.amount());
+
+        const hash = await bchClient.transfer({
+          amount: baseAmount(amount),
+          recipient: matchingPool.address,
+          memo,
+          feeRate: feeRates.average
+        });
+
+        this.hash = hash;
+        this.pushTxStatus(hash, this.swapData.sourceAsset);
         this.txState = TransactionConfirmationState.SUCCESS;
       } catch (error) {
         console.error('error making transfer: ', error);
@@ -345,6 +353,18 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
 
   }
 
+  pushTxStatus(hash: string, asset: Asset) {
+    this.txStatusService.addTransaction({
+      chain: asset.chain,
+      ticker: asset.ticker,
+      status: TxStatus.PENDING,
+      action: TxActions.SWAP,
+      isThorchainTx: true,
+      symbol: asset.symbol,
+      hash,
+    });
+  }
+
   async estimateEthGasPrice() {
 
     const user = this.swapData.user;
@@ -352,7 +372,6 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
     const targetAsset = this.swapData.targetAsset;
 
     if (user && user.clients && user.clients.ethereum) {
-
 
       const ethClient = user.clients.ethereum;
       const targetAddress = await ethClient.getAddress();

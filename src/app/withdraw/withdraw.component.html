@@ -1,14 +1,8 @@
 <div class="container">
 
-  <div class="section-head-container">
-    <a [routerLink]="['/', 'pool']" mat-icon-button>
-      <mat-icon>arrow_back</mat-icon>
-    </a>
-    <h1>Remove Liquidity</h1>
-    <div style="width: 40px"></div>
-  </div>
+  <app-section-head sectionTitle="Remove Liquidity" [displayBackBtn]="true" (back)="back()"></app-section-head>
 
-  <div style="position: relative;">
+  <div class="relative">
     <div class="uni-input">
 
       <span>Amount</span>
@@ -27,7 +21,7 @@
 
     </div>
 
-    <div class="flxr flxr--align-center flxr--just-center">
+    <div class="flex items-center justify-center">
       <button [disabled]="true">
         <mat-icon [class.disabled]="true" class="to-btn-icon">arrow_downward</mat-icon>
       </button>
@@ -35,14 +29,14 @@
 
     <div class="uni-input">
 
-      <div *ngIf="asset" class="unstake-calc flxr flxr--just-space-between">
+      <div *ngIf="asset" class="unstake-calc flex justify-between">
         <span *ngIf="removeAssetAmount">{{removeAssetAmount | number:"0.0-6"}}</span>
         <span *ngIf="!removeAssetAmount">-</span>
         <app-icon-ticker [iconPath]="asset.iconPath" [ticker]="asset.ticker"></app-icon-ticker>
 
       </div>
 
-      <div class="unstake-calc flxr flxr--just-space-between">
+      <div class="unstake-calc flex justify-between">
         <span *ngIf="removeRuneAmount">{{removeRuneAmount | number:"0.0-6"}}</span>
         <span *ngIf="!removeRuneAmount">-</span>
         <app-icon-ticker [iconPath]="rune.iconPath" [ticker]="rune.ticker"></app-icon-ticker>
@@ -51,44 +45,34 @@
 
     </div>
 
-    <div *ngIf="asset" style="padding: 10px 20px; font-size: 0.8rem;" class="prices">
+    <div *ngIf="asset" class="prices py-2 px-4 text-sm">
 
-      <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
+      <div class="flex justify-between pb-2 items-center">
         <span class="tx-detail-label">Prices</span>
         <span>1 {{rune.ticker}} = {{assetBasePrice | number:"1.2-4"}} {{asset.ticker}}</span>
       </div>
 
-      <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
+      <div class="flex justify-between pb-2 items-center">
         <span></span>
         <span>1 {{asset.ticker}} = {{runeBasePrice | number:"1.2-4"}} {{rune.ticker}}</span>
       </div>
 
-      <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
+      <div class="flex justify-between pb-2 items-center">
         <span class="tx-detail-label">TX Fees</span>
         <span>1 RUNE</span>
       </div>
 
-      <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
+      <div class="flex justify-between pb-2 items-center">
         <span class="tx-detail-label"></span>
         <!-- TODO: estimate this on the fly -->
         <span>+ {{asset.ticker}} Network Gas</span>
       </div>
 
-      <!-- <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
-        <span class="tx-detail-label"></span>
-        <span>{{assetBasePrice | number:"0.0-4"}} {{asset.ticker}}</span>
-      </div> -->
-
-      <!-- <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
-        <span class="tx-detail-label">Network Fee</span>
-        <span>0.0003 BNB</span>
-      </div> -->
-
     </div>
 
     <button
       (click)="openConfirmationDialog()"
-      class="main-action-btn"
+      class="main-action-btn w-full"
       mat-flat-button
       color="primary"
       [disabled]="!user || !removeAssetAmount || insufficientBnb || (removeAssetAmount && removeAssetAmount <= 0 || remainingTime)"

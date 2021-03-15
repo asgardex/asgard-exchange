@@ -32,7 +32,11 @@ export class ReconnectDialogComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  async keystoreUnlockClicked() {
+  async initUnlock() {
+
+    if (this.keystoreConnecting) {
+      return;
+    }
 
     this.keystoreConnecting = true;
 

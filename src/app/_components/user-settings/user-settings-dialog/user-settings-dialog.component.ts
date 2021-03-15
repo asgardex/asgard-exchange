@@ -3,8 +3,10 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { Chain } from '@xchainjs/xchain-util';
 import { Subscription } from 'rxjs';
 import { AssetAndBalance } from 'src/app/_classes/asset-and-balance';
+import { PoolDTO } from 'src/app/_classes/pool';
 import { User } from 'src/app/_classes/user';
 import { MainViewsEnum, OverlaysService } from 'src/app/_services/overlays.service';
+import { MidgardService } from 'src/app/_services/midgard.service';
 import { TransactionStatusService } from 'src/app/_services/transaction-status.service';
 import { UserService } from 'src/app/_services/user.service';
 
@@ -21,6 +23,8 @@ export class UserSettingsDialogComponent implements OnInit, OnDestroy {
   bitcoinAddress: string;
   thorAddress: string;
   ethereumAddress: string;
+  litecoinAddress: string;
+  bchAddress: string;
   loading: boolean;
   pendingTxCount: number;
   _mode: 'ADDRESSES' | 'ADDRESS' | 'PENDING_TXS'
@@ -51,14 +55,15 @@ export class UserSettingsDialogComponent implements OnInit, OnDestroy {
 
   @Input() userSetting: boolean;
   @Output() userSettingChange = new EventEmitter<boolean>();
+  pools: PoolDTO[];
 
   constructor(
     private userService: UserService,
     private txStatusService: TransactionStatusService,
-    private overlaysService: OverlaysService
-    // public dialogRef: MatDialogRef<UserSettingsDialogComponent>
+    private overlaysService: OverlaysService,
+    private midgardService: MidgardService,
   ) {
-
+    this.pools = [];
     this.pendingTxCount = 0;
     this.mode = 'ADDRESSES';
 
@@ -72,23 +77,12 @@ export class UserSettingsDialogComponent implements OnInit, OnDestroy {
           this.user = user;
 
           if (this.user.clients) {
-
-            if (this.user.clients.binance) {
-              this.binanceAddress = await this.user.clients.binance.getAddress();
-            }
-
-            if (this.user.clients.bitcoin) {
-              this.bitcoinAddress = await this.user.clients.bitcoin.getAddress();
-            }
-
-            if (this.user.clients.thorchain) {
-              this.thorAddress = await this.user.clients.thorchain.getAddress();
-            }
-
-            if (this.user.clients.ethereum) {
-              this.ethereumAddress = await this.user.clients.ethereum.getAddress();
-            }
-
+            this.binanceAddress = await this.user.clients.binance.getAddress();
+            this.bitcoinAddress = await this.user.clients.bitcoin.getAddress();
+            this.thorAddress = await this.user.clients.thorchain.getAddress();
+            this.ethereumAddress = await this.user.clients.ethereum.getAddress();
+            this.litecoinAddress = await this.user.clients.litecoin.getAddress();
+            this.bchAddress = await this.user.clients.bitcoinCash.getAddress();
           }
 
           this.loading = false;
@@ -108,6 +102,11 @@ export class UserSettingsDialogComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.getPools();
+  }
+
+  getPools() {
+    this.midgardService.getPools().subscribe( (res) => this.pools = res );
   }
 
   selectAddress(address: string, chain: Chain) {

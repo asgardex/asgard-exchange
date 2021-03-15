@@ -1,8 +1,8 @@
 <div class="container">
 
-  <app-section-head sectionTitle="Create Pool" [backRouterLink]="['/', 'pool']"></app-section-head>
+  <app-section-head sectionTitle="Create Pool" [displayBackBtn]="true" (back)="back()"></app-section-head>
 
-  <div style="position: relative;">
+  <div class="relative">
 
     <app-asset-input
       label="Input"
@@ -10,11 +10,10 @@
       [(assetUnit)]="assetAmount"
       [balance]="assetBalance"
       [disabledAssetSymbol]="rune.symbol"
-      [coinGeckoList]="coinGeckoList"
       [selectableMarkets]="selectableMarkets">
     </app-asset-input>
 
-    <div class="flxr flxr--align-center flxr--just-center">
+    <div class="flex items-center justify-center">
       <mat-icon [class.disabled]="true" class="to-btn-icon">add</mat-icon>
     </div>
 
@@ -25,25 +24,24 @@
       [balance]="runeBalance"
       [hideMax]="true"
       [disabledMarketSelect]="true"
-      [disabledAssetSymbol]="rune.symbol"
-      [coinGeckoList]="coinGeckoList">
+      [disabledAssetSymbol]="rune.symbol">
     </app-asset-input>
 
-    <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
+    <div class="flex justify-between mb-2">
       <span class="tx-detail-label">Recommended RUNE Total</span>
       <span *ngIf="recommendedRuneAmount">{{ recommendedRuneAmount | number:"0.0-0" }}</span>
       <span *ngIf="!recommendedRuneAmount"> - </span>
     </div>
 
 
-    <div style="font-size: 0.8rem; font-style: italic;">
+    <div class="italic text-xs">
       *A minimum of 1,000 RUNE + balancing asset is required to create a pool
     </div>
 
-    <div class="flxr">
+    <div class="flex">
       <app-approve-eth-contract
         *ngIf="ethContractApprovalRequired"
-        style="width: 50%; margin-right: 8px;"
+        class="w-1/2 mr-2"
         [contractAddress]="ethRouter"
         [asset]="asset"
         (approved)="contractApproved()">
@@ -54,7 +52,7 @@
         class="main-action-btn"
         mat-flat-button
         color="primary"
-        [ngStyle]="{'width': ethContractApprovalRequired ? '50%' : '100%'}"
+        [ngClass]="ethContractApprovalRequired ? 'w-1/2' : 'w-full'"
         [disabled]="formDisabled()">
           {{mainButtonText()}}
       </button>

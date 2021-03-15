@@ -1,10 +1,3 @@
-<!-- <div class="container" style="position: absolute; top: -2px; left: -2px;"> -->
-
-<!-- <div style="padding: 1rem 1rem 0" class="section-head-container">
-
-    <h1>Transactions</h1>
-    <div style="width: 40px"></div>
-  </div> -->
 <div class="container-wrapper">
   <div class="container">
     <div class="main-container">
@@ -53,20 +46,19 @@
       <a [href]="explorerPath(tx)" target="_blank"
         class="uni-input">
 
-        <label style="width: 100%" class="flxr flxr--just-space-between">
-          <span>{{tx.ticker}}</span>
-          <span>{{tx.action}}</span>
-        </label>
+              <label class="flex justify-between w-full">
+                <span>{{tx.ticker}}</span>
+                <span>{{tx.action}}</span>
+              </label>
 
-        <div class="flxr" style="width: 100%">
+              <div class="flex items-center justify-between w-full">
 
-                <input [value]="tx.hash.substring(0, 4) + '...' + tx.hash.substring(tx.hash.length - 4, tx.hash.length)" name="thor-address" [disabled]="true" />
+                <span>{{tx.hash.substring(0, 4) + '...' + tx.hash.substring(tx.hash.length - 4, tx.hash.length)}}</span>
 
-          <button matSuffix mat-icon-button>
-            <mat-icon *ngIf="tx.status === 'COMPLETE'">check_circle</mat-icon>
-            <mat-progress-spinner *ngIf="tx.status === 'PENDING'" diameter="16" color="primary" mode="indeterminate">
-            </mat-progress-spinner>
-          </button>
+                <button class="flex items-center justify-center" matSuffix mat-icon-button>
+                  <mat-icon *ngIf="tx.status === 'COMPLETE'">check_circle</mat-icon>
+                  <mat-progress-spinner *ngIf="tx.status === 'PENDING'" diameter="16" color="primary" mode="indeterminate"></mat-progress-spinner>
+                </button>
 
         </div>
 

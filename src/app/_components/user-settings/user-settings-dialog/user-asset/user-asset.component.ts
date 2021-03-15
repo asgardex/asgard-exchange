@@ -1,7 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Chain } from '@xchainjs/xchain-util';
 import { AssetAndBalance } from 'src/app/_classes/asset-and-balance';
-import { CoinGeckoService } from 'src/app/_services/coin-gecko.service';
 import { CopyService } from 'src/app/_services/copy.service';
 
 @Component({
@@ -35,7 +34,6 @@ export class UserAssetComponent implements OnInit {
   }
 
   ngOnInit(): void {
-
   }
 
   getIconPath(chain: Chain): string {

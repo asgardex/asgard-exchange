@@ -26,12 +26,12 @@ import { MatDialog } from '@angular/material/dialog';
 import { ConfirmSwapModalComponent } from './confirm-swap-modal/confirm-swap-modal.component';
 import { User } from '../_classes/user';
 import { Balances } from '@xchainjs/xchain-client';
-import { CGCoinListItem, CoinGeckoService } from '../_services/coin-gecko.service';
 import { AssetAndBalance } from '../_classes/asset-and-balance';
 import { PoolDTO } from '../_classes/pool';
 import { SlippageToleranceService } from '../_services/slippage-tolerance.service';
 import { PoolAddressDTO } from '../_classes/pool-address';
 import { MainViewsEnum, OverlaysService } from '../_services/overlays.service';
+import { ThorchainPricesService } from '../_services/thorchain-prices.service';
 
 export enum SwapType {
   DOUBLE_SWAP = 'double_swap',
@@ -180,7 +180,6 @@ export class SwapComponent implements OnInit, OnDestroy {
   poolDetailSourceError: boolean;
 
   insufficientBnb: boolean;
-  coinGeckoList: CGCoinListItem[];
   selectableMarkets: AssetAndBalance[];
   targetMarketShow: boolean;
   sourceMarketShow: boolean;
@@ -198,8 +197,8 @@ export class SwapComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private midgardService: MidgardService,
     private binanceService: BinanceService,
-    private cgService: CoinGeckoService,
     private slipLimitService: SlippageToleranceService,
+    private thorchainPricesService: ThorchainPricesService,
     public overlaysService: OverlaysService) {
 
     this.selectedSourceAsset = new Asset('THOR.RUNE');
@@ -251,7 +250,6 @@ export class SwapComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.getConstants();
     this.getBinanceFees();
-    this.getCoinGeckoCoinList();
     this.getPools();
     this.getEthRouter();
   }
@@ -305,34 +303,32 @@ export class SwapComponent implements OnInit, OnDestroy {
       (res) => {
 
         const availablePools = res.filter( (pool) => pool.status === 'available' );
-        const poolNames = availablePools.map( (pool) => pool.asset );
-        const sortedByName = poolNames.sort();
-        this.selectableMarkets = sortedByName.map((poolName) => ({
-          asset: new Asset(poolName),
+
+        this.selectableMarkets = availablePools
+        .sort( (a, b) => a.asset.localeCompare(b.asset) )
+        .map((pool) => ({
+          asset: new Asset(pool.asset),
+          assetPriceUSD: +pool.assetPriceUSD
         }))
         // filter out until we can add support
         .filter( (pool) => pool.asset.chain === 'BNB'
           || pool.asset.chain === 'THOR'
           || pool.asset.chain === 'BTC'
           || pool.asset.chain === 'ETH'
+          || pool.asset.chain === 'LTC'
+          || pool.asset.chain === 'BCH'
         );
 
         // Keeping RUNE at top by default
         this.selectableMarkets.unshift({
           asset: new Asset('THOR.RUNE'),
+          assetPriceUSD: this.thorchainPricesService.estimateRunePrice(availablePools)
         });
       },
       (err) => console.error('error fetching pools:', err)
     );
   }
 
-  getCoinGeckoCoinList() {
-
-    this.cgService.getCoinList().subscribe( (res) => {
-      this.coinGeckoList = res;
-    });
-
-  }
 
   async checkContractApproved() {
 
@@ -375,93 +371,28 @@ export class SwapComponent implements OnInit, OnDestroy {
     const output = this.targetAssetUnit.div(10 ** 8);
     console.log(output);
 
-    const id = this.cgService.getCoinIdBySymbol(this.selectedSourceAsset.ticker, this.coinGeckoList);
+    let sourceAssetPrice;
+    let targetAssetPrice;
 
-    if (id) {
-      let sourceAssetPrice;
-      let targetAssetPrice;
+    console.log('check balance');
 
-      console.log('check balance');
-
-      this.cgService.getCurrencyConversion(id).subscribe(
-        (res) => {
-          console.log(res)
-
-          for (const [_key, value] of Object.entries(res)) {
-            sourceAssetPrice = value.usd;
-
-            const id = this.cgService.getCoinIdBySymbol(this.selectedTargetAsset.ticker, this.coinGeckoList);
-
-            if (id) {
-              console.log('check balance');
-
-              this.cgService.getCurrencyConversion(id).subscribe(
-                (res) => {
-                  console.log(res)
-
-                  for (const [_key, value] of Object.entries(res)) {
-                    targetAssetPrice = value.usd;
-
-                    this.swapData = {
-                      sourceAsset: this.selectedSourceAsset,
-                      targetAsset: this.selectedTargetAsset,
-                      runeFee: this.runeTransactionFee,
-                      bnbFee: this.binanceTransferFeeDisplay,
-                      basePrice: this.basePrice,
-                      inputValue: this.sourceAssetUnit,
-                      outputValue: output,
-                      user: this.user,
-                      slip: this.slip,
-                      balance: this.sourceBalance,
-                      sourceAssetPrice,
-                      targetAssetPrice,
-                    }
-
-                    console.log(this.swapData);
-
-                  }
-
-                  this.overlaysService.setCurrentSwapView('Confirm')
-                }
-              );
-
-            }
-
-          }
-        }
-      );
-
+    this.swapData = {
+      sourceAsset: this.selectedSourceAsset,
+      targetAsset: this.selectedTargetAsset,
+      runeFee: this.runeTransactionFee,
+      bnbFee: this.binanceTransferFeeDisplay,
+      basePrice: this.basePrice,
+      inputValue: this.sourceAssetUnit,
+      outputValue: output,
+      user: this.user,
+      slip: this.slip,
+      balance: this.sourceBalance,
+      sourceAssetPrice,
+      targetAssetPrice,
     }
 
 
-    // const dialogRef = this.dialog.open(
-    //   ConfirmSwapModalComponent,
-    //   {
-    //     minWidth: '260px',
-    //     maxWidth: '420px',
-    //     width: '50vw',
-    //     data: {
-    //       sourceAsset: this.selectedSourceAsset,
-    //       targetAsset: this.selectedTargetAsset,
-    //       runeFee: this.runeTransactionFee,
-    //       bnbFee: this.binanceTransferFeeDisplay,
-    //       basePrice: this.basePrice,
-    //       inputValue: this.sourceAssetUnit,
-    //       outputValue: this.targetAssetUnit.div(10 ** 8),
-    //       user: this.user,
-    //       slip: this.slip
-    //     }
-    //   }
-    // );
-
-    // dialogRef.afterClosed().subscribe( (transactionSuccess: boolean) => {
-
-    //   if (transactionSuccess) {
-    //     this.targetAssetUnit = null;
-    //     this.sourceAssetUnit = null;
-    //   }
-
-    // });
+    this.overlaysService.setCurrentSwapView('Confirm')
   }
 
   getPoolDetails(chain: string, symbol: string, type: 'source' | 'target') {

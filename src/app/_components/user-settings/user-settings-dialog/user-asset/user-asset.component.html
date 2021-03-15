@@ -48,7 +48,7 @@
 
   <div class="right-content">
     <div class="balance">
-      <img *ngIf="asset.asset.iconPath" class="asset-icon" [src]="asset.asset.iconPath" appImgFallback />
+      <img *ngIf="asset && asset.asset && asset.asset.iconPath" class="asset-icon" [src]="asset && asset.asset && asset.asset.iconPath" appImgFallback />
       <div class="amount">
         <span class="mono">{{ asset.balance.amount().toNumber() | number: '.2-5' }}</span>
         <div class="usd-val" *ngIf="usdValue"><span class="mono">~${{usdValue | number:"0.0-2"}}</span> USD</div>
@@ -77,15 +77,15 @@
 
   <!-- </div> -->
 
-  <!-- <ul class="actions flxr flxr--just-center">
-    <li class="action flxr flxr--flow-col">
+  <!-- <ul class="actions flex justify-center">
+    <li class="action flex flex-col">
       <button mat-mini-fab color="primary" aria-label="Send" (click)="send.emit()">
         <mat-icon>upgrade</mat-icon>
       </button>
       Send
     </li>
 
-    <li class="action flxr flxr--flow-col flxr--align-center">
+    <li class="action flex flex-col items-center">
       <button mat-mini-fab color="primary" aria-label="Copy" (click)="copyToClipboard()">
         <mat-icon>content_copy</mat-icon>
       </button>
@@ -93,7 +93,27 @@
     </li>
   </ul> -->
 
-  <!-- <app-testnet-warning></app-testnet-warning> -->
+  <!-- <ul  class="actions flex justify-center">   -->
+
+    <!-- NATIVE RUNE DEPOSIT -->
+    <!-- <li *ngIf="asset && asset.asset.chain === 'THOR' && asset.asset.ticker === 'RUNE'" class="action flex flex-col items-center">
+      <button mat-mini-fab color="primary" aria-label="Copy" (click)="deposit.emit()">
+        <mat-icon>flash_on</mat-icon>
+      </button>
+      Deposit
+    </li> -->
+
+    <!-- UPGRADE BNB/ETH RUNE TO NATIVE RUNE -->
+    <!-- <li *ngIf="asset && (asset.asset.chain === 'BNB' || asset.asset.chain === 'ETH') && asset.asset.ticker === 'RUNE'" class="action flex flex-col items-center">
+      <button mat-mini-fab color="primary" aria-label="Copy" (click)="upgradeRune.emit()">
+        <mat-icon>upgrade</mat-icon>
+      </button>
+      Native RUNE
+    </li> -->
+
+  <!-- </ul> -->
+
+  <!-- <app-testnet-warning *ngIf="asset && asset.asset && asset.asset.chain" [chain]="asset.asset.chain"></app-testnet-warning> -->
 
 </div>
 

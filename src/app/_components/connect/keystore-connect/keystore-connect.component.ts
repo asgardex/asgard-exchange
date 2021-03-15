@@ -87,7 +87,11 @@ export class KeystoreConnectComponent implements OnInit {
 
   }
 
-  async keystoreUnlockClicked() {
+  async initUnlock() {
+
+    if (this.keystoreConnecting) {
+      return;
+    }
 
     this.keystoreConnecting = true;
 

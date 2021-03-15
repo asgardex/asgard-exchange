@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { AssetAndBalance } from 'src/app/_classes/asset-and-balance';
-import { CGCoinListItem, CoinGeckoService } from 'src/app/_services/coin-gecko.service';
+import { CGCoinListItem } from 'src/app/_services/coin-gecko.service';
 import { ActionOptions } from '../action-options.enum';
 
 @Component({
@@ -65,20 +65,11 @@ export class DepositFormComponent implements OnInit {
 
   coinGeckoList: CGCoinListItem[];
 
-  constructor(private cgService: CoinGeckoService) {
+  constructor() {
     this.confirm = new EventEmitter();
   }
 
   ngOnInit(): void {
-    this.getCoinGeckoCoinList();
-  }
-
-  getCoinGeckoCoinList() {
-
-    this.cgService.getCoinList().subscribe( (res) => {
-      this.coinGeckoList = res;
-    });
-
   }
 
   onMemoAssetChange(memoAsset: string) {

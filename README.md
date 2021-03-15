@@ -1,6 +1,7 @@
 # AsgardExchange
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 9.0.6.
+This project was generated with [Angular CLI](https://github.com/angular/angular-cli).
+For component styling we are using [Angular Material](https://material.angular.io/) and [Tailwind](https://tailwindcss.com/docs).
 
 ## Development server
 

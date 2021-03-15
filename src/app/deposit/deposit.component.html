@@ -1,14 +1,8 @@
 <div *ngIf="assetPoolData" class="container">
 
-  <div class="section-head-container">
-    <a [routerLink]="['/', 'pool']" mat-icon-button>
-      <mat-icon>arrow_back</mat-icon>
-    </a>
-    <h1>Add Liquidity</h1>
-    <div style="width: 40px"></div>
-  </div>
+  <app-section-head sectionTitle="Add Liquidity" [displayBackBtn]="true" (back)="back()"></app-section-head>
 
-  <div style="position: relative;">
+  <div class="relative">
 
     <app-asset-input
       label="Input"
@@ -16,11 +10,10 @@
       [(assetUnit)]="assetAmount"
       [balance]="assetBalance"
       [disabledAssetSymbol]="rune.symbol"
-      [coinGeckoList]="coinGeckoList"
       [selectableMarkets]="selectableMarkets">
     </app-asset-input>
 
-    <div class="flxr flxr--align-center flxr--just-center">
+    <div class="flex items-center justify-center">
       <mat-icon [class.disabled]="true" class="to-btn-icon">add</mat-icon>
     </div>
 
@@ -32,14 +25,13 @@
       [hideMax]="true"
       [disableInput]="true"
       [disabledAssetSymbol]="rune.symbol"
-      [disabledMarketSelect]="true"
-      [coinGeckoList]="coinGeckoList">
+      [disabledMarketSelect]="true">
     </app-asset-input>
 
-    <div class="flxr">
+    <div class="flex">
       <app-approve-eth-contract
         *ngIf="ethContractApprovalRequired"
-        style="width: 50%; margin-right: 8px;"
+        class="w-1/2 mr-2"
         [contractAddress]="ethRouter"
         [asset]="asset"
         (approved)="contractApproved()">
@@ -48,7 +40,7 @@
       <button
         (click)="openConfirmationDialog()"
         class="main-action-btn"
-        [ngStyle]="{'width': ethContractApprovalRequired ? '50%' : '100%'}"
+        [ngClass]="ethContractApprovalRequired ? 'w-1/2' : 'w-full'"
         mat-flat-button
         color="primary"
         [disabled]="formDisabled()"
@@ -58,14 +50,6 @@
 
     </div>
 
-    <div class="tag">
-      <div class="tag-contents">
-        <div class="flxr flxr--just-space-between" style="margin-bottom: 6px;">
-          <span class="tx-detail-label">Total Fee</span>
-          <span>1 RUNE + {{asset.ticker}} Network Gas</span>
-        </div>
-      </div>
-    </div>
 
   </div>
 

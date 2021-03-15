@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'app-section-head',
@@ -7,10 +7,14 @@ import { Component, Input, OnInit } from '@angular/core';
 })
 export class SectionHeadComponent implements OnInit {
 
-  @Input() backRouterLink?: string[];
   @Input() sectionTitle: string;
+  @Input() displayBackBtn: boolean;
+  @Output() back: EventEmitter<null>;
 
-  constructor() { }
+  constructor() {
+    this.back = new EventEmitter<null>();
+    this.displayBackBtn = false;
+  }
 
   ngOnInit(): void {
   }

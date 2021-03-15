@@ -1,19 +1,21 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { Asset } from 'src/app/_classes/asset';
 import { MarketsModalComponent } from '../markets-modal/markets-modal.component';
 import { MatDialog } from '@angular/material/dialog';
 import { UserService } from 'src/app/_services/user.service';
-import { CGCoinListItem, CoinGeckoService } from 'src/app/_services/coin-gecko.service';
 import { AssetAndBalance } from 'src/app/_classes/asset-and-balance';
 import { userInfo } from 'os';
 import { OverlaysService } from 'src/app/_services/overlays.service';
+import { EthUtilsService } from 'src/app/_services/eth-utils.service';
+import { User } from 'src/app/_classes/user';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-asset-input',
   templateUrl: './asset-input.component.html',
   styleUrls: ['./asset-input.component.scss']
 })
-export class AssetInputComponent implements OnInit {
+export class AssetInputComponent implements OnInit, OnDestroy {
 
   /**
    * Selected Asset
@@ -58,71 +60,40 @@ export class AssetInputComponent implements OnInit {
   @Input() disabledMarketSelect: boolean;
   @Input() loading: boolean;
   @Input() error: boolean;
-  @Input() set coinGeckoList(list: CGCoinListItem[]) {
-    this._coinGeckoList = list;
-    if (this._coinGeckoList) {
-      this.checkUsdBalance();
-      this.getAssetPrice();
-    }
+  @Input() set selectableMarkets(markets: AssetAndBalance[]) {
+    this._selectableMarkets = markets;
+    this.checkUsdBalance();
   }
-  get coinGeckoList() {
-    return this._coinGeckoList;
+  get selectableMarkets() {
+    return this._selectableMarkets;
   }
-  _coinGeckoList: CGCoinListItem[];
-
-  @Input() selectableMarkets: AssetAndBalance[];
+  _selectableMarkets: AssetAndBalance[];
 
   usdValue: number;
-  assetUsd: number;
+  user: User;
+  subs: Subscription[];
 
-  constructor(private userService: UserService, private cgService: CoinGeckoService, public overlayService: OverlaysService) {
+  constructor(private dialog: MatDialog, private userService: UserService, private ethUtilsService: EthUtilsService, public overlayService: OverlaysService) {
+    const user$ = this.userService.user$.subscribe(
+      (user) => this.user = user
+    );
+    this.subs = [user$];
   }
 
   ngOnInit(): void {
   }
 
-  checkUsdBalance() {
+  checkUsdBalance(): void {
 
-    if (this.selectedAsset && this.balance && this.coinGeckoList) {
-      const id = this.cgService.getCoinIdBySymbol(this.selectedAsset.ticker, this.coinGeckoList);
-
-      if (id) {
-        this.cgService.getCurrencyConversion(id).subscribe(
-          (res) => {
-            console.log(res)
-
-            for (const [_key, value] of Object.entries(res)) {
-              this.usdValue = this.balance * value.usd;
-            }
-          }
-        );
-
-      }
+    if (!this.balance || !this.selectableMarkets) {
+      return;
     }
-  }
 
-  getAssetPrice() {
-
-    if (this.selectedAsset && this.coinGeckoList) {
-      const id = this.cgService.getCoinIdBySymbol(this.selectedAsset.ticker, this.coinGeckoList);
-
-      if (id) {
-        this.cgService.getCurrencyConversion(id).subscribe(
-          (res) => {
-            console.log(res);
-
-            for (const [_key, value] of Object.entries(res)) {
-              this.assetUsd = value.usd;
-            }
-          }
-        );
-
-      }
+    const targetPool = this.selectableMarkets.find( (market) => `${market.asset.chain}.${market.asset.ticker}` === `${this.selectedAsset.chain}.${this.selectedAsset.ticker}` );
+    if (!targetPool || !targetPool.assetPriceUSD) {
+      return;
     }
-  }
-
-  updateAssetUnits(val) {
-    this.assetUnitChange.emit(val);
+    this.usdValue = targetPool.assetPriceUSD * this.balance;
   }
 
   getMax() {
@@ -131,22 +102,43 @@ export class AssetInputComponent implements OnInit {
     }
   }
 
-  setMax() {
+  updateAssetUnits(val): void {
+    this.assetUnitChange.emit(val);
+  }
+
+  async setMax(): Promise<void> {
+
+    this.loading = true;
 
     if (this.balance) {
-      const max = this.userService.maximumSpendableBalance(this.selectedAsset, this.balance);
-      this.assetUnitChange.emit(max);
+      let max: number;
+      if (this.selectedAsset.chain === 'ETH') {
+        if (this.user && this.user.clients) {
+          max = await this.ethUtilsService.maximumSpendableBalance({
+            asset: this.selectedAsset,
+            client: this.user.clients.ethereum,
+            balance: this.balance
+          });
+        } else {
+          console.error('no user clients found: ', this.user);
+          max = 0;
+        }
+      } else {
+        max = this.userService.maximumSpendableBalance(this.selectedAsset, this.balance);
+      }
+
+      if (max) {
+        this.assetUnitChange.emit(max);
+      } else {
+        console.error('max undefined');
+      }
     }
 
+    this.loading = false;
+
   }
 
-  emptyInput() {
-    this.assetUnit = 0;
-    this.selectedAsset = undefined;
-    this.balance = 0;
-  }
-
-  launchMarketsModal() {
+  launchMarketsModal(): void {
     //TODO: change the data flow into the compoenent directly
     this.userService.user$.subscribe(
       async (user) => {
@@ -159,28 +151,12 @@ export class AssetInputComponent implements OnInit {
       }
     );
 
+  }
 
-    // const dialogRef = this.dialog.open(
-    //   MarketsModalComponent,
-    //   {
-    //     minWidth: '260px',
-    //     maxWidth: '420px',
-    //     width: '50vw',
-    //     data: {
-    //       disabledAssetSymbol: this.disabledAssetSymbol,
-    //       selectableMarkets: this.selectableMarkets
-    //     }
-    //   }
-    // );
-
-    // dialogRef.afterClosed().subscribe( (result: Asset) => {
-
-    //   if (result) {
-    //     this.selectedAssetChange.emit(result);
-    //   }
-
-    // });
-
+  ngOnDestroy() {
+    for (const sub of this.subs) {
+      sub.unsubscribe();
+    }
   }
 
 }

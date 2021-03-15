@@ -18,10 +18,16 @@
           [selectableMarkets]="selectableMarkets">
         </app-asset-input>
 
-        <div>
+        <div (click)="reverseTransaction()" [disabled]="!selectedSourceAsset || !selectedTargetAsset">
           <app-arrow *ngIf="user" [seperator]="!selectedSourceAsset || !selectedTargetAsset"></app-arrow>
           <div *ngIf="!user" style="height: 38px;"></div>
         </div>
+
+        <!-- <div class="flex justify-between items-center">
+          <button class="reverse-transaction" (click)="reverseTransaction()" [disabled]="!selectedSourceAsset || !selectedTargetAsset">
+            <mat-icon [class.disabled]="!selectedSourceAsset || !selectedTargetAsset" class="to-btn-icon">arrow_downward</mat-icon>
+          </button>
+        </div> -->
 
         <!-- TARGET -->
         <app-asset-input label="Receive" [isSource]="false"
@@ -75,13 +81,26 @@
             <span (click)="goToSettings()">{{slippageTolerance}}% slip tolerance <span>(click to adjust)</span></span>
           </div>
 
-          <!-- <span style="display: block; color: #FF4954; font-size: 14px; margin-top: 5px;">Disclaimer: I’m a BETA product.
-            Don’t swap/deposit large</span> -->
         </div>
-        <!-- <div class="tag">
-        <div class="tag-contents">
 
-        </div>
+        <!-- <div class="flex">
+          <app-approve-eth-contract
+            *ngIf="ethContractApprovalRequired && ethInboundAddress && selectedSourceAsset"
+            class="w-1/2 mr-2"
+            [contractAddress]="ethInboundAddress.router"
+            [asset]="selectedSourceAsset"
+            (approved)="contractApproved()">
+          </app-approve-eth-contract>
+          <button
+            (click)="openConfirmationDialog()"
+            class="main-action-btn"
+            mat-flat-button
+            color="primary"
+            [disabled]="formInvalid()"
+            [ngClass]="ethContractApprovalRequired ? 'w-1/2' : 'w-full'"
+          >
+            {{mainButtonText()}}
+          </button>
         </div> -->
 
         <!-- please connect button -->

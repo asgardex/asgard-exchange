@@ -1,5 +1,5 @@
-<div class="flxr flxr--align-center">
-  <div class="asset-icon-container flxr flxr--align-center">
+<div class="flex items-center">
+  <div class="asset-icon-container flex items-center mr-3">
     <img *ngIf="iconPath" [src]="iconPath" appImgFallback />
     <mat-icon *ngIf="!iconPath">help_outline</mat-icon>
   </div>
