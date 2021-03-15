@@ -51,7 +51,7 @@
       <img *ngIf="asset.asset.iconPath" class="asset-icon" [src]="asset.asset.iconPath" appImgFallback />
       <div class="amount">
         <span class="mono">{{ asset.balance.amount().toNumber() | number: '.2-5' }}</span>
-        <div class="usd-val"><span class="mono">~$</span> USD</div>
+        <div class="usd-val" *ngIf="usdValue"><span class="mono">~${{usdValue | number:"0.0-2"}}</span> USD</div>
       </div>
     </div>
     <div class="tx-history">

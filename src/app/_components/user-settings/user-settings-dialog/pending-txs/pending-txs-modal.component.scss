@@ -6,10 +6,17 @@
   border-radius: 3px;
   height: 49px;
 
-  .icon-addr label {
-    font-weight: 500;
-    font-size: 22px;
-    line-height: 30px;
+  .icon-addr {
+    display: flex;
+    align-items: center;
+    flex: 1 1 auto;
+    width: 100%;
+
+    label {
+      font-weight: 500;
+      font-size: 22px;
+      line-height: 30px;
+    }
   }
 
   .asset-icon-container {
@@ -19,8 +26,7 @@
   }
 
   .addr {
-    width: 300px;
-    margin-left: 45px;
+    width: 250px;
 
     input {
       text-align: right;
@@ -33,11 +39,6 @@
       line-height: 30px;
       text-overflow: ellipsis;
     }
-  }
-
-  .icon-addr {
-    display: flex;
-    align-items: center;
   }
 
   &:hover {

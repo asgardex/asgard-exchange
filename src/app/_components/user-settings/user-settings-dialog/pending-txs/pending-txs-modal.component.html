@@ -21,10 +21,10 @@
               <img class="asset-icon"
                 src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/RUNE-B1A/logo.png" />
             </div>
-            <label style="text-transform: uppercase;">{{tx.action}} <span style="color: #414856;">({{tx.chain}}.{{tx.ticker}})</span></label>
+            <label style="text-transform: uppercase;">{{tx.action}} <span style="color: #414856;">({{tx.chain}}.{{tx.ticker}} <span *ngIf="tx.status === 'PENDING'">- PENDING</span>)</span></label>
           </div>
           <div class="addr">
-            <input [value]="tx.hash.substring(0, 8) + '...' + tx.hash.substring(tx.hash.length - 8, tx.hash.length)" name="thor-address" [disabled]="true" />
+            <input [value]="tx.hash.substring(0, 6) + '...' + tx.hash.substring(tx.hash.length - 6, tx.hash.length)" name="thor-address" [disabled]="true" />
           </div>
         </div>
 
