@@ -100,6 +100,7 @@ export class AssetInputComponent implements OnInit, OnDestroy {
     if (!targetPool || !targetPool.assetPriceUSD) {
       return;
     }
+
     this.assetPriceUSD = targetPool.assetPriceUSD;
     this.usdValue = this.assetPriceUSD * this.assetUnit;
   }

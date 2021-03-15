@@ -371,8 +371,8 @@ export class SwapComponent implements OnInit, OnDestroy {
     const output = this.targetAssetUnit.div(10 ** 8);
     console.log(output);
 
-    let sourceAssetPrice;
-    let targetAssetPrice;
+    let sourceAssetPrice = this.selectableMarkets.find( (asset) => `${asset.asset.chain}.${asset.asset.ticker}` === `${this.selectedSourceAsset.chain}.${this.selectedSourceAsset.ticker}`).assetPriceUSD;
+    let targetAssetPrice = this.selectableMarkets.find( (asset) => `${asset.asset.chain}.${asset.asset.ticker}` === `${this.selectedTargetAsset.chain}.${this.selectedTargetAsset.ticker}`).assetPriceUSD;
 
     console.log('check balance');
 
