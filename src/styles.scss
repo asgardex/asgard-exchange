@@ -1,3 +1,13 @@
+//Colors
+:root {
+  --primary-default: #28F4AE;
+  --primary-graident-bottom-left: #00CCFF;
+  --primary-graident-top-right: #33FF99;
+  --primary-grey-text: #474E5D;
+  --primary-dark-color: #000B12;
+  --primary-yellow: #F3BA2F;
+}
+
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
@@ -22,15 +32,6 @@
 // hue. Available color palettes: https://material.io/design/color/
 // $asgard-exchange-primary: mat-palette($mat-indigo);
 // $asgard-exchange-accent: mat-palette($mat-pink, A200, A100, A400);
-
-//Colors
-:root {
-  --primary-default: #28F4AE;
-  --primary-graident-bottom-left: #00CCFF;
-  --primary-graident-top-right: #33FF99;
-}
-
-
 
 $uniswap-primary: (
   50: rgba(21, 163, 111, 0.44),
