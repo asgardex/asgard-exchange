@@ -68,7 +68,7 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
 
   disconnect() {
     this.userService.setUser(null);
-    this.overlayChange.emit(false);
+    this.overlaysService.setViews(MainViewsEnum.Swap, "Swap");
   }
 
   toggleMenu() {

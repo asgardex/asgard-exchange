@@ -6,7 +6,8 @@
     <a class="flex items-center" [routerLink]="['/', 'swap']">
       <img style="width: 36.61px; height: 42px; margin-right: 8px" src="assets/images/vanaheimex-green.svg" />
       <span class="title">ASGARDEX
-        <span class="tag">MAINNET</span>
+        <span class="tag" *ngIf="!isTestnet">MAINNET</span>
+        <span class="tag" *ngIf="isTestnet">TESTNET</span>
       </span>
     </a>
   </h1>

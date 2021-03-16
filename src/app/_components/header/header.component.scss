@@ -69,6 +69,10 @@ header {
     align-items: center;
     position: absolute;
     right: 15px;
+
+    .thorchain-indicator {
+      height: 45px;
+    }
   }
 
   #testnet-indicator {

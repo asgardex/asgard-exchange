@@ -9,7 +9,7 @@
     height: 8px;
     border-radius: 50%;
     margin-left: 8px;
-    background-color: #23dcc8;
+    background-color: var(--primary-default);
   }
 
   .spin::before {
@@ -17,7 +17,7 @@
     animation: 1s cubic-bezier(0.455, 0.03, 0.515, 0.955) spinner;
     animation-play-state: inherit;
     border: solid 2px transparent;
-    border-bottom-color: #23dcc8;
+    border-bottom-color: var(--primary-default);
     border-radius: 50%;
     content: "";
     height: 12px;
@@ -69,6 +69,7 @@
 
 .nav-social {
   display: flex;
+  height: 21px;
   .social-item {
     padding: 0 12px;
     &:first-of-type {
@@ -77,11 +78,14 @@
     .hover-pic {
       display: none;
     }
+    .icon-pic {
+      display: inline;
+    }
     &:last-of-type {
       padding-right: 0;
     }
     &:hover {
-      fill: #23dcc8;
+      fill: var(--primary-default);
       .icon-pic {
         display: none;
       }
@@ -126,10 +130,10 @@ span {
   transition: 0.5s ease;
 
   &:hover {
-    background-color: #23dcc8;
+    background-color: var(--primary-default);
     transition: 0.1s ease;
     .nav-rune-number {
-      color: #23dcc8;
+      color: var(--primary-default);
     }
   }
 
