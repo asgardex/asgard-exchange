@@ -1,47 +1,106 @@
-<div *ngIf="txState == 'PENDING_CONFIRMATION' && asset">
+<div *ngIf="asset">
 
-  <app-modal-section-header sectionTitle="Confirm Upgrade" [displayBackBtn]="true" (back)="back.emit()"></app-modal-section-header>
+  <div class="container-wrapper upgrade">
 
-  <div class="modal-head confirm-modal-head">
-
-    <div class="flex justify-between transaction-detail">
-
-      <div class="flex items-center">
-        <div style="margin-right: 12px;" class="asset-icon-container flex items-center">
-          <img *ngIf="asset.asset && asset.asset.iconPath" [src]="asset.asset.iconPath" appImgFallback />
-          <mat-icon *ngIf="!asset.asset.iconPath">help_outline</mat-icon>
+    <div class="container">
+      <div class="main-container" *ngIf="asset">
+        <div class="content-top">
+          <app-breadcrumb [path]="[{name: 'asgardex', swapView: 'Swap', mainView: 'Swap'}, {name: 'upgrade rune', disable: true}]" [isError]="txState === 'ERROR'" [message]="txState === 'ERROR'? 'error occured' : txState === 'SUCCESS' ? 'SUCCESS' : txState === 'PENDING_CONFIRMATION' ? 'confirm' : 'confirming...'"></app-breadcrumb>
+            <div class="top-right">
+            </div>
         </div>
-        <span style="margin-right: 8px; font-size: 20px">{{amount}}</span>
-      </div>
 
-      <span>{{asset.asset.ticker}}</span>
+      <div class="content-middle">
+        <app-asset-input
+          label="Upgrade"
+          [(selectedAsset)]="asset.asset"
+          [(assetUnit)]="amount"
+          [isSource]="true"
+          [balance]="asset.balance.amount().toNumber()"
+          [disabledAssetSymbol]="asset.asset.symbol"
+          [selectableMarkets]="[asset]"
+          [hideMax]="true"
+          [disableInput]="true"
+          [disabledMarketSelect]="true">
+        </app-asset-input>
+
+        <app-arrow [seperator]="true" [isGrey]="txState === 'SUCCESS'"></app-arrow>
+
+        <app-asset-input
+          label="Receive"
+          [(selectedAsset)]="nativeRune.asset"
+          [(assetUnit)]="amount"
+          [isSource]="true"
+          [balance]="nativeRune.balance.amount().toNumber()"
+          [disabledAssetSymbol]="nativeRune.asset.symbol"
+          [selectableMarkets]="[nativeRune]"
+          [disableInput]="true"
+          [hideMax]="true"
+          [disabledMarketSelect]="true">
+        </app-asset-input>
+
+        <ng-container *ngIf="txState === 'SUCCESS'">
+          <app-arrow [seperator]="true"></app-arrow>
+          <app-notice [tags]="['Copy', 'Explorer']">
+            <span text >{{hash}}</span>
+            <div tag_one (click)="copyToClipboard()">
+              <span>COPY</span>
+            </div>
+            <div tag_two>
+              <a target="_blank" *ngIf="asset.asset.chain === 'BNB'" style="text-decoration: none; color: inherit;" [href]="binanceExplorerUrl + '/' + hash">Explore</a>
+              <a target="_blank" *ngIf="asset.asset.chain === 'ETH'" style="text-decoration: none; color: inherit;" [href]="ethereumExplorerUrl + '/' + hash">Explore</a>
+            </div>
+          </app-notice>
+        </ng-container>
+
+        <div class="disclaimer p-3" *ngIf="txState === 'PENDING_CONFIRMATION'">
+          This RUNE is currently a {{asset.asset.chain}} token. <br />
+          By upgrading, you will be upgrading it off of the BNB chain to native RUNE. <br />
+          Your native RUNE will show up in your RUNE wallet in user settings. <br />
+        </div>
+
+        <div>
+
+        <div class="bottom-actions two-btn" *ngIf="txState === 'PENDING_CONFIRMATION'">
+          <div class="left-btn">
+            <button class="close-btn" (click)="back.emit()">
+              <span>cancel</span>
+            </button>
+          </div>
+          <div class="divider"></div>
+          <div class="right-btn">
+            <button
+              class="next-btn"
+              (click)="submitTransaction()">
+                <span>confirm</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="bottom-actions" *ngIf="txState === 'SUBMITTING'">
+          <button class="next-btn" aria-labelledby="please wait..." disabled>
+            <span>please wait...</span>
+          </button>
+        </div>
+
+        <div class="bottom-actions" *ngIf="txState === 'SUCCESS'">
+          <button class="close-btn" aria-labelledby="close" (click)="close()">
+            <span>close</span>
+          </button>
+        </div>
 
     </div>
-
-    <small>
-      This RUNE is currently a {{asset.asset.chain}} token. <br />
-      By clicking the button below, you will be upgrading it off of the {{asset.asset.chain}} chain to native RUNE. Your native RUNE will show up in your RUNE wallet in user settings.
-    </small>
-
-    <div *ngIf="loading" style="height: 56px;" class="flex justify-center items-center w-full mt-4">
-      <mat-progress-spinner mode="indeterminate" diameter="30"></mat-progress-spinner>
-    </div>
-
-    <button *ngIf="!loading" [disabled]="insufficientChainBalance" (click)="submitTransaction()" mat-flat-button color="accent" class="main-action-btn w-full">
-      <span *ngIf="!insufficientChainBalance">Upgrade RUNE</span>
-      <span *ngIf="insufficientChainBalance">Insufficient {{asset.asset.chain}} Balance</span>
-    </button>
 
   </div>
 
 </div>
 
-<app-transaction-processing-modal
+<!-- <app-transaction-processing-modal
   *ngIf="txState === 'SUBMITTING' && asset"
   transactionDetail="Sending {{asset.asset.ticker}}">
-</app-transaction-processing-modal>
+</app-transaction-processing-modal> -->
 
-<div class="flex flex-col items-center py-8 text-sm" *ngIf="txState === 'ERROR'">
+<!-- <div class="flex flex-col items-center py-8 text-sm" *ngIf="txState === 'ERROR'">
   <mat-icon>warning</mat-icon>
   There was an error processing the RUNE upgrade.
-</div>
+</div> -->

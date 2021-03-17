@@ -28,6 +28,7 @@
     height: 28px;
     color: var(--primary-default);
     fill: var(--primary-default);
+
   }
 
   &.disable {
@@ -79,7 +80,12 @@
   border-radius: 4px;
 
   &:hover {
-    background: #2c2f36;
+    background: var(--primary-default);
+    color: var(--primary-dark-color);
+
+    .expand-more {
+      fill: var(--primary-dark-color);
+    }
   }
 }
 

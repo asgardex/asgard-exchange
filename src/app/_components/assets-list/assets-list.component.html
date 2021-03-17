@@ -11,7 +11,7 @@
         (click)="selectAsset.emit(item.asset)"
         [class.disabled]="item.asset.symbol == disabledAssetSymbol">
 
-        <div class="asset-icon-container">
+        <div class="asset-icon-container" *ngIf="showIcons">
           <img *ngIf="item.asset.iconPath" class="asset-icon" [src]="item.asset.iconPath" appImgFallback />
           <mat-icon *ngIf="!item.asset.iconPath">help_outline</mat-icon>
         </div>

@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   width: 141px;
-  height: 43px;
+  height: 45px;
   border-radius: 6px;
   text-transform: none;
   justify-content: flex-start;
@@ -29,6 +29,10 @@
     border-radius: 6px;
     padding: 7px;
     background: #000B13;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
 
     .menu {
       text-transform: uppercase;

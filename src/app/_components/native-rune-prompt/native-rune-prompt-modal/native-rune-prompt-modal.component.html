@@ -1,4 +1,4 @@
-<div class="container-wrapper" *ngIf="mode === 'SELECT_ASSET'">
+<div class="container-wrapper upgrade" *ngIf="mode === 'SELECT_ASSET'">
   <div class="container">
     <div class="main-container">
       <div class="content-top">
@@ -7,15 +7,17 @@
         </div>
       </div>
 
-      <div mat-dialog-content>
-        <app-assets-list [assetListItems]="assets" [loading]="loading" [disabledAssetSymbol]="''" (selectAsset)="selectAsset($event)"></app-assets-list>
+      <div class="content-middle">
+        <div class="expandable">
+          <app-assets-list [assetListItems]="assets" [loading]="loading" [disabledAssetSymbol]="''" (selectAsset)="selectAsset($event)" [showIcons]="false"></app-assets-list>
+        </div>
       </div>
     </div>
 
     <!-- close dialog -->
-    <div class="bottom-actions">
-      <button class="next-btn" aria-label="Upgrade to Thorchain RUNE" (click)="close()">
-        <span>upgrade</span>
+    <div class="bottom-actions two-btn">
+      <button class="close-btn" aria-label="close the prompt" (click)="close()">
+        <span>close</span>
       </button>
     </div>
   </div>
@@ -24,6 +26,7 @@
 <app-upgrade-rune
   *ngIf="mode === 'UPGRADE_ASSET'"
   [asset]="selectedAsset"
+  [nativeRune]="nativeRune"
   (confirmUpgrade)="confirmUpgradeRune($event)"
   (back)="mode = 'SELECT_ASSET'">
 </app-upgrade-rune>
@@ -32,14 +35,14 @@
   *ngIf="mode === 'CONFIRM'"
   [asset]="selectedAsset"
   [amount]="amountToSend"
-  (back)="mode = 'UPGRADE_ASSET'"
-  (transactionSuccessful)="transactionSuccessful($event)">
+  [nativeRune]="nativeRune"
+  (back)="mode = 'UPGRADE_ASSET'">
 </app-upgrade-rune-confirm>
 
-<app-transaction-success-modal
+<!-- <app-transaction-success-modal
   *ngIf="mode === 'SUCCESS'"
   [externalTx]="true"
   [chain]="selectedAsset.asset.chain"
   [hash]="successfulTxHash"
   (closeDialog)="close()">
-</app-transaction-success-modal>
+</app-transaction-success-modal> -->

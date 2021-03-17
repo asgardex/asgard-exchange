@@ -20,7 +20,7 @@
   &.outline {
     background:
      linear-gradient(var(--primary-dark-color),var(--primary-dark-color)) padding-box, /*this is your grey background*/
-     linear-gradient(to top right,var(border-bottom-left-radius), var(--primary-graident-top-right)) border-box;
+     linear-gradient(to top right,var(--primary-graident-bottom-left), var(--primary-graident-top-right)) border-box;
 
     .tag-field {
       width: 100%;

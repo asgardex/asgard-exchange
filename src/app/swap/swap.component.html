@@ -19,7 +19,7 @@
         </app-asset-input>
 
         <div (click)="reverseTransaction()">
-          <app-arrow *ngIf="user" [seperator]="!selectedSourceAsset || !selectedTargetAsset"></app-arrow>
+          <app-arrow *ngIf="user" [isGrey]="!balances || !selectedSourceAsset || !selectedTargetAsset" [seperator]="!selectedSourceAsset || !selectedTargetAsset"></app-arrow>
           <div *ngIf="!user" style="height: 38px;"></div>
         </div>
 

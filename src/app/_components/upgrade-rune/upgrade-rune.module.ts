@@ -5,6 +5,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { AssetInputModule } from '../asset-input/asset-input.module';
 import { MatButtonModule } from '@angular/material/button';
 import { ModalSectionHeaderModule } from '../modal-section-header/modal-section-header.module';
+import { ArrowModule } from '../arrow/arrow.module';
+import { BreadcrumbModule } from '../breadcrumb/breadcrumb.module';
 
 
 
@@ -15,6 +17,8 @@ import { ModalSectionHeaderModule } from '../modal-section-header/modal-section-
     MatIconModule,
     MatButtonModule,
     AssetInputModule,
+    ArrowModule,
+    BreadcrumbModule,
     ModalSectionHeaderModule
   ],
   exports: [UpgradeRuneComponent]

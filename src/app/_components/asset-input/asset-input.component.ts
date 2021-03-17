@@ -97,6 +97,9 @@ export class AssetInputComponent implements OnInit, OnDestroy {
     }
 
     const targetPool = this.selectableMarkets.find( (market) => `${market.asset.chain}.${market.asset.ticker}` === `${this.selectedAsset.chain}.${this.selectedAsset.ticker}` );
+    console.log('balance', this.balance)
+    console.log('markets', this.selectableMarkets)
+    console.log('target pool', targetPool)
     if (!targetPool || !targetPool.assetPriceUSD) {
       return;
     }

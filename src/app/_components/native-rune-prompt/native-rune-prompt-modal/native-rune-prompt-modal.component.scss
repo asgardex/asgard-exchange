@@ -1,0 +1,9 @@
+.content-middle {
+  display: flex;
+  flex-direction: column;
+  height: 365px;
+
+  .expandable {
+    flex: 1 1 auto;
+  }
+}

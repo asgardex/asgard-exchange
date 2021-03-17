@@ -620,6 +620,11 @@ input[type=number] {
     background: linear-gradient(to top right,#00CCFF, #33FF99);
   }
 
+  &.upgrade {
+    background-color: #0cf;
+    background: linear-gradient(to right, #FFFD00 0%, #F625F0 49.98%, #01F6EE 100%);
+  }
+
   &.spinner {
     display: flex;
     justify-content: center;
@@ -724,6 +729,7 @@ main {
   // padding: 45px 15px 100px;
   // min-height: calc(100vh - 138px);
   position: relative;
+  min-height: 632px;
 
   .container-wrapper {
     border-radius: 20px;
@@ -740,7 +746,7 @@ main {
     }
 
     &.upgrade {
-      background: linear-gradient(45deg, #FFFD00 0%, #F625F0 49.98%, #01F6EE 100%);
+      background: linear-gradient(to right, #FFFD00 0%, #F625F0 49.98%, #01F6EE 100%);
     }
 
     &.pending {

@@ -16,6 +16,9 @@ export class AssetsListComponent implements OnInit {
   @Output() selectAsset: EventEmitter<Asset>;
   @Output() addToken: EventEmitter<null>;
 
+  // Wheter show the icon or not
+  @Input() showIcons: boolean = true;
+
   constructor() {
     this.selectAsset = new EventEmitter<Asset>();
     this.addToken = new EventEmitter<null>();

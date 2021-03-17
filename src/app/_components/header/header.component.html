@@ -11,7 +11,9 @@
       </span>
     </a>
   </h1>
-  <app-native-rune-prompt></app-native-rune-prompt>
+  <ng-container *ngIf="user">
+    <app-native-rune-prompt></app-native-rune-prompt>
+  </ng-container>
   <div class="header-right">
     <app-user-settings *ngIf="user" [user]="user" [(overlay)]="overlay"></app-user-settings>
     <!-- <span id="testnet-indicator" *ngIf="isTestnet">Testnet</span> -->

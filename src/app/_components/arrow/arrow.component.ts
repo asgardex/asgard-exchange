@@ -8,6 +8,7 @@ import { Component, OnInit, Input } from '@angular/core';
 export class ArrowComponent implements OnInit {
 
   @Input() seperator: boolean = true;
+  @Input() isGrey: boolean = false;
 
   constructor() { }
 
