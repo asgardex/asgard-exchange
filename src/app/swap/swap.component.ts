@@ -537,14 +537,19 @@ export class SwapComponent implements OnInit, OnDestroy {
         runeBalance: baseAmount(targetPool.runeDepth),
       };
 
-      // const basePrice = getDoubleSwapOutput(assetToBase(assetAmount(1)), pool1, pool2);
       const basePrice = getDoubleSwapOutput(assetToBase(assetAmount(1)), pool2, pool1);
       this.basePrice = basePrice.amount().div(10 ** 8).toNumber();
 
       const slip = getDoubleSwapSlip(this._sourceAssetTokenValue, pool1, pool2);
       this.slip = slip.toNumber();
 
-      const total = getDoubleSwapOutput(this._sourceAssetTokenValue, pool1, pool2);
+      const valueOfRuneInAsset = getValueOfRuneInAsset(assetToBase(assetAmount(1)), pool1);
+
+      const total = getDoubleSwapOutput(baseAmount(this._sourceAssetTokenValue.amount()
+      .minus( // subtract network fee
+        valueOfRuneInAsset.amount()
+        )
+      ), pool1, pool2);
 
       if (this.sourceAssetUnit) {
         this.targetAssetUnit = (total.amount().isLessThan(0)) ? bn(0) : total.amount();

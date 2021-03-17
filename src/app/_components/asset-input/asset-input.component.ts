@@ -21,6 +21,7 @@ export class AssetInputComponent implements OnInit, OnDestroy {
   @Input() set selectedAsset(asset: Asset) {
     this._selectedAsset = asset;
     this.checkUsdBalance();
+    this.setInputUsdValue();
   }
   get selectedAsset() {
     return this._selectedAsset;
@@ -31,8 +32,15 @@ export class AssetInputComponent implements OnInit, OnDestroy {
   /**
    * Asset Unit
    */
-  @Input() assetUnit: number;
+  @Input() set assetUnit(amount: number) {
+    this._assetUnit = amount;
+    this.setInputUsdValue();
+  }
+  get assetUnit() {
+    return this._assetUnit;
+  }
   @Output() assetUnitChange = new EventEmitter<number>();
+  _assetUnit: number;
 
   @Input() label: string;
   @Input() disableInput?: boolean;
@@ -67,6 +75,7 @@ export class AssetInputComponent implements OnInit, OnDestroy {
   usdValue: number;
   user: User;
   subs: Subscription[];
+  inputUsdValue: number;
 
   constructor(private dialog: MatDialog, private userService: UserService, private ethUtilsService: EthUtilsService) {
     const user$ = this.userService.user$.subscribe(
@@ -91,8 +100,22 @@ export class AssetInputComponent implements OnInit, OnDestroy {
     this.usdValue = targetPool.assetPriceUSD * this.balance;
   }
 
+  setInputUsdValue(): void {
+
+    if (!this.selectedAsset || !this.selectableMarkets) {
+      return;
+    }
+
+    const targetPool = this.selectableMarkets.find( (market) => `${market.asset.chain}.${market.asset.ticker}` === `${this.selectedAsset.chain}.${this.selectedAsset.ticker}` );
+    if (!targetPool || !targetPool.assetPriceUSD) {
+      return;
+    }
+    this.inputUsdValue = targetPool.assetPriceUSD * this.assetUnit;
+  }
+
   updateAssetUnits(val): void {
     this.assetUnitChange.emit(val);
+    this.setInputUsdValue();
   }
 
   async setMax(): Promise<void> {
