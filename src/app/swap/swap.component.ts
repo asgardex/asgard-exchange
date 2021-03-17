@@ -527,9 +527,6 @@ export class SwapComponent implements OnInit, OnDestroy {
     const sourcePool = this.poolDetailMap[`${this.selectedSourceAsset.chain}.${this.selectedSourceAsset.symbol}`];
     const targetPool = this.poolDetailMap[`${this.selectedTargetAsset.chain}.${this.selectedTargetAsset.symbol}`];
 
-    console.log('source pool is: ', sourcePool);
-    console.log('target pool is: ', targetPool);
-
     if (sourcePool && targetPool) {
       const pool1: PoolData = {
         assetBalance: baseAmount(sourcePool.assetDepth),
