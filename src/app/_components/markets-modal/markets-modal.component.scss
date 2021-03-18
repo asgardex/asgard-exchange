@@ -18,11 +18,17 @@
     // border-radius: 20px;
 }
 
+.uni-input {
+  border: 2px solid var(--primary-default);
+  border-radius: 10px;
+}
+
 .search-input {
   color: white;
   text-transform: uppercase;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
+  line-height: initial;
 
   &::placeholder {
     color: white;
