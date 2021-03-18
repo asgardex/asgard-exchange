@@ -142,7 +142,7 @@
       *ngIf="mode === 'SEND'"
       [asset]="selectedAsset"
       (confirmSend)="confirmSend($event)"
-      (back)="mode = 'ADDRESSES'"
+      (back)="mode = 'ASSET'"
       (message)="message">
     </app-send-asset>
 

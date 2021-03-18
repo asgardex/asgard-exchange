@@ -52,21 +52,19 @@
       <label>Recipient Address</label>
       <textarea class="password" [(ngModel)]="recipientAddress" name="recipient-address" [disabled]="true"></textarea>
     </div> -->
-
-    <app-arrow></app-arrow>
+    <app-arrow [isGrey]="mode === 'SUCCESS'"></app-arrow>
 
     <app-text-field *ngIf="mode !== 'SUCCESS'"  selectedType="Text" mode="Double" typeTwo="text" label="Recipient Address" labelTwo="Memo" [(textOfField)]="recipientAddress" [disable]="true" [disableTwo]="true"></app-text-field>
     <app-text-field *ngIf="mode === 'SUCCESS'"  selectedType="Text" mode="Single" label="Recipient Address" [(textOfField)]="recipientAddress" [disable]="true"></app-text-field>
-    {{mode}}
-    {{txState}}
-    <div style="margin-top: 38px;" *ngIf="mode === 'SUCCESS'">
+    <div *ngIf="mode === 'SUCCESS'">
+      <app-arrow></app-arrow>
       <app-notice [tags]="['Copy', 'Explorer']">
         <span text >{{hash}}</span>
         <div tag_one (click)="copyToClipboard(hash)">
           <span>COPY</span>
         </div>
         <div tag_two>
-          <a target="_blank" style="text-decoration: none; color: inherit;" [href]="getExplorerPath()">Explore</a>
+          <a target="_blank" style="text-decoration: none; color: inherit;" [href]="getExplorerPath() + '/' + hash">Explore</a>
         </div>
       </app-notice>
     </div>

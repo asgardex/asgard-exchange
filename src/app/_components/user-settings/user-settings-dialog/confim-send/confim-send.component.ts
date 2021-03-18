@@ -118,6 +118,7 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
           this.hash = hash;
           this.pushTxStatus(hash, this.asset.asset, true);
           this.transactionSuccessful.next();
+          this.mode = 'SUCCESS';
         } catch (error) {
           console.error('error making transfer: ', error);
           this.error = error;
@@ -137,6 +138,7 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
           this.hash = hash;
           this.pushTxStatus(hash, this.asset.asset, false);
           this.transactionSuccessful.next();
+          this.mode = 'SUCCESS';
         } catch (error) {
           console.error('error making transfer: ', error);
           this.error = error;
@@ -162,6 +164,7 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
           this.hash = hash;
           this.pushTxStatus(hash, this.asset.asset, false);
           this.transactionSuccessful.next();
+          this.mode = 'SUCCESS';
         } catch (error) {
           console.error('error making transfer: ', error);
           this.error = error;
@@ -185,6 +188,7 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
           this.hash = hash;
           this.pushTxStatus(hash, this.asset.asset, false);
           this.transactionSuccessful.next();
+          this.mode = 'SUCCESS';
         } catch (error) {
           console.error('error making transfer: ', error);
           this.error = error;
@@ -222,6 +226,7 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
           this.hash = hash;
           this.pushTxStatus(hash, this.asset.asset, false);
           this.transactionSuccessful.next();
+          this.mode = 'SUCCESS';
         } catch (error) {
           console.error('error making transfer: ', error);
           this.error = error;
@@ -245,6 +250,7 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
           });
           this.pushTxStatus(hash, this.asset.asset, false);
           this.transactionSuccessful.next();
+          this.mode = 'SUCCESS';
         } catch (error) {
           console.error('error making transfer: ', error);
           this.error = error;

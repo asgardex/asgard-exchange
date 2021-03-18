@@ -144,11 +144,11 @@ export class UserSettingsDialogComponent implements OnInit, OnDestroy {
   }
 
   transactionSuccessful() {
-    this.mode = 'SUCCESS';
-    this.amountToSend = null;
-    this.recipient = null;
-    this.selectedAsset = null;
-    this.selectedAddress = null;
+    // this.mode = 'SUCCESS';
+    // this.amountToSend = null;
+    // this.recipient = null;
+    // this.selectedAsset = null;
+    // this.selectedAddress = null;
   }
 
   disconnect() {
