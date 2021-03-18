@@ -75,6 +75,7 @@ export class AssetInputComponent implements OnInit, OnDestroy {
   }
   _selectableMarkets: AssetAndBalance[];
 
+  @Input() priceInput: number;
   assetPriceUSD: number;
   usdValue: number;
   user: User;
