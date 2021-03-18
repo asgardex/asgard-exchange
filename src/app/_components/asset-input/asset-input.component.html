@@ -67,6 +67,7 @@
     </div>
 
     <span class="usd-est" *ngIf="usdValue && selectedAsset && balance">${{ usdValue | number: '.2-3' }} USD</span>
+    <span class="usd-est" *ngIf="!usdValue && priceInput">${{ priceInput * assetUnit | number: '.2-3' }} USD</span>
 
   </div>
 
