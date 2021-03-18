@@ -12,7 +12,7 @@
 
       <div class="content-middle">
         <app-asset-input
-          label="Upgrade"
+          [label]="txState === 'SUBMITTING' ?  'Upgrading' : txState === 'SUCCESS' ? 'Upgraded' : 'Upgrade'"
           [(selectedAsset)]="asset.asset"
           [(assetUnit)]="amount"
           [isSource]="true"
@@ -27,7 +27,7 @@
         <app-arrow [seperator]="true" [isGrey]="txState === 'SUCCESS'"></app-arrow>
 
         <app-asset-input
-          label="Receive"
+          [label]="txState === 'SUBMITTING' ? 'Receiving' : txState === 'SUCCESS' ? 'Received' : 'Receive'"
           [(selectedAsset)]="nativeRune.asset"
           [(assetUnit)]="amount"
           [isSource]="true"
