@@ -10,8 +10,9 @@
 
     <div class="flex justify-between items-center" style="position: relative;">
 
-      <div *ngIf="loading" class="flex items-center" style="height: 53px">
-        <mat-progress-spinner diameter="16" color="primary" mode="indeterminate"></mat-progress-spinner>
+      <div *ngIf="loading" class="flex items-center" style="height: 29.333px">
+        <!-- <mat-progress-spinner diameter="16" color="primary" mode="indeterminate"></mat-progress-spinner> -->
+        <span style="text-transform: uppercase; color: var(--primary-grey-color); font-size: 22px; font-family: 'Roboto Mono';">0.0</span>
       </div>
 
       <div *ngIf="!loading && error" class="flex items-center" style="height: 53px">
