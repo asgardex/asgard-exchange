@@ -20,6 +20,7 @@ import {
 import { MainViewsEnum, OverlaysService } from 'src/app/_services/overlays.service';
 import { number } from 'yargs';
 import { ExplorerPathsService } from 'src/app/_services/explorer-paths.service';
+import { CopyService } from 'src/app/_services/copy.service';
 
 
 export interface SwapData {
@@ -74,7 +75,8 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
     private slipLimitService: SlippageToleranceService,
     private ethUtilsService: EthUtilsService,
     public overlaysService: OverlaysService,
-    private explorerPathsService: ExplorerPathsService
+    private explorerPathsService: ExplorerPathsService,
+    private copyService: CopyService
   ) {
     this.loading = true;
     this.txState = TransactionConfirmationState.PENDING_CONFIRMATION;
@@ -128,6 +130,10 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
     // this.overlayChange.emit(!this.overlay);
     // this.dialogRef.close(transactionSucess);
     this.overlaysService.setCurrentSwapView('Swap');
+  }
+
+  copyToClipboard(val: string) {
+    this.copyService.copyToClipboard(val);
   }
 
   gotoWallet() {

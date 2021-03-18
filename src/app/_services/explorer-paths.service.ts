@@ -23,8 +23,8 @@ export class ExplorerPathsService {
       : 'https://blockstream.info';
 
     this.thorchainExplorerUrl = environment.network === 'testnet'
-      ? 'https://main.d3mbd42yfy75lz.amplifyapp.com/#' // flutter web beta
-      : 'https://thorchain.net';
+      ? 'https://main.d2rtjbuh4gx2cf.amplifyapp.com/#' // flutter web beta
+      : 'https://main.d1h4hfl6gvp736.amplifyapp.com/#';
 
     this.ethereumExplorerUrl = environment.network === 'testnet'
       ? 'https://ropsten.etherscan.io'

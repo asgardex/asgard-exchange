@@ -99,7 +99,7 @@
         <div style="margin-top: 38px;" *ngIf="txState === 'SUCCESS'">
           <app-notice [tags]="['Copy', 'Explorer']" (tagClicked)="noticeHandler($event)">
             <span text >{{hash}}</span>
-            <div tag_one>
+            <div tag_one (click)="copyToClipboard(hash)">
               <span>COPY</span>
             </div>
             <div tag_two>
