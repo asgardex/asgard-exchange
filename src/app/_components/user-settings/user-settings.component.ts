@@ -46,23 +46,23 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
 
   openUserSettings() {
     // this.overlayChange.emit(!this.overlay);
-    if (this.currentView == MainViewsEnum.UserSetting)
-      this.overlaysService.setCurrentView(MainViewsEnum.Swap)
-    else
+    // if (this.currentView == MainViewsEnum.UserSetting)
+    //   this.overlaysService.setCurrentView(MainViewsEnum.Swap)
+    // else
       this.overlaysService.setCurrentView(MainViewsEnum.UserSetting);
   }
 
   openAccountSetting() {
-    if (this.currentView == MainViewsEnum.AccountSetting)
-      this.overlaysService.setCurrentView(MainViewsEnum.Swap)
-    else
+    // if (this.currentView == MainViewsEnum.AccountSetting)
+    //   this.overlaysService.setCurrentView(MainViewsEnum.Swap)
+    // else
       this.overlaysService.setCurrentView(MainViewsEnum.AccountSetting);
   }
 
   openTransaction() {
-    if (this.currentView == MainViewsEnum.Transaction)
-      this.overlaysService.setCurrentView(MainViewsEnum.Swap)
-    else
+    // if (this.currentView == MainViewsEnum.Transaction)
+    //   this.overlaysService.setCurrentView(MainViewsEnum.Swap)
+    // else
       this.overlaysService.setCurrentView(MainViewsEnum.Transaction);
   }
 
