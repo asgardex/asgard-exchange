@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit, EventEmitter, Output } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { SlippageToleranceService } from 'src/app/_services/slippage-tolerance.service';
-
 @Component({
   selector: 'app-slippage-tolerance',
   templateUrl: './slippage-tolerance.component.html',
@@ -16,7 +15,6 @@ export class SlippageToleranceComponent implements OnInit, OnDestroy {
 
   set customTolerance(num: number) {
     this._customTolerance = num;
-    const tolerance = (num) ? num : 3;
   }
   get customTolerance() {
     return this._customTolerance;
@@ -33,15 +31,6 @@ export class SlippageToleranceComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-  }
-
-  selectSlippage(num: number) {
-    this.customTolerance = null;
-    this.setSlippageTolerance(num);
-  }
-
-  setSlippageTolerance(num: number) {
-    this.slippageToleranceService.setSlippageTolerance(num);
   }
 
   setSlippage() {

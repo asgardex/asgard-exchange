@@ -13,7 +13,7 @@
   </div>
   <div>
     <div mat-dialog-content>
-      <app-text-field [placeHolder]="tolerance" selectedType="Text" label="Percentage" [(textOfField)]="customTolerance" name="custom-tolerance"></app-text-field>
+      <app-text-field [placeHolder]="[tolerance]" selectedType="Number" label="Percentage" [(textOfField)]="customTolerance" name="custom-tolerance"></app-text-field>
     </div>
 
     <!-- close dialog -->
@@ -25,7 +25,7 @@
       </div>
       <div class="divider"></div>
       <div class="right-btn">
-        <button class="next-btn" [disabled]="tolerance == customTolerance || !customTolerance" (click)="setSlippage()">
+        <button class="next-btn" [disabled]="tolerance == customTolerance || !customTolerance || !(customTolerance <= 100 && customTolerance > 0)" (click)="setSlippage()">
           <span>Save</span>
         </button>
       </div>
