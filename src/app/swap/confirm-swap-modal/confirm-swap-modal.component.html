@@ -32,7 +32,7 @@
         [isSource]="true"
       ></app-asset-input>
 
-      <app-arrow></app-arrow>
+      <app-arrow [isGrey]="txState === 'SUCCESS'"></app-arrow>
 
       <app-asset-input
           [label]="txState === 'SUBMITTING' ? 'Receiving' : txState === 'SUCCESS' ? 'Received' : 'Receive'"
@@ -96,8 +96,9 @@
             ">
             Disclaimer: I’m a BETA product. Don’t swap/deposit large</span> -->
         </div>
-        <div style="margin-top: 38px;" *ngIf="txState === 'SUCCESS'">
-          <app-notice [tags]="['Copy', 'Explorer']" (tagClicked)="noticeHandler($event)">
+        <div *ngIf="txState === 'SUCCESS'">
+          <app-arrow></app-arrow>
+          <app-notice [tags]="['Copy', 'Explorer']">
             <span text >{{hash}}</span>
             <div tag_one (click)="copyToClipboard(hash)">
               <span>COPY</span>
