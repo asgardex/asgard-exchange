@@ -1,6 +1,9 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
-import { decryptFromKeystore } from '@xchainjs/xchain-crypto';
+import { decryptFromKeystore, encryptToKeyStore } from '@xchainjs/xchain-crypto';
 import { CopyService } from 'src/app/_services/copy.service';
+import { KeystoreService } from 'src/app/_services/keystore.service';
+import { environment } from 'src/environments/environment';
+
 
 @Component({
   selector: 'app-seed-phrase',
@@ -16,13 +19,42 @@ export class SeedPhraseComponent implements OnInit {
   keystoreError: boolean;
   phrase: string;
 
-  constructor(private copyService: CopyService) { }
+  constructor(private copyService: CopyService, private keystoreService: KeystoreService) { }
 
   ngOnInit(): void {
   }
 
   copyToClipboard() {
     this.copyService.copyToClipboard(this.phrase);
+  }
+
+  async downloadKeystore() {
+
+    try {
+      const keystore = await encryptToKeyStore(this.phrase, this.keystorePassword);
+
+      localStorage.setItem('keystore', JSON.stringify(keystore));
+      const user = await this.keystoreService.unlockKeystore(keystore, this.keystorePassword);
+
+      const binanceAddress = await user.clients.binance.getAddress();
+      const addressLength = binanceAddress.length;
+      const minAddress = `${binanceAddress.substring(0, environment.network === 'testnet' ? 7 : 6)}_${binanceAddress.substring(addressLength - 3, addressLength)}`;
+      const bl = new Blob([JSON.stringify(keystore)], {
+        type: 'text/plain'
+      });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(bl);
+      a.download = `asgardex-${minAddress}`;
+      a.hidden = true;
+      document.body.appendChild(a);
+      a.innerHTML =
+        'loading';
+      a.click();
+
+    } catch (error) {
+      console.error(error);
+    }
+
   }
 
   async unlock() {
