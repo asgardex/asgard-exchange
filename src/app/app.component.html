@@ -5,6 +5,18 @@
 
 <main *ngIf="isTestnet">
   <app-native-rune-prompt></app-native-rune-prompt>
+  
+  <div class="main-notification mb-8 cursor-pointer min-h-0 container" *ngIf="chainBalanceErrors && chainBalanceErrors.length > 0">
+    <div class="flex items-center">
+      <mat-icon class="mr-4">warning</mat-icon>
+      <small>
+        There has been an error fetching some of your balances.
+        Your funds are safe, you can check them on the respective explorer in the User Settings area.
+        Please try again later.
+      </small>
+    </div>
+  </div>
+  
   <router-outlet></router-outlet>
 </main>
 
