@@ -18,7 +18,6 @@ import { BehaviorSubject, of, Subject, timer } from 'rxjs';
 import { catchError, switchMap, takeUntil } from 'rxjs/operators';
 import { AssetAndBalance } from '../_classes/asset-and-balance';
 import { MidgardService } from './midgard.service';
-import { ethers } from 'ethers';
 
 export interface MidgardData<T> {
   key: string;
@@ -37,12 +36,20 @@ export class UserService {
 
   private userBalancesSource = new BehaviorSubject<Balances>(null);
   userBalances$ = this.userBalancesSource.asObservable();
+  private _balances: Balances;
+
+  private chainBalanceErrorsSource = new BehaviorSubject<Chain[]>([]);
+  chainBalanceErrors$ = this.chainBalanceErrorsSource.asObservable();
+  private _chainBalanceErrors: Chain[];
 
   private killRunePolling: Subject<void> = new Subject();
 
   asgardexBncClient: BinanceClient;
 
   constructor(private midgardService: MidgardService) {
+
+    this._balances = [];
+    this._chainBalanceErrors = [];
 
     this.asgardexBncClient = new BinanceClient({
       network: (environment.network) === 'testnet' ? 'testnet' : 'mainnet',
@@ -59,85 +66,139 @@ export class UserService {
   }
 
   async fetchBalances(): Promise<void> {
-    let balances: Balances = [];
+    this._balances = [];
+    this._chainBalanceErrors = [];
+    this.chainBalanceErrorsSource.next([]);
 
     for (const [key, _value] of Object.entries(this._user.clients)) {
-
-      let clientBalances;
-
       if (key === 'binance') {
-
-        const client = this._user.clients.binance;
-        const bncClient: BncClient = await client.getBncClient();
-        const address = await client.getAddress();
-        const bncBalances = await bncClient.getBalance(address);
-
-        clientBalances = bncBalances
-          .map((balance) => {
-
-            const asset = assetFromString(`BNB.${balance.symbol}`);
-
-            return {
-              asset,
-              amount: assetToBase(assetAmount(balance.free, 8)),
-              frozenAmount: assetToBase(assetAmount(balance.frozen, 8)),
-            };
-          });
-          // .filter((balance) => !asset || balance.asset === asset)
-
+        this.getBinanceBalances();
       } else if (key === 'ethereum') {
-
-        const client = this._user.clients.ethereum;
-
-        // ETH
-        clientBalances = await client.getBalance();
-
-        const ethAddress = await client.getAddress();
-        const assetsToQuery: {chain: Chain, ticker: string, symbol: string}[] = [];
-
-        /**
-         * Add ETH RUNE
-         */
-        assetsToQuery.push(
-          (environment.network === 'testnet')
-          ? new Asset(`ETH.RUNE-${'0xd601c6A3a36721320573885A8d8420746dA3d7A0'}`)
-          : new Asset(`ETH.RUNE-${'0x3155BA85D5F96b2d030a4966AF206230e46849cb'}`)
-        );
-
-        /**
-         * Check user balance for tokens that have existing THORChain pools
-         */
-        const pools = await this.midgardService.getPools().toPromise();
-        const ethTokenPools = pools.filter( (pool) => pool.asset.indexOf('ETH') === 0)
-          .filter( (ethPool) => ethPool.asset.indexOf('-') >= 0 );
-
-        for (const token of ethTokenPools) {
-          const tokenAsset = checkSummedAsset(token.asset);
-          assetsToQuery.push(tokenAsset);
-        }
-
-        /**
-         * Check localstorage for user-added tokens
-         */
-        const userAddedTokens: string[] = JSON.parse(localStorage.getItem(`${ethAddress}_user_added`)) || [];
-        for (const token of userAddedTokens) {
-          const tokenAsset = checkSummedAsset(token);
-          assetsToQuery.push(tokenAsset);
-        }
-
-        console.log('assetsToQuery: ', assetsToQuery);
-
-        const tokenBalances = await client.getBalance(ethAddress, assetsToQuery);
-        clientBalances.push(...tokenBalances);
-
+        this.getEthereumBalances();
       } else {
-        const client = this._user.clients[key];
-        clientBalances = await client.getBalance();
+        this.getGeneralBalance(key);
       }
-      balances = [...balances, ...clientBalances];
     }
 
+  }
+
+  setBalances(balances: Balances) {
+    this._balances = balances;
     this.userBalancesSource.next(balances);
+  }
+
+  pushBalances(balances: Balances) {
+    this._balances = [...this._balances, ...balances];
+    this.userBalancesSource.next(this._balances);
+  }
+
+  pushChainBalanceErrors(chain: Chain) {
+    this._chainBalanceErrors.push(chain);
+    this.chainBalanceErrorsSource.next(this._chainBalanceErrors);
+  }
+
+  async getGeneralBalance(key: string) {
+
+    try {
+      const client = this._user.clients[key];
+      const balances = await client.getBalance();
+      this.pushBalances(balances);
+    } catch (error) {
+      console.error(error);
+      // ethereum and binance are handled in respected functions
+      switch (key) {
+        case 'bitcoin':
+          this.pushChainBalanceErrors('BTC');
+          break;
+        case 'bitcoinCash':
+          this.pushChainBalanceErrors('BCH');
+          break;
+        case 'litecoin':
+          this.pushChainBalanceErrors('LTC');
+          break;
+        case 'thorchain':
+          this.pushChainBalanceErrors('THOR');
+          break;
+      }
+
+    }
+
+  }
+
+  async getBinanceBalances() {
+
+    try {
+      const client = this._user.clients.binance;
+      const bncClient: BncClient = await client.getBncClient();
+      const address = await client.getAddress();
+      const bncBalances = await bncClient.getBalance(address);
+
+      const balances = bncBalances
+        .map((balance) => {
+
+          const asset = assetFromString(`BNB.${balance.symbol}`);
+
+          return {
+            asset,
+            amount: assetToBase(assetAmount(balance.free, 8)),
+            frozenAmount: assetToBase(assetAmount(balance.frozen, 8)),
+          };
+        });
+
+      this.pushBalances(balances);
+    } catch (error) {
+      console.error('error fetching binance balances: ', error);
+    }
+
+  }
+
+  async getEthereumBalances() {
+
+    try {
+      const client = this._user.clients.ethereum;
+
+      // ETH
+      const balances = await client.getBalance();
+      this.pushBalances(balances);
+
+      const ethAddress = await client.getAddress();
+      const assetsToQuery: {chain: Chain, ticker: string, symbol: string}[] = [];
+
+      /**
+       * Add ETH RUNE
+       */
+      assetsToQuery.push(
+        (environment.network === 'testnet')
+        ? new Asset(`ETH.RUNE-${'0xd601c6A3a36721320573885A8d8420746dA3d7A0'}`)
+        : new Asset(`ETH.RUNE-${'0x3155BA85D5F96b2d030a4966AF206230e46849cb'}`)
+      );
+
+      /**
+       * Check user balance for tokens that have existing THORChain pools
+       */
+      const pools = await this.midgardService.getPools().toPromise();
+      const ethTokenPools = pools.filter( (pool) => pool.asset.indexOf('ETH') === 0)
+        .filter( (ethPool) => ethPool.asset.indexOf('-') >= 0 );
+
+      for (const token of ethTokenPools) {
+        const tokenAsset = checkSummedAsset(token.asset);
+        assetsToQuery.push(tokenAsset);
+      }
+
+      /**
+       * Check localstorage for user-added tokens
+       */
+      const userAddedTokens: string[] = JSON.parse(localStorage.getItem(`${ethAddress}_user_added`)) || [];
+      for (const token of userAddedTokens) {
+        const tokenAsset = checkSummedAsset(token);
+        assetsToQuery.push(tokenAsset);
+      }
+
+      const tokenBalances = await client.getBalance(ethAddress, assetsToQuery);
+      this.pushBalances(tokenBalances);
+    } catch (error) {
+      console.error(error);
+    }
 
   }
 

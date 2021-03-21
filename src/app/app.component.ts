@@ -7,6 +7,8 @@ import { LastBlockService } from 'src/app/_services/last-block.service';
 import { MidgardService } from 'src/app/_services/midgard.service';
 import { ReconnectDialogComponent } from './_components/reconnect-dialog/reconnect-dialog.component';
 import { environment } from 'src/environments/environment';
+import { UserService } from './_services/user.service';
+import { Chain } from '@xchainjs/xchain-util';
 
 @Component({
   selector: 'app-root',
@@ -18,14 +20,21 @@ export class AppComponent implements OnInit, OnDestroy {
   killPolling: Subject<void> = new Subject();
   subs: Subscription[];
   isTestnet: boolean;
+  chainBalanceErrors: Chain[];
 
   constructor(
     private dialog: MatDialog,
     private midgardService: MidgardService,
     private lastBlockService: LastBlockService,
+    private userService: UserService
   ) {
-    this.subs = [];
     this.isTestnet = (environment.network === 'testnet');
+
+    const chainBalanceErrors$ = this.userService.chainBalanceErrors$.subscribe(
+      (chains) => this.chainBalanceErrors = chains
+    );
+
+    this.subs = [chainBalanceErrors$];
   }
 
   ngOnInit(): void {

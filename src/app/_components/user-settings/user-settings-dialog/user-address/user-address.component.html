@@ -1,3 +1,5 @@
+
+
 <div class="flex justify-between items-center float-left w-full pt-4 px-4 mb-4">
   <button (click)="back.emit()" mat-icon-button>
     <mat-icon>arrow_back</mat-icon>
@@ -37,7 +39,7 @@
   </div>
 </div>
 
-<div mat-dialog-content>
+<div *ngIf="!error" mat-dialog-content>
   <app-assets-list
     [assetListItems]="assets"
     [loading]="loading"
@@ -46,4 +48,12 @@
     (selectAsset)="selectAsset($event)"
     (addToken)="navigateToAddToken.emit()">
   </app-assets-list>
+</div>
+
+<div *ngIf="error" class="p-8">
+  <small>{{error}}</small>
+  <br />
+  <a *ngIf="explorerPath" class="explorer-link text-green-400" [href]="explorerPath" target="_blank">
+    <small>Check funds safe <mat-icon>open_in_new</mat-icon></small>
+  </a>
 </div>
