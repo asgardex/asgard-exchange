@@ -102,29 +102,25 @@ export class UserService {
     try {
       const client = this._user.clients[key];
       const balances = await client.getBalance();
-      this.pushBalances(balances);        
+      this.pushBalances(balances);
     } catch (error) {
       console.error(error);
-      
       // ethereum and binance are handled in respected functions
       switch (key) {
         case 'bitcoin':
           this.pushChainBalanceErrors('BTC');
           break;
-      
         case 'bitcoinCash':
           this.pushChainBalanceErrors('BCH');
           break;
-
         case 'litecoin':
           this.pushChainBalanceErrors('LTC');
           break;
-
         case 'thorchain':
           this.pushChainBalanceErrors('THOR');
-          break;  
+          break;
       }
-      
+
     }
 
   }
@@ -149,7 +145,7 @@ export class UserService {
           };
         });
 
-      this.pushBalances(balances);        
+      this.pushBalances(balances);
     } catch (error) {
       console.error('error fetching binance balances: ', error);
     }
@@ -163,11 +159,11 @@ export class UserService {
 
       // ETH
       const balances = await client.getBalance();
-      this.pushBalances(balances);  
-  
+      this.pushBalances(balances);
+
       const ethAddress = await client.getAddress();
       const assetsToQuery: {chain: Chain, ticker: string, symbol: string}[] = [];
-  
+
       /**
        * Add ETH RUNE
        */
@@ -176,19 +172,19 @@ export class UserService {
         ? new Asset(`ETH.RUNE-${'0xd601c6A3a36721320573885A8d8420746dA3d7A0'}`)
         : new Asset(`ETH.RUNE-${'0x3155BA85D5F96b2d030a4966AF206230e46849cb'}`)
       );
-  
+
       /**
        * Check user balance for tokens that have existing THORChain pools
        */
       const pools = await this.midgardService.getPools().toPromise();
       const ethTokenPools = pools.filter( (pool) => pool.asset.indexOf('ETH') === 0)
         .filter( (ethPool) => ethPool.asset.indexOf('-') >= 0 );
-  
+
       for (const token of ethTokenPools) {
         const tokenAsset = checkSummedAsset(token.asset);
         assetsToQuery.push(tokenAsset);
       }
-  
+
       /**
        * Check localstorage for user-added tokens
        */
@@ -197,13 +193,13 @@ export class UserService {
         const tokenAsset = checkSummedAsset(token);
         assetsToQuery.push(tokenAsset);
       }
-  
+
       const tokenBalances = await client.getBalance(ethAddress, assetsToQuery);
-      this.pushBalances(tokenBalances);   
+      this.pushBalances(tokenBalances);
     } catch (error) {
       console.error(error);
     }
-    
+
   }
 
   /**

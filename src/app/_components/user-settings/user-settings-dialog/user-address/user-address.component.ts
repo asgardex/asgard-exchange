@@ -64,10 +64,10 @@ export class UserAddressComponent implements OnInit {
     const chainBalanceErrors$ = this.userService.chainBalanceErrors$.subscribe(
       (chains) => {
         if (chains.includes(this.chain)) {
-          this.error = `There was an error fetching data from the ${this.chain} endpoint. \n Your funds are safe, just an error connecting. Please try again later.`
+          this.error = `There was an error fetching data from the ${this.chain} endpoint. \n Your funds are safe, just an error connecting. Please try again later.`;
         }
       }
-    )
+    );
 
     this.setExplorerPath();
 
@@ -133,7 +133,7 @@ export class UserAddressComponent implements OnInit {
 
       case 'LTC':
         this.explorerPath = `${this.explorerPathsService.litecoinExplorerUrl}/${this.address}`;
-        break;  
+        break;
 
       default:
         break;
