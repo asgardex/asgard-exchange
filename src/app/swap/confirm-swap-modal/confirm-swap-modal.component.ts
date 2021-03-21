@@ -17,6 +17,7 @@ import {
   assetAmount,
   Asset,
 } from '@xchainjs/xchain-util';
+import { SynthUtilsService } from 'src/app/_services/synth-utils.service';
 
 
 export interface SwapData {
@@ -47,6 +48,7 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
   ethNetworkFee: number;
   insufficientChainBalance: boolean;
   loading: boolean;
+  swapToSynth: boolean;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public swapData: SwapData,
@@ -55,8 +57,10 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
     private txStatusService: TransactionStatusService,
     private userService: UserService,
     private slipLimitService: SlippageToleranceService,
-    private ethUtilsService: EthUtilsService
+    private ethUtilsService: EthUtilsService,
+    private synthUtilsService: SynthUtilsService
   ) {
+    this.swapToSynth = this.synthUtilsService.isThorchainSynth(this.swapData.targetAsset) ? true : false;
     this.loading = true;
     this.txState = TransactionConfirmationState.PENDING_CONFIRMATION;
     this.insufficientChainBalance = false;
@@ -75,12 +79,10 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
 
-    // const asset = this.swapData.sourceAsset;
     const sourceAsset = this.swapData.sourceAsset;
     if (sourceAsset.chain === 'ETH') {
 
       // ESTIMATE GAS HERE
-      // const memo =
       this.estimateEthGasPrice();
 
     } else {
@@ -147,13 +149,23 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
     const ethClient = this.swapData.user.clients.ethereum;
     const litecoinClient = this.swapData.user.clients.litecoin;
 
-    const targetAddress = await this.userService.getTokenAddress(this.swapData.user, this.swapData.targetAsset.chain);
+    const targetAddress = (this.swapToSynth) 
+      ? await this.userService.getTokenAddress(this.swapData.user, 'THOR')
+      : await this.userService.getTokenAddress(this.swapData.user, this.swapData.targetAsset.chain);
 
     const floor = this.slipLimitService.getSlipLimitFromAmount(this.swapData.outputValue);
+    
+    let targetAsset;
+    if (this.synthUtilsService.isThorchainSynth(this.swapData.targetAsset)) {
+      const underlyingAsset = this.synthUtilsService.parseNativeAsset(this.swapData.targetAsset);
+      targetAsset = underlyingAsset;
+    } else {
+      targetAsset = this.swapData.targetAsset;
+    }
 
     const memo = this.getSwapMemo(
-      this.swapData.targetAsset.chain,
-      this.swapData.targetAsset.symbol,
+      targetAsset.chain,
+      targetAsset.symbol,
       targetAddress,
       Math.floor(floor.toNumber())
     );
@@ -161,8 +173,21 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
     if (this.swapData.sourceAsset.chain === 'THOR') {
 
       try {
+        let sourceAsset;
+        if (this.synthUtilsService.isThorchainSynth(this.swapData.sourceAsset)) {
+          const underlyingAsset = this.synthUtilsService.parseNativeAsset(this.swapData.sourceAsset);
+          sourceAsset = underlyingAsset;
+        } else {
+          sourceAsset = this.swapData.sourceAsset;
+        }
+
         const hash = await thorClient.deposit({
           amount: assetToBase(assetAmount(amountNumber)),
+          asset: {
+            chain: sourceAsset.chain,
+            ticker: String(sourceAsset.ticker).toLowerCase(),
+            symbol: String(sourceAsset.symbol).toLowerCase()
+          },
           memo
         });
 

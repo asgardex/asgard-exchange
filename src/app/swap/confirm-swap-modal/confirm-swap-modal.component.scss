@@ -1,0 +1,28 @@
+.synth-help {
+    font-size: .8rem;
+}
+
+:host ::ng-deep .mat-checkbox {
+
+    .mat-checkbox-frame { 
+        border-color: white;
+    }
+
+    &.mat-checkbox-checked {
+        .mat-checkbox-frame {
+            border-color: rgba(21, 163, 111, 1);
+        }
+    }
+
+    &.mat-checkbox-disabled {
+        
+        .mat-checkbox-frame {
+            border-color: grey;
+        }
+
+        .mat-checkbox-label {
+            color: grey;
+        }
+    }
+
+}

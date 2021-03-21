@@ -41,7 +41,7 @@
 
     </div>
 
-    <div class="clear-both">
+    <div class="clear-both p-8">
       <div mat-dialog-content class="confirm-modal-content">
 
         <div>
@@ -72,9 +72,14 @@
             <span>1 Rune</span>
           </div>
 
-          <div class="flex justify-between">
+          <div class="flex justify-between mb-2">
             <span class="tx-detail-label">Slip</span>
             <span>{{swapData.slip | percent:"0.2-4"}}</span>
+          </div>
+
+          <div class="flex items-center">
+            <mat-checkbox [(ngModel)]="swapToSynth" [disabled]="swapData.targetAsset.chain === 'THOR' && swapData.targetAsset.ticker === 'RUNE'">Swap To Synth?</mat-checkbox>
+            <mat-icon class="synth-help ml-1" [inline]="true" [matTooltip]="'Swap to synth means you will receive THOR.' + swapData.targetAsset.ticker + ', which helps reduce Layer 1 fees for the transaction. You can swap THOR synths to the underlying asset 1:1. If not selected, you will receive the native Layer 1 asset.'">help</mat-icon>
           </div>
         </div>
 

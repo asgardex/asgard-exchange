@@ -31,6 +31,7 @@ import { PoolDTO } from '../_classes/pool';
 import { SlippageToleranceService } from '../_services/slippage-tolerance.service';
 import { PoolAddressDTO } from '../_classes/pool-address';
 import { ThorchainPricesService } from '../_services/thorchain-prices.service';
+import { SynthUtilsService } from '../_services/synth-utils.service';
 
 export enum SwapType {
   DOUBLE_SWAP = 'double_swap',
@@ -80,7 +81,10 @@ export class SwapComponent implements OnInit, OnDestroy {
 
     this._selectedSourceAsset = asset;
 
-    if (!this.isRune(this._selectedSourceAsset)) {
+    if (this.synthUtilsService.isThorchainSynth(this._selectedSourceAsset)) {
+      const nativeAsset = this.synthUtilsService.parseNativeAsset(this._selectedSourceAsset);
+      this.getPoolDetails(nativeAsset.chain, nativeAsset.symbol, 'source');
+    } else if (!this.isRune(this._selectedSourceAsset)) {
       this.getPoolDetails(this._selectedSourceAsset.chain, this._selectedSourceAsset.symbol, 'source');
     } else if (this._selectedSourceAsset && this.isRune(this._selectedSourceAsset)) {
       this.updateSwapDetails();
@@ -128,8 +132,10 @@ export class SwapComponent implements OnInit, OnDestroy {
     this.targetAssetUnit = null;
     this.calculatingTargetAsset = true;
 
-    // if (this._selectedTargetAsset && this._selectedTargetAsset.symbol !== this.runeSymbol) {
-    if (this._selectedTargetAsset && !this.isRune(this._selectedTargetAsset)) {
+    if (this.synthUtilsService.isThorchainSynth(this._selectedTargetAsset)) {
+      const nativeAsset = this.synthUtilsService.parseNativeAsset(this._selectedTargetAsset);
+      this.getPoolDetails(nativeAsset.chain, nativeAsset.symbol, 'target');
+    } else if (this._selectedTargetAsset && !this.isRune(this._selectedTargetAsset)) {
       this.getPoolDetails(this._selectedTargetAsset.chain, this._selectedTargetAsset.symbol, 'target');
     } else if (this._selectedTargetAsset && this.isRune(this._selectedTargetAsset)) {
       this.updateSwapDetails();
@@ -166,6 +172,8 @@ export class SwapComponent implements OnInit, OnDestroy {
   insufficientBnb: boolean;
   selectableMarkets: AssetAndBalance[];
 
+  thorchainBalances: Balances;
+
   /**
    * ETH specific
    */
@@ -178,7 +186,8 @@ export class SwapComponent implements OnInit, OnDestroy {
     private midgardService: MidgardService,
     private binanceService: BinanceService,
     private slipLimitService: SlippageToleranceService,
-    private thorchainPricesService: ThorchainPricesService) {
+    private thorchainPricesService: ThorchainPricesService,
+    private synthUtilsService: SynthUtilsService) {
 
     this.selectedSourceAsset = new Asset('THOR.RUNE');
     this.ethContractApprovalRequired = false;
@@ -186,8 +195,18 @@ export class SwapComponent implements OnInit, OnDestroy {
     const balances$ = this.userService.userBalances$.subscribe(
       (balances) => {
         this.balances = balances;
+
         this.sourceBalance = this.userService.findBalance(this.balances, this.selectedSourceAsset);
         this.targetBalance = this.userService.findBalance(this.balances, this.selectedTargetAsset);
+
+
+        if (balances) {
+
+          // add synths to selectable markets...
+          this.thorchainBalances = balances.filter( (balance) => balance.asset.chain === 'THOR' && balance.asset.symbol !== 'RUNE' );
+          this.addSynthsToSelectableMarkets();
+        }
+
 
         const bnbBalance = this.userService.findBalance(this.balances, new Asset('BNB.BNB'));
         this.insufficientBnb = bnbBalance < 0.000375;
@@ -290,11 +309,37 @@ export class SwapComponent implements OnInit, OnDestroy {
           asset: new Asset('THOR.RUNE'),
           assetPriceUSD: this.thorchainPricesService.estimateRunePrice(availablePools)
         });
+
+        this.addSynthsToSelectableMarkets();
+
       },
       (err) => console.error('error fetching pools:', err)
     );
   }
 
+  addSynthsToSelectableMarkets() {
+
+    if (!this.thorchainBalances || !this.selectableMarkets) {
+      return;
+    }
+
+    if (this.thorchainBalances.length > 0) {
+            
+      for (const synth of this.thorchainBalances) {
+        const split = synth.asset.symbol.split('/');
+        if (split.length > 0) {
+
+          const nativeChain = split[0];
+          const nativeSymbol = split[1];
+          const matchingSelectableMarket = this.selectableMarkets.find( (market) => `${market.asset.chain}.${market.asset.symbol}` === `${nativeChain}.${nativeSymbol}`);
+          this.selectableMarkets.unshift({
+            asset: new Asset(`${synth.asset.chain}.${synth.asset.symbol}`),
+            assetPriceUSD: +matchingSelectableMarket.assetPriceUSD
+          });
+        }
+      }
+    }
+  }
 
   async checkContractApproved() {
 
@@ -414,9 +459,7 @@ export class SwapComponent implements OnInit, OnDestroy {
 
       if (swapType === SwapType.SINGLE_SWAP) {
         this.calculateSingleSwap();
-      } else if (swapType === SwapType.DOUBLE_SWAP
-          && this.poolDetailMap[`${this.selectedTargetAsset.chain}.${this.selectedTargetAsset.symbol}`]
-          && this.poolDetailMap[`${this.selectedSourceAsset.chain}.${this.selectedSourceAsset.symbol}`]) {
+      } else if (swapType === SwapType.DOUBLE_SWAP) {
 
         this.calculateDoubleSwap();
 
@@ -465,9 +508,23 @@ export class SwapComponent implements OnInit, OnDestroy {
       ? true
       : false;
 
-    const poolDetail = (toRune)
-      ? this.poolDetailMap[`${this.selectedSourceAsset.chain}.${this.selectedSourceAsset.symbol}`]
-      : this.poolDetailMap[`${this.selectedTargetAsset.chain}.${this.selectedTargetAsset.symbol}`];
+    let poolDetail: PoolDTO;
+
+    if (toRune) {
+      if (this.synthUtilsService.isThorchainSynth(this.selectedSourceAsset)) {
+        const underlyingAsset = this.synthUtilsService.parseNativeAsset(this.selectedSourceAsset);
+        poolDetail = this.poolDetailMap[`${underlyingAsset.chain}.${underlyingAsset.symbol}`]
+      } else {
+        poolDetail = this.poolDetailMap[`${this.selectedSourceAsset.chain}.${this.selectedSourceAsset.symbol}`];
+      }
+    } else {
+      if (this.synthUtilsService.isThorchainSynth(this.selectedTargetAsset)) {
+        const underlyingAsset = this.synthUtilsService.parseNativeAsset(this.selectedTargetAsset);
+        poolDetail = this.poolDetailMap[`${underlyingAsset.chain}.${underlyingAsset.symbol}`]
+      } else {
+        poolDetail = this.poolDetailMap[`${this.selectedTargetAsset.chain}.${this.selectedTargetAsset.symbol}`];
+      }
+    }
 
     if (poolDetail) {
       const pool: PoolData = {
@@ -524,8 +581,22 @@ export class SwapComponent implements OnInit, OnDestroy {
    */
   calculateDoubleSwap() {
 
-    const sourcePool = this.poolDetailMap[`${this.selectedSourceAsset.chain}.${this.selectedSourceAsset.symbol}`];
-    const targetPool = this.poolDetailMap[`${this.selectedTargetAsset.chain}.${this.selectedTargetAsset.symbol}`];
+    let sourcePool: PoolDTO;
+    let targetPool: PoolDTO;
+
+    if (this.synthUtilsService.isThorchainSynth(this.selectedSourceAsset)) {
+      const underlyingAsset = this.synthUtilsService.parseNativeAsset(this.selectedSourceAsset);
+      sourcePool = this.poolDetailMap[`${underlyingAsset.chain}.${underlyingAsset.symbol}`];
+    } else {
+      sourcePool = this.poolDetailMap[`${this.selectedSourceAsset.chain}.${this.selectedSourceAsset.symbol}`];
+    }
+
+    if (this.synthUtilsService.isThorchainSynth(this.selectedTargetAsset)) {
+      const underlyingAsset = this.synthUtilsService.parseNativeAsset(this.selectedTargetAsset);
+      targetPool = this.poolDetailMap[`${underlyingAsset.chain}.${underlyingAsset.symbol}`];
+    } else {
+      targetPool = this.poolDetailMap[`${this.selectedTargetAsset.chain}.${this.selectedTargetAsset.symbol}`];
+    }
 
     if (sourcePool && targetPool) {
       const pool1: PoolData = {
@@ -557,6 +628,10 @@ export class SwapComponent implements OnInit, OnDestroy {
         this.targetAssetUnit = null;
       }
 
+    } else {
+      console.log('missing source pool or target pool: ');
+      console.log('source pool: ', sourcePool);
+      console.log('target pool: ', targetPool);
     }
 
     this.calculatingTargetAsset = false;

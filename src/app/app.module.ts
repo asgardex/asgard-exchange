@@ -72,6 +72,7 @@ import { SochainService } from './_services/sochain.service';
 import { ThorchainPricesService } from './_services/thorchain-prices.service';
 import { HaskoinService } from './_services/haskoin.service';
 import { ModalSectionHeaderModule } from './_components/modal-section-header/modal-section-header.module';
+import { SynthUtilsService } from './_services/synth-utils.service';
 
 
 @NgModule({
@@ -141,7 +142,8 @@ import { ModalSectionHeaderModule } from './_components/modal-section-header/mod
     EthUtilsService,
     SochainService,
     ThorchainPricesService,
-    HaskoinService
+    HaskoinService,
+    SynthUtilsService
   ],
   bootstrap: [AppComponent]
 })
