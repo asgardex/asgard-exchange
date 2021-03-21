@@ -34,7 +34,7 @@
     "@walletconnect/qrcode-modal": "^1.2.2",
     "@xchainjs/xchain-binance": "^4.7.0",
     "@xchainjs/xchain-bitcoin": "^0.12.0",
-    "@xchainjs/xchain-bitcoincash": "^0.7.1",
+    "@xchainjs/xchain-bitcoincash": "^0.7.2",
     "@xchainjs/xchain-client": "^0.7.0",
     "@xchainjs/xchain-crypto": "^0.2.2",
     "@xchainjs/xchain-ethereum": "^0.14.1",
@@ -88,6 +88,7 @@
     "postcss-ng-tailwind-in-components": "0.0.4",
     "protractor": "~7.0.0",
     "tailwindcss": "2.0.3",
+    "terser-webpack-plugin": "^4.1.0",
     "ts-node": "~8.3.0",
     "tslint": "~6.1.0",
     "typescript": "^4.1.5"
