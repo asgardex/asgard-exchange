@@ -287,8 +287,6 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
         const toBase = assetToBase(assetAmount(amountNumber));
         const amount = toBase.amount().minus(fee.fast.amount());
 
-        console.log('amount is: ', amount.toNumber());
-
         const hash = await bchClient.transfer({
           amount: baseAmount(amount),
           recipient: matchingPool.address,

@@ -18,6 +18,8 @@ module.exports = (config) => {
     stream: true
   };
 
+  // taken from https://github.com/thorchain/asgardex-electron/pull/1039
+  // to resolve BCH error on transfer only for builds
   config.optimization.minimizer = [
     // TerserPlugin
     // https://webpack.js.org/plugins/terser-webpack-plugin/#exclude
@@ -73,36 +75,6 @@ module.exports = (config) => {
       }
     })
   ]
-
-  // config.mangle = {
-  //   reserved: [
-  //       'Buffer',
-  //       'BigInteger',
-  //       'Point',
-  //       'ECPubKey',
-  //       'ECKey',
-  //       'sha512_asm',
-  //       'asm',
-  //       'ECPair',
-  //       'HDNode'
-  //   ]
-  // }
-
-  // new UglifyEsPlugin({
-  //   mangle: {
-  //       reserved: [
-  //           'Buffer',
-  //           'BigInteger',
-  //           'Point',
-  //           'ECPubKey',
-  //           'ECKey',
-  //           'sha512_asm',
-  //           'asm',
-  //           'ECPair',
-  //           'HDNode'
-  //       ]
-  //   }
-  // });
 
   return config
 };
