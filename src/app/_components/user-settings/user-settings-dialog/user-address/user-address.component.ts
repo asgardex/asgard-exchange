@@ -31,6 +31,7 @@ export class UserAddressComponent implements OnInit {
   assets: AssetAndBalance[];
   loading: boolean;
   explorerPath: string;
+  error: string;
 
   constructor(
     private userService: UserService,
@@ -60,9 +61,17 @@ export class UserAddressComponent implements OnInit {
       }
     );
 
+    const chainBalanceErrors$ = this.userService.chainBalanceErrors$.subscribe(
+      (chains) => {
+        if (chains.includes(this.chain)) {
+          this.error = `There was an error fetching data from the ${this.chain} endpoint. \n Your funds are safe, just an error connecting. Please try again later.`;
+        }
+      }
+    );
+
     this.setExplorerPath();
 
-    this.subs = [balances$];
+    this.subs = [balances$, chainBalanceErrors$];
 
   }
 
@@ -120,6 +129,10 @@ export class UserAddressComponent implements OnInit {
 
       case 'ETH':
         this.explorerPath = `${this.explorerPathsService.ethereumExplorerUrl}/address/${this.address}`;
+        break;
+
+      case 'LTC':
+        this.explorerPath = `${this.explorerPathsService.litecoinExplorerUrl}/${this.address}`;
         break;
 
       default:
