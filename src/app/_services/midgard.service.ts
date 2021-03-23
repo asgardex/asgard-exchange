@@ -19,7 +19,9 @@ export class MidgardService {
 
   constructor(private http: HttpClient) {
     this.v2BasePath = 'https://testnet.midgard.thorchain.info/v2';
-    this._constants$ = this.http.get<MidgardConstants>(`${this.v2BasePath}/thorchain/constants`).pipe(shareReplay()); // cached since constants are constant
+
+    // cached since constants are constant
+    this._constants$ = this.http.get<MidgardConstants>(`${this.v2BasePath}/thorchain/constants`).pipe(shareReplay());
   }
   /**
    * V2 Endpoints
