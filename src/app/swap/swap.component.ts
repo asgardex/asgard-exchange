@@ -324,7 +324,7 @@ export class SwapComponent implements OnInit, OnDestroy {
     }
 
     if (this.thorchainBalances.length > 0) {
-            
+
       for (const synth of this.thorchainBalances) {
         const split = synth.asset.symbol.split('/');
         if (split.length > 0) {
@@ -332,10 +332,12 @@ export class SwapComponent implements OnInit, OnDestroy {
           const nativeChain = split[0];
           const nativeSymbol = split[1];
           const matchingSelectableMarket = this.selectableMarkets.find( (market) => `${market.asset.chain}.${market.asset.symbol}` === `${nativeChain}.${nativeSymbol}`);
-          this.selectableMarkets.unshift({
-            asset: new Asset(`${synth.asset.chain}.${synth.asset.symbol}`),
-            assetPriceUSD: +matchingSelectableMarket.assetPriceUSD
-          });
+          if (!this.selectableMarkets.find( (market: AssetAndBalance) => `${market.asset.chain}.${market.asset.symbol}` === `${synth.asset.chain}.${synth.asset.symbol}` )) {
+            this.selectableMarkets.unshift({
+              asset: new Asset(`${synth.asset.chain}.${synth.asset.symbol}`),
+              assetPriceUSD: +matchingSelectableMarket.assetPriceUSD
+            });
+          }
         }
       }
     }

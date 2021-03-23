@@ -149,12 +149,12 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
     const ethClient = this.swapData.user.clients.ethereum;
     const litecoinClient = this.swapData.user.clients.litecoin;
 
-    const targetAddress = (this.swapToSynth) 
+    const targetAddress = (this.swapToSynth)
       ? await this.userService.getTokenAddress(this.swapData.user, 'THOR')
       : await this.userService.getTokenAddress(this.swapData.user, this.swapData.targetAsset.chain);
 
     const floor = this.slipLimitService.getSlipLimitFromAmount(this.swapData.outputValue);
-    
+
     let targetAsset;
     if (this.synthUtilsService.isThorchainSynth(this.swapData.targetAsset)) {
       const underlyingAsset = this.synthUtilsService.parseNativeAsset(this.swapData.targetAsset);
@@ -173,20 +173,13 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
     if (this.swapData.sourceAsset.chain === 'THOR') {
 
       try {
-        let sourceAsset;
-        if (this.synthUtilsService.isThorchainSynth(this.swapData.sourceAsset)) {
-          const underlyingAsset = this.synthUtilsService.parseNativeAsset(this.swapData.sourceAsset);
-          sourceAsset = underlyingAsset;
-        } else {
-          sourceAsset = this.swapData.sourceAsset;
-        }
 
         const hash = await thorClient.deposit({
           amount: assetToBase(assetAmount(amountNumber)),
           asset: {
-            chain: sourceAsset.chain,
-            ticker: String(sourceAsset.ticker).toLowerCase(),
-            symbol: String(sourceAsset.symbol).toLowerCase()
+            chain: this.swapData.sourceAsset,
+            ticker: this.swapData.sourceAsset.ticker,
+            symbol: this.swapData.sourceAsset.symbol
           },
           memo
         });

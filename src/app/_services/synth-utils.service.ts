@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { Chain } from '@xchainjs/xchain-util';
 import { Asset } from '../_classes/asset';
 
 @Injectable({
