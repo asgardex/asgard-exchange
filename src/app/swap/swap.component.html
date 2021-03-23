@@ -42,16 +42,17 @@
         <span *ngIf="basePrice">{{basePrice | number:"1.2-6"}} {{selectedSourceAsset.ticker}} per {{selectedTargetAsset.ticker}}</span>
         <span *ngIf="!basePrice">-</span>
       </div>
-  
+
       <div class="flex justify-between swap-details">
         <span class="tx-detail-label">Slip</span>
         <span *ngIf="slip">{{slip | percent:"0.2-4" }}</span>
         <span *ngIf="!slip">-</span>
       </div>
-  
+
       <div class="flex justify-between swap-details">
         <span class="tx-detail-label"></span>
-        <span>-1 RUNE THORChain Network Fee</span>
+        <span *ngIf="outboundTransactionFee">{{outboundTransactionFee}} RUNE THORChain Network Fee</span>
+        <span *ngIf="!outboundTransactionFee">...</span>
       </div>
     </div>
 

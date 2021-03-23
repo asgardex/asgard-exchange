@@ -7,6 +7,7 @@ import { TransactionDTO } from '../_classes/transaction';
 import { LastBlock } from '../_classes/last-block';
 import { PoolDTO } from '../_classes/pool';
 import { MemberDTO } from '../_classes/member';
+import { shareReplay } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -14,9 +15,11 @@ import { MemberDTO } from '../_classes/member';
 export class MidgardService {
 
   private v2BasePath: string;
+  private _constants$: Observable<MidgardConstants>;
 
   constructor(private http: HttpClient) {
     this.v2BasePath = 'https://testnet.midgard.thorchain.info/v2';
+    this._constants$ = this.http.get<MidgardConstants>(`${this.v2BasePath}/thorchain/constants`).pipe(shareReplay()); // cached since constants are constant
   }
   /**
    * V2 Endpoints
@@ -24,7 +27,7 @@ export class MidgardService {
    */
 
   getConstants(): Observable<MidgardConstants> {
-    return this.http.get<MidgardConstants>(`${this.v2BasePath}/thorchain/constants`);
+    return this._constants$;
   }
 
   getLastBlock(): Observable<LastBlock[]> {

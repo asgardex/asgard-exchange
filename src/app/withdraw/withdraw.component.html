@@ -59,7 +59,8 @@
 
       <div class="flex justify-between pb-2 items-center">
         <span class="tx-detail-label">TX Fees</span>
-        <span>1 RUNE</span>
+        <span *ngIf="outboundTransactionFee">{{outboundTransactionFee}} RUNE</span>
+        <span *ngIf="!outboundTransactionFee">...</span>
       </div>
 
       <div class="flex justify-between pb-2 items-center">

@@ -62,14 +62,9 @@
             <span *ngIf="!ethNetworkFee"> - ETH</span>
           </div>
 
-          <div *ngIf="swapData.sourceAsset.chain === 'THOR'" class="flex justify-between mb-2">
+          <div *ngIf="swapData.outboundTransactionFee" class="flex justify-between mb-2">
             <span class="tx-detail-label">Total Fee</span>
-            <span>1 Rune</span>
-          </div>
-
-          <div *ngIf="swapData.sourceAsset.chain !== 'THOR'" class="flex justify-between mb-2">
-            <span class="tx-detail-label"></span>
-            <span>1 Rune</span>
+            <span>{{swapData.outboundTransactionFee}} Rune</span>
           </div>
 
           <div class="flex justify-between">

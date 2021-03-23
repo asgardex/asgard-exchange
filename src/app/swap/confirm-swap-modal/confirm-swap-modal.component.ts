@@ -22,7 +22,7 @@ import {
 export interface SwapData {
   sourceAsset;
   targetAsset;
-  runeFee: number;
+  outboundTransactionFee: number;
   bnbFee: number;
   basePrice: number;
   inputValue: number;

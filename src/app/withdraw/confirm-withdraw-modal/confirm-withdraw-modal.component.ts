@@ -18,6 +18,7 @@ export interface ConfirmWithdrawData {
   runeBasePrice: number;
   assetBasePrice: number;
   unstakePercent: number;
+  outboundTransactionFee: number;
 }
 
 @Component({
