@@ -115,8 +115,8 @@ export class DepositComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
 
     const params$ = this.route.paramMap;
-    const balances$ = this.userService.userBalances$
-    const user$ = this.userService.user$
+    const balances$ = this.userService.userBalances$;
+    const user$ = this.userService.user$;
 
     const combined = combineLatest([params$, user$, balances$]);
     const sub = combined.subscribe( ([params, user, balances]) => {
