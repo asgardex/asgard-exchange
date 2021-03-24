@@ -6,6 +6,7 @@ import {
   baseAmount,
   assetToBase,
   assetAmount,
+  bn,
 } from '@xchainjs/xchain-util';
 import { Subscription } from 'rxjs';
 import { environment } from 'src/environments/environment';
@@ -56,6 +57,7 @@ export class WithdrawComponent implements OnInit {
   assetBasePrice: number;
 
   insufficientBnb: boolean;
+  outboundTransactionFee: number;
 
   constructor(
     private dialog: MatDialog,
@@ -97,6 +99,8 @@ export class WithdrawComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
+    this.getConstants();
 
     const params$ = this.route.paramMap.subscribe( (params) => {
 
@@ -162,7 +166,8 @@ export class WithdrawComponent implements OnInit {
   getConstants() {
     this.midgardService.getConstants().subscribe(
       (res) => {
-        this.lockBlocks = res.int_64_values.StakeLockUpBlocks;
+        this.lockBlocks = res.int_64_values.LiquidityLockUpBlocks;
+        this.outboundTransactionFee = bn(res.int_64_values.OutboundTransactionFee).div(10 ** 8).toNumber();
         this.checkCooldown();
       },
       (err) => console.error('error fetching constants: ', err)
@@ -213,7 +218,8 @@ export class WithdrawComponent implements OnInit {
           user: this.user,
           unstakePercent: this.withdrawPercent,
           runeBasePrice,
-          assetBasePrice
+          assetBasePrice,
+          outboundTransactionFee: this.outboundTransactionFee
         }
       }
     );

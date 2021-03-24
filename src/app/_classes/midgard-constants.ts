@@ -1,35 +1,45 @@
 export interface MidgardConstants {
   int_64_values: {
+    AsgardSize: number;
     BadValidatorRate: number,
+    BadValidatorRedline: number,
     BlocksPerYear: number,
-    DesireValidatorSet: number,
+    ChurnInterval: number,
+    ChurnRetryInterval: number,
+    CliTxCost: number,
+    DesiredValidatorSet: number,
     DoubleSignMaxAge: number,
     EmissionCurve: number,
     FailKeySignSlashPoints: number,
     FailKeygenSlashPoints: number,
+    FullImpLossProtectionBlocks: number,
     FundMigrationInterval: number,
+    IncentiveCurve: number,
     JailTimeKeygen: number,
     JailTimeKeysign: number,
     LackOfObservationPenalty: number,
+    LiquidityLockUpBlocks: number,
+    MaxAvailablePools: number,
+    MaxSwapsPerBlock: number,
+    MinRunePoolDepth: number,
+    MinSlashPointsForBadValidator: number,
+    MinSwapsPerBlock: number,
     MinimumBondInRune: number,
     MinimumNodesForBFT: number,
     MinimumNodesForYggdrasil: number,
-    NewPoolCycle: number,
+    NativeTransactionFee: number,
+    ObservationDelayFlexibility: number,
     ObserveSlashPoints: number,
     OldValidatorRate: number,
-    RotatePerBlockHeight: number,
-    RotateRetryBlocks: number,
+    OutboundTransactionFee: number,
+    PoolCycle: number,
     SigningTransactionPeriod: number,
-    StakeLockUpBlocks: number,
-    TransactionFee: number,
-    ValidatorRotateInNumBeforeFull: number,
-    ValidatorRotateNumAfterFull: number,
-    ValidatorRotateOutNumBeforeFull: number,
-    WhiteListGasAsset: number,
+    StagedPoolCost: number,
+    VirtualMultSynths: number,
     YggFundLimit: number
   };
   bool_values: {
-    StrictBondStakeRatio: boolean;
+    StrictBondLiquidityRatio: boolean,
   };
   string_values: {
     DefaultPoolStatus: string;

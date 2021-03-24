@@ -148,7 +148,7 @@ export class SwapComponent implements OnInit, OnDestroy {
 
   slip: number;
   slippageTolerance: number;
-  runeTransactionFee: number;
+  outboundTransactionFee: number;
   user: User;
   basePrice: number;
 
@@ -332,7 +332,7 @@ export class SwapComponent implements OnInit, OnDestroy {
         data: {
           sourceAsset: this.selectedSourceAsset,
           targetAsset: this.selectedTargetAsset,
-          runeFee: this.runeTransactionFee,
+          outboundTransactionFee: this.outboundTransactionFee,
           bnbFee: this.binanceTransferFeeDisplay,
           basePrice: this.basePrice,
           inputValue: this.sourceAssetUnit,
@@ -377,7 +377,7 @@ export class SwapComponent implements OnInit, OnDestroy {
   getConstants() {
     this.midgardService.getConstants().subscribe(
       (res) => {
-        this.runeTransactionFee = bn(res.int_64_values.TransactionFee).div(10 ** 8).toNumber();
+        this.outboundTransactionFee = bn(res.int_64_values.OutboundTransactionFee).div(10 ** 8).toNumber();
       },
       (err) => console.error('error fetching constants: ', err)
     );
