@@ -6,7 +6,7 @@ import {
   assetToBase,
   assetAmount,
 } from '@xchainjs/xchain-util';
-import { Subscription } from 'rxjs';
+import { combineLatest, Subscription } from 'rxjs';
 import { Asset } from '../_classes/asset';
 import { MidgardService } from '../_services/midgard.service';
 import { UserService } from '../_services/user.service';
@@ -15,6 +15,7 @@ import { ConfirmDepositModalComponent } from './confirm-deposit-modal/confirm-de
 import { User } from '../_classes/user';
 import { Balances } from '@xchainjs/xchain-client';
 import { AssetAndBalance } from '../_classes/asset-and-balance';
+import { EthUtilsService } from '../_services/eth-utils.service';
 
 @Component({
   selector: 'app-deposit',
@@ -95,45 +96,49 @@ export class DepositComponent implements OnInit, OnDestroy {
   ethRouter: string;
   ethContractApprovalRequired: boolean;
 
+  maximumSpendableEth: number;
+
   constructor(
     private dialog: MatDialog,
     private userService: UserService,
     private router: Router,
     private route: ActivatedRoute,
     private midgardService: MidgardService,
+    private ethUtilsService: EthUtilsService
   ) {
     this.rune = new Asset('THOR.RUNE');
 
-    const balances$ = this.userService.userBalances$.subscribe(
-      (balances) => {
-        this.balances = balances;
-        this.runeBalance = this.userService.findBalance(this.balances, this.rune);
-        this.assetBalance = this.userService.findBalance(this.balances, this.asset);
-
-        // allows us to ensure enough bnb balance
-        const bnbBalance = this.userService.findBalance(this.balances, new Asset('BNB.BNB'));
-        this.insufficientBnb = bnbBalance < 0.000375;
-      }
-    );
-
-    const user$ = this.userService.user$.subscribe(
-      (user) => {
-        this.user = user;
-
-        if (this.asset && this.asset.chain === 'ETH' && this.asset.ticker !== 'ETH') {
-          this.checkContractApproved(this.asset);
-        }
-      }
-    );
-
-    this.subs = [balances$, user$];
+    this.subs = [];
 
   }
 
   ngOnInit(): void {
 
-    const params$ = this.route.paramMap.subscribe( (params) => {
+    const params$ = this.route.paramMap;
+    const balances$ = this.userService.userBalances$
+    const user$ = this.userService.user$
 
+    const combined = combineLatest([params$, user$, balances$]);
+    const sub = combined.subscribe( ([params, user, balances]) => {
+
+      // User
+      this.user = user;
+      if (this.asset && this.asset.chain === 'ETH' && this.asset.ticker !== 'ETH') {
+        this.checkContractApproved(this.asset);
+      }
+
+      // Balance
+      this.balances = balances;
+      this.runeBalance = this.userService.findBalance(this.balances, this.rune);
+      this.assetBalance = this.userService.findBalance(this.balances, this.asset);
+
+      // allows us to ensure enough bnb balance
+      const bnbBalance = this.userService.findBalance(this.balances, new Asset('BNB.BNB'));
+      this.insufficientBnb = bnbBalance < 0.000375;
+
+      this.getMaximumSpendableEth();
+
+      // Asset
       const asset = params.get('asset');
 
       if (asset) {
@@ -144,17 +149,16 @@ export class DepositComponent implements OnInit, OnDestroy {
         if (this.asset.chain === 'ETH' && this.asset.ticker !== 'ETH') {
           this.checkContractApproved(this.asset);
         }
-
       }
 
     });
 
     this.getPools();
     this.getEthRouter();
-
-    this.subs.push(params$);
-
+    this.subs.push(sub);
   }
+
+
 
   getEthRouter() {
     this.midgardService.getInboundAddresses().subscribe(
@@ -232,18 +236,31 @@ export class DepositComponent implements OnInit, OnDestroy {
     );
   }
 
+  async getMaximumSpendableEth() {
+    if (this.asset && this.user && this.assetBalance) {
+      this.maximumSpendableEth = await this.ethUtilsService.maximumSpendableBalance({
+        asset: this.asset,
+        client: this.user.clients.ethereum,
+        balance: this.assetBalance
+      });
+    }
+  }
+
   mainButtonText(): string {
 
     if (!this.balances) {
       return 'Please connect wallet';
     } else if (this.balances && (!this.runeAmount || !this.assetAmount)) {
       return 'Enter an amount';
-    } else if (this.balances && (this.runeAmount > this.runeBalance
-      || this.assetAmount > this.userService.maximumSpendableBalance(this.asset, this.assetBalance))) {
+    } else if (this.runeAmount > this.runeBalance) {
+      return 'Insufficient balance';
+    } else if (this.asset.chain === 'ETH' && this.assetAmount > this.maximumSpendableEth) {
+      return 'Insufficient balance';
+    } else if (this.assetAmount > this.userService.maximumSpendableBalance(this.asset, this.assetBalance)) {
       return 'Insufficient balance';
     } else if (this.insufficientBnb) {
       return 'Insufficient BNB for Fee';
-    } else if (this.balances && this.runeAmount && this.assetAmount
+    } else if (this.runeAmount && this.assetAmount
       && (this.runeAmount <= this.runeBalance) && (this.assetAmount <= this.assetBalance)) {
       return 'Deposit';
     } else {
