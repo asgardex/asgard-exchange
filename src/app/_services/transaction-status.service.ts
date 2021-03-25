@@ -45,8 +45,6 @@ export class TransactionStatusService {
   private transactionSource = new BehaviorSubject<Tx[]>([]);
   txs$ = this.transactionSource.asObservable();
 
-  killOutputsPolling: {[key: string]: Subject<void>} = {};
-
   killTxPolling: {[key: string]: Subject<void>} = {};
   user: User;
 
@@ -103,6 +101,17 @@ export class TransactionStatusService {
     }
 
     this.transactionSource.next(this._txs);
+  }
+
+  clearPendingTransactions() {
+    this.transactionSource.next([]);
+    this._txs = [];
+
+    for (const hash in this.killTxPolling) {
+      if (this.killTxPolling[hash]) {
+        this.killTxPolling[hash].next();
+      }
+    }
   }
 
   updateTxStatus(hash: string, status: TxStatus) {
@@ -290,6 +299,7 @@ export class TransactionStatusService {
   }
 
   getPendingTxCount() {
+
     return this._txs.reduce( (count, tx) => {
 
       if (tx.status === TxStatus.PENDING) {

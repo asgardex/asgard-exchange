@@ -62,6 +62,8 @@ export class UserService {
     this.userSource.next(user);
     if (user) {
       this.fetchBalances();
+    } else {
+      this.userBalancesSource.next(null);
     }
   }
 
