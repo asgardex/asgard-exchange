@@ -108,7 +108,9 @@ export class TransactionStatusService {
     this._txs = [];
 
     for (const hash in this.killTxPolling) {
-      this.killTxPolling[hash].next()
+      if (this.killTxPolling[hash]) {
+        this.killTxPolling[hash].next();
+      }
     }
   }
 
