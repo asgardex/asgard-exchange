@@ -41,6 +41,7 @@ export class UserSettingsDialogComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private txStatusService: TransactionStatusService,
     private midgardService: MidgardService,
+    private transactionStatusService: TransactionStatusService,
     public dialogRef: MatDialogRef<UserSettingsDialogComponent>
   ) {
     this.pools = [];
@@ -67,6 +68,8 @@ export class UserSettingsDialogComponent implements OnInit, OnDestroy {
 
           this.loading = false;
 
+        } else {
+          this.pendingTxCount = 0;
         }
 
       }
@@ -130,7 +133,9 @@ export class UserSettingsDialogComponent implements OnInit, OnDestroy {
   }
 
   disconnect() {
+    localStorage.clear();
     this.userService.setUser(null);
+    this.transactionStatusService.clearPendingTransactions();
     this.dialogRef.close();
   }
 
