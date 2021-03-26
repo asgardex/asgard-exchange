@@ -257,7 +257,8 @@ export class DepositComponent implements OnInit, OnDestroy {
       return 'Insufficient balance';
     } else if ( (this.asset.chain === 'ETH') && this.assetAmount > this.maximumSpendable) {
       return 'Insufficient balance';
-    } else if ( (this.asset.chain !== 'ETH') && ( this.assetAmount > this.userService.maximumSpendableBalance(this.asset, this.assetBalance))) {
+    } else if ((this.asset.chain !== 'ETH')
+      && ( this.assetAmount > this.userService.maximumSpendableBalance(this.asset, this.assetBalance))) {
       return 'Insufficient balance';
     } else if (this.asset.chain === 'BNB' && this.insufficientBnb) {
       return 'Insufficient BNB for Fee';
