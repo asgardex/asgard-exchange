@@ -5,7 +5,6 @@ import {
   baseAmount,
   assetToBase,
   assetAmount,
-  bn,
 } from '@xchainjs/xchain-util';
 import { combineLatest, Subscription } from 'rxjs';
 import { Asset } from '../_classes/asset';
