@@ -76,7 +76,7 @@ export class EthUtilsService {
 
     const estimateGas = await contract.estimateGas.deposit(...params);
     const prices = await ethClient.estimateGasPrices();
-    const minimumWeiCost = prices.average.amount().multipliedBy(estimateGas.toNumber());
+    const minimumWeiCost = prices.fast.amount().multipliedBy(estimateGas.toNumber());
 
     return minimumWeiCost;
   }

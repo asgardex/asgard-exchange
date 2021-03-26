@@ -73,7 +73,10 @@
           <mat-progress-spinner mode="indeterminate" diameter="30"></mat-progress-spinner>
         </div>
 
-        <button *ngIf="!loading" (click)="submitTransaction()" mat-flat-button color="primary" class="main-action-btn w-full">Confirm Deposit</button>
+        <button *ngIf="!loading" (click)="submitTransaction()" mat-flat-button color="primary" class="main-action-btn w-full" [disabled]="insufficientChainBalance">
+          <span *ngIf="!insufficientChainBalance">Confirm Deposit</span>
+          <span *ngIf="insufficientChainBalance">Insufficient {{data.asset.chain}}</span>
+        </button>
 
       </div>
 
