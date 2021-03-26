@@ -96,7 +96,7 @@ export class DepositComponent implements OnInit, OnDestroy {
   ethRouter: string;
   ethContractApprovalRequired: boolean;
 
-  maximumSpendableEth: number;
+  maximumSpendable: number;
 
   constructor(
     private dialog: MatDialog,
@@ -104,7 +104,7 @@ export class DepositComponent implements OnInit, OnDestroy {
     private router: Router,
     private route: ActivatedRoute,
     private midgardService: MidgardService,
-    private ethUtilsService: EthUtilsService
+    private ethUtilsService: EthUtilsService,
   ) {
     this.rune = new Asset('THOR.RUNE');
 
@@ -136,14 +136,17 @@ export class DepositComponent implements OnInit, OnDestroy {
       const bnbBalance = this.userService.findBalance(this.balances, new Asset('BNB.BNB'));
       this.insufficientBnb = bnbBalance < 0.000375;
 
-      this.getMaximumSpendableEth();
-
       // Asset
       const asset = params.get('asset');
 
       if (asset) {
         this.asset = new Asset(asset);
         this.getPoolDetail(asset);
+
+        if (this.asset.chain === 'ETH') {
+          this.getMaximumSpendableEth();
+        }
+
         this.assetBalance = this.userService.findBalance(this.balances, this.asset);
 
         if (this.asset.chain === 'ETH' && this.asset.ticker !== 'ETH') {
@@ -236,7 +239,7 @@ export class DepositComponent implements OnInit, OnDestroy {
 
   async getMaximumSpendableEth() {
     if (this.asset && this.user && this.assetBalance) {
-      this.maximumSpendableEth = await this.ethUtilsService.maximumSpendableBalance({
+      this.maximumSpendable = await this.ethUtilsService.maximumSpendableBalance({
         asset: this.asset,
         client: this.user.clients.ethereum,
         balance: this.assetBalance
@@ -252,9 +255,10 @@ export class DepositComponent implements OnInit, OnDestroy {
       return 'Enter an amount';
     } else if (this.runeAmount > this.runeBalance) {
       return 'Insufficient balance';
-    } else if (this.asset.chain === 'ETH' && this.assetAmount > this.maximumSpendableEth) {
+    } else if ( (this.asset.chain === 'ETH') && this.assetAmount > this.maximumSpendable) {
       return 'Insufficient balance';
-    } else if (this.assetAmount > this.userService.maximumSpendableBalance(this.asset, this.assetBalance)) {
+    } else if ((this.asset.chain !== 'ETH')
+      && ( this.assetAmount > this.userService.maximumSpendableBalance(this.asset, this.assetBalance))) {
       return 'Insufficient balance';
     } else if (this.asset.chain === 'BNB' && this.insufficientBnb) {
       return 'Insufficient BNB for Fee';

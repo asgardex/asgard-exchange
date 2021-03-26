@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { assetAmount, assetToBase } from '@xchainjs/xchain-util';
+import { assetAmount, assetToBase, baseAmount } from '@xchainjs/xchain-util';
 import { Subscription } from 'rxjs';
 import { PoolAddressDTO } from 'src/app/_classes/pool-address';
 import { User } from 'src/app/_classes/user';
@@ -231,19 +231,20 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
     try {
       const asset = this.data.asset;
       const targetTokenMemo = `+:${asset.chain}.${asset.symbol}:${thorchainAddress}`;
+      const fee = await client.getFeesWithMemo(targetTokenMemo);
       const feeRates = await client.getFeeRates();
-      const feeRate = feeRates.average;
-
+      const toBase = assetToBase(assetAmount(this.data.assetAmount));
+      const amount = toBase.amount().minus(fee.fast.amount());
       const hash = await client.transfer({
         asset: {
           chain: this.data.asset.chain,
           symbol: this.data.asset.symbol,
           ticker: this.data.asset.ticker
         },
-        amount: assetToBase(assetAmount(this.data.assetAmount)),
+        amount: baseAmount(amount),
         recipient: recipientPool.address,
         memo: targetTokenMemo,
-        feeRate
+        feeRate: feeRates.average
       });
 
       return hash;
@@ -257,7 +258,10 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
     try {
       const asset = this.data.asset;
       const targetTokenMemo = `+:${asset.chain}.${asset.symbol}:${thorchainAddress}`;
+      const fee = await client.getFeesWithMemo(targetTokenMemo);
       const feeRates = await client.getFeeRates();
+      const toBase = assetToBase(assetAmount(this.data.assetAmount));
+      const amount = toBase.amount().minus(fee.fastest.amount());
       const feeRate = feeRates.average;
 
       const hash = await client.transfer({
@@ -266,7 +270,7 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
           symbol: this.data.asset.symbol,
           ticker: this.data.asset.ticker
         },
-        amount: assetToBase(assetAmount(this.data.assetAmount)),
+        amount: baseAmount(amount),
         recipient: recipientPool.address,
         memo: targetTokenMemo,
         feeRate
@@ -283,7 +287,10 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
     try {
       const asset = this.data.asset;
       const targetTokenMemo = `+:${asset.chain}.${asset.symbol}:${thorchainAddress}`;
+      const fee = await client.getFeesWithMemo(targetTokenMemo);
       const feeRates = await client.getFeeRates();
+      const toBase = assetToBase(assetAmount(this.data.assetAmount));
+      const amount = toBase.amount().minus(fee.fast.amount());
       const feeRate = feeRates.average;
 
       const hash = await client.transfer({
@@ -292,7 +299,7 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
           symbol: this.data.asset.symbol,
           ticker: this.data.asset.ticker
         },
-        amount: assetToBase(assetAmount(this.data.assetAmount)),
+        amount: baseAmount(amount),
         recipient: recipientPool.address,
         memo: targetTokenMemo,
         feeRate
