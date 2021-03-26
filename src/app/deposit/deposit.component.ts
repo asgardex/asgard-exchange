@@ -227,7 +227,8 @@ export class DepositComponent implements OnInit, OnDestroy {
 
   formDisabled(): boolean {
 
-    return !this.balances || !this.runeAmount || !this.assetAmount || (this.asset.chain === 'BNB' && this.insufficientBnb) || this.ethContractApprovalRequired
+    return !this.balances || !this.runeAmount || !this.assetAmount || (this.asset.chain === 'BNB' && this.insufficientBnb)
+    || this.ethContractApprovalRequired
     || (this.balances
       && (this.runeAmount > this.runeBalance || this.assetAmount > this.userService.maximumSpendableBalance(this.asset, this.assetBalance))
     );
