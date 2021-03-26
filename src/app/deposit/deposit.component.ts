@@ -5,6 +5,7 @@ import {
   baseAmount,
   assetToBase,
   assetAmount,
+  bn,
 } from '@xchainjs/xchain-util';
 import { combineLatest, Subscription } from 'rxjs';
 import { Asset } from '../_classes/asset';
@@ -187,11 +188,8 @@ export class DepositComponent implements OnInit, OnDestroy {
   }
 
   updateRuneAmount() {
-
     const runeAmount = getValueOfAssetInRune(assetToBase(assetAmount(this.assetAmount)), this.assetPoolData);
-
-    this.runeAmount = runeAmount.amount().div(10 ** 8 ).toNumber();
-
+    this.runeAmount = runeAmount.amount().isLessThan(0) ? 0 : runeAmount.amount().div(10 ** 8 ).toNumber();
   }
 
   getPoolDetail(asset: string) {
