@@ -227,7 +227,8 @@ export class DepositComponent implements OnInit, OnDestroy {
 
   formDisabled(): boolean {
 
-    return !this.balances || !this.runeAmount || !this.assetAmount || this.insufficientBnb || this.ethContractApprovalRequired
+    return !this.balances || !this.runeAmount || !this.assetAmount || (this.asset.chain === 'BNB' && this.insufficientBnb)
+    || this.ethContractApprovalRequired
     || (this.balances
       && (this.runeAmount > this.runeBalance || this.assetAmount > this.userService.maximumSpendableBalance(this.asset, this.assetBalance))
     );
@@ -255,7 +256,7 @@ export class DepositComponent implements OnInit, OnDestroy {
       return 'Insufficient balance';
     } else if (this.assetAmount > this.userService.maximumSpendableBalance(this.asset, this.assetBalance)) {
       return 'Insufficient balance';
-    } else if (this.insufficientBnb) {
+    } else if (this.asset.chain === 'BNB' && this.insufficientBnb) {
       return 'Insufficient BNB for Fee';
     } else if (this.runeAmount && this.assetAmount
       && (this.runeAmount <= this.runeBalance) && (this.assetAmount <= this.assetBalance)) {
