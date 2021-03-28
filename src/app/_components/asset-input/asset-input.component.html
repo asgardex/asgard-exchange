@@ -5,14 +5,14 @@
 
       <div class="text-gray-300">
         <label for="{{label}}Input">{{label}}</label>
-        <div style="height: 13px;">
+        <div style="height: 16px;">
           <span class="float-left text-xs h-4" *ngIf="inputUsdValue">(<i>approx ${{inputUsdValue | number:"1.0-0"}}</i>)</span>
         </div>
       </div>
 
       <label class="text-gray-300" *ngIf="selectedAsset && balance">
         Balance: {{balance | number:"1.0-8"}} <br />
-        <div style="height: 13px;">
+        <div style="height: 16px;">
           <span class="float-right text-xs h-4" *ngIf="usdValue">(<i>approx ${{usdValue | number:"1.0-0"}}</i>)</span>
         </div>
       </label>

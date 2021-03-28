@@ -501,7 +501,7 @@ export class SwapComponent implements OnInit, OnDestroy {
         .minus( // subtract network fee
           toRune
             ? valueOfRuneInAsset.amount()
-            : assetToBase(assetAmount(1)).amount()
+            : assetToBase(assetAmount(this.outboundTransactionFee ?? 0.2)).amount()
           )
         ), pool, toRune);
 
@@ -543,7 +543,7 @@ export class SwapComponent implements OnInit, OnDestroy {
       const slip = getDoubleSwapSlip(this._sourceAssetTokenValue, pool1, pool2);
       this.slip = slip.toNumber();
 
-      const valueOfRuneInAsset = getValueOfRuneInAsset(assetToBase(assetAmount(1)), pool1);
+      const valueOfRuneInAsset = getValueOfRuneInAsset(assetToBase(assetAmount(this.outboundTransactionFee ?? 0.2)), pool1);
 
       const total = getDoubleSwapOutput(baseAmount(this._sourceAssetTokenValue.amount()
       .minus( // subtract network fee
