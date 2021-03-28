@@ -14,6 +14,9 @@ import { TransactionConfirmationState } from 'src/app/_const/transaction-confirm
 import { TransactionStatusService, TxActions, TxStatus } from 'src/app/_services/transaction-status.service';
 import { UserService } from 'src/app/_services/user.service';
 import { ethers } from 'ethers';
+import { Asset as asgrsxAsset } from 'src/app/_classes/asset';
+import { Balances } from '@xchainjs/xchain-client';
+import { EthUtilsService } from 'src/app/_services/eth-utils.service';
 
 @Component({
   selector: 'app-confim-send',
@@ -22,7 +25,13 @@ import { ethers } from 'ethers';
 })
 export class ConfimSendComponent implements OnInit, OnDestroy {
 
-  @Input() asset: AssetAndBalance;
+  @Input() set asset(asset: AssetAndBalance) {
+    this._asset = asset;
+  }
+  get asset() {
+    return this._asset;
+  }
+  _asset: AssetAndBalance;
   @Input() amount: number;
   @Input() recipientAddress: string;
   @Output() back: EventEmitter<null>;
@@ -32,12 +41,21 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
   subs: Subscription[];
   txState: TransactionConfirmationState;
   error: string;
+  insufficientChainBalance: boolean;
+  balances: Balances;
+  loading: boolean;
 
-  constructor(private userService: UserService, private txStatusService: TransactionStatusService) {
+  constructor(
+    private userService: UserService,
+    private txStatusService: TransactionStatusService,
+    private ethUtilsService: EthUtilsService
+  ) {
     this.back = new EventEmitter<null>();
     this.error = '';
     this.transactionSuccessful = new EventEmitter<null>();
     this.txState = TransactionConfirmationState.PENDING_CONFIRMATION;
+    this.insufficientChainBalance = false;
+    this.loading = true;
 
     const user$ = this.userService.user$.subscribe(
       (user) => this.user = user
@@ -48,6 +66,39 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    const balances$ = this.userService.userBalances$.subscribe(
+      (balances) => {
+        this.balances = balances;
+        this.checkSufficientChainBalance();
+      }
+    );
+    this.subs.push(balances$);
+  }
+
+  async checkSufficientChainBalance() {
+    this.loading = true;
+    if (this.balances && this.asset && this.asset.asset.chain === 'BNB') {
+      const bnbBalance = this.userService.findBalance(this.balances, new asgrsxAsset('BNB.BNB'));
+      this.insufficientChainBalance = bnbBalance < 0.000375;
+    } else if (this.balances && this.asset && this.asset.asset.chain === 'ETH'
+      && this.user && this.user.clients && this.user.clients.ethereum) {
+
+      const ethClient = this.user.clients.ethereum;
+      const decimal = await this.ethUtilsService.getAssetDecimal(this.asset.asset, ethClient);
+      const amount = assetToBase(assetAmount(this.amount, decimal));
+      const estimateFees = await ethClient.estimateFeesWithGasPricesAndLimits({
+        amount,
+        recipient: this.recipientAddress,
+        asset: this.asset.asset
+      });
+      const fastest = estimateFees.fees.fastest.amount();
+      const ethBalance = this.userService.findBalance(this.balances, new asgrsxAsset('ETH.ETH'));
+      this.insufficientChainBalance = ethBalance < fastest.dividedBy(10 ** ETH_DECIMAL).toNumber();
+
+    } else {
+      console.log('no asset', this.asset);
+    }
+    this.loading = false;
   }
 
   submitTransaction() {
@@ -110,11 +161,10 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
         const bitcoinClient = this.user.clients.bitcoin;
 
         try {
-
           const feeRates = await bitcoinClient.getFeeRates();
           const fees = await bitcoinClient.getFees();
           const toBase = assetToBase(assetAmount(this.amount));
-          const amount = toBase.amount().minus(fees.fast.amount());
+          const amount = toBase.amount().minus(fees.fastest.amount());
 
           const hash = await bitcoinClient.transfer({
             amount: baseAmount(amount),
@@ -195,7 +245,7 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
           const feeRates = await litecoinClient.getFeeRates();
           const fees = await litecoinClient.getFees();
           const toBase = assetToBase(assetAmount(this.amount));
-          const amount = toBase.amount().minus(fees.fast.amount());
+          const amount = toBase.amount().minus(fees.fastest.amount());
 
           const hash = await litecoinClient.transfer({
             amount: baseAmount(amount),

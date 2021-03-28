@@ -27,7 +27,14 @@
       <textarea [(ngModel)]="recipientAddress" name="recipient-address" [disabled]="true"></textarea>
     </div>
 
-    <button (click)="submitTransaction()" mat-flat-button color="primary" class="main-action-btn w-full">Send {{asset.asset.ticker}}</button>
+    <div *ngIf="loading" style="height: 56px;" class="flex justify-center items-center w-full mt-4">
+      <mat-progress-spinner mode="indeterminate" diameter="30"></mat-progress-spinner>
+    </div>
+
+    <button *ngIf="!loading" (click)="submitTransaction()" mat-flat-button color="primary" class="main-action-btn w-full" [disabled]="insufficientChainBalance">
+      <span *ngIf="insufficientChainBalance">Insufficient {{asset.asset.chain}}</span>
+      <span *ngIf="!insufficientChainBalance">Send {{asset.asset.ticker}}</span>
+    </button>
 
   </div>
 
@@ -40,7 +47,7 @@
 
 <div *ngIf="txState === 'ERROR'" class="flex flex-col items-center py-8 text-sm">
   <mat-icon>warning</mat-icon>
-  There was an error processing the RUNE upgrade.<br />
+  There was an error sending.<br />
   {{error}}
 </div>
 

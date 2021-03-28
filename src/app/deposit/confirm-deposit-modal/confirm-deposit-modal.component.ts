@@ -337,7 +337,6 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
             memo: `+:${sourceAsset.chain}.${sourceAsset.symbol}:${thorchainAddress}`
           });
 
-          // this.ethNetworkFeeWei = estimatedFeeWei.toNumber();
           this.ethNetworkFee = estimatedFeeWei.dividedBy(10 ** ETH_DECIMAL).toNumber();
 
           this.insufficientChainBalance = estimatedFeeWei.isGreaterThan(ethBalance.amount.amount());
