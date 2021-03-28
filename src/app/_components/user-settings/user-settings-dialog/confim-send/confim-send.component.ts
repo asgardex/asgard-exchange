@@ -26,12 +26,12 @@ import { EthUtilsService } from 'src/app/_services/eth-utils.service';
 export class ConfimSendComponent implements OnInit, OnDestroy {
 
   @Input() set asset(asset: AssetAndBalance) {
-    this._asset = asset
+    this._asset = asset;
   }
   get asset() {
     return this._asset;
   }
-  _asset: AssetAndBalance
+  _asset: AssetAndBalance;
   @Input() amount: number;
   @Input() recipientAddress: string;
   @Output() back: EventEmitter<null>;
@@ -45,7 +45,11 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
   balances: Balances;
   loading: boolean;
 
-  constructor(private userService: UserService, private txStatusService: TransactionStatusService, private ethUtilsService: EthUtilsService) {
+  constructor(
+    private userService: UserService,
+    private txStatusService: TransactionStatusService,
+    private ethUtilsService: EthUtilsService
+  ) {
     this.back = new EventEmitter<null>();
     this.error = '';
     this.transactionSuccessful = new EventEmitter<null>();
@@ -67,7 +71,7 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
         this.balances = balances;
         this.checkSufficientChainBalance();
       }
-    )
+    );
     this.subs.push(balances$);
   }
 
@@ -76,12 +80,17 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
     if (this.balances && this.asset && this.asset.asset.chain === 'BNB') {
       const bnbBalance = this.userService.findBalance(this.balances, new asgrsxAsset('BNB.BNB'));
       this.insufficientChainBalance = bnbBalance < 0.000375;
-    } if (this.balances && this.asset && this.asset.asset.chain === 'ETH' && this.user && this.user.clients && this.user.clients.ethereum) {
+    } else if (this.balances && this.asset && this.asset.asset.chain === 'ETH'
+      && this.user && this.user.clients && this.user.clients.ethereum) {
 
       const ethClient = this.user.clients.ethereum;
       const decimal = await this.ethUtilsService.getAssetDecimal(this.asset.asset, ethClient);
       const amount = assetToBase(assetAmount(this.amount, decimal));
-      const estimateFees = await ethClient.estimateFeesWithGasPricesAndLimits({amount: amount, recipient: this.recipientAddress, asset: this.asset.asset});
+      const estimateFees = await ethClient.estimateFeesWithGasPricesAndLimits({
+        amount,
+        recipient: this.recipientAddress,
+        asset: this.asset.asset
+      });
       const fastest = estimateFees.fees.fastest.amount();
       const ethBalance = this.userService.findBalance(this.balances, new asgrsxAsset('ETH.ETH'));
       this.insufficientChainBalance = ethBalance < fastest.dividedBy(10 ** ETH_DECIMAL).toNumber();
