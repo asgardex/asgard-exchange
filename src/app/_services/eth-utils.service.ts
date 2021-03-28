@@ -43,21 +43,17 @@ export class EthUtilsService {
   async estimateFee({sourceAsset, ethClient, ethInbound, inputAmount, memo}: EstimateFeeParams): Promise<BigNumber> {
 
     let checkSummedAddress;
-    let decimal;
     const wallet = ethClient.getWallet();
+    const decimal = await this.getAssetDecimal(sourceAsset, ethClient);
 
     if (sourceAsset.symbol === 'ETH') {
       checkSummedAddress = '0x0000000000000000000000000000000000000000';
-      decimal = ETH_DECIMAL;
     } else {
       const assetAddress = sourceAsset.symbol.slice(sourceAsset.ticker.length + 1);
       const strip0x = assetAddress.substr(2);
       checkSummedAddress = ethers.utils.getAddress(strip0x);
-
-      const tokenContract = new ethers.Contract(checkSummedAddress, erc20ABI, wallet);
-      const tokenDecimals = await tokenContract.decimals();
-      decimal = tokenDecimals.toNumber();
     }
+
     const contract = new ethers.Contract(ethInbound.router, TCRopstenAbi, wallet);
 
     const params = [
@@ -79,6 +75,26 @@ export class EthUtilsService {
     const minimumWeiCost = prices.fast.amount().multipliedBy(estimateGas.toNumber());
 
     return minimumWeiCost;
+  }
+
+  async getAssetDecimal(asset: Asset, client: Client): Promise<number> {
+
+    if (asset.chain === 'ETH') {
+      if (asset.symbol === 'ETH') {
+        return ETH_DECIMAL;
+      } else {
+        const wallet = client.getWallet();
+        const assetAddress = asset.symbol.slice(asset.ticker.length + 1);
+        const strip0x = assetAddress.substr(2);
+        const checkSummedAddress = ethers.utils.getAddress(strip0x);
+        const tokenContract = new ethers.Contract(checkSummedAddress, erc20ABI, wallet);
+        const tokenDecimals = await tokenContract.decimals();
+        return tokenDecimals.toNumber();
+      }
+    } else {
+      throw new Error('asset chain not ETH');
+    }
+
   }
 
   async estimateApproveFee({ethClient, contractAddress, asset}: EstimateApprovalFee) {
