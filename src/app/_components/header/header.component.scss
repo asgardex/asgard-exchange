@@ -3,7 +3,6 @@ header {
   display: flex;
   width: 100%;
   justify-content: space-between;
-  padding: 1rem 1rem 0px;
   z-index: 1;
 
   h1 {
@@ -15,22 +14,18 @@ header {
 
     a {
       color: white;
-      text-decoration: none;;
+      text-decoration: none;
     }
   }
 
   #testnet-indicator {
     box-sizing: border-box;
-    margin: 0px;
     min-width: 0px;
     width: 100%;
-    background-color: rgba(243, 132, 30, 0.3);
-    border: 1px solid rgba(243, 132, 30, 0.3);
-    color: #f3841e;
+    height: 40px;
     font-weight: 500;
     border-radius: 8px;
     padding: 8px 12px;
-    margin-right: 8px;
     font-size: 0.8rem;
   }
 }

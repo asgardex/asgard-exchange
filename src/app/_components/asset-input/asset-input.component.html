@@ -1,7 +1,7 @@
 <div class="swap-input uni-input">
 
   <div class="w-full">
-    <div class="flex justify-between">
+    <div style="height: 40px;" class="flex justify-between">
 
       <div class="text-gray-300">
         <label for="{{label}}Input">{{label}}</label>
@@ -42,7 +42,7 @@
 
       <div class="flex items-center">
 
-        <button class="focus:outline-none" *ngIf="!selectedAsset" color="primary" style="min-width: 160px;" mat-flat-button (click)="launchMarketsModal()">
+        <button class="focus:outline-none" *ngIf="!selectedAsset" style="min-width: 160px;" mat-flat-button (click)="launchMarketsModal()">
           Select a token
           <mat-icon>expand_more</mat-icon>
         </button>

@@ -290,6 +290,15 @@ export class SwapComponent implements OnInit, OnDestroy {
           asset: new Asset('THOR.RUNE'),
           assetPriceUSD: this.thorchainPricesService.estimateRunePrice(availablePools)
         });
+
+        if (!this.selectedTargetAsset) {
+          const btcMarket = this.selectableMarkets.find( (market) => market.asset.chain === 'BTC' && market.asset.symbol === 'BTC' );
+          if (btcMarket) {
+            this.selectedTargetAsset = btcMarket.asset;
+          }
+          console.log('no target asset');
+        }
+
       },
       (err) => console.error('error fetching pools:', err)
     );
