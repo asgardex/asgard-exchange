@@ -36,10 +36,10 @@
       [selectableMarkets]="selectableMarkets">
     </app-asset-input>
 
-    <div *ngIf="selectedTargetAsset && selectedSourceAsset">
+    <div>
       <div class="flex justify-between swap-details">
         <span>Price:</span>
-        <span *ngIf="basePrice">{{basePrice | number:"1.2-6"}} {{selectedSourceAsset.ticker}} per {{selectedTargetAsset.ticker}}</span>
+        <span *ngIf="basePrice && selectedSourceAsset && selectedTargetAsset">{{basePrice | number:"1.2-6"}} {{selectedSourceAsset.ticker}} per {{selectedTargetAsset.ticker}}</span>
         <span *ngIf="!basePrice">-</span>
       </div>
 

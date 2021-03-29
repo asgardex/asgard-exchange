@@ -15,14 +15,14 @@
 // $asgard-exchange-accent: mat-palette($mat-pink, A200, A100, A400);
 
 $uniswap-primary: (
-  50: rgba(21, 163, 111, 0.44),
+  50: #309476,
   contrast: (
     50: white,
   )
 );
 
 $uniswap-secondary: (
-  50: rgba(21, 163, 111, 0.44),
+  50: #309476,
   contrast: (
     50:white
   )
@@ -63,13 +63,9 @@ html {
   font-size: 16px;
     -webkit-font-smoothing: antialiased;
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-  background-color: #2c2f36;
 }
 
 html, input, textarea, button {
-  // font-family: "Inter var", sans-serif;
-  // font-family: 'VT323', monospace;
-  // font-family: 'Source Code Pro', monospace;
   font-family: 'DM Mono', monospace;
 }
 
@@ -85,6 +81,8 @@ body {
   min-height: 100vh;
   background-repeat: repeat;
   color: white;
+  background-size: 100%;
+  background-image: radial-gradient(50% 50% at 50% 50%, darken(#309476, 20%) 0%, #282c34 100%);
 }
 
 html, body { height: 100%; }
@@ -101,6 +99,7 @@ button {
   background: none;
   outline: none;
   cursor: pointer;
+  @apply focus:outline-none;
 }
 
 .to-btn-icon {
@@ -206,7 +205,7 @@ button {
     appearance: textfield;
 
     &::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
-      color: #536960;
+      color: darken(#c3c5cb, 20%);
       opacity: 1; /* Firefox */
     }
 
@@ -264,12 +263,12 @@ input[type=number] {
   color: white !important;
   margin-top: 1rem !important;
   padding: 10px !important;
+  background-image: linear-gradient(90deg,darken(#3f9, 20%), darken(#31c099, 20%)),linear-gradient(90deg,darken(#0cf, 20%),#282c34);
 
   &:disabled {
-    // background-color:rgb(64, 68, 79) !important;
-    // color:rgb(108, 114, 132) !important;
-    color: #f3841e !important;
-    background-color: rgba(243, 132, 30, 0.05) !important;
+    color: rgba(245, 158, 11, 1) !important;
+    border: 1px solid rgba(245, 158, 11, 1);
+    background-image: none;
   }
 
 }
@@ -327,7 +326,7 @@ main {
   justify-content: center;
   align-items: center;
   padding: 45px 15px 100px;
-  min-height: calc(100vh - 138px);
+  min-height: calc(100vh - 170px);
   position: relative;
 
   @media (min-width: 768px) {
@@ -337,7 +336,7 @@ main {
   .container {
     background: rgba(22,25,27, 1);
     padding: 1.2rem 2rem 2rem 2rem;
-    min-height: 477px;
+    min-height: 600px;
     width: 100%;
     max-width: 470px;
     display: flex;
@@ -379,7 +378,7 @@ main {
       outline: none;
       cursor: pointer;
       text-decoration: none;
-      color: #536960;
+      color: darken(#c3c5cb, 20%);
       font-size: 20px;
 
       &.active {

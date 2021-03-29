@@ -1,12 +1,15 @@
-<header>
-  <h1>
+<header class="border-b border-gray-900 border-opacity-75 py-4 px-8">
+  <h1 class="inline-flex">
     <a class="flex items-center" [routerLink]="['/', 'swap']">
       <img style="width: 25px; margin-right: 8px" src="assets/images/thorchain-transparent.svg" />
       <span>ASGARDEX</span>
     </a>
   </h1>
-  <div>
-    <span id="testnet-indicator" *ngIf="isTestnet">Testnet</span>
+  <div class="flex">
+    <div id="testnet-indicator" class="text-yellow-500 border border-yellow-500 mr-4 px-3 py-1 rounded-lg flex items-center" *ngIf="isTestnet">
+      <mat-icon style="transform: scale(.7)" class="mr-1">error_outline</mat-icon>
+      Testnet
+    </div>
     <app-connect *ngIf="!user"></app-connect>
     <app-user-settings *ngIf="user" [user]="user"></app-user-settings>
   </div>
