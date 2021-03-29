@@ -9,6 +9,8 @@ import { ReconnectDialogComponent } from './_components/reconnect-dialog/reconne
 import { environment } from 'src/environments/environment';
 import { UserService } from './_services/user.service';
 import { Chain } from '@xchainjs/xchain-util';
+import { AssetAndBalance } from './_classes/asset-and-balance';
+import { Asset } from './_classes/asset';
 
 @Component({
   selector: 'app-root',
@@ -21,6 +23,7 @@ export class AppComponent implements OnInit, OnDestroy {
   subs: Subscription[];
   isTestnet: boolean;
   chainBalanceErrors: Chain[];
+  nonNativeRuneAssets: AssetAndBalance[];
 
   constructor(
     private dialog: MatDialog,
@@ -34,7 +37,37 @@ export class AppComponent implements OnInit, OnDestroy {
       (chains) => this.chainBalanceErrors = chains
     );
 
-    this.subs = [chainBalanceErrors$];
+    this.nonNativeRuneAssets = [];
+
+    const balances$ = this.userService.userBalances$.subscribe(
+      (balances) => {
+
+        if (balances) {
+          const nonNativeRuneAssets = balances
+          // get ETH.RUNE and BNB.RUNE
+          .filter( (balance) => {
+
+            return (balance.asset.chain === 'BNB' && balance.asset.ticker === 'RUNE')
+              || (balance.asset.chain === 'ETH' && balance.asset.ticker === 'RUNE');
+
+          })
+          // filter out 0 amounts
+          .filter( balance => balance.amount.amount().isGreaterThan(0))
+          // create Asset
+          .map( (balance) => ({
+            asset: new Asset(`${balance.asset.chain}.${balance.asset.symbol}`)
+          }));
+
+          this.nonNativeRuneAssets = this.userService.sortMarketsByUserBalance(balances, nonNativeRuneAssets);
+
+        } else {
+          this.nonNativeRuneAssets = [];
+        }
+
+      }
+    );
+
+    this.subs = [chainBalanceErrors$, balances$];
   }
 
   ngOnInit(): void {
@@ -45,6 +78,11 @@ export class AppComponent implements OnInit, OnDestroy {
     if (keystore) {
       this.openReconnectDialog(keystore);
     }
+  }
+
+  notificationsExist(): boolean {
+    return ( (this.nonNativeRuneAssets && this.nonNativeRuneAssets.length > 0)
+      || (this.chainBalanceErrors && this.chainBalanceErrors.length > 0));
   }
 
   openReconnectDialog(keystore) {

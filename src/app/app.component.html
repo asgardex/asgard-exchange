@@ -1,45 +1,56 @@
 <div class="background-container"></div>
 <div class="noise-background"></div>
 
-<app-header></app-header>
+<div class="relative min-h-screen flex flex-col justify-between">
 
-<main *ngIf="isTestnet">
-  <app-native-rune-prompt></app-native-rune-prompt>
-  
-  <div class="main-notification mb-8 cursor-pointer min-h-0 container" *ngIf="chainBalanceErrors && chainBalanceErrors.length > 0">
-    <div class="flex items-center">
-      <mat-icon class="mr-4">warning</mat-icon>
-      <small>
-        There has been an error fetching some of your balances.
-        Your funds are safe, you can check them on the respective explorer in the User Settings area.
-        Please try again later.
-      </small>
-    </div>
-  </div>
-  
-  <router-outlet></router-outlet>
-</main>
-
-<main *ngIf="!isTestnet">
   <div>
-    Multichain Coming Soon.
-  </div>
-</main>
+    <app-header class="w-full"></app-header>
 
-<footer>
-  <div class="footer-social flex justify-end">
-    <a class="footer-logo footer-logo--telegram" href="https://t.me/asgard_exchange" target="_blank"></a>
-    <a class="footer-logo footer-logo--twitter" href="https://twitter.com/asgardex" target="_blank"></a>
-    <a class="footer-logo footer-logo--github" href="https://github.com/asgardex/asgard-exchange" target="_blank"></a>
-  </div>
-  <div class="footer-content">
-    <span>This product is in beta. Do not deposit or swap large amounts of funds.</span>
-    <div class="flex thorchain-indicator">
-      <span class="mr-1">Powered by <a target="_blank" href="https://thorchain.org/">THORChain</a> </span>
-      <app-last-block-indicator></app-last-block-indicator>
+    <div class="relative">
+      <div id="notifications" class="relative xl:absolute xl:top-2 xl:right-2 float-right py-4 px-8 w-full xl:w-96">
+        <app-native-rune-prompt [nonNativeRuneAssets]="nonNativeRuneAssets"></app-native-rune-prompt>
+
+        <div *ngIf="chainBalanceErrors && chainBalanceErrors.length > 0" class="border-opacity-75 border rounded-lg text-yellow-500 border-yellow-500 px-6 py-4 mb-8">
+          <div class="flex items-center">
+            <mat-icon class="mr-4">warning</mat-icon>
+            <small>
+              There has been an error fetching some of your balances.
+              Your funds are safe, you can check them on the respective explorer in the User Settings area.
+              Please try again later.
+            </small>
+          </div>
+        </div>
+      </div>
+
+      <main *ngIf="isTestnet" [ngClass]="{'py-8 xl:py-32': notificationsExist(), 'py-32': !notificationsExist()}" class="flex flex-col justify-center items-center clear-both px-4 sm:px-0">
+        <router-outlet></router-outlet>
+      </main>
+
+      <main *ngIf="!isTestnet" class="flex flex-col justify-center items-center clear-both px-4 sm:px-0 py-32">
+        <div>
+          Multichain Coming Soon.
+        </div>
+      </main>
     </div>
+
   </div>
-</footer>
+
+  <footer class="w-full p-8">
+    <div class="footer-social flex justify-end">
+      <a class="footer-logo footer-logo--telegram" href="https://t.me/asgard_exchange" target="_blank"></a>
+      <a class="footer-logo footer-logo--twitter" href="https://twitter.com/asgardex" target="_blank"></a>
+      <a class="footer-logo footer-logo--github" href="https://github.com/asgardex/asgard-exchange" target="_blank"></a>
+    </div>
+    <div class="footer-content">
+      <span>This product is in beta. Do not deposit or swap large amounts of funds.</span>
+      <div class="flex thorchain-indicator">
+        <span class="mr-1">Powered by <a target="_blank" href="https://thorchain.org/">THORChain</a> </span>
+        <app-last-block-indicator></app-last-block-indicator>
+      </div>
+    </div>
+  </footer>
+
+</div>
 
 
 
