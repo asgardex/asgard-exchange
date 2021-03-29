@@ -63,14 +63,9 @@ html {
   font-size: 16px;
     -webkit-font-smoothing: antialiased;
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-  // background-color: #2c2f36;
-  // background-color: rgb(44, 47, 54);
 }
 
 html, input, textarea, button {
-  // font-family: "Inter var", sans-serif;
-  // font-family: 'VT323', monospace;
-  // font-family: 'Source Code Pro', monospace;
   font-family: 'DM Mono', monospace;
 }
 
@@ -87,15 +82,7 @@ body {
   background-repeat: repeat;
   color: white;
   background-size: 100%;
-  // background-position: 0px -30vh;
-  // background-repeat: no-repeat;
-  // background-image: radial-gradient(50% 50% at 50% 50%, #309476 0%, #282c34 100%);
   background-image: radial-gradient(50% 50% at 50% 50%, darken(#309476, 20%) 0%, #282c34 100%);
-
-
-  // background-image: radial-gradient(50% 50% at 50% 50%, rgba(33, 114, 229, 0.1) 0%, rgba(33, 36, 41, 0) 100%);
-  // background-image: radial-gradient(circle farthest-corner at 0 0,#309476,#282c34 32%)
-  // background-image: radial-gradient(circle farthest-corner at 0 0,#297c64,#0a272c 52%,#282c34 100%,#fff)
 }
 
 html, body { height: 100%; }
@@ -276,17 +263,12 @@ input[type=number] {
   color: white !important;
   margin-top: 1rem !important;
   padding: 10px !important;
-  // background-color: linear-gradient(90deg,#3f9,#31c099),linear-gradient(90deg,#0cf,#282c34);
   background-image: linear-gradient(90deg,darken(#3f9, 20%), darken(#31c099, 20%)),linear-gradient(90deg,darken(#0cf, 20%),#282c34);
 
   &:disabled {
-    // background-color:rgb(64, 68, 79) !important;
-    // color:rgb(108, 114, 132) !important;
     color: rgba(245, 158, 11, 1) !important;
     border: 1px solid rgba(245, 158, 11, 1);
-    // background-color: transparent;
     background-image: none;
-    // background-color: rgba(243, 132, 30, 0.05) !important;
   }
 
 }
@@ -396,8 +378,6 @@ main {
       outline: none;
       cursor: pointer;
       text-decoration: none;
-      // color: #536960;
-      // color: #282c34;
       color: darken(#c3c5cb, 20%);
       font-size: 20px;
 
