@@ -38,9 +38,9 @@ export class KeystoreCreateComponent implements OnInit {
       const user = await this.keystoreService.unlockKeystore(keystore, this.password);
       this.userService.setUser(user);
 
-      const binanceAddress = await user.clients.binance.getAddress();
-      const addressLength = binanceAddress.length;
-      const minAddress = `${binanceAddress.substring(0, environment.network === 'testnet' ? 7 : 6)}_${binanceAddress.substring(addressLength - 3, addressLength)}`;
+      const thorAddress = await user.clients.thorchain.getAddress();
+      const addressLength = thorAddress.length;
+      const minAddress = `${thorAddress.substring(0, environment.network === 'testnet' ? 7 : 6)}_${thorAddress.substring(addressLength - 3, addressLength)}`;
       const bl = new Blob([JSON.stringify(keystore)], {
         type: 'text/plain'
       });
