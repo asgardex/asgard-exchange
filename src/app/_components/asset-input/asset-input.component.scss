@@ -26,16 +26,3 @@
     cursor: inherit;
   }
 }
-
-.max {
-  background-color: rgba(21, 61, 111, 0.44) !important;
-  color: rgb(109, 168, 255);
-  padding: 4px 8px;
-  border-radius: 8px;
-  border: 1px solid rgba(21, 61, 111, 0.44);
-
-  &:hover {
-    border: 1px solid rgb(33, 114, 229);
-  }
-}
-
