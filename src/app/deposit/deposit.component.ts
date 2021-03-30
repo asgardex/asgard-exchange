@@ -106,6 +106,7 @@ export class DepositComponent implements OnInit, OnDestroy {
     private midgardService: MidgardService,
     private ethUtilsService: EthUtilsService,
   ) {
+    this.ethContractApprovalRequired = false;
     this.rune = new Asset('THOR.RUNE');
 
     this.subs = [];
@@ -137,17 +138,17 @@ export class DepositComponent implements OnInit, OnDestroy {
       this.insufficientBnb = bnbBalance < 0.000375;
 
       // Asset
+      this.ethContractApprovalRequired = false;
       const asset = params.get('asset');
 
       if (asset) {
         this.asset = new Asset(asset);
         this.getPoolDetail(asset);
+        this.assetBalance = this.userService.findBalance(this.balances, this.asset);
 
         if (this.asset.chain === 'ETH') {
           this.getMaximumSpendableEth();
         }
-
-        this.assetBalance = this.userService.findBalance(this.balances, this.asset);
 
         if (this.asset.chain === 'ETH' && this.asset.ticker !== 'ETH') {
           this.checkContractApproved(this.asset);
@@ -238,11 +239,11 @@ export class DepositComponent implements OnInit, OnDestroy {
   }
 
   async getMaximumSpendableEth() {
-    if (this.asset && this.user && this.assetBalance) {
+    if (this.asset && this.user) {
       this.maximumSpendable = await this.ethUtilsService.maximumSpendableBalance({
         asset: this.asset,
         client: this.user.clients.ethereum,
-        balance: this.assetBalance
+        balance: this.assetBalance ?? 0
       });
     }
   }
