@@ -1,8 +1,17 @@
 
 <div>
 
-  <div class="modal-head">
-    <h1 mat-dialog-title>Select a token</h1>
+  <div class="p-4 flex flex-col">
+
+    <div class="flex justify-between items-center mb-2">
+      <h1 mat-dialog-title>Select a token</h1>
+      <!-- close dialog -->
+      <div mat-dialog-actions>
+        <button mat-icon-button aria-label="Close Markets Dialog" (click)="closeDialog()" mat-dialog-close>
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    </div>
 
     <div class="uni-input mt-4">
       <input class="p-0" [(ngModel)]="searchTerm" name="keystore-password" placeholder="Search Token Symbol" />
@@ -21,12 +30,6 @@
 
     </div>
 
-    <!-- close dialog -->
-    <div mat-dialog-actions class="dialog-actions">
-      <button mat-icon-button aria-label="Close Markets Dialog" (click)="closeDialog()" mat-dialog-close>
-        <mat-icon>close</mat-icon>
-      </button>
-    </div>
   </div>
 
 </div>

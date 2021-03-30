@@ -1,43 +1,18 @@
-
-<!-- <div *ngIf="!selectedChain">
-  <div class="modal-head">
-    <h1 mat-dialog-title>Select Chain</h1>
-  </div>
-  <div>
-    <div mat-dialog-content>
-      <button class="connect-option" (click)="setSelectedChain('BNB')">
-        <img class="connect-option__logo" src="http://localhost:4200/assets/images/token-icons/bnb.png" />
-        <span>Binance Chain</span>
-      </button>
-      <button class="connect-option" (click)="setSelectedChain('BTC')" [disabled]="!isTestnet">
-        <img class="connect-option__logo" src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/BTCB-1DE/logo.png" />
-        <span>Bitcoin</span>
-      </button>
-    </div>
-  </div>
-</div>
-
-<div *ngIf="selectedChain"> -->
 <div>
 
   <div *ngIf="!connectionMethod">
-    <div class="modal-head">
+
+    <div class="flex justify-between w-full p-4 items-center">
       <h1 mat-dialog-title>Connect to a wallet</h1>
+      <div mat-dialog-actions>
+        <button mat-icon-button aria-label="Close Connect Wallet Dialog" mat-dialog-close>
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
     </div>
+
     <div>
       <div mat-dialog-content>
-
-        <!-- Connect Options -->
-
-        <!-- <button class="connect-option" (click)="connectWalletConnect()" [disabled]="true">
-          <img class="connect-option__logo" src="assets/images/wallet-connect-icon.svg" />
-          <span>Wallet Connect</span>
-        </button>
-
-        <button class="connect-option" (click)="connectLedger()" [disabled]="true">
-          <img id="ledger-logo" class="connect-option__logo" src="assets/images/ledger/ledger-logo.png" />
-          <span>Ledger</span>
-        </button> -->
 
         <button class="connect-option focus:outline-none" (click)="createKeystore()">
           <mat-icon class="connect-option__logo">add</mat-icon>
@@ -51,12 +26,6 @@
 
       </div>
 
-      <!-- close dialog -->
-      <div mat-dialog-actions class="dialog-actions">
-        <button mat-icon-button aria-label="Close Connect Wallet Dialog" mat-dialog-close>
-          <mat-icon>close</mat-icon>
-        </button>
-      </div>
     </div>
   </div>
 
@@ -66,8 +35,6 @@
 
   <!-- KEYSTORE CONNECT -->
   <app-keystore-connect *ngIf="connectionMethod == 'KEYSTORE'" (back)="clearConnectionMethod()" (closeModal)="close()"></app-keystore-connect>
-
-  <!-- <app-connect-error *ngIf="error" (back)="clearConnectionMethod()"></app-connect-error> -->
 
 </div>
 

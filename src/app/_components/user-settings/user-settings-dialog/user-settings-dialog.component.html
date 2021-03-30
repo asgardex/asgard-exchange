@@ -1,6 +1,11 @@
 <div *ngIf="mode === 'ADDRESSES'">
-  <div class="modal-head">
+  <div class="flex justify-between w-full p-4 items-center">
     <h1 mat-dialog-title>User Settings</h1>
+    <div mat-dialog-actions>
+      <button mat-icon-button aria-label="Close Connect Wallet Dialog" mat-dialog-close>
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
   </div>
   <div>
     <div mat-dialog-content>
@@ -110,12 +115,6 @@
 
     </div>
 
-    <!-- close dialog -->
-    <div mat-dialog-actions class="dialog-actions">
-      <button mat-icon-button aria-label="Close Connect Wallet Dialog" mat-dialog-close>
-        <mat-icon>close</mat-icon>
-      </button>
-    </div>
   </div>
 </div>
 
