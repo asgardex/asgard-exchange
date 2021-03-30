@@ -1,6 +1,6 @@
 <div *ngIf="mode === 'SELECT_ASSET'">
 
-  <app-modal-section-header sectionTitle="Non-native RUNE Assets" [displayCloseBtn]="true" (close)="dialogRef.close()"></app-modal-section-header>
+  <app-modal-section-header sectionTitle="Non-native RUNE Assets" [displayCloseBtn]="true" (closeModal)="dialogRef.close()"></app-modal-section-header>
 
   <div mat-dialog-content>
     <app-assets-list [assetListItems]="assets" [loading]="loading" [disabledAssetSymbol]="''" (selectAsset)="selectAsset($event)"></app-assets-list>

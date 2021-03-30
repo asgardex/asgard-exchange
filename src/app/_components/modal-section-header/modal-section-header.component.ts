@@ -12,13 +12,13 @@ export class ModalSectionHeaderComponent implements OnInit {
   @Input() displayBackBtn: boolean;
   @Input() displayCloseBtn: boolean;
   @Output() back: EventEmitter<null>;
-  @Output() close: EventEmitter<null>;
+  @Output() closeModal: EventEmitter<null>;
 
   constructor() {
     this.displayBackBtn = false;
     this.displayCloseBtn = false;
     this.back = new EventEmitter<null>();
-    this.close = new EventEmitter<null>();
+    this.closeModal = new EventEmitter<null>();
   }
 
   ngOnInit(): void {
