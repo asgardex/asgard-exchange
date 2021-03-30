@@ -3,8 +3,16 @@
 
   <div *ngIf="txState === 'PENDING_CONFIRMATION'">
 
-    <div class="modal-head confirm-modal-head">
-      <h1 mat-dialog-title>Confirm Swap</h1>
+    <div class="p-4 confirm-modal-head">
+      <div class="flex justify-between items-center mb-4">
+        <h1 mat-dialog-title>Confirm Swap</h1>
+        <!-- close dialog -->
+        <div mat-dialog-actions>
+          <button mat-icon-button aria-label="Close Dialog" (click)="closeDialog()" mat-dialog-close>
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+      </div>
 
       <div class="flex justify-between transaction-detail">
 
@@ -84,12 +92,6 @@
 
       </div>
 
-      <!-- close dialog -->
-      <div mat-dialog-actions class="dialog-actions">
-        <button mat-icon-button aria-label="Close Markets Dialog" (click)="closeDialog()" mat-dialog-close>
-          <mat-icon>close</mat-icon>
-        </button>
-      </div>
     </div>
 
   </div>

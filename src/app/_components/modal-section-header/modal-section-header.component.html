@@ -6,5 +6,10 @@
     <mat-icon *ngIf="sectionTitleIcon" class="mr-2">{{sectionTitleIcon}}</mat-icon>
     {{sectionTitle}}
   </h1>
-  <div style="width: 40px"></div>
+  <div *ngIf="!displayCloseBtn" style="width: 40px"></div>
+  <div *ngIf="displayCloseBtn" mat-dialog-actions>
+    <button mat-icon-button aria-label="Close Dialog" mat-dialog-close (click)="this.close.emit()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
 </div>

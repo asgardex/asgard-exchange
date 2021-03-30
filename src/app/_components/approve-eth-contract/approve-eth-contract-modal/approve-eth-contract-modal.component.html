@@ -1,5 +1,13 @@
-<div class="modal-head confirm-modal-head">
-  <h1 mat-dialog-title>Approve Contract</h1>
+<div class="confirm-modal-head flex flex-col p-4">
+
+  <div class="flex justify-between items-center mb-2">
+    <h1 mat-dialog-title>Approve Contract</h1>
+    <div mat-dialog-actions>
+      <button mat-icon-button aria-label="Close Approve Contract Dialog" mat-dialog-close>
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
 
   <div>
 
@@ -35,11 +43,5 @@
 
     </div>
 
-    <!-- close dialog -->
-    <div mat-dialog-actions class="dialog-actions">
-      <button mat-icon-button aria-label="Close Markets Dialog" (click)="closeDialog()" mat-dialog-close>
-        <mat-icon>close</mat-icon>
-      </button>
-    </div>
   </div>
 </div>

@@ -1,17 +1,11 @@
 <div *ngIf="mode === 'SELECT_ASSET'">
 
-  <app-modal-section-header sectionTitle="Non-native RUNE Assets"></app-modal-section-header>
+  <app-modal-section-header sectionTitle="Non-native RUNE Assets" [displayCloseBtn]="true" (close)="dialogRef.close()"></app-modal-section-header>
 
   <div mat-dialog-content>
     <app-assets-list [assetListItems]="assets" [loading]="loading" [disabledAssetSymbol]="''" (selectAsset)="selectAsset($event)"></app-assets-list>
   </div>
 
-  <!-- close dialog -->
-  <div mat-dialog-actions class="dialog-actions">
-    <button mat-icon-button aria-label="Close Markets Dialog" (click)="dialogRef.close()" mat-dialog-close>
-      <mat-icon>close</mat-icon>
-    </button>
-  </div>
 </div>
 
 <app-upgrade-rune
