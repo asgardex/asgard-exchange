@@ -17,11 +17,10 @@ export class Asset {
 
     const trustWalletMatch = CoinIconsFromTrustWallet[this.ticker];
 
-    if (trustWalletMatch) {
+    if (trustWalletMatch && chain !== 'THOR') {
       this.iconPath = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/${trustWalletMatch}/logo.png`;
     } else {
       // Override token icons when not found in trustwallet
-
 
       switch (chain) {
         case 'BTC':
@@ -45,7 +44,7 @@ export class Asset {
           break;
 
         case 'THOR':
-          this.iconPath = 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/RUNE-B1A/logo.png';
+          this.iconPath = 'assets/images/token-icons/thorchain-logo.png';
           break;
 
         case 'BCH':
