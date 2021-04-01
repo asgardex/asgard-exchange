@@ -8,7 +8,7 @@
   </h1>
   <div *ngIf="!displayCloseBtn" style="width: 40px"></div>
   <div *ngIf="displayCloseBtn" mat-dialog-actions>
-    <button mat-icon-button aria-label="Close Dialog" mat-dialog-close (click)="this.close.emit()">
+    <button mat-icon-button aria-label="Close Dialog" mat-dialog-close (click)="this.closeModal.emit()">
       <mat-icon>close</mat-icon>
     </button>
   </div>
