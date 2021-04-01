@@ -8,6 +8,7 @@ import { LastBlock } from '../_classes/last-block';
 import { PoolDTO } from '../_classes/pool';
 import { MemberDTO } from '../_classes/member';
 import { shareReplay } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +19,9 @@ export class MidgardService {
   private _constants$: Observable<MidgardConstants>;
 
   constructor(private http: HttpClient) {
-    this.v2BasePath = 'https://testnet.midgard.thorchain.info/v2';
+    this.v2BasePath = (environment.network === 'testnet')
+      ? 'https://testnet.midgard.thorchain.info/v2'
+      : 'https://midgard.thorchain.info/v2';
 
     // cached since constants are constant
     this._constants$ = this.http.get<MidgardConstants>(`${this.v2BasePath}/thorchain/constants`).pipe(shareReplay());
