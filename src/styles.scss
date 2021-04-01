@@ -283,6 +283,10 @@ input[type=number] {
 
 }
 
+.gradient-btn {
+  background-image: linear-gradient(90deg,darken(#3f9, 20%), darken(#31c099, 20%)),linear-gradient(90deg,darken(#0cf, 20%),#282c34);
+}
+
 /**
  *
  */

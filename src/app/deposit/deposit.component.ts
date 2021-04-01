@@ -97,6 +97,7 @@ export class DepositComponent implements OnInit, OnDestroy {
   ethContractApprovalRequired: boolean;
 
   maximumSpendable: number;
+  poolNotFoundErr: boolean;
 
   constructor(
     private dialog: MatDialog,
@@ -106,6 +107,7 @@ export class DepositComponent implements OnInit, OnDestroy {
     private midgardService: MidgardService,
     private ethUtilsService: EthUtilsService,
   ) {
+    this.poolNotFoundErr = false;
     this.ethContractApprovalRequired = false;
     this.rune = new Asset('THOR.RUNE');
 
@@ -206,7 +208,10 @@ export class DepositComponent implements OnInit, OnDestroy {
           };
         }
       },
-      (err) => console.error('error getting pool detail: ', err)
+      (err) => {
+        console.error('error getting pool detail: ', err);
+        this.poolNotFoundErr = true;
+      }
     );
   }
 
