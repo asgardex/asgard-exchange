@@ -233,6 +233,7 @@ export class DepositComponent implements OnInit, OnDestroy {
 
     return !this.balances || !this.runeAmount || !this.assetAmount || (this.asset.chain === 'BNB' && this.insufficientBnb)
     || this.ethContractApprovalRequired
+    || (this.assetAmount <= this.userService.minimumSpendable(this.asset))
     || (this.balances
       && (this.runeAmount > this.runeBalance || this.assetAmount > this.userService.maximumSpendableBalance(this.asset, this.assetBalance))
     );
@@ -250,20 +251,44 @@ export class DepositComponent implements OnInit, OnDestroy {
 
   mainButtonText(): string {
 
+    /** Wallet not connected */
     if (!this.balances) {
       return 'Please connect wallet';
-    } else if (this.balances && (!this.runeAmount || !this.assetAmount)) {
+    }
+
+    /** User either lacks asset balance or RUNE balance */
+    if (this.balances && (!this.runeAmount || !this.assetAmount)) {
       return 'Enter an amount';
-    } else if (this.runeAmount > this.runeBalance) {
+    }
+
+    /** RUNE amount exceeds RUNE balance */
+    if (this.runeAmount > this.runeBalance) {
       return 'Insufficient balance';
-    } else if ( (this.asset.chain === 'ETH') && this.assetAmount > this.maximumSpendable) {
+    }
+
+    /** ETH tx amount is higher than spendable amount */
+    if ( (this.asset.chain === 'ETH') && this.assetAmount > this.maximumSpendable) {
       return 'Insufficient balance';
-    } else if ((this.asset.chain !== 'ETH')
+    }
+
+    /** Non-ETH chain tx amount is higher than spendable amount */
+    if ((this.asset.chain !== 'ETH')
       && ( this.assetAmount > this.userService.maximumSpendableBalance(this.asset, this.assetBalance))) {
       return 'Insufficient balance';
-    } else if (this.asset.chain === 'BNB' && this.insufficientBnb) {
+    }
+
+    /** BNB tx and and insufficient BNB to cover costs */
+    if (this.asset.chain === 'BNB' && this.insufficientBnb) {
       return 'Insufficient BNB for Fee';
-    } else if (this.runeAmount && this.assetAmount
+    }
+
+    /** Amount is too low, considered "dusting" */
+    if ( (this.assetAmount <= this.userService.minimumSpendable(this.asset))) {
+      return 'Amount too low';
+    }
+
+    /** Good to go */
+    if (this.runeAmount && this.assetAmount
       && (this.runeAmount <= this.runeBalance) && (this.assetAmount <= this.assetBalance)) {
       return 'Deposit';
     } else {
