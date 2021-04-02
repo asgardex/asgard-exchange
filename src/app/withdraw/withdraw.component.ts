@@ -198,7 +198,50 @@ export class WithdrawComponent implements OnInit {
 
   }
 
-  openConfirmationDialog() {
+  formDisabled(): boolean {
+    /** No user connected */
+    if (!this.user) {
+      return true;
+    }
+
+    /** No asset amount set */
+    if (!this.removeAssetAmount || (this.removeAssetAmount && this.removeAssetAmount <= 0)) {
+      return true;
+    }
+
+    if (this.remainingTime) {
+      return true;
+    }
+
+    /** Amount too small - dusting */
+    if (this.removeAssetAmount <= this.userService.minimumSpendable(this.asset)) {
+      return true;
+    }
+
+    return false;
+
+  }
+
+  mainButtonText(): string {
+    /** No user connected */
+    if (!this.user) {
+      return 'Please Connect Wallet';
+    }
+
+    /** No asset amount set */
+    if (!this.removeAssetAmount || (this.removeAssetAmount && this.removeAssetAmount <= 0)) {
+      return 'Enter an Amount';
+    }
+
+    if (this.remainingTime) {
+      return `Withdraw enabled in ${this.remainingTime}`;
+    }
+
+    /** Good to go */
+    return 'Withdraw';
+  }
+
+  openConfirmationDialog(): void {
 
     const runeBasePrice = getValueOfAssetInRune(assetToBase(assetAmount(1)), this.assetPoolData).amount().div(10 ** 8).toNumber();
     const assetBasePrice = getValueOfRuneInAsset(assetToBase(assetAmount(1)), this.assetPoolData).amount().div(10 ** 8).toNumber();

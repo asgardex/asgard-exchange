@@ -239,31 +239,6 @@ export class SwapComponent implements OnInit, OnDestroy {
     );
   }
 
-  mainButtonText(): string {
-
-    if (!this.user || !this.balances) {
-      return 'Please connect wallet';
-    }
-    else if (!this.selectedTargetAsset) {
-      return 'Select a token';
-    }
-    else if (!this.sourceAssetUnit) {
-      return 'Enter an amount';
-    }
-    else if (this.sourceAssetUnit > this.userService.maximumSpendableBalance(this.selectedSourceAsset, this.sourceBalance)) {
-      return 'Insufficient balance';
-    } else if (this.selectedSourceAsset.chain === 'BNB' && this.insufficientBnb) {
-      return 'Insufficient BNB for Fee';
-    } else if ((this.slip * 100) > this.slippageTolerance) {
-      return 'Slip Limit Exceeded';
-    } else if (this.user && this.sourceAssetUnit && this.sourceAssetUnit <= this.sourceBalance && this.selectedTargetAsset) {
-      return 'Swap';
-    } else {
-      console.warn('error creating main button text');
-    }
-
-  }
-
   getPools() {
     this.midgardService.getPools().subscribe(
       (res) => {
@@ -304,7 +279,6 @@ export class SwapComponent implements OnInit, OnDestroy {
     );
   }
 
-
   async checkContractApproved() {
 
     if (this.ethInboundAddress && this.user) {
@@ -325,10 +299,59 @@ export class SwapComponent implements OnInit, OnDestroy {
     return !this.sourceAssetUnit || !this.selectedSourceAsset || !this.selectedTargetAsset || !this.targetAssetUnit
       || (this.selectedSourceAsset && this.sourceBalance
         && (this.sourceAssetUnit > this.userService.maximumSpendableBalance(this.selectedSourceAsset, this.sourceBalance)))
+      || (this.sourceAssetUnit <= this.userService.minimumSpendable(this.selectedSourceAsset))
+      || (this.targetAssetUnitDisplay <= this.userService.minimumSpendable(this.selectedTargetAsset))
       || !this.user || !this.balances
       || this.ethContractApprovalRequired
       || (this.slip * 100) > this.slippageTolerance
       || (this.selectedSourceAsset.chain === 'BNB' && this.insufficientBnb); // source is BNB and not enough funds to cover fee
+  }
+
+  mainButtonText(): string {
+
+    /** User Not connected */
+    if (!this.user || !this.balances) {
+      return 'Please connect wallet';
+    }
+
+    /** No target asset selected */
+    if (!this.selectedTargetAsset) {
+      return 'Select a token';
+    }
+
+    /** No source amount set */
+    if (!this.sourceAssetUnit) {
+      return 'Enter an amount';
+    }
+
+    /** Source amount is higher than user spendable amount */
+    if (this.sourceAssetUnit > this.userService.maximumSpendableBalance(this.selectedSourceAsset, this.sourceBalance)) {
+      return 'Insufficient balance';
+    }
+
+    /** BNB chain tx and user doesn't have enough BNB  */
+    if (this.selectedSourceAsset.chain === 'BNB' && this.insufficientBnb) {
+      return 'Insufficient BNB for Fee';
+    }
+
+    /** Amount is too low, considered "dusting" */
+    if ( (this.sourceAssetUnit <= this.userService.minimumSpendable(this.selectedSourceAsset))
+      || (this.targetAssetUnitDisplay <= this.userService.minimumSpendable(this.selectedTargetAsset))) {
+        return 'Amount too low';
+      }
+
+    /** Exceeds slip tolerance set in user settings */
+    if ((this.slip * 100) > this.slippageTolerance) {
+      return 'Slip Limit Exceeded';
+    }
+
+    /** Good to go */
+    if (this.user && this.sourceAssetUnit && this.sourceAssetUnit <= this.sourceBalance && this.selectedTargetAsset) {
+      return 'Swap';
+    } else {
+      console.warn('error creating main button text');
+    }
+
   }
 
   openConfirmationDialog() {
@@ -453,11 +476,11 @@ export class SwapComponent implements OnInit, OnDestroy {
 
         const max = this.userService.maximumSpendableBalance(target, targetBalance);
 
-        this.sourceAssetUnit = (targetBalance < targetInput.div(10 ** 8 ).toNumber()) // if target balance is less than target input
+        this.sourceAssetUnit = (targetBalance < targetInput.div(10 ** 8).toNumber()) // if target balance is less than target input
           ? max // use balance
           : targetInput.div(10 ** 8 ).toNumber(); // otherwise use input value
       } else {
-        this.sourceAssetUnit = (targetInput) ? targetInput.div(10 ** 8 ).toNumber() : 0;
+        this.sourceAssetUnit = (targetInput) ? targetInput.div(10 ** 8).toNumber() : 0;
       }
 
     }

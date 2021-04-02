@@ -76,12 +76,9 @@
       class="main-action-btn w-full"
       mat-flat-button
       color="primary"
-      [disabled]="!user || !removeAssetAmount || (removeAssetAmount && removeAssetAmount <= 0 || remainingTime)"
+      [disabled]="formDisabled()"
     >
-      <span *ngIf="!user">Please connect wallet</span>
-      <span *ngIf="user && remainingTime">Withdraw Enabled in {{remainingTime}}</span>
-      <span *ngIf="user && !remainingTime && !removeAssetAmount || (removeAssetAmount && removeAssetAmount <= 0)">Enter an amount</span>
-      <span *ngIf="user && !remainingTime && removeAssetAmount && removeAssetAmount > 0">Withdraw</span>
+      {{mainButtonText()}}
     </button>
 
   </div>
