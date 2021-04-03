@@ -245,11 +245,19 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
 
   formDisabled(): boolean {
 
+    // return !this.balances || !this.runeAmount || !this.assetAmount
+    // || this.insufficientBnb || this.runeAmount < 1000 || this.ethContractApprovalRequired
+    // || (this.balances
+    //   && (this.runeAmount > this.runeBalance || this.assetAmount > this.userService.maximumSpendableBalance(this.asset, this.assetBalance))
+    // );
+
+    /** TESTING MCCN */
     return !this.balances || !this.runeAmount || !this.assetAmount
-    || this.insufficientBnb || this.runeAmount < 1000 || this.ethContractApprovalRequired
+    || this.insufficientBnb || this.runeAmount < 10 || this.ethContractApprovalRequired
     || (this.balances
       && (this.runeAmount > this.runeBalance || this.assetAmount > this.userService.maximumSpendableBalance(this.asset, this.assetBalance))
     );
+
   }
 
   mainButtonText(): string {
@@ -265,9 +273,18 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
       return 'Insufficient balance';
     } else if (this.insufficientBnb) {
       return 'Insufficient BNB for Fee';
-    } else if (this.runeAmount < 1000) {
+    }
+
+    // else if (this.runeAmount < 1000) {
+    //   return 'Not enough RUNE to create pool';
+    // }
+
+    /** TESTING MCCN */
+    else if (this.runeAmount < 10) {
       return 'Not enough RUNE to create pool';
-    } else if (this.balances && this.runeAmount && this.assetAmount
+    }
+
+    else if (this.balances && this.runeAmount && this.assetAmount
       && (this.runeAmount <= this.runeBalance) && (this.assetAmount <= this.assetBalance)) {
       return 'Create Pool';
     } else {
