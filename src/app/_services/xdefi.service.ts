@@ -15,6 +15,7 @@ import { Client as litecoinClient } from "@xchainjs/xchain-litecoin";
 import { Client as bitcoinCashClient } from "@xchainjs/xchain-bitcoincash";
 import { User } from "../_classes/user";
 import { rejects } from "assert";
+
 @Injectable({
   providedIn: "root",
 })
@@ -48,54 +49,96 @@ export class XDEFIService {
     // XDEFI shim layer
     // Binance
     userBinanceClient.transfer = async function (transferParams) {
-      return await (window as any).xfi.binance.request({
-        method: "transfer",
-        params: [transferParams],
+      return new Promise((resolve, reject) => {
+        (window as any).xfi.binance.request(
+          {
+            method: "transfer",
+            params: [transferParams],
+          },
+          (err, result) => {
+            if (err) return reject(err);
+            return resolve(result);
+          }
+        );
       });
     };
 
     // @ts-ignore
     userBinanceClient.getAddress = async function () {
-      const addrs = await (window as any).xfi.binance.request({
-        method: "request_accounts",
-        params: [],
+      return new Promise((resolve, reject) => {
+        (window as any).xfi.binance.request(
+          {
+            method: "request_accounts",
+            params: [],
+          },
+          (err, accounts) => {
+            if (err) return reject(err);
+            return resolve(accounts[0]);
+          }
+        );
       });
-
-      return addrs[0];
     };
 
     // Bitcoin
     userBtcClient.transfer = async function (transferParams) {
-      return await (window as any).xfi.bitcoin.request({
-        method: "transfer",
-        params: [transferParams],
+      return new Promise((resolve, reject) => {
+        (window as any).xfi.bitcoin.request(
+          {
+            method: "transfer",
+            params: [transferParams],
+          },
+          (err, result) => {
+            if (err) return reject(err);
+            return resolve(result);
+          }
+        );
       });
     };
     // @ts-ignore
     userBtcClient.getAddress = async function () {
-      const addrs = await (window as any).xfi.bitcoin.request({
-        method: "request_accounts",
-        params: [],
+      return new Promise((resolve, reject) => {
+        (window as any).xfi.bitcoin.request(
+          {
+            method: "request_accounts",
+            params: [],
+          },
+          (err, accounts) => {
+            if (err) return reject(err);
+            return resolve(accounts[0]);
+          }
+        );
       });
-
-      return addrs[0];
     };
 
     // BCH
     userbchClient.transfer = async function (transferParams) {
-      return await (window as any).xfi.bitcoincash.request({
-        method: "transfer",
-        params: [transferParams],
+      return new Promise((resolve, reject) => {
+        (window as any).xfi.bitcoincash.request(
+          {
+            method: "transfer",
+            params: [transferParams],
+          },
+          (err, result) => {
+            if (err) return reject(err);
+            return resolve(result);
+          }
+        );
       });
     };
     // @ts-ignore
     userbchClient.getAddress = async function () {
-      const addrs = await (window as any).xfi.bitcoincash.request({
-        method: "request_accounts",
-        params: [],
+      return new Promise((resolve, reject) => {
+        (window as any).xfi.bitcoincash.request(
+          {
+            method: "request_accounts",
+            params: [],
+          },
+          (err, accounts) => {
+            if (err) return reject(err);
+            return resolve(accounts[0]);
+          }
+        );
       });
-
-      return addrs[0];
     };
 
     // Eth
@@ -104,19 +147,33 @@ export class XDEFIService {
     };
     // @ts-ignore
     userEthereumClient.getAddress = async function () {
-      const addrs = await (window as any).ethereum.request({
-        method: "eth_requestAccounts",
-        params: [],
+      return new Promise((resolve, reject) => {
+        (window as any).ethereum.request(
+          {
+            method: "eth_requestAccounts",
+            params: [],
+          },
+          (err, accounts) => {
+            if (err) return reject(err);
+            return resolve(accounts[0]);
+          }
+        );
       });
-
-      return addrs[0];
     };
 
     // Thor
     userThorchainClient.deposit = async function (depositParams) {
-      return await (window as any).xfi.thorchain.request({
-        method: "deposit",
-        params: [depositParams],
+      return new Promise((resolve, reject) => {
+        (window as any).xfi.thorchain.request(
+          {
+            method: "deposit",
+            params: [depositParams],
+          },
+          (err, result) => {
+            if (err) return reject(err);
+            return resolve(result);
+          }
+        );
       });
     };
     // @ts-ignore
@@ -137,19 +194,33 @@ export class XDEFIService {
 
     // Ltc
     userLtcClient.transfer = async function (transferParams) {
-      return await (window as any).xfi.litecoin.request({
-        method: "transfer",
-        params: [transferParams],
+      return new Promise((resolve, reject) => {
+        (window as any).xfi.litecoin.request(
+          {
+            method: "transfer",
+            params: [transferParams],
+          },
+          (err, result) => {
+            if (err) return reject(err);
+            return resolve(result);
+          }
+        );
       });
     };
     // @ts-ignore
     userLtcClient.getAddress = async function () {
-      const addrs = await (window as any).xfi.litecoin.request({
-        method: "request_accounts",
-        params: [],
+      return new Promise((resolve, reject) => {
+        (window as any).xfi.litecoin.request(
+          {
+            method: "request_accounts",
+            params: [],
+          },
+          (err, accounts) => {
+            if (err) return reject(err);
+            return resolve(accounts[0]);
+          }
+        );
       });
-
-      return addrs[0];
     };
 
     // End shim layer
