@@ -252,6 +252,23 @@ export class UserService {
 
   }
 
+  minimumSpendable(asset: Asset) {
+    switch (`${asset.chain}.${asset.symbol}`) {
+      case 'BTC.BTC':
+      case 'LTC.LTC':
+      case 'BCH.BCH':
+      case 'THOR.RUNE':
+        return 0.0001;
+
+      case 'BNB.BNB':
+      case 'ETH.ETH':
+        return 0.001;
+
+      default:
+        return 0.001;
+    }
+  }
+
   findBalance(balances: Balances, asset: Asset) {
 
     if (balances && asset) {

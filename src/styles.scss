@@ -296,6 +296,7 @@ input[type=number] {
 
   img {
     width: 100%;
+    border-radius: 50%;
   }
 }
 
@@ -463,4 +464,8 @@ main {
 
 .slider {
   width: 100%;
+}
+
+.cdk-global-scrollblock {
+  top: auto !important;
 }
