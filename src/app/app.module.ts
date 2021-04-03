@@ -11,6 +11,7 @@ import { ConfimSendComponent } from './_components/user-settings/user-settings-d
 import { ConnectErrorComponent } from './_components/connect/connect-error/connect-error.component';
 import { HeaderComponent } from './_components/header/header.component';
 import { KeystoreConnectComponent } from './_components/connect/keystore-connect/keystore-connect.component';
+import { XDEFIConnectComponent } from './_components/connect/xdefi-connect/xdefi-connect.component';
 import { LastBlockIndicatorComponent } from './_components/last-block-indicator/last-block-indicator.component';
 import { KeystoreCreateComponent } from './_components/connect/keystore-create/keystore-create.component';
 import { PendingTxsModalComponent } from './_components/user-settings/user-settings-dialog/pending-txs/pending-txs-modal.component';
@@ -84,6 +85,7 @@ import { ModalSectionHeaderModule } from './_components/modal-section-header/mod
     ConnectErrorComponent,
     LastBlockIndicatorComponent,
     KeystoreCreateComponent,
+    XDEFIConnectComponent,
     UserSettingsComponent,
     UserSettingsDialogComponent,
     PendingTxsModalComponent,

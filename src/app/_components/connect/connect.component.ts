@@ -35,45 +35,54 @@ export class ConnectComponent implements OnInit {
 }
 
 export enum ConnectionMethod {
-  LEDGER          = 'LEDGER',
-  KEYSTORE        = 'KEYSTORE',
-  KEYSTORE_CREATE = 'KEYSTORE_CREATE',
-  WALLET_CONNECT  = 'WALLET_CONNECT',
+  LEDGER = "LEDGER",
+  KEYSTORE = "KEYSTORE",
+  KEYSTORE_CREATE = "KEYSTORE_CREATE",
+  WALLET_CONNECT = "WALLET_CONNECT",
+  XDEFI = "XDEFI",
 }
 
 @Component({
-  selector: 'app-connect-modal',
-  templateUrl: 'connect-modal.component.html',
-  styleUrls: ['./connect.component.scss']
+  selector: "app-connect-modal",
+  templateUrl: "connect-modal.component.html",
+  styleUrls: ["./connect.component.scss"],
 })
 // tslint:disable-next-line:component-class-suffix
 export class ConnectModal implements OnDestroy {
-
   connectionMethod: ConnectionMethod;
   isTestnet: boolean;
   subs: Subscription[];
-  selectedChain: 'BNB' | 'BTC';
+  selectedChain: "BNB" | "BTC";
+  isXDEFIConnected: boolean;
 
   constructor(
     public dialogRef: MatDialogRef<ConnectModal>,
     private walletConnectService: WalletConnectService,
     private userService: UserService
   ) {
-    this.isTestnet = environment.network === 'testnet' ? true : false;
+    this.isTestnet = environment.network === "testnet" ? true : false;
 
-    const user$ = this.userService.user$.subscribe(
-      (user) => {
-        if (user) {
-          this.close();
-        }
+    const user$ = this.userService.user$.subscribe((user) => {
+      if (user) {
+        this.close();
       }
-    );
+    });
 
     this.subs = [user$];
 
+    this.isXDEFIConnected = false;
+    if ((window as any).xfi) {
+      this.isXDEFIConnected = true;
+    }
+    // window.onload = (event: any) => {
+    //   console.log("page is fully loaded", event);
+    //   if ((window as any).xfi) {
+    //     this.isXDEFIConnected = true;
+    //   }
+    // };
   }
 
-  setSelectedChain(chain: 'BNB' | 'BTC') {
+  setSelectedChain(chain: "BNB" | "BTC") {
     this.selectedChain = chain;
   }
 
@@ -87,6 +96,10 @@ export class ConnectModal implements OnDestroy {
 
   connectKeystore() {
     this.connectionMethod = ConnectionMethod.KEYSTORE;
+  }
+
+  connectXDEFI() {
+    this.connectionMethod = ConnectionMethod.XDEFI;
   }
 
   connectLedger() {
@@ -106,5 +119,4 @@ export class ConnectModal implements OnDestroy {
       sub.unsubscribe();
     }
   }
-
 }
