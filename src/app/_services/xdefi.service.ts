@@ -147,17 +147,9 @@ export class XDEFIService {
     };
     // @ts-ignore
     userEthereumClient.getAddress = async function () {
-      return new Promise((resolve, reject) => {
-        (window as any).ethereum.request(
-          {
-            method: "eth_requestAccounts",
-            params: [],
-          },
-          (err, accounts) => {
-            if (err) return reject(err);
-            return resolve(accounts[0]);
-          }
-        );
+      return (window as any).ethereum.request({
+        method: "eth_requestAccounts",
+        params: [],
       });
     };
 
@@ -226,6 +218,36 @@ export class XDEFIService {
     // End shim layer
 
     const thorAddress = await userThorchainClient.getAddress();
+    console.log({ thorAddress });
+    const bnbAddress = await userBinanceClient.getAddress();
+    console.log({ bnbAddress });
+    const btcAddress = await userBtcClient.getAddress();
+    console.log({ btcAddress });
+
+    const bchAddress = await userbchClient.getAddress();
+    console.log({ bchAddress });
+
+    const ethAddress = await userEthereumClient.getAddress();
+    console.log({ ethAddress });
+
+    const ltcAddress = await userLtcClient.getAddress();
+    console.log({ ltcAddress });
+
+    userThorchainClient.getAddress = () => thorAddress;
+    userBinanceClient.getAddress = () => bnbAddress;
+    userBtcClient.getAddress = () => btcAddress;
+    userbchClient.getAddress = () => bchAddress;
+    userEthereumClient.getAddress = () => ethAddress;
+    userLtcClient.getAddress = () => ltcAddress;
+
+    console.log({
+      thorAddress,
+      bnbAddress,
+      btcAddress,
+      bchAddress,
+      ethAddress,
+      ltcAddress,
+    });
 
     const newUser = new User({
       type: "XDEFI",
