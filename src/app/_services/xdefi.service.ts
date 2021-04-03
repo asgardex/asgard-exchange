@@ -227,7 +227,7 @@ export class XDEFIService {
     const bchAddress = await userbchClient.getAddress();
     console.log({ bchAddress });
 
-    const ethAddress = await userEthereumClient.getAddress();
+    const ethAddress = (await userEthereumClient.getAddress())[0];
     console.log({ ethAddress });
 
     const ltcAddress = await userLtcClient.getAddress();
