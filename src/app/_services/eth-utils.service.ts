@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ethers } from 'ethers';
 import { PoolAddressDTO } from '../_classes/pool-address';
-import { TCRopstenAbi } from '../_abi/thorchain.abi';
+import { TCAbi, TCRopstenAbi } from '../_abi/thorchain.abi';
 import { Client, ETH_DECIMAL } from '@xchainjs/xchain-ethereum/lib';
 import { assetAmount, assetToBase, baseAmount } from '@xchainjs/xchain-util';
 import BigNumber from 'bignumber.js';
@@ -45,16 +45,21 @@ export class EthUtilsService {
     let checkSummedAddress;
     const wallet = ethClient.getWallet();
     const decimal = await this.getAssetDecimal(sourceAsset, ethClient);
+    const abi = (environment.network === 'testnet')
+      ? TCRopstenAbi
+      : TCAbi;
 
     if (sourceAsset.symbol === 'ETH') {
       checkSummedAddress = '0x0000000000000000000000000000000000000000';
     } else {
       const assetAddress = sourceAsset.symbol.slice(sourceAsset.ticker.length + 1);
-      const strip0x = assetAddress.substr(2);
+      const strip0x = (assetAddress.substr(0, 2).toUpperCase() === '0X')
+        ? assetAddress.substr(2)
+        : assetAddress;
       checkSummedAddress = ethers.utils.getAddress(strip0x);
     }
 
-    const contract = new ethers.Contract(ethInbound.router, TCRopstenAbi, wallet);
+    const contract = new ethers.Contract(ethInbound.router, abi, wallet);
 
     const params = [
       // Vault Address
