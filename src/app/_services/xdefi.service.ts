@@ -47,21 +47,6 @@ export class XDEFIService {
     const userbchClient = new bitcoinCashClient({ network, phrase });
 
     // XDEFI shim layer
-    // Binance
-    userBinanceClient.transfer = async function (transferParams) {
-      return new Promise((resolve, reject) => {
-        (window as any).xfi.binance.request(
-          {
-            method: "transfer",
-            params: [transferParams],
-          },
-          (err, result) => {
-            if (err) return reject(err);
-            return resolve(result);
-          }
-        );
-      });
-    };
 
     // @ts-ignore
     userBinanceClient.getAddress = async function () {
@@ -74,22 +59,6 @@ export class XDEFIService {
           (err, accounts) => {
             if (err) return reject(err);
             return resolve(accounts[0]);
-          }
-        );
-      });
-    };
-
-    // Bitcoin
-    userBtcClient.transfer = async function (transferParams) {
-      return new Promise((resolve, reject) => {
-        (window as any).xfi.bitcoin.request(
-          {
-            method: "transfer",
-            params: [transferParams],
-          },
-          (err, result) => {
-            if (err) return reject(err);
-            return resolve(result);
           }
         );
       });
@@ -109,22 +78,6 @@ export class XDEFIService {
         );
       });
     };
-
-    // BCH
-    userbchClient.transfer = async function (transferParams) {
-      return new Promise((resolve, reject) => {
-        (window as any).xfi.bitcoincash.request(
-          {
-            method: "transfer",
-            params: [transferParams],
-          },
-          (err, result) => {
-            if (err) return reject(err);
-            return resolve(result);
-          }
-        );
-      });
-    };
     // @ts-ignore
     userbchClient.getAddress = async function () {
       return new Promise((resolve, reject) => {
@@ -140,32 +93,11 @@ export class XDEFIService {
         );
       });
     };
-
-    // Eth
-    userEthereumClient.approve = function (params) {
-      return Promise.resolve({} as any); // TODO: ethereum approve logic
-    };
     // @ts-ignore
     userEthereumClient.getAddress = async function () {
       return (window as any).ethereum.request({
         method: "eth_requestAccounts",
         params: [],
-      });
-    };
-
-    // Thor
-    userThorchainClient.deposit = async function (depositParams) {
-      return new Promise((resolve, reject) => {
-        (window as any).xfi.thorchain.request(
-          {
-            method: "deposit",
-            params: [depositParams],
-          },
-          (err, result) => {
-            if (err) return reject(err);
-            return resolve(result);
-          }
-        );
       });
     };
     // @ts-ignore
@@ -179,22 +111,6 @@ export class XDEFIService {
           (err, accounts) => {
             if (err) return reject(err);
             return resolve(accounts[0]);
-          }
-        );
-      });
-    };
-
-    // Ltc
-    userLtcClient.transfer = async function (transferParams) {
-      return new Promise((resolve, reject) => {
-        (window as any).xfi.litecoin.request(
-          {
-            method: "transfer",
-            params: [transferParams],
-          },
-          (err, result) => {
-            if (err) return reject(err);
-            return resolve(result);
           }
         );
       });
@@ -239,6 +155,139 @@ export class XDEFIService {
     userbchClient.getAddress = () => bchAddress;
     userEthereumClient.getAddress = () => ethAddress;
     userLtcClient.getAddress = () => ltcAddress;
+
+    // Binance
+    userBinanceClient.transfer = async function (transferParams) {
+      console.debug("userBinanceClient.transfer", transferParams);
+      return new Promise((resolve, reject) => {
+        (window as any).xfi.binance.request(
+          {
+            method: "transfer",
+            params: [
+              {
+                ...transferParams,
+                from: bnbAddress,
+                amount: {
+                  amount: transferParams.amount.amount().toString(),
+                  decimals: transferParams.amount.decimal,
+                },
+              },
+            ],
+          },
+          (err, result) => {
+            if (err) return reject(err);
+            return resolve(result);
+          }
+        );
+      });
+    };
+
+    // Bitcoin
+    userBtcClient.transfer = async function (transferParams) {
+      console.debug("userBtcClient.transfer", transferParams);
+      return new Promise((resolve, reject) => {
+        (window as any).xfi.bitcoin.request(
+          {
+            method: "transfer",
+            params: [
+              {
+                ...transferParams,
+                from: btcAddress,
+                amount: {
+                  amount: transferParams.amount.amount().toString(),
+                  decimals: transferParams.amount.decimal,
+                },
+              },
+            ],
+          },
+          (err, result) => {
+            if (err) return reject(err);
+            return resolve(result);
+          }
+        );
+      });
+    };
+
+    // BCH
+    userbchClient.transfer = async function (transferParams) {
+      console.debug("userbchClient.transfer", transferParams);
+      return new Promise((resolve, reject) => {
+        (window as any).xfi.bitcoincash.request(
+          {
+            method: "transfer",
+            params: [
+              {
+                ...transferParams,
+                from: bchAddress,
+                amount: {
+                  amount: transferParams.amount.amount().toString(),
+                  decimals: transferParams.amount.decimal,
+                },
+              },
+            ],
+          },
+          (err, result) => {
+            if (err) return reject(err);
+            return resolve(result);
+          }
+        );
+      });
+    };
+    // Eth
+    userEthereumClient.approve = function (params) {
+      console.debug("userEthereumClient.approve", params);
+      return Promise.resolve({} as any); // TODO: ethereum approve logic
+    };
+    // Thor
+    userThorchainClient.deposit = async function (depositParams) {
+      console.debug("userThorchainClient.deposit", depositParams);
+      return new Promise((resolve, reject) => {
+        (window as any).xfi.thorchain.request(
+          {
+            method: "deposit",
+            params: [
+              {
+                ...depositParams,
+                from: thorAddress,
+                amount: {
+                  amount: depositParams.amount.amount().toString(),
+                  decimals: depositParams.amount.decimal,
+                },
+              },
+            ],
+          },
+          (err, result) => {
+            if (err) return reject(err);
+            return resolve(result);
+          }
+        );
+      });
+    };
+    // Ltc
+    userLtcClient.transfer = async function (transferParams) {
+      console.debug("userLtcClient.transfer", transferParams);
+      return new Promise((resolve, reject) => {
+        (window as any).xfi.litecoin.request(
+          {
+            method: "transfer",
+            params: [
+              {
+                ...transferParams,
+                from: ltcAddress,
+                amount: {
+                  amount: transferParams.amount.amount().toString(),
+                  decimals: transferParams.amount.decimal,
+                },
+              },
+            ],
+          },
+          (err, result) => {
+            if (err) return reject(err);
+            return resolve(result);
+          }
+        );
+      });
+    };
 
     console.log({
       thorAddress,

@@ -132,7 +132,10 @@ export class UpgradeRuneConfirmComponent implements OnInit, OnDestroy {
 
             if (this.user.type === 'keystore') {
               this.keystoreTransfer(matchingPool);
-            } else {
+            } else if(this.user.type ==='XDEFI') {
+              this.keystoreTransfer(matchingPool);
+            }
+            else {
               console.error('no matching user type');
             }
 
