@@ -115,7 +115,11 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
 
             if (matchingPool) {
 
-              if (this.swapData.user.type === 'keystore' || this.swapData.user.type === 'ledger') {
+              if (
+                this.swapData.user.type === 'keystore' ||
+                this.swapData.user.type === 'ledger' ||
+                this.swapData.user.type === 'XDEFI'
+              ) {
                 this.keystoreTransfer(matchingPool);
               } else {
                 console.log('no error type matches');
@@ -179,6 +183,7 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
         this.txState = TransactionConfirmationState.SUCCESS;
       } catch (error) {
         console.error('error making transfer: ', error);
+        console.error(error.stack);
         this.error = error;
         this.txState = TransactionConfirmationState.ERROR;
       }
@@ -250,6 +255,7 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
         this.txState = TransactionConfirmationState.SUCCESS;
       } catch (error) {
         console.error('error making transfer: ', error);
+        console.error(error.stack);
         this.error = error;
         this.txState = TransactionConfirmationState.ERROR;
       }

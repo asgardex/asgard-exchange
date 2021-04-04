@@ -129,9 +129,11 @@ export class EthUtilsService {
   }
 
   async callDeposit({inboundAddress, asset, memo, ethClient, amount}: CallDepositParams): Promise<string> {
-
+    console.log({
+      method: 'callDeposit',
+      inboundAddress, asset, memo, ethClient, amount
+    });
     let hash;
-    const wallet = ethClient.getWallet();
     const abi = (environment.network) === 'testnet'
       ? TCRopstenAbi
       : TCRopstenAbi;
@@ -139,8 +141,8 @@ export class EthUtilsService {
     if (asset.ticker === 'ETH') {
 
       const ethAddress = await ethClient.getAddress();
-      const contract = new ethers.Contract(inboundAddress.router, abi, wallet);
-      const contractRes = await contract.deposit(
+      const contract = new ethers.Contract(inboundAddress.router, abi);
+      const unsignedTx = await contract.populateTransaction.deposit(
         inboundAddress.address, // not sure if this is correct...
         '0x0000000000000000000000000000000000000000',
         ethers.utils.parseEther(String(amount)),
@@ -148,6 +150,11 @@ export class EthUtilsService {
         memo,
         {from: ethAddress, value: ethers.utils.parseEther(String(amount))}
       );
+      console.log({unsignedTx});
+      const contractRes = await ethClient
+        .getWallet()
+        .sendTransaction(unsignedTx);
+      console.log({contractRes});
 
       // tslint:disable-next-line:no-string-literal
       hash = contractRes['hash'] ? contractRes['hash'] : '';
@@ -157,7 +164,7 @@ export class EthUtilsService {
       const assetAddress = asset.symbol.slice(asset.ticker.length + 1);
       const strip0x = assetAddress.substr(2);
       const checkSummedAddress = ethers.utils.getAddress(strip0x);
-      const tokenContract = new ethers.Contract(checkSummedAddress, erc20ABI, wallet);
+      const tokenContract = new ethers.Contract(checkSummedAddress, erc20ABI);
       const decimal = await tokenContract.decimals();
       const params = [
         inboundAddress.address, // vault

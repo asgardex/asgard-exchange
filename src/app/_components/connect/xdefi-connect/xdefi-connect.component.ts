@@ -27,6 +27,10 @@ export class XDEFIConnectComponent implements OnInit {
   ngOnInit(): void {
     this.listProviders = this.xdefiService.listEnabledXDFIProviders();
     this.isValidNetwork = this.xdefiService.isValidNetwork();
+    }
+
+  clearKeystore() {
+    this.back.emit();
   }
 
   async initUnlock() {

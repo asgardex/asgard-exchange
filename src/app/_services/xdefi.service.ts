@@ -6,18 +6,31 @@ import { get } from "lodash";
 // import { UserService } from "./user.service";
 // const base64js = require('base64-js');
 // const bech32 = require('bech32');
-import { environment } from "src/environments/environment";
+import { environment } from 'src/environments/environment';
 // import { decryptFromKeystore } from '@xchainjs/xchain-crypto';
-import { Client as binanceClient } from "@xchainjs/xchain-binance";
-import { Client as bitcoinClient } from "@xchainjs/xchain-bitcoin";
-import { Client as thorchainClient } from "@xchainjs/xchain-thorchain";
-import { Client as ethereumClient } from "@xchainjs/xchain-ethereum/lib";
-import { Client as litecoinClient } from "@xchainjs/xchain-litecoin";
-import { Client as bitcoinCashClient } from "@xchainjs/xchain-bitcoincash";
-import { User } from "../_classes/user";
+import { Client as binanceClient } from '@xchainjs/xchain-binance';
+import { Client as bitcoinClient } from '@xchainjs/xchain-bitcoin';
+import { Client as thorchainClient } from '@xchainjs/xchain-thorchain';
+import {
+  Client as ethereumClient,
+  estimateDefaultFeesWithGasPricesAndLimits,
+  ETHAddress,
+  getTokenAddress,
+  TxOverrides,
+} from '@xchainjs/xchain-ethereum/lib';
+import { Client as litecoinClient } from '@xchainjs/xchain-litecoin';
+import { Client as bitcoinCashClient } from '@xchainjs/xchain-bitcoincash';
+import { User } from '../_classes/user';
+import { BigNumber } from '@ethersproject/bignumber';
+import { ethers } from 'ethers';
+import { erc20ABI } from '../_abi/erc20.abi';
+import { AssetETH, assetToString } from '@xchainjs/xchain-util';
+import { toUtf8Bytes } from '@ethersproject/strings';
+import { Address } from '@xchainjs/xchain-client';
+import { hexlify } from '@ethersproject/bytes';
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class XDEFIService {
   public static listProvider = [
@@ -81,16 +94,16 @@ export class XDEFIService {
   async initXDEFI() {}
 
   async connectXDEFI() {
-    const network = environment.network === "testnet" ? "testnet" : "mainnet";
+    const network = environment.network === 'testnet' ? 'testnet' : 'mainnet';
     const MOCK_PHRASE =
-      "image rally need wedding health address purse army antenna leopard sea gain";
+      'image rally need wedding health address purse army antenna leopard sea gain';
     const phrase = MOCK_PHRASE;
     const userBinanceClient = new binanceClient({ network, phrase });
     const userBtcClient = new bitcoinClient({
       network,
       phrase,
-      sochainUrl: "https://sochain.com/api/v2",
-      blockstreamUrl: "https://blockstream.info",
+      sochainUrl: 'https://sochain.com/api/v2',
+      blockstreamUrl: 'https://blockstream.info',
     });
     const userThorchainClient = new thorchainClient({ network, phrase });
     const userEthereumClient = new ethereumClient({
@@ -105,82 +118,82 @@ export class XDEFIService {
     // XDEFI shim layer
 
     // @ts-ignore
-    userBinanceClient.getAddress = async function () {
+    userBinanceClient.getAddress = async () => {
       return new Promise((resolve, reject) => {
         (window as any).xfi.binance.request(
           {
-            method: "request_accounts",
+            method: 'request_accounts',
             params: [],
           },
           (err, accounts) => {
-            if (err) return reject(err);
+            if (err) { return reject(err); }
             return resolve(accounts[0]);
           }
         );
       });
     };
     // @ts-ignore
-    userBtcClient.getAddress = async function () {
+    userBtcClient.getAddress = async () => {
       return new Promise((resolve, reject) => {
         (window as any).xfi.bitcoin.request(
           {
-            method: "request_accounts",
+            method: 'request_accounts',
             params: [],
           },
           (err, accounts) => {
-            if (err) return reject(err);
+            if (err) { return reject(err); }
             return resolve(accounts[0]);
           }
         );
       });
     };
     // @ts-ignore
-    userbchClient.getAddress = async function () {
+    userbchClient.getAddress = async () => {
       return new Promise((resolve, reject) => {
         (window as any).xfi.bitcoincash.request(
           {
-            method: "request_accounts",
+            method: 'request_accounts',
             params: [],
           },
           (err, accounts) => {
-            if (err) return reject(err);
+            if (err) { return reject(err); }
             return resolve(accounts[0]);
           }
         );
       });
     };
     // @ts-ignore
-    userEthereumClient.getAddress = async function () {
+    userEthereumClient.getAddress = async () => {
       return (window as any).ethereum.request({
-        method: "eth_requestAccounts",
+        method: 'eth_requestAccounts',
         params: [],
       });
     };
     // @ts-ignore
-    userThorchainClient.getAddress = async function () {
+    userThorchainClient.getAddress = async () => {
       return new Promise((resolve, reject) => {
         (window as any).xfi.thorchain.request(
           {
-            method: "request_accounts",
+            method: 'request_accounts',
             params: [],
           },
           (err, accounts) => {
-            if (err) return reject(err);
+            if (err) { return reject(err); }
             return resolve(accounts[0]);
           }
         );
       });
     };
     // @ts-ignore
-    userLtcClient.getAddress = async function () {
+    userLtcClient.getAddress = async () => {
       return new Promise((resolve, reject) => {
         (window as any).xfi.litecoin.request(
           {
-            method: "request_accounts",
+            method: 'request_accounts',
             params: [],
           },
           (err, accounts) => {
-            if (err) return reject(err);
+            if (err) { return reject(err); }
             return resolve(accounts[0]);
           }
         );
@@ -213,12 +226,12 @@ export class XDEFIService {
     userLtcClient.getAddress = () => ltcAddress;
 
     // Binance
-    userBinanceClient.transfer = async function (transferParams) {
-      console.debug("userBinanceClient.transfer", transferParams);
+    userBinanceClient.transfer = async (transferParams) => {
+      console.log('userBinanceClient.transfer', transferParams);
       return new Promise((resolve, reject) => {
         (window as any).xfi.binance.request(
           {
-            method: "transfer",
+            method: 'transfer',
             params: [
               {
                 ...transferParams,
@@ -231,7 +244,7 @@ export class XDEFIService {
             ],
           },
           (err, result) => {
-            if (err) return reject(err);
+            if (err) { return reject(err); }
             return resolve(result);
           }
         );
@@ -239,12 +252,12 @@ export class XDEFIService {
     };
 
     // Bitcoin
-    userBtcClient.transfer = async function (transferParams) {
-      console.debug("userBtcClient.transfer", transferParams);
+    userBtcClient.transfer = async (transferParams) => {
+      console.log('userBtcClient.transfer', transferParams);
       return new Promise((resolve, reject) => {
         (window as any).xfi.bitcoin.request(
           {
-            method: "transfer",
+            method: 'transfer',
             params: [
               {
                 ...transferParams,
@@ -257,7 +270,7 @@ export class XDEFIService {
             ],
           },
           (err, result) => {
-            if (err) return reject(err);
+            if (err) { return reject(err); }
             return resolve(result);
           }
         );
@@ -265,12 +278,12 @@ export class XDEFIService {
     };
 
     // BCH
-    userbchClient.transfer = async function (transferParams) {
-      console.debug("userbchClient.transfer", transferParams);
+    userbchClient.transfer = async (transferParams) => {
+      console.log('userbchClient.transfer', transferParams);
       return new Promise((resolve, reject) => {
         (window as any).xfi.bitcoincash.request(
           {
-            method: "transfer",
+            method: 'transfer',
             params: [
               {
                 ...transferParams,
@@ -283,24 +296,196 @@ export class XDEFIService {
             ],
           },
           (err, result) => {
-            if (err) return reject(err);
+            if (err) { return reject(err); }
             return resolve(result);
           }
         );
       });
     };
     // Eth
-    userEthereumClient.approve = function (params) {
-      console.debug("userEthereumClient.approve", params);
-      return Promise.resolve({} as any); // TODO: ethereum approve logic
+    userEthereumClient.approve = async (spender, sender, amount) => {
+      console.log('userEthereumClient.approve', spender, sender, amount);
+      const txAmount = amount
+        ? BigNumber.from(amount.amount().toFixed())
+        : BigNumber.from(2).pow(256).sub(1);
+      const contract = new ethers.Contract(sender, erc20ABI);
+      const unsignedTx = await contract.populateTransaction.approve(
+        spender,
+        txAmount
+      );
+      unsignedTx.from = ethAddress;
+      return (window as any).ethereum.request({
+        method: 'eth_sendTransaction',
+        params: [unsignedTx],
+      });
+    };
+    const oldWallet = userEthereumClient.getWallet();
+    oldWallet.getAddress = async () => ethAddress;
+    oldWallet.sendTransaction = (unsignedTx) => {
+      unsignedTx.value = hexlify(BigNumber.from(unsignedTx.value || 0));
+      return (window as any).ethereum.request({
+        method: 'eth_sendTransaction',
+        params: [unsignedTx],
+      });
+    };
+    oldWallet.signTransaction = (unsignedTx) => {
+        unsignedTx.value = hexlify(BigNumber.from(unsignedTx.value || 0));
+
+        return (window as any).ethereum.request({
+          method: 'eth_signTransaction',
+          params: [unsignedTx],
+        });
+      };
+    const newGetWallet = () => {
+      return oldWallet;
+    };
+    userEthereumClient.getWallet = newGetWallet;
+    userEthereumClient.transfer = async ({
+      asset,
+      memo,
+      amount,
+      recipient,
+      feeOptionKey,
+      gasPrice,
+      gasLimit,
+    }) => {
+      console.log({
+        method: 'ethCLient.transfer',
+        asset,
+        memo,
+        amount,
+        recipient,
+        feeOptionKey,
+        gasPrice,
+        gasLimit,
+      });
+      try {
+        const txAmount = BigNumber.from(amount.amount().toFixed());
+
+        let assetAddress;
+        if (asset && assetToString(asset) !== assetToString(AssetETH)) {
+          assetAddress = getTokenAddress(asset);
+        }
+
+        const isETHAddress = assetAddress === ETHAddress;
+
+        // feeOptionKey
+
+        const defaultGasLimit: ethers.BigNumber = isETHAddress
+          ? BigNumber.from(21000)
+          : BigNumber.from(100000);
+
+        let overrides: TxOverrides = {
+          gasLimit: gasLimit || defaultGasLimit,
+          gasPrice: gasPrice && BigNumber.from(gasPrice.amount().toFixed()),
+        };
+
+        // override `overrides` if `feeOptionKey` is provided
+        if (feeOptionKey) {
+          const _gasPrice = await userEthereumClient
+            .estimateGasPrices()
+            .then((prices) => prices[feeOptionKey])
+            .catch(
+              () =>
+                estimateDefaultFeesWithGasPricesAndLimits().gasPrices[
+                  feeOptionKey
+                ]
+            );
+          const _gasLimit = await userEthereumClient
+            .estimateGasLimit({ asset, recipient, amount, memo })
+            .catch(() => defaultGasLimit);
+
+          overrides = {
+            gasLimit: _gasLimit,
+            gasPrice: BigNumber.from(_gasPrice.amount().toFixed()),
+          };
+        }
+
+        let txResult;
+        if (assetAddress && !isETHAddress) {
+          // Transfer ERC20
+          const contract = new ethers.Contract(assetAddress, erc20ABI);
+          const unsignedTx = await contract.populateTransaction.transfer(
+            recipient,
+            txAmount,
+            Object.assign({}, overrides)
+          );
+          unsignedTx.from = ethAddress;
+          txResult = await (window as any).ethereum.request({
+            method: 'eth_sendTransaction',
+            params: [unsignedTx],
+          });
+        } else {
+          // Transfer ETH
+          const transactionRequest = Object.assign(
+            { to: recipient, value: txAmount },
+            {
+              ...overrides,
+              data: memo ? toUtf8Bytes(memo) : undefined,
+            }
+          );
+          txResult = await (window as any).ethereum.request({
+            method: 'eth_sendTransaction',
+            params: [transactionRequest],
+          });
+        }
+
+        return txResult.hash || txResult;
+      } catch (error) {
+        console.error(error);
+        return Promise.reject(error);
+      }
+
+      // return (window as any).ethereum.request({
+      //   method: "eth_sendTransaction",
+      //   params: [unsignedTx],
+      // });
+    };
+    userEthereumClient.call = async (
+      address: Address,
+      abi: ethers.ContractInterface,
+      func: string,
+      params: Array<any>
+    ) => {
+      console.log({
+        method: 'ethCLient.call',
+        address,
+        abi,
+        func,
+        params,
+      });
+      try {
+        if (!address) {
+          return Promise.reject(new Error('address must be provided'));
+        }
+        const contract = new ethers.Contract(
+          address,
+          abi,
+          userEthereumClient.getProvider()
+        );
+        const txResult = await contract[func](...params, {
+          from: ethAddress,
+        });
+        console.log({ txResult });
+        return txResult;
+      } catch (error) {
+        console.error(error);
+        console.error('stack');
+        return Promise.reject(error);
+      }
+
+      // return (window as any).ethereum.request({
+      //   method: "eth_sendTransaction",
+      //   params: [unsignedTx],
+      // });
     };
     // Thor
-    userThorchainClient.deposit = async function (depositParams) {
-      console.debug("userThorchainClient.deposit", depositParams);
+    userThorchainClient.deposit = async (depositParams) => {
+      console.log('userThorchainClient.deposit', depositParams);
       return new Promise((resolve, reject) => {
         (window as any).xfi.thorchain.request(
           {
-            method: "deposit",
+            method: 'deposit',
             params: [
               {
                 ...depositParams,
@@ -313,19 +498,21 @@ export class XDEFIService {
             ],
           },
           (err, result) => {
-            if (err) return reject(err);
+            if (err) {
+              return reject(err);
+            }
             return resolve(result);
           }
         );
       });
     };
     // Ltc
-    userLtcClient.transfer = async function (transferParams) {
-      console.debug("userLtcClient.transfer", transferParams);
+    userLtcClient.transfer = async (transferParams) => {
+      console.log('userLtcClient.transfer', transferParams);
       return new Promise((resolve, reject) => {
         (window as any).xfi.litecoin.request(
           {
-            method: "transfer",
+            method: 'transfer',
             params: [
               {
                 ...transferParams,
@@ -338,7 +525,7 @@ export class XDEFIService {
             ],
           },
           (err, result) => {
-            if (err) return reject(err);
+            if (err) { return reject(err); }
             return resolve(result);
           }
         );
@@ -355,7 +542,7 @@ export class XDEFIService {
     });
 
     const newUser = new User({
-      type: "XDEFI",
+      type: 'XDEFI',
       wallet: thorAddress,
       clients: {
         binance: userBinanceClient,

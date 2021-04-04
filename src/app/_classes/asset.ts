@@ -101,3 +101,14 @@ export const checkSummedAsset = (poolName: string): {chain: Chain, ticker: strin
   const checkSummedAddress = ethers.utils.getAddress(strip0x);
   return  {chain: asset.chain, ticker: asset.ticker, symbol: `${asset.ticker}-${checkSummedAddress}`};
 };
+
+export const isNonNativeRuneToken = (asset: {chain: Chain, ticker: string, symbol: string}): boolean => {
+  const runeTokens = [
+    'BNB.RUNE-B1A', // chaosnet
+    'BNB.RUNE-67C', // testnet
+    'ETH.RUNE-0XD601C6A3A36721320573885A8D8420746DA3D7A0', // testnet
+    'ETH.RUNE-0X3155BA85D5F96B2D030A4966AF206230E46849CB' // chaosnet
+  ];
+
+  return runeTokens.includes(`${asset.chain}.${asset.symbol}`.toUpperCase());
+};
