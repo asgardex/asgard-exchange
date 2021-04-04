@@ -1,5 +1,5 @@
-import { Injectable } from "@angular/core";
-import { get } from "lodash";
+import { Injectable } from '@angular/core';
+import { get } from 'lodash';
 // import { TransferResult } from '@thorchain/asgardex-binance';
 // import QRCodeModal from '@walletconnect/qrcode-modal';
 // import { User } from '../_classes/user';
@@ -35,34 +35,34 @@ import { hexlify } from '@ethersproject/bytes';
 export class XDEFIService {
   public static listProvider = [
     {
-      title: "Ethereum Provider",
-      providerPath: "ethereum",
+      title: 'Ethereum Provider',
+      providerPath: 'ethereum',
       enabled: true,
       disableNetworkValidation: true,
     },
     {
-      title: "Bitcoin Provider",
-      providerPath: ["xfi", "bitcoin"],
+      title: 'Bitcoin Provider',
+      providerPath: ['xfi', 'bitcoin'],
       enabled: true,
     },
     {
-      title: "BinanceDEX Provider",
-      providerPath: ["xfi", "binance"],
+      title: 'BinanceDEX Provider',
+      providerPath: ['xfi', 'binance'],
       enabled: true,
     },
     {
-      title: "BitcoinCash Provider",
-      providerPath: ["xfi", "bitcoincash"],
+      title: 'BitcoinCash Provider',
+      providerPath: ['xfi', 'bitcoincash'],
       enabled: true,
     },
     {
-      title: "LiteCoin Provider",
-      providerPath: ["xfi", "litecoin"],
+      title: 'LiteCoin Provider',
+      providerPath: ['xfi', 'litecoin'],
       enabled: true,
     },
     {
-      title: "Thorchain Provider",
-      providerPath: ["xfi", "thorchain"],
+      title: 'Thorchain Provider',
+      providerPath: ['xfi', 'thorchain'],
       enabled: true,
     },
   ];
@@ -76,7 +76,7 @@ export class XDEFIService {
           return false;
         }
         const projectNetwork =
-          environment.network === "testnet" ? "testnet" : "mainnet";
+          environment.network === 'testnet' ? 'testnet' : 'mainnet';
         return projectNetwork !== providerInfo.network;
       }
     );
