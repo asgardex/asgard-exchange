@@ -10,11 +10,24 @@ import { environment } from "src/environments/environment";
 import { Client as binanceClient } from "@xchainjs/xchain-binance";
 import { Client as bitcoinClient } from "@xchainjs/xchain-bitcoin";
 import { Client as thorchainClient } from "@xchainjs/xchain-thorchain";
-import { Client as ethereumClient } from "@xchainjs/xchain-ethereum/lib";
+import {
+  Client as ethereumClient,
+  estimateDefaultFeesWithGasPricesAndLimits,
+  ETHAddress,
+  getTokenAddress,
+  TxOverrides,
+} from "@xchainjs/xchain-ethereum/lib";
 import { Client as litecoinClient } from "@xchainjs/xchain-litecoin";
 import { Client as bitcoinCashClient } from "@xchainjs/xchain-bitcoincash";
 import { User } from "../_classes/user";
 import { rejects } from "assert";
+import { BigNumber } from "@ethersproject/bignumber";
+import { ethers } from "ethers";
+import { erc20ABI } from "../_abi/erc20.abi";
+import { AssetETH, assetToString } from "@xchainjs/xchain-util";
+import { toUtf8Bytes } from "@ethersproject/strings";
+import { Address } from "@xchainjs/xchain-client";
+import { hexlify } from "@ethersproject/bytes";
 
 @Injectable({
   providedIn: "root",
@@ -234,9 +247,181 @@ export class XDEFIService {
       });
     };
     // Eth
-    userEthereumClient.approve = function (params) {
-      console.debug("userEthereumClient.approve", params);
-      return Promise.resolve({} as any); // TODO: ethereum approve logic
+    userEthereumClient.approve = async function (spender, sender, amount) {
+      console.debug("userEthereumClient.approve", spender, sender, amount);
+      const txAmount = amount
+        ? BigNumber.from(amount.amount().toFixed())
+        : BigNumber.from(2).pow(256).sub(1);
+      const contract = new ethers.Contract(sender, erc20ABI);
+      const unsignedTx = await contract.populateTransaction.approve(
+        spender,
+        txAmount
+      );
+      unsignedTx.from = ethAddress;
+      return (window as any).ethereum.request({
+        method: "eth_sendTransaction",
+        params: [unsignedTx],
+      });
+    };
+    const oldWallet = userEthereumClient.getWallet();
+    oldWallet.getAddress = async () => ethAddress;
+    oldWallet.sendTransaction = (unsignedTx) => {
+      unsignedTx.value = hexlify(BigNumber.from(unsignedTx.value || 0));
+      return (window as any).ethereum.request({
+        method: "eth_sendTransaction",
+        params: [unsignedTx],
+      });
+    };
+      oldWallet.signTransaction = (unsignedTx) => {
+        unsignedTx.value = hexlify(BigNumber.from(unsignedTx.value || 0));
+
+        return (window as any).ethereum.request({
+          method: "eth_signTransaction",
+          params: [unsignedTx],
+        });
+      };
+    const newGetWallet = function () {
+      return oldWallet;
+    };
+    userEthereumClient.getWallet = newGetWallet
+    userEthereumClient.transfer = async function ({
+      asset,
+      memo,
+      amount,
+      recipient,
+      feeOptionKey,
+      gasPrice,
+      gasLimit,
+    }) {
+      console.debug({
+        method: "ethCLient.transfer",
+        asset,
+        memo,
+        amount,
+        recipient,
+        feeOptionKey,
+        gasPrice,
+        gasLimit,
+      });
+      try {
+        const txAmount = BigNumber.from(amount.amount().toFixed());
+
+        let assetAddress;
+        if (asset && assetToString(asset) !== assetToString(AssetETH)) {
+          assetAddress = getTokenAddress(asset);
+        }
+
+        const isETHAddress = assetAddress === ETHAddress;
+
+        // feeOptionKey
+
+        const defaultGasLimit: ethers.BigNumber = isETHAddress
+          ? BigNumber.from(21000)
+          : BigNumber.from(100000);
+
+        let overrides: TxOverrides = {
+          gasLimit: gasLimit || defaultGasLimit,
+          gasPrice: gasPrice && BigNumber.from(gasPrice.amount().toFixed()),
+        };
+
+        // override `overrides` if `feeOptionKey` is provided
+        if (feeOptionKey) {
+          const gasPrice = await userEthereumClient
+            .estimateGasPrices()
+            .then((prices) => prices[feeOptionKey])
+            .catch(
+              () =>
+                estimateDefaultFeesWithGasPricesAndLimits().gasPrices[
+                  feeOptionKey
+                ]
+            );
+          const gasLimit = await userEthereumClient
+            .estimateGasLimit({ asset, recipient, amount, memo })
+            .catch(() => defaultGasLimit);
+
+          overrides = {
+            gasLimit,
+            gasPrice: BigNumber.from(gasPrice.amount().toFixed()),
+          };
+        }
+
+        let txResult;
+        if (assetAddress && !isETHAddress) {
+          // Transfer ERC20
+          const contract = new ethers.Contract(assetAddress, erc20ABI);
+          const unsignedTx = await contract.populateTransaction.transfer(
+            recipient,
+            txAmount,
+            Object.assign({}, overrides)
+          );
+          unsignedTx.from = ethAddress;
+          txResult = await (window as any).ethereum.request({
+            method: "eth_sendTransaction",
+            params: [unsignedTx],
+          });
+        } else {
+          // Transfer ETH
+          const transactionRequest = Object.assign(
+            { to: recipient, value: txAmount },
+            {
+              ...overrides,
+              data: memo ? toUtf8Bytes(memo) : undefined,
+            }
+          );
+          txResult = await (window as any).ethereum.request({
+            method: "eth_sendTransaction",
+            params: [transactionRequest],
+          });
+        }
+
+        return txResult.hash || txResult;
+      } catch (error) {
+        console.error(error);
+        return Promise.reject(error);
+      }
+
+      // return (window as any).ethereum.request({
+      //   method: "eth_sendTransaction",
+      //   params: [unsignedTx],
+      // });
+    };
+    userEthereumClient.call = async function (
+      address: Address,
+      abi: ethers.ContractInterface,
+      func: string,
+      params: Array<any>
+    ) {
+      console.debug({
+        method: "ethCLient.call",
+        address,
+        abi,
+        func,
+        params,
+      });
+      try {
+        if (!address) {
+          return Promise.reject(new Error("address must be provided"));
+        }
+        const contract = new ethers.Contract(
+          address,
+          abi,
+          userEthereumClient.getProvider()
+        );
+        const txResult = await contract[func](...params, {
+          from: ethAddress,
+        });
+        console.log({ txResult });
+        return txResult;
+      } catch (error) {
+        console.error(error);
+        console.error('stack')
+        return Promise.reject(error);
+      }
+
+      // return (window as any).ethereum.request({
+      //   method: "eth_sendTransaction",
+      //   params: [unsignedTx],
+      // });
     };
     // Thor
     userThorchainClient.deposit = async function (depositParams) {
