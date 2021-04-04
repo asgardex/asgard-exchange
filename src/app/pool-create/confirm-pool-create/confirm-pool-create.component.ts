@@ -68,7 +68,7 @@ export class ConfirmPoolCreateComponent implements OnInit, OnDestroy {
             const bnbBalance = balances.find( (balance) => balance.asset.chain === 'BNB' && balance.asset.symbol === 'BNB' );
             if (bnbBalance)  {
               this.bnbBalance = bnbBalance.amount.amount().toNumber();
-              this.estimatBnbFee();
+              this.estimateBnbFee();
             }
           }
         }
@@ -225,7 +225,7 @@ export class ConfirmPoolCreateComponent implements OnInit, OnDestroy {
     }
   }
 
-  async estimatBnbFee() {
+  async estimateBnbFee() {
     this.insufficientChainBalance = (this.bnbBalance && (this.bnbBalance / 10 ** 8 < 0.000375));
     this.networkFee = 0.000375;
     this.loading = false;
