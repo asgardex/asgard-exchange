@@ -3,8 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { CGCoinListItem, CoinGeckoService } from '../_services/coin-gecko.service';
 import { MidgardService } from '../_services/midgard.service';
-import { Asset } from '../_classes/asset';
-import { environment } from 'src/environments/environment';
+import { Asset, isNonNativeRuneToken } from '../_classes/asset';
 import { UserService } from '../_services/user.service';
 import { Balances } from '@xchainjs/xchain-client';
 import { AssetAndBalance } from '../_classes/asset-and-balance';
@@ -19,8 +18,6 @@ import { baseAmount } from '@xchainjs/xchain-util';
   styleUrls: ['./pool-create.component.scss']
 })
 export class PoolCreateComponent implements OnInit, OnDestroy {
-
-  // runeSymbol = environment.network === 'chaosnet' ? 'RUNE-B1A' : 'RUNE-67C';
 
   /**
    * Rune
@@ -295,15 +292,16 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
 
   checkCreateableMarkets() {
 
-    const runeSymbol = environment.network === 'chaosnet' ? 'RUNE-B1A' : 'RUNE-67C';
-
     if (this.pools && this.balances) {
 
       // TODO: consolidate this is also used in pool.component
       this.selectableMarkets = this.balances.filter( (balance) => {
         const asset = balance.asset;
+
         return !this.pools.find((pool) => pool === `${asset.chain}.${asset.symbol}`)
-          && asset.symbol !== runeSymbol;
+          && !isNonNativeRuneToken(asset)
+          && asset.chain !== 'THOR';
+
       }).map( (balance) => {
         return {asset: new Asset(`${balance.asset.chain}.${balance.asset.symbol}`)};
       });

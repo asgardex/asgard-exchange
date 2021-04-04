@@ -4,10 +4,10 @@ import { Subscription } from 'rxjs';
 import { User } from '../_classes/user';
 import { MidgardService } from '../_services/midgard.service';
 import { UserService } from '../_services/user.service';
-import { environment } from 'src/environments/environment';
 import { PoolDTO } from '../_classes/pool';
 import { MemberPool } from '../_classes/member';
 import { TransactionStatusService } from '../_services/transaction-status.service';
+import { isNonNativeRuneToken } from '../_classes/asset';
 
 @Component({
   selector: 'app-pool',
@@ -75,14 +75,12 @@ export class PoolComponent implements OnInit, OnDestroy {
 
   checkCreateableMarkets() {
 
-    const runeSymbol = environment.network === 'chaosnet' ? 'RUNE-B1A' : 'RUNE-67C';
-
     if (this.pools && this.balances) {
 
       this.createablePools = this.balances.filter( (balance) => {
         const asset = balance.asset;
         return !this.pools.find((pool) => pool.asset === `${asset.chain}.${asset.symbol}`)
-          && asset.symbol !== runeSymbol;
+          && !isNonNativeRuneToken(asset);
       }).map( (balance) => `${balance.asset.chain}.${balance.asset.symbol}` );
 
     }

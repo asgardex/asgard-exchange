@@ -7,7 +7,7 @@ import {
   assetAmount,
 } from '@xchainjs/xchain-util';
 import { combineLatest, Subscription } from 'rxjs';
-import { Asset } from '../_classes/asset';
+import { Asset, isNonNativeRuneToken } from '../_classes/asset';
 import { MidgardService } from '../_services/midgard.service';
 import { UserService } from '../_services/user.service';
 import { MatDialog } from '@angular/material/dialog';
@@ -110,9 +110,7 @@ export class DepositComponent implements OnInit, OnDestroy {
     this.poolNotFoundErr = false;
     this.ethContractApprovalRequired = false;
     this.rune = new Asset('THOR.RUNE');
-
     this.subs = [];
-
   }
 
   ngOnInit(): void {
@@ -145,6 +143,12 @@ export class DepositComponent implements OnInit, OnDestroy {
 
       if (asset) {
         this.asset = new Asset(asset);
+
+        if (isNonNativeRuneToken(this.asset)) {
+          this.back();
+          return;
+        }
+
         this.getPoolDetail(asset);
         this.assetBalance = this.userService.findBalance(this.balances, this.asset);
 
@@ -224,11 +228,13 @@ export class DepositComponent implements OnInit, OnDestroy {
         }))
         // filter out until we can add support
         .filter( (pool) => pool.asset.chain === 'BNB'
-          || pool.asset.chain === 'THOR'
           || pool.asset.chain === 'BTC'
           || pool.asset.chain === 'ETH'
           || pool.asset.chain === 'LTC'
-          || pool.asset.chain === 'BCH');
+          || pool.asset.chain === 'BCH')
+
+         // filter out non-native RUNE tokens
+        .filter( (pool) => !isNonNativeRuneToken(pool.asset));
       },
       (err) => console.error('error fetching pools:', err)
     );
