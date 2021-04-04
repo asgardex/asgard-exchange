@@ -35,24 +35,24 @@ export class ConnectComponent implements OnInit {
 }
 
 export enum ConnectionMethod {
-  LEDGER = "LEDGER",
-  KEYSTORE = "KEYSTORE",
-  KEYSTORE_CREATE = "KEYSTORE_CREATE",
-  WALLET_CONNECT = "WALLET_CONNECT",
-  XDEFI = "XDEFI",
+  LEDGER = 'LEDGER',
+  KEYSTORE = 'KEYSTORE',
+  KEYSTORE_CREATE = 'KEYSTORE_CREATE',
+  WALLET_CONNECT = 'WALLET_CONNECT',
+  XDEFI = 'XDEFI',
 }
 
 @Component({
-  selector: "app-connect-modal",
-  templateUrl: "connect-modal.component.html",
-  styleUrls: ["./connect.component.scss"],
+  selector: 'app-connect-modal',
+  templateUrl: 'connect-modal.component.html',
+  styleUrls: ['./connect.component.scss'],
 })
 // tslint:disable-next-line:component-class-suffix
 export class ConnectModal implements OnDestroy {
   connectionMethod: ConnectionMethod;
   isTestnet: boolean;
   subs: Subscription[];
-  selectedChain: "BNB" | "BTC";
+  selectedChain: 'BNB' | 'BTC';
   isXDEFIConnected: boolean;
 
   constructor(
@@ -60,7 +60,7 @@ export class ConnectModal implements OnDestroy {
     private walletConnectService: WalletConnectService,
     private userService: UserService
   ) {
-    this.isTestnet = environment.network === "testnet" ? true : false;
+    this.isTestnet = environment.network === 'testnet' ? true : false;
 
     const user$ = this.userService.user$.subscribe((user) => {
       if (user) {
@@ -82,7 +82,7 @@ export class ConnectModal implements OnDestroy {
     // };
   }
 
-  setSelectedChain(chain: "BNB" | "BTC") {
+  setSelectedChain(chain: 'BNB' | 'BTC') {
     this.selectedChain = chain;
   }
 

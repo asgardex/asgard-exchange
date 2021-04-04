@@ -130,9 +130,9 @@ export class EthUtilsService {
 
   async callDeposit({inboundAddress, asset, memo, ethClient, amount}: CallDepositParams): Promise<string> {
     console.log({
-      method:'callDeposit',
+      method: 'callDeposit',
       inboundAddress, asset, memo, ethClient, amount
-    })
+    });
     let hash;
     const abi = (environment.network) === 'testnet'
       ? TCRopstenAbi
@@ -150,11 +150,11 @@ export class EthUtilsService {
         memo,
         {from: ethAddress, value: ethers.utils.parseEther(String(amount))}
       );
-      console.log({unsignedTx})
+      console.log({unsignedTx});
       const contractRes = await ethClient
         .getWallet()
         .sendTransaction(unsignedTx);
-      console.log({contractRes})
+      console.log({contractRes});
 
       // tslint:disable-next-line:no-string-literal
       hash = contractRes['hash'] ? contractRes['hash'] : '';

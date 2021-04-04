@@ -1,11 +1,11 @@
-import { Component, OnInit, Output, EventEmitter } from "@angular/core";
-import { UserService } from "src/app/_services/user.service";
-import { XDEFIService } from "src/app/_services/xdefi.service";
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { UserService } from 'src/app/_services/user.service';
+import { XDEFIService } from 'src/app/_services/xdefi.service';
 
 @Component({
-  selector: "app-xdefi-connect",
-  templateUrl: "./xdefi-connect.component.html",
-  styleUrls: ["./xdefi-connect.component.scss"],
+  selector: 'app-xdefi-connect',
+  templateUrl: './xdefi-connect.component.html',
+  styleUrls: ['./xdefi-connect.component.scss'],
 })
 export class XDEFIConnectComponent implements OnInit {
   xdefiPassword: string;
@@ -28,7 +28,7 @@ export class XDEFIConnectComponent implements OnInit {
   ngOnInit(): void {}
 
   clearKeystore() {
-    this.xdefiPassword = "";
+    this.xdefiPassword = '';
     this.xdefiFile = null;
     this.xdefiFileSelected = false;
     this.back.emit();
