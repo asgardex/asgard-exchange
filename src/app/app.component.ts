@@ -11,6 +11,7 @@ import { UserService } from './_services/user.service';
 import { Chain } from '@xchainjs/xchain-util';
 import { AssetAndBalance } from './_classes/asset-and-balance';
 import { Asset } from './_classes/asset';
+import { ReconnectXDEFIDialogComponent } from './_components/reconnect-xdefi-dialog/reconnect-xdefi-dialog.component';
 
 @Component({
   selector: 'app-root',
@@ -29,7 +30,7 @@ export class AppComponent implements OnInit, OnDestroy {
     private dialog: MatDialog,
     private midgardService: MidgardService,
     private lastBlockService: LastBlockService,
-    private userService: UserService
+    private userService: UserService,
   ) {
     this.isTestnet = (environment.network === 'testnet');
 
@@ -70,13 +71,17 @@ export class AppComponent implements OnInit, OnDestroy {
     this.subs = [chainBalanceErrors$, balances$];
   }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.pollLastBlock();
 
     const keystoreString = localStorage.getItem('keystore');
+    const XDEFIConnected = localStorage.getItem('XDEFI_CONNECTED');
+
     const keystore = JSON.parse(keystoreString);
     if (keystore) {
       this.openReconnectDialog(keystore);
+    } else if (XDEFIConnected) {
+      this.openReconnectXDEFIDialog();
     }
   }
 
@@ -85,7 +90,7 @@ export class AppComponent implements OnInit, OnDestroy {
       || (this.chainBalanceErrors && this.chainBalanceErrors.length > 0));
   }
 
-  openReconnectDialog(keystore) {
+  openReconnectDialog(keystore?) {
     this.dialog.open(
       ReconnectDialogComponent,
       {
@@ -95,6 +100,17 @@ export class AppComponent implements OnInit, OnDestroy {
         data: {
           keystore
         }
+      }
+    );
+  }
+
+  openReconnectXDEFIDialog() {
+    this.dialog.open(
+      ReconnectXDEFIDialogComponent,
+      {
+        maxWidth: '420px',
+        width: '50vw',
+        minWidth: '260px',
       }
     );
   }

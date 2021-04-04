@@ -1,0 +1,50 @@
+<div class="container">
+  <app-modal-section-header
+    sectionTitle="XDEFI Found"
+  ></app-modal-section-header>
+
+  <div class="dialog-content">
+    <div mat-dialog-content>
+      <ul>
+        <li *ngFor="let providerInfo of listProviders" class="flex align-item">
+          <span>- {{ providerInfo.title }}</span>
+          <mat-icon
+            [ngStyle]="{ color: providerInfo.enabled ? 'green' : 'red' }"
+          >
+            {{ providerInfo.enabled ? "check" : "close" }}
+          </mat-icon>
+        </li>
+      </ul>
+      <button
+        style="cursor: auto; font-size: 12px"
+        class="uni-input uni-input--file"
+        [disabled]="true"
+      >
+        <span>Reconnect XDEFI from previous session</span>
+        <mat-icon [ngStyle]="{ color: 'green' }">check</mat-icon>
+      </button>
+    </div>
+    <div *ngIf="!isValidNetwork" class="uni-input uni-input--file">
+      <span style="font-size: 0.8rem; color: red">Incorrect network!</span>
+    </div>
+    <div class="flex justify-between items-center" style="height: 38px">
+      <button class="mb-2" mat-flat-button (click)="forget()">
+        <span>Forget XDEFI</span>
+      </button>
+      <button
+        class="flex flex-row"
+        mat-flat-button
+        color="accent"
+        (click)="initConnect()"
+        [disabled]="!isValidNetwork"
+      >
+        <span>Re-connect to XDEFI</span>
+        <mat-progress-spinner
+          mode="indeterminate"
+          diameter="30"
+          *ngIf="connecting"
+        ></mat-progress-spinner>
+      </button>
+    </div>
+  </div>
+</div>

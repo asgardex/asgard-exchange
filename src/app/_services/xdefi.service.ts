@@ -1,8 +1,9 @@
 import { Injectable } from "@angular/core";
+import { get } from "lodash";
 // import { TransferResult } from '@thorchain/asgardex-binance';
 // import QRCodeModal from '@walletconnect/qrcode-modal';
 // import { User } from '../_classes/user';
-import { UserService } from "./user.service";
+// import { UserService } from "./user.service";
 // const base64js = require('base64-js');
 // const bech32 = require('bech32');
 import { environment } from "src/environments/environment";
@@ -14,13 +15,68 @@ import { Client as ethereumClient } from "@xchainjs/xchain-ethereum/lib";
 import { Client as litecoinClient } from "@xchainjs/xchain-litecoin";
 import { Client as bitcoinCashClient } from "@xchainjs/xchain-bitcoincash";
 import { User } from "../_classes/user";
-import { rejects } from "assert";
 
 @Injectable({
   providedIn: "root",
 })
 export class XDEFIService {
-  constructor(private userService: UserService) {}
+  public static listProvider = [
+    {
+      title: "Ethereum Provider",
+      providerPath: "ethereum",
+      enabled: true,
+      disableNetworkValidation: true,
+    },
+    {
+      title: "Bitcoin Provider",
+      providerPath: ["xfi", "bitcoin"],
+      enabled: true,
+    },
+    {
+      title: "BinanceDEX Provider",
+      providerPath: ["xfi", "binance"],
+      enabled: true,
+    },
+    {
+      title: "BitcoinCash Provider",
+      providerPath: ["xfi", "bitcoincash"],
+      enabled: true,
+    },
+    {
+      title: "LiteCoin Provider",
+      providerPath: ["xfi", "litecoin"],
+      enabled: true,
+    },
+    {
+      title: "Thorchain Provider",
+      providerPath: ["xfi", "thorchain"],
+      enabled: true,
+    },
+  ];
+  constructor() {}
+
+  isValidNetwork() {
+    const invalidNetworkProvider = XDEFIService.listProvider.find(
+      ({ providerPath, disableNetworkValidation }) => {
+        const providerInfo = get(window, providerPath);
+        if (disableNetworkValidation || !providerInfo) {
+          return false;
+        }
+        const projectNetwork =
+          environment.network === "testnet" ? "testnet" : "mainnet";
+        return projectNetwork !== providerInfo.network;
+      }
+    );
+    return !invalidNetworkProvider;
+  }
+
+  listEnabledXDFIProviders() {
+    return XDEFIService.listProvider.map((provider) => ({
+      ...provider,
+      // @ts-ignore
+      enabled: get(window, provider.providerPath),
+    }));
+  }
 
   async initXDEFI() {}
 

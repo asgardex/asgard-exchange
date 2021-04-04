@@ -24,9 +24,10 @@
           <span>Connect Keystore</span>
         </button>
 
-        <button class="connect-option focus:outline-none" [disabled]="!isXDEFIConnected" (click)="connectXDEFI()">
+        <button class="connect-option focus:outline-none"  (click)="connectXDEFI()">
           <img width="24px" src="https://www.xdefi.io/favicon.svg" lass="connect-option__logo"/>
-          <span>Connect with XDEFI</span>
+          <span *ngIf="isXDEFIConnected">Connect with XDEFI</span>
+          <span *ngIf="!isXDEFIConnected">Download&nbsp;<a href="XDEFI.io">XDEFI</a></span>
         </button>
 
       </div>

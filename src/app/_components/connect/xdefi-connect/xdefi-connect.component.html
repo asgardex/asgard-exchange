@@ -6,32 +6,20 @@
 
   <div class="dialog-content">
     <div mat-dialog-content>
-      <!-- <button
-        class="uni-input uni-input--file focus:outline-none"
-        (click)="xdefiInput.click()"
-      >
-        <span>Connect XDEFI</span>
-        <mat-icon *ngIf="!xdefiFileSelected">vpn_key</mat-icon>
-        <mat-icon *ngIf="xdefiFileSelected" [ngStyle]="{ color: 'green' }"
-          >check</mat-icon
-        >
-      </button> -->
-
-      <!-- <div class="uni-input">
-        <label>Password</label>
-        <input
-          class="focus:outline-none focus:ring-0"
-          [(ngModel)]="xdefiPassword"
-          name="xdefi-password"
-          placeholder="Please Enter Password"
-          type="password"
-          (keyup.enter)="initUnlock()"
-        />
-      </div> -->
-
+      <ul>
+        <li *ngFor="let providerInfo of listProviders" class="flex align-item">
+          <span>- {{ providerInfo.title }}</span>
+          <mat-icon
+            [ngStyle]="{ color: providerInfo.enabled ? 'green' : 'red' }"
+          >
+            {{ providerInfo.enabled ? "check" : "close" }}
+          </mat-icon>
+        </li>
+      </ul>
+      <br />
       <small
         >You need to enable all dApps Injection Providers in
-        <b>Settings > dApps Settings</b>.</small
+        <b>Settings > dApps Settings </b> then reload the page.</small
       >
       <br />
     </div>
@@ -41,14 +29,18 @@
         <span *ngIf="xdefiError" style="font-size: 0.8rem; color: #2172e5"
           >XDEFI Login Incorrect</span
         >
+        <span *ngIf="!isValidNetwork" style="font-size: 0.8rem; color: #2172e5"
+          >Incorrect network!</span
+        >
       </div>
+      <br />
       <div>
         <button
           *ngIf="!xdefiConnecting"
           mat-flat-button
           color="accent"
           (click)="initUnlock()"
-          [disabled]="xdefiConnecting"
+          [disabled]="xdefiConnecting || !isValidNetwork"
         >
           <span>Connect</span>
         </button>
