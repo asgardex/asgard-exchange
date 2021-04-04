@@ -111,4 +111,4 @@ export const isNonNativeRuneToken = (asset: {chain: Chain, ticker: string, symbo
   ];
 
   return runeTokens.includes(`${asset.chain}.${asset.symbol}`.toUpperCase());
-}
+};
