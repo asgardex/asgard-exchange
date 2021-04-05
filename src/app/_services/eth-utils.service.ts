@@ -137,10 +137,10 @@ export class EthUtilsService {
     const abi = (environment.network) === 'testnet'
       ? TCRopstenAbi
       : TCRopstenAbi;
+    const ethAddress = await ethClient.getAddress();
 
     if (asset.ticker === 'ETH') {
 
-      const ethAddress = await ethClient.getAddress();
       const contract = new ethers.Contract(inboundAddress.router, abi);
       const unsignedTx = await contract.populateTransaction.deposit(
         inboundAddress.address, // not sure if this is correct...
@@ -164,16 +164,26 @@ export class EthUtilsService {
       const assetAddress = asset.symbol.slice(asset.ticker.length + 1);
       const strip0x = assetAddress.substr(2);
       const checkSummedAddress = ethers.utils.getAddress(strip0x);
-      const tokenContract = new ethers.Contract(checkSummedAddress, erc20ABI);
-      const decimal = await tokenContract.decimals();
+      // const tokenContract = new ethers.Contract(checkSummedAddress, erc20ABI);
+      const decimal: BigNumber = await ethClient.call(checkSummedAddress, erc20ABI, 'decimals', []);
+      // const decimal = await tokenContract.decimals();
       const params = [
         inboundAddress.address, // vault
         checkSummedAddress, // asset
         assetToBase(assetAmount(amount, decimal.toNumber())).amount().toFixed(), // amount
         memo
       ];
-
-      const contractRes = await ethClient.call(inboundAddress.router, abi, 'deposit', params);
+      const vaultContract = new ethers.Contract(inboundAddress.router, abi);
+      const unsignedTx = await vaultContract.populateTransaction.deposit(
+        ...params,
+        {from: ethAddress}
+      );
+      console.log({unsignedTx});
+      const contractRes = await ethClient
+        .getWallet()
+        .sendTransaction(unsignedTx);
+      console.log({contractRes});
+      // const contractRes = await ethClient(inboundAddress.router, abi, 'deposit', params);
 
       // tslint:disable-next-line:no-string-literal
       hash = contractRes['hash'] ? contractRes['hash'] : '';
