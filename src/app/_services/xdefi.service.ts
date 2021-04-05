@@ -93,6 +93,94 @@ export class XDEFIService {
 
   async initXDEFI() {}
 
+  async getBnbAddress():Promise<string>{
+    if(!(window as any).xfi.binance) return;
+    return new Promise((resolve, reject) => {
+      (window as any).xfi.binance.request(
+        {
+          method: 'request_accounts',
+          params: [],
+        },
+        (err, accounts) => {
+          if (err) { return reject(err); }
+          return resolve(accounts[0]);
+        }
+      );
+    });
+  };
+
+  async getBtcAddress():Promise<string>{
+    if(!(window as any).xfi.bitcoin) return;
+    return new Promise((resolve, reject) => {
+      (window as any).xfi.bitcoin.request(
+        {
+          method: 'request_accounts',
+          params: [],
+        },
+        (err, accounts) => {
+          if (err) { return reject(err); }
+          return resolve(accounts[0]);
+        }
+      );
+    });
+  }
+
+  async getBchAddress():Promise<string>{
+    if(!(window as any).xfi.bitcoincash) return;
+    return new Promise((resolve, reject) => {
+      (window as any).xfi.bitcoincash.request(
+        {
+          method: 'request_accounts',
+          params: [],
+        },
+        (err, accounts) => {
+          if (err) { return reject(err); }
+          return resolve(accounts[0]);
+        }
+      );
+    });
+  }
+
+  async getEthAddress():Promise<string>{
+    if(!(window as any).ethereum) return
+    return (window as any).ethereum.request({
+      method: 'eth_requestAccounts',
+      params: [],
+    });
+  }
+
+  async getThorChainAddress():Promise<string>{
+    if(!(window as any).xfi.thorchain) return;
+    return new Promise((resolve, reject) => {
+      (window as any).xfi.thorchain.request(
+        {
+          method: 'request_accounts',
+          params: [],
+        },
+        (err, accounts) => {
+          if (err) { return reject(err); }
+          return resolve(accounts[0]);
+        }
+      );
+    });
+  }
+
+  async getLtcAddress():Promise<string>{
+    if(!(window as any).xfi.litecoin) return;
+    return new Promise((resolve, reject) => {
+      (window as any).xfi.litecoin.request(
+        {
+          method: 'request_accounts',
+          params: [],
+        },
+        (err, accounts) => {
+          if (err) { return reject(err); }
+          return resolve(accounts[0]);
+        }
+      );
+    });
+  }
+
   async connectXDEFI() {
     const network = environment.network === 'testnet' ? 'testnet' : 'mainnet';
     const MOCK_PHRASE =
@@ -114,115 +202,34 @@ export class XDEFIService {
     });
     const userLtcClient = new litecoinClient({ network, phrase });
     const userbchClient = new bitcoinCashClient({ network, phrase });
-
-    // XDEFI shim layer
-
-    // @ts-ignore
-    userBinanceClient.getAddress = async () => {
-      return new Promise((resolve, reject) => {
-        (window as any).xfi.binance.request(
-          {
-            method: 'request_accounts',
-            params: [],
-          },
-          (err, accounts) => {
-            if (err) { return reject(err); }
-            return resolve(accounts[0]);
-          }
-        );
-      });
-    };
-    // @ts-ignore
-    userBtcClient.getAddress = async () => {
-      return new Promise((resolve, reject) => {
-        (window as any).xfi.bitcoin.request(
-          {
-            method: 'request_accounts',
-            params: [],
-          },
-          (err, accounts) => {
-            if (err) { return reject(err); }
-            return resolve(accounts[0]);
-          }
-        );
-      });
-    };
-    // @ts-ignore
-    userbchClient.getAddress = async () => {
-      return new Promise((resolve, reject) => {
-        (window as any).xfi.bitcoincash.request(
-          {
-            method: 'request_accounts',
-            params: [],
-          },
-          (err, accounts) => {
-            if (err) { return reject(err); }
-            return resolve(accounts[0]);
-          }
-        );
-      });
-    };
-    // @ts-ignore
-    userEthereumClient.getAddress = async () => {
-      return (window as any).ethereum.request({
-        method: 'eth_requestAccounts',
-        params: [],
-      });
-    };
-    // @ts-ignore
-    userThorchainClient.getAddress = async () => {
-      return new Promise((resolve, reject) => {
-        (window as any).xfi.thorchain.request(
-          {
-            method: 'request_accounts',
-            params: [],
-          },
-          (err, accounts) => {
-            if (err) { return reject(err); }
-            return resolve(accounts[0]);
-          }
-        );
-      });
-    };
-    // @ts-ignore
-    userLtcClient.getAddress = async () => {
-      return new Promise((resolve, reject) => {
-        (window as any).xfi.litecoin.request(
-          {
-            method: 'request_accounts',
-            params: [],
-          },
-          (err, accounts) => {
-            if (err) { return reject(err); }
-            return resolve(accounts[0]);
-          }
-        );
-      });
-    };
-
-    // End shim layer
-
-    const thorAddress = await userThorchainClient.getAddress();
-    console.log({ thorAddress });
-    const bnbAddress = await userBinanceClient.getAddress();
-    console.log({ bnbAddress });
-    const btcAddress = await userBtcClient.getAddress();
-    console.log({ btcAddress });
-
-    const bchAddress = await userbchClient.getAddress();
-    console.log({ bchAddress });
-
-    const ethAddress = (await userEthereumClient.getAddress())[0];
-    console.log({ ethAddress });
-
-    const ltcAddress = await userLtcClient.getAddress();
-    console.log({ ltcAddress });
+    const [thorAddress] = await Promise.all([
+      this.getThorChainAddress(),
+      new Promise(resolve => setTimeout(resolve, 100))
+    ]);
+    const [
+      bnbAddress,
+      btcAddress,
+      bchAddress,
+      ethAddress,
+      ltcAddress
+    ] = await Promise.all([
+      this.getBnbAddress(),
+      this.getBtcAddress(),
+      this.getBchAddress(),
+      this.getEthAddress(),
+      this.getLtcAddress()
+    ])
+    console.log('after,',  bnbAddress,
+    btcAddress,
+    bchAddress,
+    [ethAddress],
+    ltcAddress)
 
     userThorchainClient.getAddress = () => thorAddress;
     userBinanceClient.getAddress = () => bnbAddress;
     userBtcClient.getAddress = () => btcAddress;
     userbchClient.getAddress = () => bchAddress;
-    userEthereumClient.getAddress = () => ethAddress;
+    userEthereumClient.getAddress = () => ethAddress && ethAddress[0];
     userLtcClient.getAddress = () => ltcAddress;
 
     // Binance
