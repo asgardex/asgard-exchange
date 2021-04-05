@@ -93,8 +93,8 @@ export class XDEFIService {
 
   async initXDEFI() {}
 
-  async getBnbAddress():Promise<string>{
-    if(!(window as any).xfi.binance) return;
+  async getBnbAddress(): Promise<string>{
+    if (!(window as any).xfi.binance) { return; }
     return new Promise((resolve, reject) => {
       (window as any).xfi.binance.request(
         {
@@ -107,10 +107,10 @@ export class XDEFIService {
         }
       );
     });
-  };
+  }
 
-  async getBtcAddress():Promise<string>{
-    if(!(window as any).xfi.bitcoin) return;
+  async getBtcAddress(): Promise<string>{
+    if (!(window as any).xfi.bitcoin) { return; }
     return new Promise((resolve, reject) => {
       (window as any).xfi.bitcoin.request(
         {
@@ -125,8 +125,8 @@ export class XDEFIService {
     });
   }
 
-  async getBchAddress():Promise<string>{
-    if(!(window as any).xfi.bitcoincash) return;
+  async getBchAddress(): Promise<string>{
+    if (!(window as any).xfi.bitcoincash) { return; }
     return new Promise((resolve, reject) => {
       (window as any).xfi.bitcoincash.request(
         {
@@ -141,16 +141,16 @@ export class XDEFIService {
     });
   }
 
-  async getEthAddress():Promise<string>{
-    if(!(window as any).ethereum) return
+  async getEthAddress(): Promise<string>{
+    if (!(window as any).ethereum) { return; }
     return (window as any).ethereum.request({
       method: 'eth_requestAccounts',
       params: [],
     });
   }
 
-  async getThorChainAddress():Promise<string>{
-    if(!(window as any).xfi.thorchain) return;
+  async getThorChainAddress(): Promise<string>{
+    if (!(window as any).xfi.thorchain) { return; }
     return new Promise((resolve, reject) => {
       (window as any).xfi.thorchain.request(
         {
@@ -165,8 +165,8 @@ export class XDEFIService {
     });
   }
 
-  async getLtcAddress():Promise<string>{
-    if(!(window as any).xfi.litecoin) return;
+  async getLtcAddress(): Promise<string>{
+    if (!(window as any).xfi.litecoin) { return; }
     return new Promise((resolve, reject) => {
       (window as any).xfi.litecoin.request(
         {
@@ -218,12 +218,7 @@ export class XDEFIService {
       this.getBchAddress(),
       this.getEthAddress(),
       this.getLtcAddress()
-    ])
-    console.log('after,',  bnbAddress,
-    btcAddress,
-    bchAddress,
-    [ethAddress],
-    ltcAddress)
+    ]);
 
     userThorchainClient.getAddress = () => thorAddress;
     userBinanceClient.getAddress = () => bnbAddress;
