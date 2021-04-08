@@ -38,7 +38,6 @@ import { LastBlockService } from './_services/last-block.service';
 import { MidgardService } from './_services/midgard.service';
 import { UserService } from './_services/user.service';
 import { TransactionStatusService } from './_services/transaction-status.service';
-import { WalletConnectService } from './_services/wallet-connect.service';
 import { KeystoreService } from './_services/keystore.service';
 import { SlippageToleranceService } from './_services/slippage-tolerance.service';
 import { CoinGeckoService } from './_services/coin-gecko.service';
@@ -134,7 +133,6 @@ import { ModalSectionHeaderModule } from './_components/modal-section-header/mod
     UserService,
     MidgardService,
     LastBlockService,
-    WalletConnectService,
     ExplorerPathsService,
     SlippageToleranceService,
     TransactionStatusService,

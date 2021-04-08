@@ -3,7 +3,6 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { UserService } from 'src/app/_services/user.service';
 import { environment } from 'src/environments/environment';
 import { Subscription } from 'rxjs';
-import { WalletConnectService } from 'src/app/_services/wallet-connect.service';
 
 
 @Component({
@@ -19,11 +18,9 @@ export class ConnectComponent implements OnInit {
     minWidth: '260px'
   };
 
-  constructor(private dialog: MatDialog, private walletConnectService: WalletConnectService) { }
+  constructor(private dialog: MatDialog) { }
 
-  ngOnInit(): void {
-    this.walletConnectService.initWalletConnect();
-  }
+  ngOnInit(): void {}
 
   openDialog() {
     this.dialog.open(
@@ -56,7 +53,6 @@ export class ConnectModal implements OnDestroy {
 
   constructor(
     public dialogRef: MatDialogRef<ConnectModal>,
-    private walletConnectService: WalletConnectService,
     private userService: UserService
   ) {
     this.isTestnet = environment.network === 'testnet' ? true : false;
@@ -75,10 +71,6 @@ export class ConnectModal implements OnDestroy {
 
   setSelectedChain(chain: 'BNB' | 'BTC') {
     this.selectedChain = chain;
-  }
-
-  connectWalletConnect() {
-    this.walletConnectService.connectWalletConnect();
   }
 
   createKeystore() {
