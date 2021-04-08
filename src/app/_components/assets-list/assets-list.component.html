@@ -33,6 +33,9 @@
           <div *ngIf="item.balance" class="flex flex-col justify-end text-right">
             <span class="text-sm font-normal">{{item.balance.amount().toNumber()}}</span>
           </div>
+          <div *ngIf="!item.balance" class="flex flex-col justify-end text-right">
+            <span class="text-sm font-normal">0</span>
+          </div>
         </div>
 
         <span *ngIf="item.asset.chain === 'ETH' && item.asset.ticker !== 'ETH'" class="text-xs text-gray-400">{{item.asset.symbol.split('-')[1]}}</span>

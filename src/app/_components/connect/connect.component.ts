@@ -1,9 +1,6 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { UserService } from 'src/app/_services/user.service';
 import { environment } from 'src/environments/environment';
-import { Subscription } from 'rxjs';
-import { WalletConnectService } from 'src/app/_services/wallet-connect.service';
 
 
 @Component({
@@ -19,11 +16,9 @@ export class ConnectComponent implements OnInit {
     minWidth: '260px'
   };
 
-  constructor(private dialog: MatDialog, private walletConnectService: WalletConnectService) { }
+  constructor(private dialog: MatDialog) { }
 
-  ngOnInit(): void {
-    this.walletConnectService.initWalletConnect();
-  }
+  ngOnInit(): void {}
 
   openDialog() {
     this.dialog.open(
@@ -41,6 +36,12 @@ export enum ConnectionMethod {
   WALLET_CONNECT = 'WALLET_CONNECT',
   XDEFI = 'XDEFI',
 }
+export enum ConnectionView {
+  KEYSTORE_CONNECT      = 'KEYSTORE_CONNECT',
+  KEYSTORE_CREATE       = 'KEYSTORE_CREATE',
+  KEYSTORE_WRITE_PHRASE = 'KEYSTORE_WRITE_PHRASE',
+  XDEFI = 'XDEFI',
+}
 
 @Component({
   selector: 'app-connect-modal',
@@ -48,75 +49,57 @@ export enum ConnectionMethod {
   styleUrls: ['./connect.component.scss'],
 })
 // tslint:disable-next-line:component-class-suffix
-export class ConnectModal implements OnDestroy {
-  connectionMethod: ConnectionMethod;
+export class ConnectModal {
+
+  connectionView: ConnectionView;
   isTestnet: boolean;
-  subs: Subscription[];
   selectedChain: 'BNB' | 'BTC';
   isXDEFIConnected: boolean;
+  phrase: string;
 
   constructor(
     public dialogRef: MatDialogRef<ConnectModal>,
-    private walletConnectService: WalletConnectService,
-    private userService: UserService
   ) {
     this.isTestnet = environment.network === 'testnet' ? true : false;
-
-    const user$ = this.userService.user$.subscribe((user) => {
-      if (user) {
-        this.close();
-      }
-    });
-
-    this.subs = [user$];
 
     this.isXDEFIConnected = false;
     if ((window as any).xfi) {
       this.isXDEFIConnected = true;
     }
-    // window.onload = (event: any) => {
-    //   console.log("page is fully loaded", event);
-    //   if ((window as any).xfi) {
-    //     this.isXDEFIConnected = true;
-    //   }
-    // };
   }
 
   setSelectedChain(chain: 'BNB' | 'BTC') {
     this.selectedChain = chain;
   }
 
-  connectWalletConnect() {
-    this.walletConnectService.connectWalletConnect();
-  }
-
   createKeystore() {
-    this.connectionMethod = ConnectionMethod.KEYSTORE_CREATE;
+    this.connectionView = ConnectionView.KEYSTORE_CREATE;
   }
 
   connectKeystore() {
-    this.connectionMethod = ConnectionMethod.KEYSTORE;
+    this.connectionView = ConnectionView.KEYSTORE_CONNECT;
   }
 
   connectXDEFI() {
-    this.connectionMethod = ConnectionMethod.XDEFI;
+    if(!this.isXDEFIConnected) {
+      return window.open("https://xdefi.io", "_blank");
+    }
+    this.connectionView = ConnectionView.XDEFI;
   }
 
-  connectLedger() {
-    this.connectionMethod = ConnectionMethod.LEDGER;
+  storePhrasePrompt(phrase: string) {
+    this.phrase = phrase;
+    this.connectionView = ConnectionView.KEYSTORE_WRITE_PHRASE;
   }
 
   clearConnectionMethod() {
-    this.connectionMethod = null;
+    this.phrase = null;
+    this.connectionView = null;
   }
 
   close() {
+    this.phrase = null;
     this.dialogRef.close();
   }
 
-  ngOnDestroy() {
-    for (const sub of this.subs) {
-      sub.unsubscribe();
-    }
-  }
 }

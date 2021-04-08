@@ -34,6 +34,7 @@ import { AssetsListModule } from './_components/assets-list/assets-list.module';
 import { AssetInputModule } from './_components/asset-input/asset-input.module';
 import { TransactionProcessingModalModule } from './_components/transaction-processing-modal/transaction-processing-modal.module';
 import { DirectivesModule } from './_directives/directives.module';
+import { PhraseWordsListModule } from './_components/phrase-words-list/phrase-words-list.module';
 
 /** SERVICES */
 import { BinanceService } from './_services/binance.service';
@@ -42,7 +43,6 @@ import { LastBlockService } from './_services/last-block.service';
 import { MidgardService } from './_services/midgard.service';
 import { UserService } from './_services/user.service';
 import { TransactionStatusService } from './_services/transaction-status.service';
-import { WalletConnectService } from './_services/wallet-connect.service';
 import { KeystoreService } from './_services/keystore.service';
 import { SlippageToleranceService } from './_services/slippage-tolerance.service';
 import { CoinGeckoService } from './_services/coin-gecko.service';
@@ -77,6 +77,8 @@ import { ThorchainPricesService } from './_services/thorchain-prices.service';
 import { HaskoinService } from './_services/haskoin.service';
 import { ModalSectionHeaderModule } from './_components/modal-section-header/modal-section-header.module';
 import { ReconnectXDEFIDialogComponent } from './_components/reconnect-xdefi-dialog/reconnect-xdefi-dialog.component';
+import { KeystoreCreateStorePhraseComponent } from './_components/connect/keystore-create-store-phrase/keystore-create-store-phrase.component';
+
 
 @NgModule({
   declarations: [
@@ -105,6 +107,7 @@ import { ReconnectXDEFIDialogComponent } from './_components/reconnect-xdefi-dia
     DepositConfirmComponent,
     DepositFormComponent,
     UserAddressAddTokenComponent,
+    KeystoreCreateStorePhraseComponent,
   ],
   imports: [
     AssetInputModule,
@@ -131,6 +134,7 @@ import { ReconnectXDEFIDialogComponent } from './_components/reconnect-xdefi-dia
     TransactionSuccessModalModule,
     DirectivesModule,
     ModalSectionHeaderModule,
+    PhraseWordsListModule
   ],
   providers: [
     BinanceService,
@@ -140,7 +144,6 @@ import { ReconnectXDEFIDialogComponent } from './_components/reconnect-xdefi-dia
     UserService,
     MidgardService,
     LastBlockService,
-    WalletConnectService,
     ExplorerPathsService,
     SlippageToleranceService,
     TransactionStatusService,

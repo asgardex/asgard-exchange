@@ -109,6 +109,7 @@ export class KeystoreConnectComponent implements OnInit {
       localStorage.setItem('keystore', JSON.stringify(this.keystore));
       const user = await this.keystoreService.unlockKeystore(this.keystore, this.keystorePassword);
       this.userService.setUser(user);
+      this.closeModal.emit();
     } catch (error) {
       this.keystoreConnecting = false;
       this.keystoreError = true;
