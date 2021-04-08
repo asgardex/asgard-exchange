@@ -544,4 +544,5 @@ export class XDEFIService {
     });
 
     return newUser;
+  }
 }
