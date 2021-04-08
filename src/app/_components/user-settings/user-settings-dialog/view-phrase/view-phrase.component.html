@@ -7,7 +7,7 @@
     <div *ngIf="!passwordAccepted">
       <div class="uni-input">
         <label>Password</label>
-        <input [(ngModel)]="keystorePassword" name="keystore-password" placeholder="Please Enter Password" type="password" />
+        <input class="focus:outline-none focus:ring-0" [(ngModel)]="keystorePassword" name="keystore-password" placeholder="Please Enter Password" type="password" (keyup.enter)="unlock()" />
       </div>
 
       <div class="flex justify-between items-center" style="height: 38px">
@@ -25,7 +25,7 @@
     </div>
 
     <div *ngIf="passwordAccepted">
-      {{phrase}}
+      <app-phrase-words-list [phrase]="phrase"></app-phrase-words-list>
     </div>
 
   </div>
