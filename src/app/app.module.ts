@@ -30,6 +30,7 @@ import { AssetsListModule } from './_components/assets-list/assets-list.module';
 import { AssetInputModule } from './_components/asset-input/asset-input.module';
 import { TransactionProcessingModalModule } from './_components/transaction-processing-modal/transaction-processing-modal.module';
 import { DirectivesModule } from './_directives/directives.module';
+import { PhraseWordsListModule } from './_components/phrase-words-list/phrase-words-list.module';
 
 /** SERVICES */
 import { BinanceService } from './_services/binance.service';
@@ -71,6 +72,7 @@ import { SochainService } from './_services/sochain.service';
 import { ThorchainPricesService } from './_services/thorchain-prices.service';
 import { HaskoinService } from './_services/haskoin.service';
 import { ModalSectionHeaderModule } from './_components/modal-section-header/modal-section-header.module';
+import { KeystoreCreateStorePhraseComponent } from './_components/connect/keystore-create-store-phrase/keystore-create-store-phrase.component';
 
 
 @NgModule({
@@ -98,6 +100,7 @@ import { ModalSectionHeaderModule } from './_components/modal-section-header/mod
     DepositConfirmComponent,
     DepositFormComponent,
     UserAddressAddTokenComponent,
+    KeystoreCreateStorePhraseComponent,
   ],
   imports: [
     AssetInputModule,
@@ -123,7 +126,8 @@ import { ModalSectionHeaderModule } from './_components/modal-section-header/mod
     AppRoutingModule,
     TransactionSuccessModalModule,
     DirectivesModule,
-    ModalSectionHeaderModule
+    ModalSectionHeaderModule,
+    PhraseWordsListModule
   ],
   providers: [
     BinanceService,
