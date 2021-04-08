@@ -16,9 +16,9 @@
       [selectableMarkets]="selectableMarkets">
     </app-asset-input>
 
-    <div class="flex justify-between items-center">
+    <div class="flex justify-between items-center float-right">
       <button class="reverse-transaction" (click)="reverseTransaction()" [disabled]="!selectedSourceAsset || !selectedTargetAsset">
-        <mat-icon [class.disabled]="!selectedSourceAsset || !selectedTargetAsset" class="to-btn-icon">arrow_downward</mat-icon>
+        <mat-icon [class.disabled]="!selectedSourceAsset || !selectedTargetAsset" class="to-btn-icon text-xl">swap_vert</mat-icon>
       </button>
     </div>
 
