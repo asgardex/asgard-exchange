@@ -1,13 +1,6 @@
 import { Injectable } from '@angular/core';
 import { get } from 'lodash';
-// import { TransferResult } from '@thorchain/asgardex-binance';
-// import QRCodeModal from '@walletconnect/qrcode-modal';
-// import { User } from '../_classes/user';
-// import { UserService } from "./user.service";
-// const base64js = require('base64-js');
-// const bech32 = require('bech32');
 import { environment } from 'src/environments/environment';
-// import { decryptFromKeystore } from '@xchainjs/xchain-crypto';
 import { Client as binanceClient } from '@xchainjs/xchain-binance';
 import { Client as bitcoinClient } from '@xchainjs/xchain-bitcoin';
 import { Client as thorchainClient } from '@xchainjs/xchain-thorchain';
@@ -210,7 +203,7 @@ export class XDEFIService {
       bnbAddress,
       btcAddress,
       bchAddress,
-      ethAddress,
+      ethAddresses,
       ltcAddress
     ] = await Promise.all([
       this.getBnbAddress(),
@@ -220,11 +213,13 @@ export class XDEFIService {
       this.getLtcAddress()
     ]);
 
+    console.log('all addresses')
+
     userThorchainClient.getAddress = () => thorAddress;
     userBinanceClient.getAddress = () => bnbAddress;
     userBtcClient.getAddress = () => btcAddress;
     userbchClient.getAddress = () => bchAddress;
-    userEthereumClient.getAddress = () => ethAddress && ethAddress[0];
+    userEthereumClient.getAddress = () => ethAddresses?.[0];
     userLtcClient.getAddress = () => ltcAddress;
 
     // Binance
@@ -315,14 +310,14 @@ export class XDEFIService {
         spender,
         txAmount
       );
-      unsignedTx.from = ethAddress;
+      unsignedTx.from = ethAddresses[0];
       return (window as any).ethereum.request({
         method: 'eth_sendTransaction',
         params: [unsignedTx],
       });
     };
     const oldWallet = userEthereumClient.getWallet();
-    oldWallet.getAddress = async () => ethAddress;
+    oldWallet.getAddress = async () => ethAddresses[0];
     oldWallet.sendTransaction = (unsignedTx) => {
       unsignedTx.value = hexlify(BigNumber.from(unsignedTx.value || 0));
       return (window as any).ethereum.request({
@@ -412,7 +407,7 @@ export class XDEFIService {
             txAmount,
             Object.assign({}, overrides)
           );
-          unsignedTx.from = ethAddress;
+          unsignedTx.from = ethAddresses[0];
           txResult = await (window as any).ethereum.request({
             method: 'eth_sendTransaction',
             params: [unsignedTx],
@@ -438,10 +433,6 @@ export class XDEFIService {
         return Promise.reject(error);
       }
 
-      // return (window as any).ethereum.request({
-      //   method: "eth_sendTransaction",
-      //   params: [unsignedTx],
-      // });
     };
     userEthereumClient.call = async (
       address: Address,
@@ -466,7 +457,7 @@ export class XDEFIService {
           userEthereumClient.getProvider()
         );
         const txResult = await contract[func](...params, {
-          from: ethAddress,
+          from: ethAddresses[0],
         });
         console.log({ txResult });
         return txResult;
@@ -476,10 +467,6 @@ export class XDEFIService {
         return Promise.reject(error);
       }
 
-      // return (window as any).ethereum.request({
-      //   method: "eth_sendTransaction",
-      //   params: [unsignedTx],
-      // });
     };
     // Thor
     userThorchainClient.deposit = async (depositParams) => {
@@ -539,7 +526,7 @@ export class XDEFIService {
       bnbAddress,
       btcAddress,
       bchAddress,
-      ethAddress,
+      ethAddresses,
       ltcAddress,
     });
 
@@ -557,110 +544,4 @@ export class XDEFIService {
     });
 
     return newUser;
-    // // await this.walletConnector.killSession();
-    // if (!this.walletConnector) {
-    //   this.initXDEFI();
-    // }
-    // // Check if connection is already established
-    // if (!this.walletConnector.connected) {
-    //   // create new session
-    //   await this.walletConnector.createSession();
-    //   const uri = this.walletConnector.uri;
-    //   // display QR Code modal
-    //   QRCodeModal.open(uri, () => {});
-    // }
-    // // Subscribe to connection events
-    // this.walletConnector.on("connect", async (error, payload) => {
-    //   if (error) {
-    //     throw error;
-    //   }
-    //   // Close QR Code Modal
-    //   QRCodeModal.close();
-    //   const accounts = await this.walletConnector.getAccounts();
-    //   const bnbAccount = accounts.find((account) => account.network === 714);
-    //   if (bnbAccount) {
-    //     const user = new User({
-    //       type: "walletconnect",
-    //       wallet: bnbAccount.address,
-    //     });
-    //     this.userService.setUser(user);
-    //   }
-    // });
-    // this.walletConnector.on("session_update", (error, payload) => {
-    //   if (error) {
-    //     throw error;
-    //   }
-    // });
-    // this.walletConnector.on("disconnect", (error, payload) => {
-    //   if (error) {
-    //     throw error;
-    //   }
-    //   this.userService.setUser(null); // Reset user as null
-    //   this.walletConnector = null; // Delete connector
-    // });
-  }
-
-  // // TODO: add BncClient to asgardex/binance types
-  // // TODO: set tx type
-  // walletConnectSendTx(tx, bncClient): Promise<TransferResult> {
-  //   const NETWORK_ID = 714;
-
-  //   return new Promise((resolve, reject) => {
-  //     this.walletConnector
-  //       .trustSignTransaction(NETWORK_ID, tx)
-  //       .then((result) => {
-  //         bncClient
-  //           .sendRawTransaction(result, true)
-  //           .then((response) => {
-  //             resolve(response);
-  //           })
-  //           .catch((error) => {
-  //             reject(error);
-  //           });
-  //       })
-  //       .catch((error) => {
-  //         console.error("trustSignTransaction error: ", error);
-  //         reject(error);
-  //       });
-  //   });
-  // }
-
-  // _getByteArrayFromAddress(address: string) {
-  //   const decodeAddress = bech32.decode(address);
-  //   return base64js.fromByteArray(
-  //     Buffer.from(bech32.fromWords(decodeAddress.words))
-  //   );
-  // }
-
-  // walletConnectGetSendOrderMsg({ fromAddress, toAddress, coins: coinData }) {
-  //   // 1. sort denoms by alphabet order
-  //   // 2. validate coins with zero amounts
-  //   const coins = coinData
-  //     .sort((a, b) => a.denom.localeCompare(b.denom))
-  //     .filter((data) => {
-  //       return data.amount > 0;
-  //     });
-
-  //   // if coin data is invalid, return null
-  //   if (!coins.length) {
-  //     return null;
-  //   }
-
-  //   const msg = {
-  //     inputs: [
-  //       {
-  //         address: this._getByteArrayFromAddress(fromAddress),
-  //         coins,
-  //       },
-  //     ],
-  //     outputs: [
-  //       {
-  //         address: this._getByteArrayFromAddress(toAddress),
-  //         coins,
-  //       },
-  //     ],
-  //   };
-
-  //   return msg;
-  // }
 }

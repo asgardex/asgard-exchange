@@ -21,8 +21,10 @@ export class ReconnectXDEFIDialogComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.listProviders = this.xdefiService.listEnabledXDFIProviders();
-    this.isValidNetwork = this.xdefiService.isValidNetwork();
+    setTimeout(() => {
+      this.listProviders = this.xdefiService.listEnabledXDFIProviders();
+      this.isValidNetwork = this.xdefiService.isValidNetwork();
+    }, 200)
   }
 
   async initConnect() {
