@@ -13,6 +13,7 @@ export class KeystoreCreateComponent implements OnInit {
 
   @Output() back: EventEmitter<null>;
   @Output() closeModal: EventEmitter<null>;
+  @Output() keystoreCreated: EventEmitter<string>;
   password: string;
   confirmPassword: string;
   phrase: string;
@@ -24,12 +25,14 @@ export class KeystoreCreateComponent implements OnInit {
     this.phrase = generatePhrase();
     this.back = new EventEmitter<null>();
     this.closeModal = new EventEmitter<null>();
+    this.keystoreCreated = new EventEmitter<string>();
   }
 
   ngOnInit(): void {
   }
 
   async createKeystore() {
+    this.loading = true;
 
     try {
       const keystore = await encryptToKeyStore(this.phrase, this.password);
@@ -53,10 +56,12 @@ export class KeystoreCreateComponent implements OnInit {
         'loading';
       a.click();
 
-      this.closeModal.next();
+      this.keystoreCreated.emit(this.phrase);
     } catch (error) {
       console.error(error);
     }
+
+    this.loading = false;
 
   }
 
