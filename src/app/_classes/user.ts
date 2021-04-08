@@ -28,7 +28,7 @@ export class User {
     binance: {
       transfer
     }
-  }
+  };
 
   // for Ledger
   ledger?: any;

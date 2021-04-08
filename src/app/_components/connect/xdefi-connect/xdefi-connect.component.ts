@@ -47,10 +47,10 @@ export class XDEFIConnectComponent implements OnInit {
     this.xdefiConnecting = true;
     try {
       const user = await this.xdefiService.connectXDEFI();
-      console.log('xdefiConnect::got user', user)
+      console.log('xdefiConnect::got user', user);
       this.userService.setUser(user);
       localStorage.setItem('XDEFI_CONNECTED', 'true');
-      this.closeModal.emit()
+      this.closeModal.emit();
     } catch (error) {
       this.xdefiError = true;
       console.error(error);

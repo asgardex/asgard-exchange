@@ -213,7 +213,7 @@ export class XDEFIService {
       this.getLtcAddress()
     ]);
 
-    console.log('all addresses')
+    console.log('all addresses');
 
     userThorchainClient.getAddress = () => thorAddress;
     userBinanceClient.getAddress = () => bnbAddress;

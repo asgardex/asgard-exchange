@@ -24,7 +24,7 @@ export class ReconnectXDEFIDialogComponent implements OnInit {
     setTimeout(() => {
       this.listProviders = this.xdefiService.listEnabledXDFIProviders();
       this.isValidNetwork = this.xdefiService.isValidNetwork();
-    }, 200)
+    }, 200);
   }
 
   async initConnect() {
