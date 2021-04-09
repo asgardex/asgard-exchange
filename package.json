@@ -12,7 +12,7 @@
     "lint": "ng lint",
     "e2e": "ng e2e",
     "serve": "serve dist/asgard-exchange/",
-    "heroku-postbuild": "npm run build:testnet"
+    "heroku-postbuild": "npm i -g serve && npm run build:testnet"
   },
   "private": true,
   "dependencies": {
@@ -86,7 +86,6 @@
     "karma-jasmine-html-reporter": "^1.5.0",
     "postcss-ng-tailwind-in-components": "0.0.4",
     "protractor": "~7.0.0",
-    "serve": "^11.3.2",
     "tailwindcss": "2.0.3",
     "terser-webpack-plugin": "^4.1.0",
     "ts-node": "~8.3.0",
