@@ -95,5 +95,8 @@
   },
   "browser": {
     "crypto": false
+  },
+  "engines": {
+    "node": "14.x"
   }
 }
