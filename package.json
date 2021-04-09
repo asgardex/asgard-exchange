@@ -11,7 +11,7 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "serve": "serve",
+    "serve": "serve dist/asgard-exchange/",
     "heroku-postbuild": "npm run build:testnet"
   },
   "private": true,
