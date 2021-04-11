@@ -15,7 +15,7 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
   @Input() user: User;
   pendingTxCount: number;
   modalDimensions = {
-    maxWidth: '420px',
+    maxWidth: '520px',
     width: '50vw',
     minWidth: '260px'
   };
