@@ -180,9 +180,12 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
       (res) => {
         const poolNames = res.map( (pool) => pool.asset );
         this.pools = poolNames;
-        if (this.pools.includes(currentPool)) {
-          this.router.navigate(['/', 'deposit', currentPool]);
-        }
+
+        /** MCCN TESTING */
+        // if (this.pools.includes(currentPool)) {
+        //   this.router.navigate(['/', 'deposit', currentPool]);
+        // }
+
         this.checkCreateableMarkets();
       }
     );
@@ -298,9 +301,13 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
       this.selectableMarkets = this.balances.filter( (balance) => {
         const asset = balance.asset;
 
-        return !this.pools.find((pool) => pool === `${asset.chain}.${asset.symbol}`)
-          && !isNonNativeRuneToken(asset)
+        /** MCCN TESTING */
+        // return !this.pools.find((pool) => pool === `${asset.chain}.${asset.symbol}`)
+        //   && !isNonNativeRuneToken(asset)
+        //   && asset.chain !== 'THOR';
+        return !isNonNativeRuneToken(asset)
           && asset.chain !== 'THOR';
+
 
       }).map( (balance) => {
         return {asset: new Asset(`${balance.asset.chain}.${balance.asset.symbol}`)};
