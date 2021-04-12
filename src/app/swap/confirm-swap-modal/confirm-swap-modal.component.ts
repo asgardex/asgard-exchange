@@ -16,6 +16,7 @@ import {
   assetToBase,
   assetAmount,
   Asset,
+  assetToString,
 } from '@xchainjs/xchain-util';
 
 
@@ -76,7 +77,7 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
 
-    this.estimatedMinutes = this.txStatusService.estimateTime(this.swapData.sourceAsset.chain, this.swapData.inputValue);
+    this.estimateTime();
 
     const sourceAsset = this.swapData.sourceAsset;
     if (sourceAsset.chain === 'ETH') {
@@ -88,6 +89,17 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
       this.loading = false;
     }
 
+  }
+
+  async estimateTime() {
+    if (this.swapData.sourceAsset.chain === 'ETH' && this.swapData.sourceAsset.symbol !== 'ETH') {
+      this.estimatedMinutes = await this.ethUtilsService.estimateERC20Time(
+        assetToString(this.swapData.sourceAsset),
+        this.swapData.inputValue
+      );
+    } else {
+      this.estimatedMinutes = this.txStatusService.estimateTime(this.swapData.sourceAsset.chain, this.swapData.inputValue);
+    }
   }
 
   closeDialog(transactionSucess?: boolean) {
