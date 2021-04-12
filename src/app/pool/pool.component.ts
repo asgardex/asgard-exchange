@@ -28,12 +28,14 @@ export class PoolComponent implements OnInit, OnDestroy {
   maxLiquidityRune: number;
   totalPooledRune: number;
   depositsDisabled: boolean;
+  pendingTxLength: number;
 
   constructor(private userService: UserService, private midgardService: MidgardService, private txStatusService: TransactionStatusService) {
 
     this.subs = [];
     this.memberPools = [];
     this.depositsDisabled = false;
+    this.pendingTxLength = 0;
 
     const user$ = this.userService.user$.subscribe(
       (user) => {
@@ -52,8 +54,8 @@ export class PoolComponent implements OnInit, OnDestroy {
     const pendingTx$ = this.txStatusService.txs$.subscribe(
       (tx) => {
 
-        if (tx && tx.length > 0) {
-          // have to call this twice to break the midgard cache
+        if (tx && tx.length !== this.pendingTxLength) {
+          this.pendingTxLength = tx.length;
           setTimeout( () => {
             this.getAccountPools();
           }, 3000);

@@ -211,4 +211,15 @@ export class EthUtilsService {
 
   }
 
+  async estimateERC20Time(token: string, tokenAmount: number): Promise<number> {
+    const tokenPool = await this.midgardService.getPool(token).toPromise();
+    const ethPool = await this.midgardService.getPool('ETH.ETH').toPromise();
+    const assetUnitsPerEth = (+tokenPool.assetPriceUSD) / (+ethPool.assetPriceUSD);
+    const totalInEth = (tokenAmount * assetUnitsPerEth);
+    const chainBlockReward = 3;
+    const chainBlockTime = 15; // seconds
+    const estimatedMinutes = (Math.ceil( totalInEth / chainBlockReward) * (chainBlockTime / 60));
+    return (estimatedMinutes < 1) ? 1 : estimatedMinutes;
+  }
+
 }

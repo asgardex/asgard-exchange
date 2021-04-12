@@ -5,8 +5,9 @@ import { User } from '../../_classes/user';
 import { TransactionConfirmationState } from '../../_const/transaction-confirmation-state';
 import { UserService } from '../../_services/user.service';
 import { environment } from 'src/environments/environment';
-import { assetAmount, assetToBase } from '@xchainjs/xchain-util';
+import { assetAmount, assetToBase, assetToString } from '@xchainjs/xchain-util';
 import { TransactionStatusService, TxActions, TxStatus } from 'src/app/_services/transaction-status.service';
+import { EthUtilsService } from 'src/app/_services/eth-utils.service';
 
 // TODO: this is the same as ConfirmStakeData in confirm stake modal
 export interface ConfirmWithdrawData {
@@ -40,7 +41,8 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
     @Inject(MAT_DIALOG_DATA) public data: ConfirmWithdrawData,
     public dialogRef: MatDialogRef<ConfirmWithdrawModalComponent>,
     private txStatusService: TransactionStatusService,
-    private userService: UserService
+    private userService: UserService,
+    private ethUtilsService: EthUtilsService,
   ) {
     this.txState = TransactionConfirmationState.PENDING_CONFIRMATION;
     const user$ = this.userService.user$.subscribe(
@@ -55,7 +57,15 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.estimatedMinutes = this.txStatusService.estimateTime(this.data.asset.chain, this.data.assetAmount);
+    this.estimateTime();
+  }
+
+  async estimateTime() {
+    if (this.data.asset.chain === 'ETH' && this.data.asset.symbol !== 'ETH') {
+      this.estimatedMinutes = await this.ethUtilsService.estimateERC20Time(assetToString(this.data.asset), this.data.assetAmount);
+    } else {
+      this.estimatedMinutes = this.txStatusService.estimateTime(this.data.asset.chain, this.data.assetAmount);
+    }
   }
 
   async submitTransaction(): Promise<void> {

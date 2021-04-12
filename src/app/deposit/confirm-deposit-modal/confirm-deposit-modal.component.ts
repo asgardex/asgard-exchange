@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { assetAmount, assetToBase, baseAmount } from '@xchainjs/xchain-util';
+import { assetAmount, assetToBase, assetToString, baseAmount } from '@xchainjs/xchain-util';
 import { Subscription } from 'rxjs';
 import { PoolAddressDTO } from 'src/app/_classes/pool-address';
 import { User } from 'src/app/_classes/user';
@@ -64,7 +64,7 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
 
-    this.estimatedMinutes = this.txStatusService.estimateTime(this.data.asset.chain, this.data.assetAmount);
+    this.estimateTime();
 
     if (this.data.asset.chain === 'ETH') {
       this.estimateEthGasPrice();
@@ -72,6 +72,14 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
       this.loading = false;
     }
 
+  }
+
+  async estimateTime() {
+    if (this.data.asset.chain === 'ETH' && this.data.asset.symbol !== 'ETH') {
+      this.estimatedMinutes = await this.ethUtilsService.estimateERC20Time(assetToString(this.data.asset), this.data.assetAmount);
+    } else {
+      this.estimatedMinutes = this.txStatusService.estimateTime(this.data.asset.chain, this.data.assetAmount);
+    }
   }
 
   submitTransaction(): void {
