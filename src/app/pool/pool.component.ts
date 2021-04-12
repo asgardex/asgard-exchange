@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Balances } from '@xchainjs/xchain-client';
-import { Subscription } from 'rxjs';
+import { combineLatest, Subscription } from 'rxjs';
 import { User } from '../_classes/user';
 import { MidgardService } from '../_services/midgard.service';
 import { UserService } from '../_services/user.service';
@@ -25,10 +25,14 @@ export class PoolComponent implements OnInit, OnDestroy {
   createablePools: string[];
   memberPools: MemberPool[];
   addresses: string[];
+  maxLiquidityRune: number;
+  totalPooledRune: number;
+  depositsDisabled: boolean;
 
   constructor(private userService: UserService, private midgardService: MidgardService, private txStatusService: TransactionStatusService) {
 
     this.subs = [];
+    this.depositsDisabled = false;
 
     const user$ = this.userService.user$.subscribe(
       (user) => {
@@ -63,6 +67,7 @@ export class PoolComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.getPools();
+    this.getPoolCap();
   }
 
   getPools() {
@@ -86,6 +91,24 @@ export class PoolComponent implements OnInit, OnDestroy {
 
     }
 
+  }
+
+  getPoolCap() {
+    const mimir$ = this.midgardService.getMimir();
+    const network$ = this.midgardService.getNetwork();
+    const combined = combineLatest([mimir$, network$]);
+    const sub = combined.subscribe( ([mimir, network]) => {
+
+      this.totalPooledRune = +network.totalPooledRune / (10 ** 8);
+
+      if (mimir && mimir['mimir//MAXLIQUIDITYRUNE']) {
+        this.maxLiquidityRune = mimir['mimir//MAXLIQUIDITYRUNE'] / (10 ** 8);
+
+        this.depositsDisabled = (this.totalPooledRune / mimir['mimir//MAXLIQUIDITYRUNE'] >= .9);
+
+      }
+
+    });
   }
 
   async getAddresses(): Promise<string[]> {

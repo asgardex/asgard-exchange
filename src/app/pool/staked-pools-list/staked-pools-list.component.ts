@@ -18,6 +18,7 @@ export class StakedPoolsListComponent implements OnInit {
     return this._pools;
   }
   _pools: PoolDTO[];
+  @Input() depositsDisabled: boolean;
 
   @Input() set memberPools(memberPools: MemberPool[]) {
     this._memberPools = memberPools;
