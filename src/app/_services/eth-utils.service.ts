@@ -140,6 +140,8 @@ export class EthUtilsService {
     const abi = (environment.network) === 'testnet'
       ? TCRopstenAbi
       : TCRopstenAbi;
+    const gasPrices = await ethClient.estimateGasPrices();
+    const gasPrice = gasPrices.fast.amount().toFixed(0);
 
     if (asset.ticker === 'ETH') {
 
@@ -151,7 +153,7 @@ export class EthUtilsService {
         ethers.utils.parseEther(String(amount)),
         // memo,
         memo,
-        {from: ethAddress, value: ethers.utils.parseEther(String(amount))}
+        {from: ethAddress, value: ethers.utils.parseEther(String(amount)), gasPrice}
       );
 
       // tslint:disable-next-line:no-string-literal
@@ -168,7 +170,8 @@ export class EthUtilsService {
         inboundAddress.address, // vault
         checkSummedAddress, // asset
         assetToBase(assetAmount(amount, decimal.toNumber())).amount().toFixed(), // amount
-        memo
+        memo,
+        { gasPrice }
       ];
 
       const contractRes = await ethClient.call(inboundAddress.router, abi, 'deposit', params);

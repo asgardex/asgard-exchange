@@ -34,6 +34,7 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
   subs: Subscription[];
   killPolling: Subject<void> = new Subject();
   error: string;
+  estimatedMinutes: number;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: ConfirmWithdrawData,
@@ -54,6 +55,7 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.estimatedMinutes = this.txStatusService.estimateTime(this.data.asset.chain, this.data.assetAmount);
   }
 
   async submitTransaction(): Promise<void> {

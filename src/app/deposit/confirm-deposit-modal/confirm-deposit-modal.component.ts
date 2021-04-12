@@ -36,10 +36,10 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
   hash: string;
   subs: Subscription[];
   error: string;
-
   ethNetworkFee: number;
   insufficientChainBalance: boolean;
   loading: boolean;
+  estimatedMinutes: number;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: ConfirmDepositData,
@@ -63,6 +63,8 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+
+    this.estimatedMinutes = this.txStatusService.estimateTime(this.data.asset.chain, this.data.assetAmount);
 
     if (this.data.asset.chain === 'ETH') {
       this.estimateEthGasPrice();
