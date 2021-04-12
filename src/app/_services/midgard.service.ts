@@ -57,9 +57,7 @@ export class MidgardService {
   }
 
   getTransaction(txId: string): Observable<TransactionDTO> {
-
     const params = new HttpParams().set('offset', '0').set('limit', '1').set('txid', txId);
-
     return this.http.get<TransactionDTO>(`${this.v2BasePath}/actions`, {params});
   }
 
