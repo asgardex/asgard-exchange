@@ -32,6 +32,7 @@ export class PoolComponent implements OnInit, OnDestroy {
   constructor(private userService: UserService, private midgardService: MidgardService, private txStatusService: TransactionStatusService) {
 
     this.subs = [];
+    this.memberPools = [];
     this.depositsDisabled = false;
 
     const user$ = this.userService.user$.subscribe(
@@ -51,7 +52,7 @@ export class PoolComponent implements OnInit, OnDestroy {
     const pendingTx$ = this.txStatusService.txs$.subscribe(
       (tx) => {
 
-        if (tx) {
+        if (tx && tx.length > 0) {
           // have to call this twice to break the midgard cache
           setTimeout( () => {
             this.getAccountPools();
@@ -109,6 +110,8 @@ export class PoolComponent implements OnInit, OnDestroy {
       }
 
     });
+
+    this.subs.push(sub);
   }
 
   async getAddresses(): Promise<string[]> {
@@ -145,14 +148,12 @@ export class PoolComponent implements OnInit, OnDestroy {
       for (const address of this.addresses) {
         this.midgardService.getMember(address).subscribe(
           (res) => {
-            if (!this.memberPools) {
-              this.memberPools = res.pools;
-            } else {
-              for (const pool of res.pools) {
-                const match = this.memberPools.find( (existingPool) => existingPool.pool === pool.pool );
-                if (!match) {
-                  this.memberPools.push(pool);
-                }
+            for (const pool of res.pools) {
+              const match = this.memberPools.find( (existingPool) => existingPool.pool === pool.pool );
+              if (!match) {
+                const memberPools = this.memberPools;
+                memberPools.push(pool);
+                this.memberPools = [...memberPools];
               }
             }
           }
