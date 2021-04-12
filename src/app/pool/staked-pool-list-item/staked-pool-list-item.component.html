@@ -27,9 +27,9 @@
 
 
     <div class="flex justify-between">
-      <a mat-flat-button class="w-1/2" color="primary" [routerLink]="['/', 'deposit', asset.chain + '.' + asset.symbol]">Deposit</a>
-      <span class="w-2"></span>
-      <a mat-flat-button class="w-1/2" color="primary" [routerLink]="['/', 'withdraw', asset.chain + '.' +  asset.symbol]">Withdraw</a>
+      <a *ngIf="!depositsDisabled" mat-flat-button class="w-1/2" color="primary" [routerLink]="['/', 'deposit', asset.chain + '.' + asset.symbol]">Deposit</a>
+      <span *ngIf="!depositsDisabled" class="w-2"></span>
+      <a mat-flat-button [ngClass]="{'w-1/2' : !depositsDisabled, 'w-full' : depositsDisabled}" color="primary" [routerLink]="['/', 'withdraw', asset.chain + '.' +  asset.symbol]">Withdraw</a>
     </div>
   </div>
 

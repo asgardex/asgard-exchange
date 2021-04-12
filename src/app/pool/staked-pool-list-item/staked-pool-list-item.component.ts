@@ -37,6 +37,8 @@ export class StakedPoolListItemComponent implements OnChanges {
   }
   _poolData: PoolDTO;
 
+  @Input() depositsDisabled: boolean;
+
   pooledRune: number;
   pooledAsset: number;
   poolShare: number;
