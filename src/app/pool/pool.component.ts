@@ -24,6 +24,7 @@ export class PoolComponent implements OnInit, OnDestroy {
   balances: Balances;
   createablePools: string[];
   memberPools: MemberPool[];
+  addresses: string[];
 
   constructor(private userService: UserService, private midgardService: MidgardService, private txStatusService: TransactionStatusService) {
 
@@ -87,35 +88,56 @@ export class PoolComponent implements OnInit, OnDestroy {
 
   }
 
+  async getAddresses(): Promise<string[]> {
+    const thorClient = this.user.clients.thorchain;
+    const thorAddress = await thorClient.getAddress();
+
+    const btcClient = this.user.clients.bitcoin;
+    const btcAddress = await btcClient.getAddress();
+
+    const ltcClient = this.user.clients.litecoin;
+    const ltcAddress = await ltcClient.getAddress();
+
+    const bchClient = this.user.clients.bitcoinCash;
+    const bchAddress = await bchClient.getAddress();
+
+    const bnbClient = this.user.clients.binance;
+    const bnbAddress = await bnbClient.getAddress();
+
+    const ethClient = this.user.clients.ethereum;
+    const ethAddress = await ethClient.getAddress();
+
+    return [thorAddress, btcAddress, ltcAddress, bchAddress, bnbAddress, ethAddress];
+  }
+
   async getAccountPools() {
     this.loading = true;
 
     if (this.user) {
 
-      const client = this.user.clients.thorchain; // only need to query binance bc all pools are balanced by RUNE
-      const address = await client.getAddress();
+      if (!this.addresses) {
+        this.addresses = await this.getAddresses();
+      }
 
-      this.midgardService.getMember(address).subscribe(
-        (res) => {
-          this.memberPools = res.pools;
-          this.loading = false;
-        },
-        (err) => {
-
-          if (err.status === 404) {
-            this.memberPools = [];
-          } else {
-            this.userPoolError = true;
+      for (const address of this.addresses) {
+        this.midgardService.getMember(address).subscribe(
+          (res) => {
+            if (!this.memberPools) {
+              this.memberPools = res.pools;
+            } else {
+              for (const pool of res.pools) {
+                const match = this.memberPools.find( (existingPool) => existingPool.pool === pool.pool );
+                if (!match) {
+                  this.memberPools.push(pool);
+                }
+              }
+            }
           }
-
-          this.loading = false;
-          console.error('error fetching account pool: ', err);
-        }
-      );
-
-
+        );
+      }
     }
 
+    this.loading = false;
   }
 
   ngOnDestroy(): void {
