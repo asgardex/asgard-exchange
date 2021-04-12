@@ -13,6 +13,7 @@ import { IconTickerModule } from '../_components/icon-ticker/icon-ticker.module'
 import { TransactionLedgerConfirmModalModule } from '../_components/transaction-ledger-confirm-modal/transaction-ledger-confirm-modal.module';
 import { DirectivesModule } from '../_directives/directives.module';
 import { SectionHeadModule } from '../_components/section-head/section-head.module';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 
 @NgModule({
@@ -29,6 +30,7 @@ import { SectionHeadModule } from '../_components/section-head/section-head.modu
     IconTickerModule,
     DirectivesModule,
     SectionHeadModule,
+    MatTooltipModule,
     RouterModule.forChild([
       {
         path: ':asset',

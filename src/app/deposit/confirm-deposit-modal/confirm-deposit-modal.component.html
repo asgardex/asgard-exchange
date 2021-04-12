@@ -55,6 +55,14 @@
         <div>
 
           <div class="flex justify-between mb-2">
+            <div class="tx-detail-label flex items-end">
+              Estimated Tx Time
+              <mat-icon style="transform: scale(.6)" matTooltip="Estimated Confirmation Time is the time it will take for THORChain to process your transaction.">info</mat-icon>
+            </div>
+            <div class="flex items-end"><{{estimatedMinutes}} min</div>
+          </div>
+
+          <div class="flex justify-between mb-2">
             <span class="tx-detail-label">Rates</span>
             <span>1 {{data.rune.ticker}} = {{data.assetBasePrice | number:"1.2-4"}} {{data.asset.ticker}}</span>
           </div>

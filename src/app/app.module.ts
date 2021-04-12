@@ -55,6 +55,7 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 /** EXTERNAL */
 import { QRCodeModule } from 'angularx-qrcode';
@@ -127,7 +128,8 @@ import { KeystoreCreateStorePhraseComponent } from './_components/connect/keysto
     TransactionSuccessModalModule,
     DirectivesModule,
     ModalSectionHeaderModule,
-    PhraseWordsListModule
+    PhraseWordsListModule,
+    MatTooltipModule
   ],
   providers: [
     BinanceService,
