@@ -47,6 +47,7 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
   ethNetworkFee: number;
   insufficientChainBalance: boolean;
   loading: boolean;
+  estimatedMinutes: number;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public swapData: SwapData,
@@ -75,12 +76,12 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
 
-    // const asset = this.swapData.sourceAsset;
+    this.estimatedMinutes = this.txStatusService.estimateTime(this.swapData.sourceAsset.chain, this.swapData.inputValue);
+
     const sourceAsset = this.swapData.sourceAsset;
     if (sourceAsset.chain === 'ETH') {
 
       // ESTIMATE GAS HERE
-      // const memo =
       this.estimateEthGasPrice();
 
     } else {

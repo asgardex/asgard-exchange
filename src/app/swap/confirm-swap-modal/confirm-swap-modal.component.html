@@ -59,6 +59,14 @@
             <span>{{swapData.basePrice | number:"1.2-4"}} {{swapData.sourceAsset.ticker}} per {{swapData.targetAsset.ticker}}</span>
           </div> -->
 
+          <div class="flex justify-between mb-2">
+            <div class="tx-detail-label flex items-end">
+              Estimated Tx Time
+              <mat-icon style="transform: scale(.6)" matTooltip="Estimated Confirmation Time is the time it will take for THORChain to process your transaction.">info</mat-icon>
+            </div>
+            <div class="flex items-end"><{{estimatedMinutes}} min</div>
+          </div>
+
           <div *ngIf="swapData.sourceAsset.chain === 'BNB'" class="flex justify-between mb-2">
             <span class="tx-detail-label">Total Fee</span>
             <span>{{swapData.bnbFee | number:"0.0-6"}} BNB</span>

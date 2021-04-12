@@ -298,6 +298,61 @@ export class TransactionStatusService {
 
   }
 
+  chainBlockReward(chain: Chain): number {
+    switch (chain) {
+      case 'BTC':
+        return 6.5;
+
+      case 'BCH':
+        return 6.25;
+
+      case 'LTC':
+        return 12.5;
+
+      case 'ETH':
+        return 3;
+
+      // Confirms immediately
+      // case 'BNB':
+      //   return ~;
+
+    }
+  }
+
+  chainBlockTime(chain: Chain): number {
+    // in seconds
+    switch (chain) {
+      case 'BTC':
+        return 600;
+
+      case 'BCH':
+        return 600;
+
+      case 'LTC':
+        return 150;
+
+      case 'ETH':
+        return 15;
+
+      // Confirms immediately
+      // case 'BNB':
+      //   return ~;
+    }
+  }
+
+  estimateTime(chain: Chain, amount: number): number {
+
+    if (chain === 'BNB' || chain === 'THOR') {
+      return 1;
+    } else {
+      const chainBlockReward = this.chainBlockReward(chain);
+      const chainBlockTime = this.chainBlockTime(chain);
+      const estimatedMinutes = (Math.ceil(amount / chainBlockReward) * (chainBlockTime / 60));
+      return (estimatedMinutes < 1) ? 1 : estimatedMinutes;
+    }
+
+  }
+
   getPendingTxCount() {
 
     return this._txs.reduce( (count, tx) => {
