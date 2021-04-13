@@ -18,6 +18,7 @@ import {
   BaseAmount,
   assetToBase,
   assetAmount,
+  assetToString,
 } from '@xchainjs/xchain-util';
 import { PoolDetail } from '../_classes/pool-detail';
 import { MidgardService } from '../_services/midgard.service';
@@ -233,6 +234,10 @@ export class SwapComponent implements OnInit, OnDestroy {
 
   isRune(asset: Asset): boolean {
     return asset && asset.ticker === 'RUNE'; // covers BNB and native
+  }
+
+  isNativeRune(asset: Asset): boolean {
+    return assetToString(asset) === 'THOR.RUNE';
   }
 
   getEthRouter() {
