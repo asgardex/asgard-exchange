@@ -16,7 +16,8 @@ export type EstimateFeeParams = {
   sourceAsset: Asset,
   ethClient: Client,
   ethInbound: PoolAddressDTO,
-  inputAmount: number,
+  // inputAmount: number,
+  inputAmount: BigNumber;
   memo: string
 };
 
@@ -25,7 +26,8 @@ export type CallDepositParams = {
   asset: Asset,
   memo: string,
   ethClient: Client,
-  amount: number
+  // amount: number
+  amount: BigNumber
 };
 
 export type EstimateApprovalFee = {ethClient: EthClient, contractAddress: string, asset: Asset};
@@ -44,7 +46,7 @@ export class EthUtilsService {
 
     let checkSummedAddress;
     const wallet = ethClient.getWallet();
-    const decimal = await this.getAssetDecimal(sourceAsset, ethClient);
+    // const decimal = await this.getAssetDecimal(sourceAsset, ethClient);
     const abi = (environment.network === 'testnet')
       ? TCRopstenAbi
       : TCAbi;
@@ -69,7 +71,8 @@ export class EthUtilsService {
       checkSummedAddress,
 
       // Amount
-      assetToBase(assetAmount(inputAmount, decimal)).amount().toFixed(),
+      // assetToBase(assetAmount(inputAmount, decimal)).amount().toFixed(),
+      inputAmount.toFixed(),
 
       // Memo
       memo
@@ -150,10 +153,13 @@ export class EthUtilsService {
       const contractRes = await contract.deposit(
         inboundAddress.address, // not sure if this is correct...
         '0x0000000000000000000000000000000000000000',
-        ethers.utils.parseEther(String(amount)),
-        // memo,
+        // ethers.utils.parseEther(String(amount)),
+
+        amount.toFixed(),
+
         memo,
-        {from: ethAddress, value: ethers.utils.parseEther(String(amount)), gasPrice}
+        // {from: ethAddress, value: ethers.utils.parseEther(String(amount)), gasPrice}
+        {from: ethAddress, value: amount.toFixed(), gasPrice}
       );
 
       // tslint:disable-next-line:no-string-literal
@@ -164,12 +170,12 @@ export class EthUtilsService {
       const assetAddress = asset.symbol.slice(asset.ticker.length + 1);
       const strip0x = assetAddress.substr(2);
       const checkSummedAddress = ethers.utils.getAddress(strip0x);
-      const tokenContract = new ethers.Contract(checkSummedAddress, erc20ABI, wallet);
-      const decimal = await tokenContract.decimals();
+      // const tokenContract = new ethers.Contract(checkSummedAddress, erc20ABI, wallet);
+      // const decimal = await tokenContract.decimals();
       const params = [
         inboundAddress.address, // vault
         checkSummedAddress, // asset
-        assetToBase(assetAmount(amount, decimal.toNumber())).amount().toFixed(), // amount
+        amount.toFixed(), // amount
         memo,
         { gasPrice }
       ];
