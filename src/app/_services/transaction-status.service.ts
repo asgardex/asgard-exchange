@@ -14,7 +14,8 @@ import { HaskoinService, HaskoinTxResponse } from './haskoin.service';
 
 export const enum TxStatus {
   PENDING = 'PENDING',
-  COMPLETE = 'COMPLETE'
+  COMPLETE = 'COMPLETE',
+  REFUNDED = 'REFUNDED'
 }
 
 export enum TxActions {
@@ -185,7 +186,13 @@ export class TransactionStatusService {
           // }
 
           if (resTx.in[0].txID.toUpperCase() === hash.toUpperCase() && resTx.status.toUpperCase() === 'SUCCESS') {
-            this.updateTxStatus(hash, TxStatus.COMPLETE);
+
+            if (resTx.status.toUpperCase() === 'REFUND') {
+              this.updateTxStatus(hash, TxStatus.REFUNDED);
+            } else {
+              this.updateTxStatus(hash, TxStatus.COMPLETE);
+            }
+
             this.userService.fetchBalances();
             this.killTxPolling[hash].next();
           } else {
