@@ -25,7 +25,7 @@ export class MidgardService {
   private _mimir$: Observable<MimirResponse>;
 
   constructor(private http: HttpClient) {
-    this.v2BasePath = environment.network === 'testnet'
+    this.v2BasePath = (environment.network === 'testnet')
       ? 'https://testnet.midgard.thorchain.info/v2'
       : 'https://midgard.thorchain.info/v2';
 

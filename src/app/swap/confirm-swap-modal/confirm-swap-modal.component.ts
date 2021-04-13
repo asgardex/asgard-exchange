@@ -18,6 +18,7 @@ import {
   Asset,
   assetToString,
 } from '@xchainjs/xchain-util';
+import { Balances } from '@xchainjs/xchain-client';
 
 
 export interface SwapData {
@@ -49,6 +50,7 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
   insufficientChainBalance: boolean;
   loading: boolean;
   estimatedMinutes: number;
+  balances: Balances;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public swapData: SwapData,
@@ -71,7 +73,11 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
       }
     );
 
-    this.subs = [user$];
+    const balances$ = this.userService.userBalances$.subscribe(
+      (balances) => this.balances = balances
+    );
+
+    this.subs = [user$, balances$];
 
   }
 
@@ -250,11 +256,19 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
         // temporarily drops slip limit until mainnet
         const ethMemo = `=:${targetAsset.chain}.${targetAsset.symbol}:${targetAddress}`;
 
+        const decimal = await this.ethUtilsService.getAssetDecimal(this.swapData.sourceAsset, ethClient);
+        let amount = assetToBase(assetAmount(this.swapData.inputValue, decimal)).amount();
+        const balanceAmount = this.userService.findRawBalance(this.balances, this.swapData.sourceAsset);
+
+        if (amount.isGreaterThan(balanceAmount)) {
+          amount = balanceAmount;
+        }
+
         const hash = await this.ethUtilsService.callDeposit({
           inboundAddress: matchingPool,
           asset: sourceAsset,
           memo: ethMemo,
-          amount: amountNumber,
+          amount,
           ethClient
         });
 
@@ -351,11 +365,21 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
 
           const ethInbound = addresses.find( (inbound) => inbound.chain === 'ETH' );
 
+          const decimal = await this.ethUtilsService.getAssetDecimal(this.swapData.sourceAsset, ethClient);
+          let amount = assetToBase(assetAmount(this.swapData.inputValue, decimal)).amount();
+
+          const balanceAmount = this.userService.findRawBalance(this.balances, this.swapData.sourceAsset);
+          // const balanceAmount = assetToBase(assetAmount(this.swapData.sourceAsset.balance.amount(), decimal)).amount();
+
+          if (amount.isGreaterThan(balanceAmount)) {
+            amount = balanceAmount;
+          }
+
           const estimatedFeeWei = await this.ethUtilsService.estimateFee({
             sourceAsset,
             ethClient,
             ethInbound,
-            inputAmount: this.swapData.inputValue,
+            inputAmount: amount,
             memo: `=:${targetAsset.chain}.${targetAsset.symbol}:${targetAddress}`
           });
 
@@ -373,10 +397,7 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
   }
 
   getSwapMemo(chain: string, symbol: string, addr: string, sliplimit: number): string {
-    // return `=:${chain}.${symbol}:${addr}:${sliplimit}`;
-
-    // temporarily disable slip limit for testnet
-    return `=:${chain}.${symbol}:${addr}`;
+    return `=:${chain}.${symbol}:${addr}:${sliplimit}`;
   }
 
   ngOnDestroy(): void {

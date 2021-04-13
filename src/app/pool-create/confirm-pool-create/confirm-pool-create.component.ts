@@ -1,6 +1,6 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { assetAmount, assetToBase } from '@xchainjs/xchain-util';
+import { assetAmount, assetToBase, baseAmount } from '@xchainjs/xchain-util';
 import { Subscription } from 'rxjs';
 import { User } from 'src/app/_classes/user';
 import { TransactionConfirmationState } from 'src/app/_const/transaction-confirmation-state';
@@ -11,6 +11,10 @@ import { Client as BinanceClient } from '@xchainjs/xchain-binance';
 import { PoolAddressDTO } from 'src/app/_classes/pool-address';
 import { Client as EthereumClient, ETH_DECIMAL } from '@xchainjs/xchain-ethereum/lib';
 import { EthUtilsService } from 'src/app/_services/eth-utils.service';
+import { Client as LitecoinClient } from '@xchainjs/xchain-litecoin';
+import { Client as BchClient } from '@xchainjs/xchain-bitcoincash';
+import { Client as BitcoinClient } from '@xchainjs/xchain-bitcoin';
+import { Balances } from '@xchainjs/xchain-client';
 
 export interface ConfirmCreatePoolData {
   asset;
@@ -35,6 +39,7 @@ export class ConfirmPoolCreateComponent implements OnInit, OnDestroy {
   loading: boolean;
   insufficientChainBalance: boolean;
   bnbBalance: number;
+  balances: Balances;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: ConfirmCreatePoolData,
@@ -52,7 +57,11 @@ export class ConfirmPoolCreateComponent implements OnInit, OnDestroy {
       (user) => this.user = user
     );
 
-    this.subs = [user$];
+    const balances$ = this.userService.userBalances$.subscribe(
+      (balances) => this.balances = balances
+    );
+
+    this.subs = [user$, balances$];
 
   }
 
@@ -137,6 +146,24 @@ export class ConfirmPoolCreateComponent implements OnInit, OnDestroy {
           hash = await this.ethereumDeposit(ethClient, thorchainAddress, recipientPool);
           break;
 
+
+        /** FOR MCCN TESTING */
+        case 'BTC':
+          const btcClient = this.user.clients.bitcoin;
+          hash = await this.bitcoinDeposit(btcClient, thorchainAddress, recipientPool);
+          break;
+
+        case 'LTC':
+          const ltcClient = this.user.clients.litecoin;
+          hash = await this.litecoinDeposit(ltcClient, thorchainAddress, recipientPool);
+          break;
+
+        case 'BCH':
+          const bchClient = this.user.clients.bitcoinCash;
+          hash = await this.bchDeposit(bchClient, thorchainAddress, recipientPool);
+          break;
+        /** END */
+
         default:
           console.error(`${this.data.asset.chain} does not match`);
           return;
@@ -211,12 +238,108 @@ export class ConfirmPoolCreateComponent implements OnInit, OnDestroy {
     try {
       const asset = this.data.asset;
       const targetTokenMemo = `+:${asset.chain}.${asset.symbol}:${thorchainAddress}`;
+
+      const decimal = await this.ethUtilsService.getAssetDecimal(this.data.asset, client);
+      let amount = assetToBase(assetAmount(this.data.assetAmount, decimal)).amount();
+
+      const balanceAmount = this.userService.findRawBalance(this.balances, this.data.asset);
+      // const balanceAmount = assetToBase(assetAmount(this.data.asset.balance.amount(), decimal)).amount();
+
+      if (amount.isGreaterThan(balanceAmount)) {
+        amount = balanceAmount;
+      }
+
       const hash = await this.ethUtilsService.callDeposit({
         inboundAddress: recipientPool,
         asset,
         memo: targetTokenMemo,
-        amount: this.data.assetAmount,
+        amount,
         ethClient: client
+      });
+
+      return hash;
+    } catch (error) {
+      throw(error);
+    }
+  }
+
+  async bitcoinDeposit(client: BitcoinClient, thorchainAddress: string, recipientPool: PoolAddressDTO): Promise<string> {
+    // deposit token
+    try {
+      const asset = this.data.asset;
+      const targetTokenMemo = `+:${asset.chain}.${asset.symbol}:${thorchainAddress}`;
+      const fee = await client.getFeesWithMemo(targetTokenMemo);
+      const feeRates = await client.getFeeRates();
+      const toBase = assetToBase(assetAmount(this.data.assetAmount));
+      const amount = toBase.amount().minus(fee.fast.amount());
+      const hash = await client.transfer({
+        asset: {
+          chain: this.data.asset.chain,
+          symbol: this.data.asset.symbol,
+          ticker: this.data.asset.ticker
+        },
+        amount: baseAmount(amount),
+        recipient: recipientPool.address,
+        memo: targetTokenMemo,
+        feeRate: feeRates.average
+      });
+
+      return hash;
+    } catch (error) {
+      throw(error);
+    }
+  }
+
+  async bchDeposit(client: BchClient, thorchainAddress: string, recipientPool: PoolAddressDTO): Promise<string> {
+    // deposit token
+    try {
+      const asset = this.data.asset;
+      const targetTokenMemo = `+:${asset.chain}.${asset.symbol}:${thorchainAddress}`;
+      const fee = await client.getFeesWithMemo(targetTokenMemo);
+      const feeRates = await client.getFeeRates();
+      const toBase = assetToBase(assetAmount(this.data.assetAmount));
+      const amount = toBase.amount().minus(fee.fastest.amount());
+      const feeRate = feeRates.average;
+
+      const hash = await client.transfer({
+        asset: {
+          chain: this.data.asset.chain,
+          symbol: this.data.asset.symbol,
+          ticker: this.data.asset.ticker
+        },
+        amount: baseAmount(amount),
+        recipient: recipientPool.address,
+        memo: targetTokenMemo,
+        feeRate
+      });
+
+      return hash;
+    } catch (error) {
+      throw(error);
+    }
+  }
+
+  async litecoinDeposit(client: LitecoinClient, thorchainAddress: string, recipientPool: PoolAddressDTO): Promise<string> {
+    // deposit token
+    try {
+      const asset = this.data.asset;
+      const targetTokenMemo = `+:${asset.chain}.${asset.symbol}:${thorchainAddress}`;
+      const fee = await client.getFeesWithMemo(targetTokenMemo);
+      const feeRates = await client.getFeeRates();
+      const toBase = assetToBase(assetAmount(this.data.assetAmount));
+      const amount = toBase.amount().minus(fee.fast.amount());
+      const feeRate = feeRates.average;
+
+      const hash = await client.transfer({
+        asset: {
+          chain: this.data.asset.chain,
+          symbol: this.data.asset.symbol,
+          ticker: this.data.asset.ticker
+        },
+        amount: baseAmount(amount),
+        recipient: recipientPool.address,
+        memo: targetTokenMemo,
+        feeRate
       });
 
       return hash;
@@ -248,12 +371,19 @@ export class ConfirmPoolCreateComponent implements OnInit, OnDestroy {
         async (addresses) => {
 
           const ethInbound = addresses.find( (inbound) => inbound.chain === 'ETH' );
+          const decimal = await this.ethUtilsService.getAssetDecimal(this.data.asset, ethClient);
+          let amount = assetToBase(assetAmount(this.data.assetAmount, decimal)).amount();
+          const balanceAmount = this.userService.findRawBalance(this.balances, this.data.asset);
+
+          if (amount.isGreaterThan(balanceAmount)) {
+            amount = balanceAmount;
+          }
 
           const estimatedFeeWei = await this.ethUtilsService.estimateFee({
             sourceAsset,
             ethClient,
             ethInbound,
-            inputAmount: this.data.assetAmount,
+            inputAmount: amount,
             memo: `+:${sourceAsset.chain}.${sourceAsset.symbol}:${thorchainAddress}`
           });
 

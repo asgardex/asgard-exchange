@@ -156,7 +156,7 @@ export class UserAddressComponent implements OnInit {
         return 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png';
 
       case 'THOR':
-        return 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/RUNE-B1A/logo.png';
+        return 'assets/images/token-icons/thorchain-logo.png';
     }
   }
 

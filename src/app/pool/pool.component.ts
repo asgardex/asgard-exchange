@@ -28,14 +28,13 @@ export class PoolComponent implements OnInit, OnDestroy {
   maxLiquidityRune: number;
   totalPooledRune: number;
   depositsDisabled: boolean;
-  pendingTxLength: number;
+  txStreamInitSuccess: boolean;
 
   constructor(private userService: UserService, private midgardService: MidgardService, private txStatusService: TransactionStatusService) {
 
     this.subs = [];
     this.memberPools = [];
     this.depositsDisabled = false;
-    this.pendingTxLength = 0;
 
     const user$ = this.userService.user$.subscribe(
       (user) => {
@@ -52,15 +51,15 @@ export class PoolComponent implements OnInit, OnDestroy {
     );
 
     const pendingTx$ = this.txStatusService.txs$.subscribe(
-      (tx) => {
+      (_) => {
 
-        if (tx && tx.length !== this.pendingTxLength) {
-          this.pendingTxLength = tx.length;
+        if (!this.txStreamInitSuccess) {
+          this.txStreamInitSuccess = true;
+        } else {
           setTimeout( () => {
             this.getAccountPools();
           }, 3000);
         }
-
       }
     );
 
@@ -140,6 +139,7 @@ export class PoolComponent implements OnInit, OnDestroy {
 
   async getAccountPools() {
     this.loading = true;
+    this.memberPools = [];
 
     if (this.user) {
 

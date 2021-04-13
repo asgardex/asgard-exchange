@@ -22,15 +22,10 @@
         </div>
       </div>
 
-      <main *ngIf="isTestnet" [ngClass]="{'py-8 xl:py-32': notificationsExist(), 'py-32': !notificationsExist()}" class="flex flex-col justify-center items-center clear-both px-4 sm:px-0">
+      <main [ngClass]="{'py-8 xl:py-32': notificationsExist(), 'py-32': !notificationsExist()}" class="flex flex-col justify-center items-center clear-both px-4 sm:px-0">
         <router-outlet></router-outlet>
       </main>
 
-      <main *ngIf="!isTestnet" class="flex flex-col justify-center items-center clear-both px-4 sm:px-0 py-32">
-        <div>
-          Multichain Coming Soon.
-        </div>
-      </main>
     </div>
 
   </div>
