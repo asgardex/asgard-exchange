@@ -1,6 +1,6 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Asset as xchainAsset } from '@xchainjs/xchain-util';
+import { Asset as xchainAsset, baseAmount, bn } from '@xchainjs/xchain-util';
 import { ethers } from 'ethers';
 import { Subscription, combineLatest } from 'rxjs';
 import { Asset } from 'src/app/_classes/asset';
@@ -64,6 +64,8 @@ export class ApproveEthContractModalComponent implements OnInit, OnDestroy {
   async estimateApprovalFee(addresses: PoolAddressDTO[]) {
     const ethInboundAddress = addresses.find( (address) => address.chain === 'ETH' );
     const { asset, contractAddress } = this.data;
+    const assetAddress = asset.symbol.slice(asset.ticker.length + 1);
+    const strip0x = assetAddress.substr(2);
 
     if (!ethInboundAddress) {
       console.error('no eth inbound address found');
@@ -76,10 +78,10 @@ export class ApproveEthContractModalComponent implements OnInit, OnDestroy {
     }
 
     try {
-      const fee = await this.ethUtilsService.estimateApproveFee({
-        ethClient: this.user.clients.ethereum,
-        asset,
-        contractAddress
+      const fee = await this.user.clients.ethereum.estimateApprove({
+        spender: contractAddress,
+        sender: strip0x,
+        amount: baseAmount(bn(2).pow(96).minus(1))
       });
       this.fee = ethers.utils.formatEther(fee.toString());
       this.insufficientEthBalance = (+this.fee) > this.ethBalance;
@@ -100,7 +102,12 @@ export class ApproveEthContractModalComponent implements OnInit, OnDestroy {
 
       const assetAddress = asset.symbol.slice(asset.ticker.length + 1);
       const strip0x = assetAddress.substr(2);
-      const approve = await this.user.clients.ethereum.approve(contractAddress, strip0x);
+      const approve = await this.user.clients.ethereum.approve({
+        spender: contractAddress,
+        sender: strip0x,
+        amount: baseAmount(bn(2).pow(96).minus(1)),
+        feeOptionKey: 'fast'
+      });
 
       this.txStatusService.pollEthContractApproval(approve.hash);
       this.dialogRef.close(approve.hash);

@@ -118,18 +118,6 @@ export class EthUtilsService {
 
   }
 
-  async estimateApproveFee({ethClient, contractAddress, asset}: EstimateApprovalFee) {
-    const wallet = ethClient.getWallet();
-    const assetAddress = asset.symbol.slice(asset.ticker.length + 1);
-    const strip0x = (assetAddress.toUpperCase().indexOf('0X') === 0) ? assetAddress.substr(2) : assetAddress;
-    const checkSummedAddress = ethers.utils.getAddress(strip0x);
-    const contract = new ethers.Contract(checkSummedAddress, erc20ABI, wallet);
-    const estimateGas = await contract.estimateGas.approve(contractAddress, checkSummedAddress);
-    const prices = await ethClient.estimateGasPrices();
-    const minimumWeiCost = prices.average.amount().multipliedBy(estimateGas.toNumber());
-    return minimumWeiCost;
-  }
-
   async maximumSpendableBalance(ethParams: {asset: Asset, balance: number, client: EthClient}) {
 
     const {asset, balance, client } = ethParams;
