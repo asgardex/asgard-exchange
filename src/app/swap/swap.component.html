@@ -54,6 +54,13 @@
         <span *ngIf="outboundTransactionFee">{{outboundTransactionFee}} RUNE THORChain Network Fee</span>
         <span *ngIf="!outboundTransactionFee">...</span>
       </div>
+
+      <div class="flex justify-between swap-details">
+        <span class="tx-detail-label"></span>
+        <span *ngIf="outputNetworkFee">{{selectedTargetAsset.ticker}} {{outputNetworkFee | number:"1.0-8"}} Network Fee</span>
+        <span *ngIf="!outputNetworkFee">...</span>
+      </div>
+
     </div>
 
     <div class="flex">

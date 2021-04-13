@@ -11,6 +11,7 @@ import { ethRUNERopsten } from '../_abi/erc20RUNE.abi';
 import { MidgardService } from './midgard.service';
 import { Client as EthClient } from '@xchainjs/xchain-ethereum';
 import { Asset } from '@xchainjs/xchain-util';
+import { PoolDTO } from '../_classes/pool';
 
 export type EstimateFeeParams = {
   sourceAsset: Asset,
@@ -231,6 +232,10 @@ export class EthUtilsService {
     const chainBlockTime = 15; // seconds
     const estimatedMinutes = (Math.ceil( totalInEth / chainBlockReward) * (chainBlockTime / 60));
     return (estimatedMinutes < 1) ? 1 : estimatedMinutes;
+  }
+
+  getErc20ValueInEth(ethPool: PoolDTO, tokenPool: PoolDTO) {
+    return (+tokenPool.assetPriceUSD) / (+ethPool.assetPriceUSD);
   }
 
 }
