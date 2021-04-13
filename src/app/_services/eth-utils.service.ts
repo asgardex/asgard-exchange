@@ -52,13 +52,15 @@ export class EthUtilsService {
       ? TCRopstenAbi
       : TCAbi;
 
-      // testing
-      const gasPrices = await ethClient.estimateGasPrices();
-      const gasPrice = gasPrices.fast.amount().toFixed(0);
-      console.log('gas price is: ', gasPrice);
-      console.log('inboundAddress.gas_rate: ', ethInbound.gas_rate);
-      console.log('inbound address formatted is: ', baseAmount(ethers.utils.parseUnits(ethInbound.gas_rate, 'gwei').toString(), ETH_DECIMAL).amount().toFixed(0));
-      // end testing
+    // testing
+    const gasPrices = await ethClient.estimateGasPrices();
+    const gasPrice = gasPrices.fast.amount().toFixed(0);
+    console.log('gas price is: ', gasPrice);
+    console.log('inboundAddress.gas_rate: ', ethInbound.gas_rate);
+    console.log('inbound address formatted is: ',
+      baseAmount(ethers.utils.parseUnits(ethInbound.gas_rate, 'gwei').toString(), ETH_DECIMAL
+    ).amount().toFixed(0));
+    // end testing
 
     if (sourceAsset.symbol === 'ETH') {
       checkSummedAddress = '0x0000000000000000000000000000000000000000';
@@ -88,7 +90,10 @@ export class EthUtilsService {
     ];
 
     const estimateGas = await contract.estimateGas.deposit(...params);
-    const minimumCost = baseAmount(ethers.utils.parseUnits(ethInbound.gas_rate, 'gwei').toString(), ETH_DECIMAL).amount().multipliedBy(estimateGas.toNumber());
+    const minimumCost = baseAmount(
+      ethers.utils.parseUnits(ethInbound.gas_rate, 'gwei').toString(),
+      ETH_DECIMAL
+    ).amount().multipliedBy(estimateGas.toNumber());
 
     return minimumCost;
   }
@@ -155,7 +160,11 @@ export class EthUtilsService {
     const deprecatedEthClientgasPrice = gasPrices.fast.amount().toFixed(0);
     console.log('gas price is: ', deprecatedEthClientgasPrice);
     console.log('inboundAddress.gas_rate: ', inboundAddress.gas_rate);
-    console.log('inboundAddress format units is: ', baseAmount(ethers.utils.parseUnits(inboundAddress.gas_rate, 'gwei').toString(), ETH_DECIMAL).amount().toFixed(0));
+    console.log('inboundAddress format units is: ',
+      baseAmount(
+        ethers.utils.parseUnits(inboundAddress.gas_rate, 'gwei').toString(),
+        ETH_DECIMAL
+      ).amount().toFixed(0));
     const gasPrice = baseAmount(ethers.utils.parseUnits(inboundAddress.gas_rate, 'gwei').toString(), ETH_DECIMAL).amount().toFixed(0);
 
     if (asset.ticker === 'ETH') {
