@@ -23,6 +23,7 @@
 
                 <button class="flex items-center justify-center" matSuffix mat-icon-button>
                   <mat-icon *ngIf="tx.status === 'COMPLETE'">check_circle</mat-icon>
+                  <mat-icon matTooltip="Transaction Refunded" *ngIf="tx.status === 'REFUNDED'">undo</mat-icon>
                   <mat-progress-spinner *ngIf="tx.status === 'PENDING'" diameter="16" color="primary" mode="indeterminate"></mat-progress-spinner>
                 </button>
 
