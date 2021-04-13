@@ -32,7 +32,7 @@ import { PoolDTO } from '../_classes/pool';
 import { SlippageToleranceService } from '../_services/slippage-tolerance.service';
 import { PoolAddressDTO } from '../_classes/pool-address';
 import { ThorchainPricesService } from '../_services/thorchain-prices.service';
-import { EthUtilsService } from '../_services/eth-utils.service';
+import { TransactionUtilsService } from '../_services/transaction-utils.service';
 
 export enum SwapType {
   DOUBLE_SWAP = 'double_swap',
@@ -176,6 +176,7 @@ export class SwapComponent implements OnInit, OnDestroy {
 
   inboundAddresses: PoolAddressDTO[];
   ethPool: PoolDTO;
+  inputNetworkFee: number;
   outputNetworkFee: number;
 
   constructor(
@@ -185,7 +186,7 @@ export class SwapComponent implements OnInit, OnDestroy {
     private binanceService: BinanceService,
     private slipLimitService: SlippageToleranceService,
     private thorchainPricesService: ThorchainPricesService,
-    private ethUtilsService: EthUtilsService) {
+    private txUtilsService: TransactionUtilsService) {
 
     this.selectedSourceAsset = new Asset('THOR.RUNE');
     this.ethContractApprovalRequired = false;
@@ -320,8 +321,7 @@ export class SwapComponent implements OnInit, OnDestroy {
   formInvalid(): boolean {
 
     return !this.sourceAssetUnit || !this.selectedSourceAsset || !this.selectedTargetAsset || !this.targetAssetUnit
-      || (this.selectedSourceAsset && this.sourceBalance
-        && (this.sourceAssetUnit > this.userService.maximumSpendableBalance(this.selectedSourceAsset, this.sourceBalance)))
+      || (this.sourceAssetUnit > this.userService.maximumSpendableBalance(this.selectedSourceAsset, this.sourceBalance))
       || (this.sourceAssetUnit <= this.userService.minimumSpendable(this.selectedSourceAsset))
       || (this.targetAssetUnitDisplay <= this.userService.minimumSpendable(this.selectedTargetAsset))
       || !this.user || !this.balances
@@ -550,13 +550,18 @@ export class SwapComponent implements OnInit, OnDestroy {
 
       /** Network Fee */
       // const networkFee = this.calculateNetworkFee(this.selectedTargetAsset, poolDetail);
-      this.outputNetworkFee = this.calculateNetworkFee(
+      const networkFee = this.txUtilsService.calculateNetworkFee(
         (toRune)
           ? this.selectedSourceAsset
           : this.selectedTargetAsset,
         poolDetail
       );
-      console.log('network fee is: ', this.outputNetworkFee);
+
+      if (toRune) {
+        this.inputNetworkFee = networkFee;
+      } else {
+        this.outputNetworkFee = networkFee;
+      }
 
       /**
        * Total output amount in target units minus 1 RUNE
@@ -568,7 +573,7 @@ export class SwapComponent implements OnInit, OnDestroy {
             ? valueOfRuneInAsset.amount().multipliedBy(this.outboundTransactionFee ?? 0.2)
             : assetToBase(assetAmount(this.outboundTransactionFee ?? 0.2)).amount()
           ).minus(
-            assetToBase(assetAmount(this.outputNetworkFee)).amount())
+            assetToBase(assetAmount(networkFee)).amount())
         ), pool, toRune);
 
       if (this.sourceAssetUnit) {
@@ -603,6 +608,9 @@ export class SwapComponent implements OnInit, OnDestroy {
         runeBalance: baseAmount(targetPool.runeDepth),
       };
 
+      this.inputNetworkFee = this.txUtilsService.calculateNetworkFee(this.selectedSourceAsset, sourcePool);
+      this.outputNetworkFee = this.txUtilsService.calculateNetworkFee(this.selectedTargetAsset, targetPool);
+
       const basePrice = getDoubleSwapOutput(assetToBase(assetAmount(1)), pool2, pool1);
       this.basePrice = basePrice.amount().div(10 ** 8).toNumber();
 
@@ -612,13 +620,14 @@ export class SwapComponent implements OnInit, OnDestroy {
       const valueOfRuneInAsset = getValueOfRuneInAsset(assetToBase(assetAmount(this.outboundTransactionFee ?? 0.2)), pool1);
 
       const total = getDoubleSwapOutput(baseAmount(this._sourceAssetTokenValue.amount()
-      .minus( // subtract RUNE network fee
-        valueOfRuneInAsset.amount().multipliedBy(this.outboundTransactionFee ?? 0.2)
+        .minus( // subtract RUNE network fee
+          valueOfRuneInAsset.amount().multipliedBy(this.outboundTransactionFee ?? 0.2)
         )
-      ), pool1, pool2);
+        .minus(assetToBase(assetAmount(this.inputNetworkFee)).amount())
+      ), pool1, pool2).amount().minus(assetToBase(assetAmount(this.outputNetworkFee)).amount());
 
       if (this.sourceAssetUnit) {
-        this.targetAssetUnit = (total.amount().isLessThan(0)) ? bn(0) : total.amount();
+        this.targetAssetUnit = (total.isLessThan(0)) ? bn(0) : total;
       } else {
         this.targetAssetUnit = null;
       }
@@ -629,48 +638,6 @@ export class SwapComponent implements OnInit, OnDestroy {
 
   }
 
-  calculateNetworkFee(asset: Asset, assetPool: PoolDTO): number {
-
-    const matchingInboundAddress = this.inboundAddresses.find( (pool) => pool.chain === asset.chain );
-
-    if (matchingInboundAddress) {
-      switch (asset.chain) {
-        case 'BTC':
-        case 'LTC':
-        case 'BCH':
-          return (250 * (+matchingInboundAddress.gas_rate) * 3) / 10 ** 8;
-
-        case 'ETH':
-
-          // ETH
-          if (asset.symbol === 'ETH') {
-            return (35000 * (+matchingInboundAddress.gas_rate) * (10**9) * 3)  / 10**18;
-          }
-          // ERC20
-          else {
-            // example...
-            // ethGasVal = 0.2 ETH
-            // 1 USDT = 0.1 ETH
-            // 2 USDT to cover gas
-            const ethGasVal = (70000 * (+matchingInboundAddress.gas_rate) * (10**9) * 3)  / 10**18;
-            console.log('gas rate is: ', matchingInboundAddress.gas_rate);
-            console.log('eth gas value is: ', ethGasVal);
-            const tokenEthValue = (+assetPool.assetPriceUSD) / (+this.ethPool.assetPriceUSD);
-            // const tokenEthValue = this.ethUtilsService.getErc20ValueInEth(this.ethPool, assetPool);
-            console.log('token eth value is: ', tokenEthValue);
-            return ethGasVal / tokenEthValue;
-          }
-
-        case 'BNB':
-          return 0.000375;
-
-        case 'THOR':
-          return this.outboundTransactionFee ?? 0.2;
-      }
-      console.error('calculateNetworkFee no chain match');
-    }
-    console.error('calculateNetworkFee no matching inbound address found');
-  }
 
   ngOnDestroy() {
     for (const sub of this.subs) {

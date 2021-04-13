@@ -74,6 +74,7 @@ import { ThorchainPricesService } from './_services/thorchain-prices.service';
 import { HaskoinService } from './_services/haskoin.service';
 import { ModalSectionHeaderModule } from './_components/modal-section-header/modal-section-header.module';
 import { KeystoreCreateStorePhraseComponent } from './_components/connect/keystore-create-store-phrase/keystore-create-store-phrase.component';
+import { TransactionUtilsService } from './_services/transaction-utils.service';
 
 
 @NgModule({
@@ -145,7 +146,8 @@ import { KeystoreCreateStorePhraseComponent } from './_components/connect/keysto
     EthUtilsService,
     SochainService,
     ThorchainPricesService,
-    HaskoinService
+    HaskoinService,
+    TransactionUtilsService
   ],
   bootstrap: [AppComponent]
 })
