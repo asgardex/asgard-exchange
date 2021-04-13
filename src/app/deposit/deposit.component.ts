@@ -16,6 +16,7 @@ import { User } from '../_classes/user';
 import { Balances } from '@xchainjs/xchain-client';
 import { AssetAndBalance } from '../_classes/asset-and-balance';
 import { EthUtilsService } from '../_services/eth-utils.service';
+import { TransactionUtilsService } from '../_services/transaction-utils.service';
 
 @Component({
   selector: 'app-deposit',
@@ -99,6 +100,8 @@ export class DepositComponent implements OnInit, OnDestroy {
   maximumSpendable: number;
   poolNotFoundErr: boolean;
 
+  networkFee: number;
+
   constructor(
     private dialog: MatDialog,
     private userService: UserService,
@@ -106,6 +109,7 @@ export class DepositComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private midgardService: MidgardService,
     private ethUtilsService: EthUtilsService,
+    private txUtilsService: TransactionUtilsService
   ) {
     this.poolNotFoundErr = false;
     this.ethContractApprovalRequired = false;
@@ -210,6 +214,9 @@ export class DepositComponent implements OnInit, OnDestroy {
             assetBalance: baseAmount(res.assetDepth),
             runeBalance: baseAmount(res.runeDepth),
           };
+
+          this.networkFee = this.txUtilsService.calculateNetworkFee(this.asset, res);
+
         }
       },
       (err) => {

@@ -54,6 +54,19 @@
         <span *ngIf="outboundTransactionFee">{{outboundTransactionFee}} RUNE THORChain Network Fee</span>
         <span *ngIf="!outboundTransactionFee">...</span>
       </div>
+
+      <div *ngIf="selectedSourceAsset && !isNativeRune(selectedSourceAsset)" class="flex justify-between swap-details">
+        <span class="tx-detail-label"></span>
+        <span *ngIf="inputNetworkFee">{{inputNetworkFee | number:"1.0-8"}} {{selectedSourceAsset.ticker}}.{{selectedSourceAsset.chain}}  Network Fee</span>
+        <span *ngIf="!inputNetworkFee">...</span>
+      </div>
+
+      <div *ngIf="selectedTargetAsset && !isNativeRune(selectedTargetAsset)" class="flex justify-between swap-details">
+        <span class="tx-detail-label"></span>
+        <span *ngIf="outputNetworkFee">{{outputNetworkFee | number:"1.0-8"}} {{selectedTargetAsset.ticker}}.{{selectedTargetAsset.chain}} Network Fee</span>
+        <span *ngIf="!outputNetworkFee">...</span>
+      </div>
+
     </div>
 
     <div class="flex">

@@ -263,6 +263,8 @@ export class UserService {
         return 0.0001;
 
       case 'BNB.BNB':
+        return 0.001;
+
       case 'ETH.ETH':
         return 0.001;
 

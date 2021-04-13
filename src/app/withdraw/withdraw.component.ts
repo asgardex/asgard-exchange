@@ -15,6 +15,7 @@ import { MemberPool } from '../_classes/member';
 import { User } from '../_classes/user';
 import { LastBlockService } from '../_services/last-block.service';
 import { MidgardService } from '../_services/midgard.service';
+import { TransactionUtilsService } from '../_services/transaction-utils.service';
 import { UserService } from '../_services/user.service';
 import { ConfirmWithdrawModalComponent } from './confirm-withdraw-modal/confirm-withdraw-modal.component';
 
@@ -59,13 +60,16 @@ export class WithdrawComponent implements OnInit {
   insufficientBnb: boolean;
   outboundTransactionFee: number;
 
+  networkFee: number;
+
   constructor(
     private dialog: MatDialog,
     private route: ActivatedRoute,
     private userService: UserService,
     private lastBlockService: LastBlockService,
     private midgardService: MidgardService,
-    private router: Router
+    private router: Router,
+    private txUtilsService: TransactionUtilsService
   ) {
 
     this.rune = new Asset(this.runeSymbol);
@@ -293,6 +297,8 @@ export class WithdrawComponent implements OnInit {
 
           this.runeBasePrice = getValueOfAssetInRune(assetToBase(assetAmount(1)), this.assetPoolData).amount().div(10 ** 8).toNumber();
           this.assetBasePrice = getValueOfRuneInAsset(assetToBase(assetAmount(1)), this.assetPoolData).amount().div(10 ** 8).toNumber();
+
+          this.networkFee = this.txUtilsService.calculateNetworkFee(this.asset, res);
 
           this.calculate();
         }
