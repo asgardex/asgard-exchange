@@ -96,11 +96,26 @@ export class UpgradeRuneConfirmComponent implements OnInit, OnDestroy {
         async (addresses) => {
 
           const ethInbound = addresses.find( (inbound) => inbound.chain === 'ETH' );
+          const decimal = await this.ethUtilsService.getAssetDecimal(this.asset.asset, ethClient);
+          let amount = assetToBase(assetAmount(this.amount, decimal)).amount();
+          const balanceAmount = assetToBase(assetAmount(this.asset.balance.amount(), decimal)).amount();
+
+          const balanceFormatted = this.userService.findBalance(this.balances, this.asset.asset);
+          const max = await this.ethUtilsService.maximumSpendableBalance({asset: this.asset.asset, balance: balanceFormatted, client: ethClient});
+
+          if (this.amount >= max) {
+            amount = balanceAmount;
+          }
+
+          if (amount.isGreaterThan(balanceAmount)) {
+            amount = balanceAmount;
+          }
+
           const estimatedFeeWei = await this.ethUtilsService.estimateFee({
             sourceAsset: this.asset.asset,
             ethClient,
             ethInbound,
-            inputAmount: this.amount,
+            inputAmount: amount,
             memo: `SWITCH:${thorAddress}`
           });
 
@@ -186,12 +201,26 @@ export class UpgradeRuneConfirmComponent implements OnInit, OnDestroy {
         } else if (asset.chain === 'ETH') {
 
           const client = this.user.clients.ethereum;
+          const decimal = await this.ethUtilsService.getAssetDecimal(this.asset.asset, client);
+          let amount = assetToBase(assetAmount(this.amount, decimal)).amount();
+          const balanceAmount = assetToBase(assetAmount(this.asset.balance.amount(), decimal)).amount();
+
+          const balanceFormatted = this.userService.findBalance(this.balances, this.asset.asset);
+          const max = await this.ethUtilsService.maximumSpendableBalance({asset: this.asset.asset, balance: balanceFormatted, client});
+
+          if (this.amount >= max) {
+            amount = balanceAmount;
+          }
+
+          if (amount.isGreaterThan(balanceAmount)) {
+            amount = balanceAmount;
+          }
 
           const hash = await this.ethUtilsService.callDeposit({
             asset: this.asset.asset,
             inboundAddress: matchingPool,
             memo,
-            amount: amountNumber,
+            amount,
             ethClient: client
           });
 

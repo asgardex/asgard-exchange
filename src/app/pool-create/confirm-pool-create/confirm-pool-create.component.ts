@@ -14,6 +14,7 @@ import { EthUtilsService } from 'src/app/_services/eth-utils.service';
 import { Client as LitecoinClient } from '@xchainjs/xchain-litecoin';
 import { Client as BchClient } from '@xchainjs/xchain-bitcoincash';
 import { Client as BitcoinClient } from '@xchainjs/xchain-bitcoin';
+import { Balances } from '@xchainjs/xchain-client';
 
 export interface ConfirmCreatePoolData {
   asset;
@@ -38,6 +39,7 @@ export class ConfirmPoolCreateComponent implements OnInit, OnDestroy {
   loading: boolean;
   insufficientChainBalance: boolean;
   bnbBalance: number;
+  balances: Balances;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: ConfirmCreatePoolData,
@@ -55,7 +57,11 @@ export class ConfirmPoolCreateComponent implements OnInit, OnDestroy {
       (user) => this.user = user
     );
 
-    this.subs = [user$];
+    const balances$ = this.userService.userBalances$.subscribe(
+      (balances) => this.balances = balances
+    );
+
+    this.subs = [user$, balances$];
 
   }
 
@@ -232,11 +238,22 @@ export class ConfirmPoolCreateComponent implements OnInit, OnDestroy {
     try {
       const asset = this.data.asset;
       const targetTokenMemo = `+:${asset.chain}.${asset.symbol}:${thorchainAddress}`;
+
+      const decimal = await this.ethUtilsService.getAssetDecimal(this.data.asset, client);
+      let amount = assetToBase(assetAmount(this.data.assetAmount, decimal)).amount();
+
+      const balanceAmount = this.userService.findRawBalance(this.balances, this.data.asset);
+      // const balanceAmount = assetToBase(assetAmount(this.data.asset.balance.amount(), decimal)).amount();
+
+      if (amount.isGreaterThan(balanceAmount)) {
+        amount = balanceAmount;
+      }
+
       const hash = await this.ethUtilsService.callDeposit({
         inboundAddress: recipientPool,
         asset,
         memo: targetTokenMemo,
-        amount: this.data.assetAmount,
+        amount,
         ethClient: client
       });
 
@@ -354,12 +371,19 @@ export class ConfirmPoolCreateComponent implements OnInit, OnDestroy {
         async (addresses) => {
 
           const ethInbound = addresses.find( (inbound) => inbound.chain === 'ETH' );
+          const decimal = await this.ethUtilsService.getAssetDecimal(this.data.asset, ethClient);
+          let amount = assetToBase(assetAmount(this.data.assetAmount, decimal)).amount();
+          const balanceAmount = this.userService.findRawBalance(this.balances, this.data.asset);
+
+          if (amount.isGreaterThan(balanceAmount)) {
+            amount = balanceAmount;
+          }
 
           const estimatedFeeWei = await this.ethUtilsService.estimateFee({
             sourceAsset,
             ethClient,
             ethInbound,
-            inputAmount: this.data.assetAmount,
+            inputAmount: amount,
             memo: `+:${sourceAsset.chain}.${sourceAsset.symbol}:${thorchainAddress}`
           });
 

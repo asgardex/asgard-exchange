@@ -12,12 +12,14 @@ import {
   assetToBase,
   assetFromString,
   baseToAsset,
-  Chain
+  Chain,
+  bn
 } from '@xchainjs/xchain-util';
 import { BehaviorSubject, of, Subject, timer } from 'rxjs';
 import { catchError, switchMap, takeUntil } from 'rxjs/operators';
 import { AssetAndBalance } from '../_classes/asset-and-balance';
 import { MidgardService } from './midgard.service';
+import BigNumber from 'bignumber.js';
 
 export interface MidgardData<T> {
   key: string;
@@ -278,6 +280,19 @@ export class UserService {
         return baseToAsset(match.amount).amount().toNumber();
       } else {
         return 0.0;
+      }
+    }
+  }
+
+  // TODO -> hacky bandaid for erc20 dusting
+  findRawBalance(balances: Balances, asset: Asset): BigNumber {
+    if (balances && asset) {
+      const match = balances.find( (balance) => `${balance.asset.chain}.${balance.asset.symbol}`.toUpperCase() === `${asset.chain}.${asset.symbol}`.toUpperCase() );
+
+      if (match) {
+        return match.amount.amount();
+      } else {
+        return bn(0);
       }
     }
   }
