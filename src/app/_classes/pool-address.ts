@@ -4,6 +4,7 @@ export interface PoolAddressDTO {
   address: string;
   router: string;
   halted: boolean;
+  gas_rate: string;
 }
 
 export class PoolAddress {

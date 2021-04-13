@@ -3,7 +3,7 @@ import { ethers } from 'ethers';
 import { PoolAddressDTO } from '../_classes/pool-address';
 import { TCAbi, TCRopstenAbi } from '../_abi/thorchain.abi';
 import { Client, ETH_DECIMAL } from '@xchainjs/xchain-ethereum/lib';
-import { assetAmount, assetToBase, baseAmount } from '@xchainjs/xchain-util';
+import { assetAmount, assetToBase, baseAmount, bn } from '@xchainjs/xchain-util';
 import BigNumber from 'bignumber.js';
 import { erc20ABI } from '../_abi/erc20.abi';
 import { environment } from '../../environments/environment';
@@ -51,6 +51,17 @@ export class EthUtilsService {
       ? TCRopstenAbi
       : TCAbi;
 
+
+      // testing
+      const gasPrices = await ethClient.estimateGasPrices();
+      const gasPrice = gasPrices.fast.amount().toFixed(0);
+      console.log('gas price is: ', gasPrice);
+      console.log('inboundAddress.gas_rate: ', ethInbound.gas_rate);
+      // console.log('format units is: ', ethers.utils.parseUnits(inboundAddress.gas_rate, 'gwei'));
+      // console.log('format units is: ', baseAmount(ethers.utils.parseUnits(inboundAddress.gas_rate, 'gwei').toString(), ETH_DECIMAL).amount().toFixed(0));
+      console.log('format units is: ', baseAmount(ethers.utils.parseUnits(ethInbound.gas_rate, 'gwei').toString(), ETH_DECIMAL).amount().toFixed(0));
+      // end testing
+
     if (sourceAsset.symbol === 'ETH') {
       checkSummedAddress = '0x0000000000000000000000000000000000000000';
     } else {
@@ -79,10 +90,9 @@ export class EthUtilsService {
     ];
 
     const estimateGas = await contract.estimateGas.deposit(...params);
-    const prices = await ethClient.estimateGasPrices();
-    const minimumWeiCost = prices.fast.amount().multipliedBy(estimateGas.toNumber());
+    const minimumCost = baseAmount(ethers.utils.parseUnits(ethInbound.gas_rate, 'gwei').toString(), ETH_DECIMAL).amount().multipliedBy(estimateGas.toNumber());
 
-    return minimumWeiCost;
+    return minimumCost;
   }
 
   async getAssetDecimal(asset: Asset, client: Client): Promise<number> {
@@ -144,7 +154,16 @@ export class EthUtilsService {
       ? TCRopstenAbi
       : TCRopstenAbi;
     const gasPrices = await ethClient.estimateGasPrices();
-    const gasPrice = gasPrices.fast.amount().toFixed(0);
+    const ethClientgasPrice = gasPrices.fast.amount().toFixed(0);
+    console.log('gas price is: ', ethClientgasPrice);
+    console.log('inboundAddress.gas_rate: ', inboundAddress.gas_rate);
+    // console.log('format units is: ', ethers.utils.parseUnits(inboundAddress.gas_rate, 'gwei'));
+    // console.log('format units is: ', baseAmount(ethers.utils.parseUnits(inboundAddress.gas_rate, 'gwei').toString(), ETH_DECIMAL).amount().toFixed(0));
+    console.log('format units is: ', baseAmount(ethers.utils.parseUnits(inboundAddress.gas_rate, 'gwei').toString(), ETH_DECIMAL).amount().toFixed(0));
+    const gasPrice = baseAmount(ethers.utils.parseUnits(inboundAddress.gas_rate, 'gwei').toString(), ETH_DECIMAL).amount().toFixed(0);
+
+    // 108000000000
+    // 10000000000
 
     if (asset.ticker === 'ETH') {
 
