@@ -101,7 +101,11 @@ export class UpgradeRuneConfirmComponent implements OnInit, OnDestroy {
           const balanceAmount = assetToBase(assetAmount(this.asset.balance.amount(), decimal)).amount();
 
           const balanceFormatted = this.userService.findBalance(this.balances, this.asset.asset);
-          const max = await this.ethUtilsService.maximumSpendableBalance({asset: this.asset.asset, balance: balanceFormatted, client: ethClient});
+          const max = await this.ethUtilsService.maximumSpendableBalance({
+            asset: this.asset.asset,
+            balance: balanceFormatted,
+            client: ethClient
+          });
 
           if (this.amount >= max) {
             amount = balanceAmount;
