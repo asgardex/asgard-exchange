@@ -31,6 +31,7 @@ export interface SwapData {
   outputValue: BigNumber;
   user: User;
   slip: number;
+  estimatedFee: number;
 }
 
 @Component({
@@ -224,12 +225,9 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
     } else if (this.swapData.sourceAsset.chain === 'BTC') {
 
       try {
-
-        // const fee = await bitcoinClient.getFeesWithMemo(memo);
-        // const feeRates = await bitcoinClient.getFeeRates();
         const toBase = assetToBase(assetAmount(amountNumber));
-        const amount = toBase.amount().minus(matchingPool.gas_rate);
-
+        const feeToBase = assetToBase(assetAmount(this.swapData.estimatedFee));
+        const amount = toBase.amount().minus(feeToBase.amount().minus(1));
         const hash = await bitcoinClient.transfer({
           amount: baseAmount(amount),
           recipient: matchingPool.address,
@@ -284,16 +282,15 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
     } else if (this.swapData.sourceAsset.chain === 'LTC') {
 
       try {
-        const fee = await litecoinClient.getFeesWithMemo(memo);
-        const feeRates = await litecoinClient.getFeeRates();
         const toBase = assetToBase(assetAmount(amountNumber));
-        const amount = toBase.amount().minus(fee.fast.amount());
+        const feeToBase = assetToBase(assetAmount(this.swapData.estimatedFee));
+        const amount = toBase.amount().minus(feeToBase.amount().minus(+matchingPool.gas_rate));
 
         const hash = await litecoinClient.transfer({
           amount: baseAmount(amount),
           recipient: matchingPool.address,
           memo,
-          feeRate: feeRates.average
+          feeRate: +matchingPool.gas_rate
         });
 
         this.hash = hash;
@@ -309,16 +306,15 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
 
       try {
         const bchClient = this.swapData.user.clients.bitcoinCash;
-        const fee = await bchClient.getFeesWithMemo(memo);
-        const feeRates = await bchClient.getFeeRates();
         const toBase = assetToBase(assetAmount(amountNumber));
-        const amount = toBase.amount().minus(fee.fast.amount());
+        const feeToBase = assetToBase(assetAmount(this.swapData.estimatedFee));
+        const amount = toBase.amount().minus(feeToBase.amount().minus(1));
 
         const hash = await bchClient.transfer({
           amount: baseAmount(amount),
           recipient: matchingPool.address,
           memo,
-          feeRate: feeRates.average
+          feeRate: +matchingPool.gas_rate
         });
 
         this.hash = hash;

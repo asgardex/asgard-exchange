@@ -393,7 +393,8 @@ export class SwapComponent implements OnInit, OnDestroy {
           inputValue: this.sourceAssetUnit,
           outputValue: this.targetAssetUnit.div(10 ** 8),
           user: this.user,
-          slip: this.slip
+          slip: this.slip,
+          estimatedFee: this.inputNetworkFee
         }
       }
     );
