@@ -259,10 +259,14 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
     try {
       const asset = this.data.asset;
       const targetTokenMemo = `+:${asset.chain}.${asset.symbol}:${thorchainAddress}`;
-      const fee = await client.getFeesWithMemo(targetTokenMemo);
-      const feeRates = await client.getFeeRates();
+      // const fee = await client.getFeesWithMemo(targetTokenMemo);
+      // const feeRates = await client.getFeeRates();
       const toBase = assetToBase(assetAmount(this.data.assetAmount));
-      const amount = toBase.amount().minus(fee.fast.amount());
+      const amount = toBase.amount().minus(recipientPool.gas_rate);
+
+      // console.log('feeRates.average: ', feeRates.average);
+      console.log('recipientPool gas rate is: ', recipientPool.gas_rate);
+
       const hash = await client.transfer({
         asset: {
           chain: this.data.asset.chain,
@@ -272,7 +276,7 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
         amount: baseAmount(amount),
         recipient: recipientPool.address,
         memo: targetTokenMemo,
-        feeRate: feeRates.average
+        feeRate: +recipientPool.gas_rate
       });
 
       return hash;
