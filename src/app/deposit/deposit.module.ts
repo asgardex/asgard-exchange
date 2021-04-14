@@ -14,11 +14,12 @@ import { ApproveEthContractModule } from '../_components/approve-eth-contract/ap
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { DirectivesModule } from '../_directives/directives.module';
 import { SectionHeadModule } from '../_components/section-head/section-head.module';
+import { RetryRuneDepositComponent } from './retry-rune-deposit/retry-rune-deposit.component';
 
 
 
 @NgModule({
-  declarations: [DepositComponent, ConfirmDepositModalComponent],
+  declarations: [DepositComponent, ConfirmDepositModalComponent, RetryRuneDepositComponent],
   imports: [
     CommonModule,
     MatButtonModule,
