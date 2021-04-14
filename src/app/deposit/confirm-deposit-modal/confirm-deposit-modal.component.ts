@@ -34,7 +34,7 @@ export interface ConfirmDepositData {
 })
 export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
 
-  txState: TransactionConfirmationState;
+  txState: TransactionConfirmationState | 'RETRY_RUNE_DEPOSIT';
   hash: string;
   subs: Subscription[];
   error: string;
@@ -182,24 +182,28 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
         memo: runeMemo,
       });
 
-      this.hash = runeHash;
-      this.txStatusService.addTransaction({
-        chain: 'THOR',
-        hash: runeHash,
-        ticker: `${asset.ticker}-RUNE`,
-        status: TxStatus.PENDING,
-        action: TxActions.DEPOSIT,
-        symbol: asset.symbol,
-        isThorchainTx: true
-      });
+      this.runeDepositSuccess(runeHash);
+
     } catch (error) {
       console.error('error making RUNE transfer: ', error);
-      this.txState = TransactionConfirmationState.ERROR;
+      this.txState = 'RETRY_RUNE_DEPOSIT';
       this.error = error;
     }
 
-    this.txState = TransactionConfirmationState.SUCCESS;
+  }
 
+  runeDepositSuccess(runeHash: string) {
+    this.hash = runeHash;
+    this.txStatusService.addTransaction({
+      chain: 'THOR',
+      hash: runeHash,
+      ticker: `${this.data.asset.ticker}-RUNE`,
+      status: TxStatus.PENDING,
+      action: TxActions.DEPOSIT,
+      symbol: this.data.asset.symbol,
+      isThorchainTx: true
+    });
+    this.txState = TransactionConfirmationState.SUCCESS;
   }
 
   async ethereumDeposit(client: EthereumClient, thorchainAddress: string, recipientPool: PoolAddressDTO) {

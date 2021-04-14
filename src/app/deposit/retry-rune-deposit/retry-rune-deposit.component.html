@@ -1,0 +1,60 @@
+<div *ngIf="!loading">
+
+  <div class="confirm-modal-head p-4">
+
+    <div class="flex justify-between items-center mb-4">
+      <h1 mat-dialog-title class="mb-0">RUNE Deposit Failed</h1>
+    </div>
+
+    <div class="flex justify-between transaction-detail">
+
+      <div class="flex items-center">
+        <div class="asset-icon-container flex items-center mr-4">
+          <img *ngIf="rune && rune.iconPath" [src]="rune.iconPath" appImgFallback />
+          <mat-icon *ngIf="!rune || !rune.iconPath">help_outline</mat-icon>
+        </div>
+        <span class="text-xl mr-2">{{runeAmount}}</span>
+      </div>
+
+      <span>{{rune.ticker}}</span>
+
+    </div>
+
+  </div>
+
+  <div class="clear-both">
+    <div mat-dialog-content class="confirm-modal-content">
+      <span *ngIf="asset && !resubmitError" class="flex py-2">
+        It looks like the {{asset.ticker}} deposit suceeded, but there was an error depositing the RUNE.
+        The error is: "{{errorMessage}}".
+        We use symmetrical deposits, which means THORChain is waiting for the RUNE deposit to register you as a pool member.<br />
+        Let's try depositing your RUNE again...
+      </span>
+
+      <span *ngIf="resubmitError">It looks like resubmitting RUNE failed. The error is: "{{resubmitError}}"</span>
+
+      <app-asset-input
+        label="Input"
+        [(selectedAsset)]="rune"
+        [(assetUnit)]="runeAmount"
+        [balance]="runeBalance"
+        [hideMax]="true"
+        [disabledMarketSelect]="true">
+      </app-asset-input>
+
+      <div class="clear-both">
+        <div mat-dialog-content class="confirm-modal-content">
+          <button *ngIf="!loading" (click)="resubmitRuneDeposit()" mat-flat-button color="primary" class="main-action-btn w-full">
+            <span>Resubmit RUNE Deposit</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<app-transaction-processing-modal
+  *ngIf="loading"
+  transactionDetail="Resubmitting RUNE Deposit">
+</app-transaction-processing-modal>

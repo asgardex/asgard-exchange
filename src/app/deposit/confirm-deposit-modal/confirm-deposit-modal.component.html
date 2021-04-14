@@ -122,5 +122,13 @@
     </span>
   </div>
 
+  <app-retry-rune-deposit *ngIf="txState === 'RETRY_RUNE_DEPOSIT'"
+    [asset]="data.asset"
+    [assetAmount]="data.assetAmount"
+    [runeAmount]="data.runeAmount"
+    [user]="data.user"
+    [errorMessage]="error"
+    (retrySuccess)="runeDepositSuccess($event)">
+  </app-retry-rune-deposit>
 
 </div>
