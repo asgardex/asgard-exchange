@@ -112,7 +112,7 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
 
       this.midgardService.getInboundAddresses().subscribe(
         (addresses) => this.submitKeystoreTransaction(addresses)
-      )
+      );
 
     }
 
