@@ -177,12 +177,6 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
         const bitcoinClient = this.user.clients.bitcoin;
 
         try {
-          // const toBase = assetToBase(assetAmount(this.amount));
-          // const estimatedFee = this.txUtilsService.calculateNetworkFee(new AsgrsxAsset(`BTC.BTC`));
-          // const feeToBase = assetToBase(assetAmount(estimatedFee));
-          // const amount = toBase.amount().minus(feeToBase.amount().minus(1));
-
-
 
           // TODO -> consolidate this with BTC, BCH, LTC
           const asset = new AsgrsxAsset(`BTC.BTC`);
@@ -206,8 +200,6 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
           }
           // TODO -> consolidate this with BTC, BCH, LTC
 
-
-
           const hash = await bitcoinClient.transfer({
             amount: baseAmount(amount),
             recipient: this.recipientAddress,
@@ -226,7 +218,6 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
         const bchClient = this.user.clients.bitcoinCash;
 
         try {
-
 
           // TODO -> consolidate this with BTC, BCH, LTC
           const asset = new AsgrsxAsset(`BCH.BCH`);
@@ -249,9 +240,6 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
             return;
           }
           // TODO -> consolidate this with BTC, BCH, LTC
-
-          console.log('matching BCH gas rate is: ', +matchingAddress.gas_rate);
-
 
           const hash = await bchClient.transfer({
             amount: baseAmount(amount),
