@@ -17,6 +17,8 @@ import { ethers } from 'ethers';
 import { Asset as asgrsxAsset } from 'src/app/_classes/asset';
 import { Balances } from '@xchainjs/xchain-client';
 import { EthUtilsService } from 'src/app/_services/eth-utils.service';
+import { MidgardService } from 'src/app/_services/midgard.service';
+import { PoolAddressDTO } from 'src/app/_classes/pool-address';
 
 @Component({
   selector: 'app-confim-send',
@@ -48,7 +50,8 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
   constructor(
     private userService: UserService,
     private txStatusService: TransactionStatusService,
-    private ethUtilsService: EthUtilsService
+    private ethUtilsService: EthUtilsService,
+    private midgardService: MidgardService
   ) {
     this.back = new EventEmitter<null>();
     this.error = '';
@@ -106,14 +109,25 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
     this.txState = TransactionConfirmationState.SUBMITTING;
 
     if (this.user.type === 'keystore') {
-      this.submitKeystoreTransaction();
+
+      this.midgardService.getInboundAddresses().subscribe(
+        (addresses) => this.submitKeystoreTransaction(addresses)
+      )
+
     }
 
   }
 
-  async submitKeystoreTransaction() {
+  async submitKeystoreTransaction(inboundAddresses: PoolAddressDTO[]) {
 
     if (this.asset && this.asset.asset) {
+
+          // find recipient pool
+      const matchingAddress = inboundAddresses.find( (pool) => pool.chain === this.asset.asset.chain );
+      if (!matchingAddress) {
+        console.error('no recipient pool found');
+        return;
+      }
 
       if (this.asset.asset.chain === 'THOR') {
 
@@ -161,15 +175,13 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
         const bitcoinClient = this.user.clients.bitcoin;
 
         try {
-          const feeRates = await bitcoinClient.getFeeRates();
-          const fees = await bitcoinClient.getFees();
           const toBase = assetToBase(assetAmount(this.amount));
-          const amount = toBase.amount().minus(fees.fastest.amount());
+          const amount = toBase.amount().minus(matchingAddress.gas_rate);
 
           const hash = await bitcoinClient.transfer({
             amount: baseAmount(amount),
             recipient: this.recipientAddress,
-            feeRate: feeRates.average
+            feeRate: +matchingAddress.gas_rate
           });
           this.pushTxStatus(hash, this.asset.asset, false);
           this.transactionSuccessful.next();
