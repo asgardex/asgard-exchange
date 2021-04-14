@@ -225,9 +225,31 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
     } else if (this.swapData.sourceAsset.chain === 'BTC') {
 
       try {
+
+        // TODO -> consolidate this with BTC, BCH, LTC
+        const balanceAmount = this.userService.findRawBalance(this.balances, this.swapData.sourceAsset);
         const toBase = assetToBase(assetAmount(amountNumber));
         const feeToBase = assetToBase(assetAmount(this.swapData.estimatedFee));
-        const amount = toBase.amount().minus(feeToBase.amount().minus(1));
+        if (balanceAmount.minus(feeToBase.amount()).minus(toBase.amount()).isGreaterThan(0)) {
+
+        }
+        const amount = (balanceAmount
+          // subtract fee
+          .minus(feeToBase.amount())
+          // subtract amount
+          .minus(toBase.amount())
+          .isGreaterThan(0))
+            ? toBase.amount() // send full amount, fee can be deducted from remaining balance
+            : toBase.amount().minus(feeToBase.amount()); // after deductions, not enough to process, subtract fee from amount
+
+        if (amount.isLessThan(0)) {
+          this.error = 'Insufficient funds. Try sending a smaller amount';
+          this.txState = TransactionConfirmationState.ERROR;
+          return;
+        }
+        // TODO -> consolidate this with BTC, BCH, LTC
+
+
         const hash = await bitcoinClient.transfer({
           amount: baseAmount(amount),
           recipient: matchingPool.address,
@@ -282,9 +304,26 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
     } else if (this.swapData.sourceAsset.chain === 'LTC') {
 
       try {
+
+        // TODO -> consolidate this with BTC, BCH, LTC
+        const balanceAmount = this.userService.findRawBalance(this.balances, this.swapData.sourceAsset);
         const toBase = assetToBase(assetAmount(amountNumber));
         const feeToBase = assetToBase(assetAmount(this.swapData.estimatedFee));
-        const amount = toBase.amount().minus(feeToBase.amount().minus(+matchingPool.gas_rate));
+        const amount = (balanceAmount
+          // subtract fee
+          .minus(feeToBase.amount())
+          // subtract amount
+          .minus(toBase.amount())
+          .isGreaterThan(0))
+            ? toBase.amount() // send full amount, fee can be deducted from remaining balance
+            : toBase.amount().minus(feeToBase.amount()); // after deductions, not enough to process, subtract fee from amount
+
+        if (amount.isLessThan(0)) {
+          this.error = 'Insufficient funds. Try sending a smaller amount';
+          this.txState = TransactionConfirmationState.ERROR;
+          return;
+        }
+        // TODO -> consolidate this with BTC, BCH, LTC
 
         const hash = await litecoinClient.transfer({
           amount: baseAmount(amount),
@@ -306,9 +345,26 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
 
       try {
         const bchClient = this.swapData.user.clients.bitcoinCash;
+
+        // TODO -> consolidate this with BTC, BCH, LTC
+        const balanceAmount = this.userService.findRawBalance(this.balances, this.swapData.sourceAsset);
         const toBase = assetToBase(assetAmount(amountNumber));
         const feeToBase = assetToBase(assetAmount(this.swapData.estimatedFee));
-        const amount = toBase.amount().minus(feeToBase.amount().minus(1));
+        const amount = (balanceAmount
+          // subtract fee
+          .minus(feeToBase.amount())
+          // subtract amount
+          .minus(toBase.amount())
+          .isGreaterThan(0))
+            ? toBase.amount() // send full amount, fee can be deducted from remaining balance
+            : toBase.amount().minus(feeToBase.amount()); // after deductions, not enough to process, subtract fee from amount
+
+        if (amount.isLessThan(0)) {
+          this.error = 'Insufficient funds. Try sending a smaller amount';
+          this.txState = TransactionConfirmationState.ERROR;
+          return;
+        }
+        // end TODO
 
         const hash = await bchClient.transfer({
           amount: baseAmount(amount),

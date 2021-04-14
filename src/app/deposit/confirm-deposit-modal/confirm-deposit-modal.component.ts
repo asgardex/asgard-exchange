@@ -260,9 +260,26 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
     try {
       const asset = this.data.asset;
       const targetTokenMemo = `+:${asset.chain}.${asset.symbol}:${thorchainAddress}`;
+
+      // TODO -> consolidate this with BTC, BCH, LTC
+      const balanceAmount = this.userService.findRawBalance(this.balances, this.data.asset);
       const toBase = assetToBase(assetAmount(this.data.assetAmount));
       const feeToBase = assetToBase(assetAmount(this.data.estimatedFee));
-      const amount = toBase.amount().minus( feeToBase.amount().minus(1) );
+      const amount = (balanceAmount
+        // subtract fee
+        .minus(feeToBase.amount())
+        // subtract amount
+        .minus(toBase.amount())
+        .isGreaterThan(0))
+          ? toBase.amount() // send full amount, fee can be deducted from remaining balance
+          : toBase.amount().minus(feeToBase.amount()); // after deductions, not enough to process, subtract fee from amount
+
+      if (amount.isLessThan(0)) {
+        this.error = 'Insufficient funds. Try sending a smaller amount';
+        this.txState = TransactionConfirmationState.ERROR;
+        return;
+      }
+      // TODO -> consolidate this with BTC, BCH, LTC
 
       const hash = await client.transfer({
         asset: {
@@ -287,9 +304,26 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
     try {
       const asset = this.data.asset;
       const targetTokenMemo = `+:${asset.chain}.${asset.symbol}:${thorchainAddress}`;
+
+      // TODO -> consolidate this with BTC, BCH, LTC
+      const balanceAmount = this.userService.findRawBalance(this.balances, this.data.asset);
       const toBase = assetToBase(assetAmount(this.data.assetAmount));
       const feeToBase = assetToBase(assetAmount(this.data.estimatedFee));
-      const amount = toBase.amount().minus( feeToBase.amount().minus(1) );
+      const amount = (balanceAmount
+        // subtract fee
+        .minus(feeToBase.amount())
+        // subtract amount
+        .minus(toBase.amount())
+        .isGreaterThan(0))
+          ? toBase.amount() // send full amount, fee can be deducted from remaining balance
+          : toBase.amount().minus(feeToBase.amount()); // after deductions, not enough to process, subtract fee from amount
+
+      if (amount.isLessThan(0)) {
+        this.error = 'Insufficient funds. Try sending a smaller amount';
+        this.txState = TransactionConfirmationState.ERROR;
+        return;
+      }
+      // TODO -> consolidate this with BTC, BCH, LTC
 
       const hash = await client.transfer({
         asset: {
@@ -314,9 +348,26 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
     try {
       const asset = this.data.asset;
       const targetTokenMemo = `+:${asset.chain}.${asset.symbol}:${thorchainAddress}`;
+
+      // TODO -> consolidate this with BTC, BCH, LTC
+      const balanceAmount = this.userService.findRawBalance(this.balances, this.data.asset);
       const toBase = assetToBase(assetAmount(this.data.assetAmount));
       const feeToBase = assetToBase(assetAmount(this.data.estimatedFee));
-      const amount = toBase.amount().minus( feeToBase.amount().minus(recipientPool.gas_rate) );
+      const amount = (balanceAmount
+        // subtract fee
+        .minus(feeToBase.amount())
+        // subtract amount
+        .minus(toBase.amount())
+        .isGreaterThan(0))
+          ? toBase.amount() // send full amount, fee can be deducted from remaining balance
+          : toBase.amount().minus(feeToBase.amount()); // after deductions, not enough to process, subtract fee from amount
+
+      if (amount.isLessThan(0)) {
+        this.error = 'Insufficient funds. Try sending a smaller amount';
+        this.txState = TransactionConfirmationState.ERROR;
+        return;
+      }
+      // TODO -> consolidate this with BTC, BCH, LTC
 
       const hash = await client.transfer({
         asset: {

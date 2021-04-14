@@ -177,10 +177,36 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
         const bitcoinClient = this.user.clients.bitcoin;
 
         try {
+          // const toBase = assetToBase(assetAmount(this.amount));
+          // const estimatedFee = this.txUtilsService.calculateNetworkFee(new AsgrsxAsset(`BTC.BTC`));
+          // const feeToBase = assetToBase(assetAmount(estimatedFee));
+          // const amount = toBase.amount().minus(feeToBase.amount().minus(1));
+
+
+
+          // TODO -> consolidate this with BTC, BCH, LTC
+          const asset = new AsgrsxAsset(`BTC.BTC`);
+          const estimatedFee = this.txUtilsService.calculateNetworkFee(asset);
+          const balanceAmount = this.userService.findRawBalance(this.balances, asset);
           const toBase = assetToBase(assetAmount(this.amount));
-          const estimatedFee = this.txUtilsService.calculateNetworkFee(new AsgrsxAsset(`BTC.BTC`));
           const feeToBase = assetToBase(assetAmount(estimatedFee));
-          const amount = toBase.amount().minus(feeToBase.amount().minus(1));
+          const amount = (balanceAmount
+            // subtract fee
+            .minus(feeToBase.amount())
+            // subtract amount
+            .minus(toBase.amount())
+            .isGreaterThan(0))
+              ? toBase.amount() // send full amount, fee can be deducted from remaining balance
+              : toBase.amount().minus(feeToBase.amount()); // after deductions, not enough to process, subtract fee from amount
+
+          if (amount.isLessThan(0)) {
+            this.error = 'Insufficient funds. Try sending a smaller amount';
+            this.txState = TransactionConfirmationState.ERROR;
+            return;
+          }
+          // TODO -> consolidate this with BTC, BCH, LTC
+
+
 
           const hash = await bitcoinClient.transfer({
             amount: baseAmount(amount),
@@ -200,10 +226,33 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
         const bchClient = this.user.clients.bitcoinCash;
 
         try {
+
+
+          // TODO -> consolidate this with BTC, BCH, LTC
+          const asset = new AsgrsxAsset(`BCH.BCH`);
+          const estimatedFee = this.txUtilsService.calculateNetworkFee(asset);
+          const balanceAmount = this.userService.findRawBalance(this.balances, asset);
           const toBase = assetToBase(assetAmount(this.amount));
-          const estimatedFee = this.txUtilsService.calculateNetworkFee(new AsgrsxAsset(`BCH.BCH`));
           const feeToBase = assetToBase(assetAmount(estimatedFee));
-          const amount = toBase.amount().minus(feeToBase.amount().minus(1));
+          const amount = (balanceAmount
+            // subtract fee
+            .minus(feeToBase.amount())
+            // subtract amount
+            .minus(toBase.amount())
+            .isGreaterThan(0))
+              ? toBase.amount() // send full amount, fee can be deducted from remaining balance
+              : toBase.amount().minus(feeToBase.amount()); // after deductions, not enough to process, subtract fee from amount
+
+          if (amount.isLessThan(0)) {
+            this.error = 'Insufficient funds. Try sending a smaller amount';
+            this.txState = TransactionConfirmationState.ERROR;
+            return;
+          }
+          // TODO -> consolidate this with BTC, BCH, LTC
+
+          console.log('matching BCH gas rate is: ', +matchingAddress.gas_rate);
+
+
           const hash = await bchClient.transfer({
             amount: baseAmount(amount),
             recipient: this.recipientAddress,
@@ -257,10 +306,31 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
         const litecoinClient = this.user.clients.litecoin;
 
         try {
+
+
+          // TODO -> consolidate this with BTC, BCH, LTC
+          const asset = new AsgrsxAsset(`LTC.LTC`);
+          const estimatedFee = this.txUtilsService.calculateNetworkFee(asset);
+          const balanceAmount = this.userService.findRawBalance(this.balances, asset);
           const toBase = assetToBase(assetAmount(this.amount));
-          const estimatedFee = this.txUtilsService.calculateNetworkFee(new AsgrsxAsset(`LTC.LTC`));
           const feeToBase = assetToBase(assetAmount(estimatedFee));
-          const amount = toBase.amount().minus(feeToBase.amount().minus(matchingAddress.gas_rate));
+          const amount = (balanceAmount
+            // subtract fee
+            .minus(feeToBase.amount())
+            // subtract amount
+            .minus(toBase.amount())
+            .isGreaterThan(0))
+              ? toBase.amount() // send full amount, fee can be deducted from remaining balance
+              : toBase.amount().minus(feeToBase.amount()); // after deductions, not enough to process, subtract fee from amount
+
+          if (amount.isLessThan(0)) {
+            this.error = 'Insufficient funds. Try sending a smaller amount';
+            this.txState = TransactionConfirmationState.ERROR;
+            return;
+          }
+          // TODO -> consolidate this with BTC, BCH, LTC
+
+
           const hash = await litecoinClient.transfer({
             amount: baseAmount(amount),
             recipient: this.recipientAddress,
