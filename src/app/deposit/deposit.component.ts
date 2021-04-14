@@ -332,6 +332,7 @@ export class DepositComponent implements OnInit, OnDestroy {
           assetAmount: this.assetAmount,
           runeAmount: this.runeAmount,
           user: this.user,
+          estimatedFee: this.networkFee,
           runeBasePrice,
           assetBasePrice
         }
