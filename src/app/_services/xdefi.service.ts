@@ -5,6 +5,7 @@ import { Client as binanceClient } from '@xchainjs/xchain-binance';
 import { Client as bitcoinClient } from '@xchainjs/xchain-bitcoin';
 import { Client as thorchainClient } from '@xchainjs/xchain-thorchain';
 import {
+  ApproveParams,
   Client as ethereumClient,
   estimateDefaultFeesWithGasPricesAndLimits,
   ETHAddress,
@@ -21,6 +22,7 @@ import { AssetETH, assetToString } from '@xchainjs/xchain-util';
 import { toUtf8Bytes } from '@ethersproject/strings';
 import { Address } from '@xchainjs/xchain-client';
 import { hexlify } from '@ethersproject/bytes';
+import { getDefaultGasPrices } from '@xchainjs/xchain-ethereum/lib/utils';
 
 @Injectable({
   providedIn: 'root',
@@ -300,15 +302,31 @@ export class XDEFIService {
       });
     };
     // Eth
-    userEthereumClient.approve = async (spender, sender, amount) => {
-      console.log('userEthereumClient.approve', spender, sender, amount);
+    userEthereumClient.approve = async ({spender, sender, amount, feeOptionKey}: ApproveParams) => {
+      console.log('userEthereumClient.approve', { spender, sender, amount, feeOptionKey });
+      const gasPrice = feeOptionKey && BigNumber.from(
+        (
+          await userEthereumClient.estimateGasPrices()
+            .then((prices) => prices[feeOptionKey])
+            .catch(() => getDefaultGasPrices()[feeOptionKey])
+        )
+          .amount()
+          .toFixed(),
+      );
+      const gasLimit = await userEthereumClient.estimateApprove({ spender, sender, amount }).catch(() => undefined);
+
       const txAmount = amount
         ? BigNumber.from(amount.amount().toFixed())
         : BigNumber.from(2).pow(256).sub(1);
       const contract = new ethers.Contract(sender, erc20ABI);
       const unsignedTx = await contract.populateTransaction.approve(
         spender,
-        txAmount
+        txAmount,
+        {
+          from: userEthereumClient.getAddress(),
+          gasPrice,
+          gasLimit
+        }
       );
       unsignedTx.from = ethAddresses[0];
       return (window as any).ethereum.request({
