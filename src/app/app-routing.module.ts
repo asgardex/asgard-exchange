@@ -25,6 +25,10 @@ const routes: Routes = [
     loadChildren: () => import('./deposit/deposit.module').then(m => m.DepositModule),
   },
   {
+    path: 'deposit-sym-recovery',
+    loadChildren: () => import('./deposit-sym-recovery/deposit-sym-recovery.module').then(m => m.DepositSymRecoveryModule),
+  },
+  {
     path: 'withdraw',
     loadChildren: () => import('./withdraw/withdraw.module').then(m => m.WithdrawModule),
   },
