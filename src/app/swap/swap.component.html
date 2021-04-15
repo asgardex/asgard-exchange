@@ -52,7 +52,7 @@
       <div *ngIf="selectedSourceAsset" class="flex justify-between swap-details">
         <span class="tx-detail-label">Network Fee</span>
         <span *ngIf="inputNetworkFee">{{inputNetworkFee | number:"1.0-8"}} {{selectedSourceAsset.chain}}.{{selectedSourceAsset.ticker}}</span>
-        <span *ngIf="!inputNetworkFee">...</span>
+        <span *ngIf="!inputNetworkFee">-</span>
       </div>
 
     </div>

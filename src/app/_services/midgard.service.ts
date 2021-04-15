@@ -15,6 +15,12 @@ export interface MimirResponse {
   [key: string]: number;
 }
 
+export interface ThorchainQueue {
+  swap: number;
+  outbound: number;
+  internal: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -73,6 +79,10 @@ export class MidgardService {
   getTransaction(txId: string): Observable<TransactionDTO> {
     const params = new HttpParams().set('offset', '0').set('limit', '1').set('txid', txId);
     return this.http.get<TransactionDTO>(`${this.v2BasePath}/actions`, {params});
+  }
+
+  getQueue(): Observable<ThorchainQueue> {
+    return this.http.get<ThorchainQueue>(`${this.v2BasePath}/thorchain/queue`);
   }
 
   getMimir(): Observable<MimirResponse> {
