@@ -558,10 +558,13 @@ export class SwapComponent implements OnInit, OnDestroy {
         poolDetail
       );
 
+      const runeFee = this.outboundTransactionFee ?? 0.2;
+
       if (toRune) {
         this.inputNetworkFee = networkFee;
       } else {
         this.outputNetworkFee = networkFee;
+        this.inputNetworkFee = runeFee;
       }
 
       /**
