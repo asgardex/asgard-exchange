@@ -16,9 +16,9 @@ export interface MimirResponse {
 }
 
 export interface ThorchainQueue {
-  swap: number,
-	outbound: number,
-	internal: number
+  swap: number;
+  outbound: number;
+  internal: number;
 }
 
 @Injectable({

@@ -336,7 +336,7 @@ export class SwapComponent implements OnInit, OnDestroy {
       || (this.targetAssetUnitDisplay <= this.userService.minimumSpendable(this.selectedTargetAsset))
       || !this.user || !this.balances
       || this.ethContractApprovalRequired
-      || this.queue && this.queue.outbound >= 12
+      || (this.queue && this.queue.outbound >= 12)
       || (this.slip * 100) > this.slippageTolerance
       || (this.selectedSourceAsset.chain === 'BNB' && this.insufficientBnb); // source is BNB and not enough funds to cover fee
   }
