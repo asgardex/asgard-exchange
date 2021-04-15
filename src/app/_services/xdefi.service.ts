@@ -308,7 +308,10 @@ export class XDEFIService {
         (
           await userEthereumClient.estimateGasPrices()
             .then((prices) => prices[feeOptionKey])
-            .catch(() => getDefaultGasPrices()[feeOptionKey])
+            .catch(() => {
+              const { gasPrices } = estimateDefaultFeesWithGasPricesAndLimits()
+              return gasPrices[feeOptionKey]
+            })
         )
           .amount()
           .toFixed(),
