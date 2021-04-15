@@ -180,9 +180,12 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
       (res) => {
         const poolNames = res.map( (pool) => pool.asset );
         this.pools = poolNames;
-        if (this.pools.includes(currentPool)) {
-          this.router.navigate(['/', 'deposit', currentPool]);
-        }
+
+        /** MCCN TESTING */
+        // if (this.pools.includes(currentPool)) {
+        //   this.router.navigate(['/', 'deposit', currentPool]);
+        // }
+
         this.checkCreateableMarkets();
       }
     );
@@ -247,6 +250,7 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
     || (this.balances
       && (this.runeAmount > this.runeBalance || this.assetAmount > this.userService.maximumSpendableBalance(this.asset, this.assetBalance))
     );
+
   }
 
   mainButtonText(): string {
@@ -262,9 +266,11 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
       return 'Insufficient balance';
     } else if (this.insufficientBnb) {
       return 'Insufficient BNB for Fee';
-    } else if (this.runeAmount < 1000) {
+    }
+    else if (this.runeAmount < 1000) {
       return 'Not enough RUNE to create pool';
-    } else if (this.balances && this.runeAmount && this.assetAmount
+    }
+    else if (this.balances && this.runeAmount && this.assetAmount
       && (this.runeAmount <= this.runeBalance) && (this.assetAmount <= this.assetBalance)) {
       return 'Create Pool';
     } else {
@@ -281,9 +287,13 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
       this.selectableMarkets = this.balances.filter( (balance) => {
         const asset = balance.asset;
 
-        return !this.pools.find((pool) => pool === `${asset.chain}.${asset.symbol}`)
-          && !isNonNativeRuneToken(asset)
+        /** MCCN TESTING */
+        // return !this.pools.find((pool) => pool === `${asset.chain}.${asset.symbol}`)
+        //   && !isNonNativeRuneToken(asset)
+        //   && asset.chain !== 'THOR';
+        return !isNonNativeRuneToken(asset)
           && asset.chain !== 'THOR';
+
 
       }).map( (balance) => {
         return {asset: new Asset(`${balance.asset.chain}.${balance.asset.symbol}`)};

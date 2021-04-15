@@ -14,9 +14,12 @@ import { TransactionConfirmationState } from 'src/app/_const/transaction-confirm
 import { TransactionStatusService, TxActions, TxStatus } from 'src/app/_services/transaction-status.service';
 import { UserService } from 'src/app/_services/user.service';
 import { ethers } from 'ethers';
-import { Asset as asgrsxAsset } from 'src/app/_classes/asset';
+import { Asset as AsgrsxAsset } from 'src/app/_classes/asset';
 import { Balances } from '@xchainjs/xchain-client';
 import { EthUtilsService } from 'src/app/_services/eth-utils.service';
+import { MidgardService } from 'src/app/_services/midgard.service';
+import { PoolAddressDTO } from 'src/app/_classes/pool-address';
+import { TransactionUtilsService } from 'src/app/_services/transaction-utils.service';
 
 @Component({
   selector: 'app-confim-send',
@@ -48,7 +51,9 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
   constructor(
     private userService: UserService,
     private txStatusService: TransactionStatusService,
-    private ethUtilsService: EthUtilsService
+    private ethUtilsService: EthUtilsService,
+    private midgardService: MidgardService,
+    private txUtilsService: TransactionUtilsService
   ) {
     this.back = new EventEmitter<null>();
     this.error = '';
@@ -78,7 +83,7 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
   async checkSufficientChainBalance() {
     this.loading = true;
     if (this.balances && this.asset && this.asset.asset.chain === 'BNB') {
-      const bnbBalance = this.userService.findBalance(this.balances, new asgrsxAsset('BNB.BNB'));
+      const bnbBalance = this.userService.findBalance(this.balances, new AsgrsxAsset('BNB.BNB'));
       this.insufficientChainBalance = bnbBalance < 0.000375;
     } else if (this.balances && this.asset && this.asset.asset.chain === 'ETH'
       && this.user && this.user.clients && this.user.clients.ethereum) {
@@ -92,7 +97,7 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
         asset: this.asset.asset
       });
       const fastest = estimateFees.fees.fastest.amount();
-      const ethBalance = this.userService.findBalance(this.balances, new asgrsxAsset('ETH.ETH'));
+      const ethBalance = this.userService.findBalance(this.balances, new AsgrsxAsset('ETH.ETH'));
       this.insufficientChainBalance = ethBalance < fastest.dividedBy(10 ** ETH_DECIMAL).toNumber();
 
     } else {
@@ -106,14 +111,25 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
     this.txState = TransactionConfirmationState.SUBMITTING;
 
     if (this.user.type === 'keystore') {
-      this.submitKeystoreTransaction();
+
+      this.midgardService.getInboundAddresses().subscribe(
+        (addresses) => this.submitKeystoreTransaction(addresses)
+      );
+
     }
 
   }
 
-  async submitKeystoreTransaction() {
+  async submitKeystoreTransaction(inboundAddresses: PoolAddressDTO[]) {
 
     if (this.asset && this.asset.asset) {
+
+          // find recipient pool
+      const matchingAddress = inboundAddresses.find( (pool) => pool.chain === this.asset.asset.chain );
+      if (!matchingAddress) {
+        console.error('no recipient pool found');
+        return;
+      }
 
       if (this.asset.asset.chain === 'THOR') {
 
@@ -161,15 +177,33 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
         const bitcoinClient = this.user.clients.bitcoin;
 
         try {
-          const feeRates = await bitcoinClient.getFeeRates();
-          const fees = await bitcoinClient.getFees();
+
+          // TODO -> consolidate this with BTC, BCH, LTC
+          const asset = new AsgrsxAsset(`BTC.BTC`);
+          const estimatedFee = this.txUtilsService.calculateNetworkFee(asset);
+          const balanceAmount = this.userService.findRawBalance(this.balances, asset);
           const toBase = assetToBase(assetAmount(this.amount));
-          const amount = toBase.amount().minus(fees.fastest.amount());
+          const feeToBase = assetToBase(assetAmount(estimatedFee));
+          const amount = (balanceAmount
+            // subtract fee
+            .minus(feeToBase.amount())
+            // subtract amount
+            .minus(toBase.amount())
+            .isGreaterThan(0))
+              ? toBase.amount() // send full amount, fee can be deducted from remaining balance
+              : toBase.amount().minus(feeToBase.amount()); // after deductions, not enough to process, subtract fee from amount
+
+          if (amount.isLessThan(0)) {
+            this.error = 'Insufficient funds. Try sending a smaller amount';
+            this.txState = TransactionConfirmationState.ERROR;
+            return;
+          }
+          // TODO -> consolidate this with BTC, BCH, LTC
 
           const hash = await bitcoinClient.transfer({
             amount: baseAmount(amount),
             recipient: this.recipientAddress,
-            feeRate: feeRates.average
+            feeRate: +matchingAddress.gas_rate
           });
           this.pushTxStatus(hash, this.asset.asset, false);
           this.transactionSuccessful.next();
@@ -184,14 +218,33 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
         const bchClient = this.user.clients.bitcoinCash;
 
         try {
-          const feeRates = await bchClient.getFeeRates();
-          const fees = await bchClient.getFees();
+
+          // TODO -> consolidate this with BTC, BCH, LTC
+          const asset = new AsgrsxAsset(`BCH.BCH`);
+          const estimatedFee = this.txUtilsService.calculateNetworkFee(asset);
+          const balanceAmount = this.userService.findRawBalance(this.balances, asset);
           const toBase = assetToBase(assetAmount(this.amount));
-          const amount = toBase.amount().minus(fees.fastest.amount());
+          const feeToBase = assetToBase(assetAmount(estimatedFee));
+          const amount = (balanceAmount
+            // subtract fee
+            .minus(feeToBase.amount())
+            // subtract amount
+            .minus(toBase.amount())
+            .isGreaterThan(0))
+              ? toBase.amount() // send full amount, fee can be deducted from remaining balance
+              : toBase.amount().minus(feeToBase.amount()); // after deductions, not enough to process, subtract fee from amount
+
+          if (amount.isLessThan(0)) {
+            this.error = 'Insufficient funds. Try sending a smaller amount';
+            this.txState = TransactionConfirmationState.ERROR;
+            return;
+          }
+          // TODO -> consolidate this with BTC, BCH, LTC
+
           const hash = await bchClient.transfer({
             amount: baseAmount(amount),
             recipient: this.recipientAddress,
-            feeRate: feeRates.average
+            feeRate: +matchingAddress.gas_rate
           });
           this.pushTxStatus(hash, this.asset.asset, false);
           this.transactionSuccessful.next();
@@ -242,15 +295,34 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
 
         try {
 
-          const feeRates = await litecoinClient.getFeeRates();
-          const fees = await litecoinClient.getFees();
+
+          // TODO -> consolidate this with BTC, BCH, LTC
+          const asset = new AsgrsxAsset(`LTC.LTC`);
+          const estimatedFee = this.txUtilsService.calculateNetworkFee(asset);
+          const balanceAmount = this.userService.findRawBalance(this.balances, asset);
           const toBase = assetToBase(assetAmount(this.amount));
-          const amount = toBase.amount().minus(fees.fastest.amount());
+          const feeToBase = assetToBase(assetAmount(estimatedFee));
+          const amount = (balanceAmount
+            // subtract fee
+            .minus(feeToBase.amount())
+            // subtract amount
+            .minus(toBase.amount())
+            .isGreaterThan(0))
+              ? toBase.amount() // send full amount, fee can be deducted from remaining balance
+              : toBase.amount().minus(feeToBase.amount()); // after deductions, not enough to process, subtract fee from amount
+
+          if (amount.isLessThan(0)) {
+            this.error = 'Insufficient funds. Try sending a smaller amount';
+            this.txState = TransactionConfirmationState.ERROR;
+            return;
+          }
+          // TODO -> consolidate this with BTC, BCH, LTC
+
 
           const hash = await litecoinClient.transfer({
             amount: baseAmount(amount),
             recipient: this.recipientAddress,
-            feeRate: feeRates.average
+            feeRate: +matchingAddress.gas_rate
           });
           this.pushTxStatus(hash, this.asset.asset, false);
           this.transactionSuccessful.next();

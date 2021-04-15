@@ -16,7 +16,9 @@ import {
   assetToBase,
   assetAmount,
   Asset,
+  assetToString,
 } from '@xchainjs/xchain-util';
+import { Balances } from '@xchainjs/xchain-client';
 
 
 export interface SwapData {
@@ -29,6 +31,7 @@ export interface SwapData {
   outputValue: BigNumber;
   user: User;
   slip: number;
+  estimatedFee: number;
 }
 
 @Component({
@@ -47,6 +50,8 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
   ethNetworkFee: number;
   insufficientChainBalance: boolean;
   loading: boolean;
+  estimatedMinutes: number;
+  balances: Balances;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public swapData: SwapData,
@@ -69,24 +74,39 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
       }
     );
 
-    this.subs = [user$];
+    const balances$ = this.userService.userBalances$.subscribe(
+      (balances) => this.balances = balances
+    );
+
+    this.subs = [user$, balances$];
 
   }
 
   ngOnInit() {
 
-    // const asset = this.swapData.sourceAsset;
+    this.estimateTime();
+
     const sourceAsset = this.swapData.sourceAsset;
     if (sourceAsset.chain === 'ETH') {
 
       // ESTIMATE GAS HERE
-      // const memo =
       this.estimateEthGasPrice();
 
     } else {
       this.loading = false;
     }
 
+  }
+
+  async estimateTime() {
+    if (this.swapData.sourceAsset.chain === 'ETH' && this.swapData.sourceAsset.symbol !== 'ETH') {
+      this.estimatedMinutes = await this.ethUtilsService.estimateERC20Time(
+        assetToString(this.swapData.sourceAsset),
+        this.swapData.inputValue
+      );
+    } else {
+      this.estimatedMinutes = this.txStatusService.estimateTime(this.swapData.sourceAsset.chain, this.swapData.inputValue);
+    }
   }
 
   closeDialog(transactionSucess?: boolean) {
@@ -211,16 +231,35 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
 
       try {
 
-        const fee = await bitcoinClient.getFeesWithMemo(memo);
-        const feeRates = await bitcoinClient.getFeeRates();
+        // TODO -> consolidate this with BTC, BCH, LTC
+        const balanceAmount = this.userService.findRawBalance(this.balances, this.swapData.sourceAsset);
         const toBase = assetToBase(assetAmount(amountNumber));
-        const amount = toBase.amount().minus(fee.fast.amount());
+        const feeToBase = assetToBase(assetAmount(this.swapData.estimatedFee));
+        if (balanceAmount.minus(feeToBase.amount()).minus(toBase.amount()).isGreaterThan(0)) {
+
+        }
+        const amount = (balanceAmount
+          // subtract fee
+          .minus(feeToBase.amount())
+          // subtract amount
+          .minus(toBase.amount())
+          .isGreaterThan(0))
+            ? toBase.amount() // send full amount, fee can be deducted from remaining balance
+            : toBase.amount().minus(feeToBase.amount()); // after deductions, not enough to process, subtract fee from amount
+
+        if (amount.isLessThan(0)) {
+          this.error = 'Insufficient funds. Try sending a smaller amount';
+          this.txState = TransactionConfirmationState.ERROR;
+          return;
+        }
+        // TODO -> consolidate this with BTC, BCH, LTC
+
 
         const hash = await bitcoinClient.transfer({
           amount: baseAmount(amount),
           recipient: matchingPool.address,
           memo,
-          feeRate: feeRates.average
+          feeRate: +matchingPool.gas_rate
         });
 
         this.hash = hash;
@@ -242,11 +281,19 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
         // temporarily drops slip limit until mainnet
         const ethMemo = `=:${targetAsset.chain}.${targetAsset.symbol}:${targetAddress}`;
 
+        const decimal = await this.ethUtilsService.getAssetDecimal(this.swapData.sourceAsset, ethClient);
+        let amount = assetToBase(assetAmount(this.swapData.inputValue, decimal)).amount();
+        const balanceAmount = this.userService.findRawBalance(this.balances, this.swapData.sourceAsset);
+
+        if (amount.isGreaterThan(balanceAmount)) {
+          amount = balanceAmount;
+        }
+
         const hash = await this.ethUtilsService.callDeposit({
           inboundAddress: matchingPool,
           asset: sourceAsset,
           memo: ethMemo,
-          amount: amountNumber,
+          amount,
           ethClient
         });
 
@@ -263,16 +310,32 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
     } else if (this.swapData.sourceAsset.chain === 'LTC') {
 
       try {
-        const fee = await litecoinClient.getFeesWithMemo(memo);
-        const feeRates = await litecoinClient.getFeeRates();
+
+        // TODO -> consolidate this with BTC, BCH, LTC
+        const balanceAmount = this.userService.findRawBalance(this.balances, this.swapData.sourceAsset);
         const toBase = assetToBase(assetAmount(amountNumber));
-        const amount = toBase.amount().minus(fee.fast.amount());
+        const feeToBase = assetToBase(assetAmount(this.swapData.estimatedFee));
+        const amount = (balanceAmount
+          // subtract fee
+          .minus(feeToBase.amount())
+          // subtract amount
+          .minus(toBase.amount())
+          .isGreaterThan(0))
+            ? toBase.amount() // send full amount, fee can be deducted from remaining balance
+            : toBase.amount().minus(feeToBase.amount()); // after deductions, not enough to process, subtract fee from amount
+
+        if (amount.isLessThan(0)) {
+          this.error = 'Insufficient funds. Try sending a smaller amount';
+          this.txState = TransactionConfirmationState.ERROR;
+          return;
+        }
+        // TODO -> consolidate this with BTC, BCH, LTC
 
         const hash = await litecoinClient.transfer({
           amount: baseAmount(amount),
           recipient: matchingPool.address,
           memo,
-          feeRate: feeRates.average
+          feeRate: +matchingPool.gas_rate
         });
 
         this.hash = hash;
@@ -288,16 +351,32 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
 
       try {
         const bchClient = this.swapData.user.clients.bitcoinCash;
-        const fee = await bchClient.getFeesWithMemo(memo);
-        const feeRates = await bchClient.getFeeRates();
+
+        // TODO -> consolidate this with BTC, BCH, LTC
+        const balanceAmount = this.userService.findRawBalance(this.balances, this.swapData.sourceAsset);
         const toBase = assetToBase(assetAmount(amountNumber));
-        const amount = toBase.amount().minus(fee.fast.amount());
+        const feeToBase = assetToBase(assetAmount(this.swapData.estimatedFee));
+        const amount = (balanceAmount
+          // subtract fee
+          .minus(feeToBase.amount())
+          // subtract amount
+          .minus(toBase.amount())
+          .isGreaterThan(0))
+            ? toBase.amount() // send full amount, fee can be deducted from remaining balance
+            : toBase.amount().minus(feeToBase.amount()); // after deductions, not enough to process, subtract fee from amount
+
+        if (amount.isLessThan(0)) {
+          this.error = 'Insufficient funds. Try sending a smaller amount';
+          this.txState = TransactionConfirmationState.ERROR;
+          return;
+        }
+        // end TODO
 
         const hash = await bchClient.transfer({
           amount: baseAmount(amount),
           recipient: matchingPool.address,
           memo,
-          feeRate: feeRates.average
+          feeRate: +matchingPool.gas_rate
         });
 
         this.hash = hash;
@@ -344,11 +423,21 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
 
           const ethInbound = addresses.find( (inbound) => inbound.chain === 'ETH' );
 
+          const decimal = await this.ethUtilsService.getAssetDecimal(this.swapData.sourceAsset, ethClient);
+          let amount = assetToBase(assetAmount(this.swapData.inputValue, decimal)).amount();
+
+          const balanceAmount = this.userService.findRawBalance(this.balances, this.swapData.sourceAsset);
+          // const balanceAmount = assetToBase(assetAmount(this.swapData.sourceAsset.balance.amount(), decimal)).amount();
+
+          if (amount.isGreaterThan(balanceAmount)) {
+            amount = balanceAmount;
+          }
+
           const estimatedFeeWei = await this.ethUtilsService.estimateFee({
             sourceAsset,
             ethClient,
             ethInbound,
-            inputAmount: this.swapData.inputValue,
+            inputAmount: amount,
             memo: `=:${targetAsset.chain}.${targetAsset.symbol}:${targetAddress}`
           });
 
@@ -366,10 +455,7 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
   }
 
   getSwapMemo(chain: string, symbol: string, addr: string, sliplimit: number): string {
-    // return `=:${chain}.${symbol}:${addr}:${sliplimit}`;
-
-    // temporarily disable slip limit for testnet
-    return `=:${chain}.${symbol}:${addr}`;
+    return `=:${chain}.${symbol}:${addr}:${sliplimit}`;
   }
 
   ngOnDestroy(): void {

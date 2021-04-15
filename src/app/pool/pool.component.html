@@ -8,9 +8,21 @@
   <div class="relative">
 
     <div class="float-left w-full" style="margin: -12px 0 24px">
-      <a [routerLink]="['/', 'deposit', 'BTC.BTC']" class="main-action-btn w-full" mat-flat-button color="primary">
+
+      <div *ngIf="maxLiquidityRune" style="padding: 8px" class="flex justify-center disabled-list">
+        <div>
+          <span>{{totalPooledRune | number: '1.0-0'}}</span> / <span class="mr-1">{{maxLiquidityRune | number}} </span>
+        </div>
+        <span>RUNE Cap Pooled</span>
+      </div>
+
+
+      <a *ngIf="!depositsDisabled" [routerLink]="['/', 'deposit', 'BTC.BTC']" class="main-action-btn w-full" mat-flat-button color="primary">
         Add Liquidity
       </a>
+
+      <button *ngIf="depositsDisabled" class="main-action-btn w-full" mat-flat-button color="primary" disabled>Pool Cap > 90%</button>
+
       <a
         *ngIf="createablePools && createablePools.length > 0"
         [routerLink]="['/', 'create-pool']"
@@ -36,7 +48,7 @@
       Connect wallet to view liquidity
     </div>
 
-    <app-staked-pools-list *ngIf="user && pools && memberPools" [pools]="pools" [memberPools]="memberPools"></app-staked-pools-list>
+    <app-staked-pools-list *ngIf="user && pools && memberPools" [pools]="pools" [memberPools]="memberPools" [depositsDisabled]="depositsDisabled"></app-staked-pools-list>
 
     <div *ngIf="user && (!pools || !memberPools)" style="height: 140px" class="flex justify-center items-center float-left w-full">
 
@@ -48,7 +60,6 @@
           <mat-icon>warning</mat-icon>
           Error fetching user pools
         </div>
-
 
     </div>
 

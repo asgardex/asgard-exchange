@@ -14,7 +14,8 @@ import { HaskoinService, HaskoinTxResponse } from './haskoin.service';
 
 export const enum TxStatus {
   PENDING = 'PENDING',
-  COMPLETE = 'COMPLETE'
+  COMPLETE = 'COMPLETE',
+  REFUNDED = 'REFUNDED'
 }
 
 export enum TxActions {
@@ -185,7 +186,13 @@ export class TransactionStatusService {
           // }
 
           if (resTx.in[0].txID.toUpperCase() === hash.toUpperCase() && resTx.status.toUpperCase() === 'SUCCESS') {
-            this.updateTxStatus(hash, TxStatus.COMPLETE);
+
+            if (resTx.status.toUpperCase() === 'REFUND') {
+              this.updateTxStatus(hash, TxStatus.REFUNDED);
+            } else {
+              this.updateTxStatus(hash, TxStatus.COMPLETE);
+            }
+
             this.userService.fetchBalances();
             this.killTxPolling[hash].next();
           } else {
@@ -294,6 +301,61 @@ export class TransactionStatusService {
 
     } else {
       console.error('no eth client found...', this.user);
+    }
+
+  }
+
+  chainBlockReward(chain: Chain): number {
+    switch (chain) {
+      case 'BTC':
+        return 6.5;
+
+      case 'BCH':
+        return 6.25;
+
+      case 'LTC':
+        return 12.5;
+
+      case 'ETH':
+        return 3;
+
+      // Confirms immediately
+      // case 'BNB':
+      //   return ~;
+
+    }
+  }
+
+  chainBlockTime(chain: Chain): number {
+    // in seconds
+    switch (chain) {
+      case 'BTC':
+        return 600;
+
+      case 'BCH':
+        return 600;
+
+      case 'LTC':
+        return 150;
+
+      case 'ETH':
+        return 15;
+
+      // Confirms immediately
+      // case 'BNB':
+      //   return ~;
+    }
+  }
+
+  estimateTime(chain: Chain, amount: number): number {
+
+    if (chain === 'BNB' || chain === 'THOR') {
+      return 1;
+    } else {
+      const chainBlockReward = this.chainBlockReward(chain);
+      const chainBlockTime = this.chainBlockTime(chain);
+      const estimatedMinutes = (Math.ceil(amount / chainBlockReward) * (chainBlockTime / 60));
+      return (estimatedMinutes < 1) ? 1 : estimatedMinutes;
     }
 
   }

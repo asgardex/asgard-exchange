@@ -8,6 +8,18 @@ import { LastBlock } from '../_classes/last-block';
 import { PoolDTO } from '../_classes/pool';
 import { MemberDTO } from '../_classes/member';
 import { shareReplay } from 'rxjs/operators';
+import { environment } from 'src/environments/environment';
+import { NetworkSummary } from '../_classes/network';
+
+export interface MimirResponse {
+  [key: string]: number;
+}
+
+export interface ThorchainQueue {
+  swap: number;
+  outbound: number;
+  internal: number;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -16,12 +28,20 @@ export class MidgardService {
 
   private v2BasePath: string;
   private _constants$: Observable<MidgardConstants>;
+  private _mimir$: Observable<MimirResponse>;
 
   constructor(private http: HttpClient) {
-    this.v2BasePath = 'https://testnet.midgard.thorchain.info/v2';
+    this.v2BasePath = (environment.network === 'testnet')
+      ? 'https://testnet.midgard.thorchain.info/v2'
+      : 'https://midgard.thorchain.info/v2';
+
+    const thornodeBaseUrl = environment.network === 'testnet'
+      ? 'https://testnet.thornode.thorchain.info'
+      : 'https://thornode.thorchain.info';
 
     // cached since constants are constant
     this._constants$ = this.http.get<MidgardConstants>(`${this.v2BasePath}/thorchain/constants`).pipe(shareReplay());
+    this._mimir$ = this.http.get<MimirResponse>(`${thornodeBaseUrl}/thorchain/mimir`).pipe(shareReplay());
   }
   /**
    * V2 Endpoints
@@ -36,6 +56,9 @@ export class MidgardService {
     return this.http.get<LastBlock[]>(`${this.v2BasePath}/thorchain/lastblock`);
   }
 
+  getNetwork(): Observable<NetworkSummary> {
+    return this.http.get<NetworkSummary>(`${this.v2BasePath}/network`);
+  }
 
   getInboundAddresses(): Observable<PoolAddressDTO[]> {
     return this.http.get<PoolAddressDTO[]>(`${this.v2BasePath}/thorchain/inbound_addresses`);
@@ -54,10 +77,16 @@ export class MidgardService {
   }
 
   getTransaction(txId: string): Observable<TransactionDTO> {
-
     const params = new HttpParams().set('offset', '0').set('limit', '1').set('txid', txId);
-
     return this.http.get<TransactionDTO>(`${this.v2BasePath}/actions`, {params});
+  }
+
+  getQueue(): Observable<ThorchainQueue> {
+    return this.http.get<ThorchainQueue>(`${this.v2BasePath}/thorchain/queue`);
+  }
+
+  getMimir(): Observable<MimirResponse> {
+    return this._mimir$;
   }
 
 }

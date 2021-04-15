@@ -16,6 +16,7 @@ import { User } from '../_classes/user';
 import { Balances } from '@xchainjs/xchain-client';
 import { AssetAndBalance } from '../_classes/asset-and-balance';
 import { EthUtilsService } from '../_services/eth-utils.service';
+import { TransactionUtilsService } from '../_services/transaction-utils.service';
 
 @Component({
   selector: 'app-deposit',
@@ -97,6 +98,9 @@ export class DepositComponent implements OnInit, OnDestroy {
   ethContractApprovalRequired: boolean;
 
   maximumSpendable: number;
+  poolNotFoundErr: boolean;
+
+  networkFee: number;
 
   constructor(
     private dialog: MatDialog,
@@ -105,7 +109,9 @@ export class DepositComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private midgardService: MidgardService,
     private ethUtilsService: EthUtilsService,
+    private txUtilsService: TransactionUtilsService
   ) {
+    this.poolNotFoundErr = false;
     this.ethContractApprovalRequired = false;
     this.rune = new Asset('THOR.RUNE');
     this.subs = [];
@@ -208,9 +214,15 @@ export class DepositComponent implements OnInit, OnDestroy {
             assetBalance: baseAmount(res.assetDepth),
             runeBalance: baseAmount(res.runeDepth),
           };
+
+          this.networkFee = this.txUtilsService.calculateNetworkFee(this.asset, res);
+
         }
       },
-      (err) => console.error('error getting pool detail: ', err)
+      (err) => {
+        console.error('error getting pool detail: ', err);
+        this.poolNotFoundErr = true;
+      }
     );
   }
 
@@ -320,6 +332,7 @@ export class DepositComponent implements OnInit, OnDestroy {
           assetAmount: this.assetAmount,
           runeAmount: this.runeAmount,
           user: this.user,
+          estimatedFee: this.networkFee,
           runeBasePrice,
           assetBasePrice
         }

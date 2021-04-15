@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { ethers } from 'ethers';
 import { PoolAddressDTO } from '../_classes/pool-address';
-import { TCRopstenAbi } from '../_abi/thorchain.abi';
+import { TCAbi, TCRopstenAbi } from '../_abi/thorchain.abi';
 import { Client, ETH_DECIMAL } from '@xchainjs/xchain-ethereum/lib';
-import { assetAmount, assetToBase, baseAmount } from '@xchainjs/xchain-util';
+import { assetAmount, assetToBase, baseAmount, bn } from '@xchainjs/xchain-util';
 import BigNumber from 'bignumber.js';
 import { erc20ABI } from '../_abi/erc20.abi';
 import { environment } from '../../environments/environment';
@@ -11,12 +11,14 @@ import { ethRUNERopsten } from '../_abi/erc20RUNE.abi';
 import { MidgardService } from './midgard.service';
 import { Client as EthClient } from '@xchainjs/xchain-ethereum';
 import { Asset } from '@xchainjs/xchain-util';
+import { PoolDTO } from '../_classes/pool';
 
 export type EstimateFeeParams = {
   sourceAsset: Asset,
   ethClient: Client,
   ethInbound: PoolAddressDTO,
-  inputAmount: number,
+  // inputAmount: number,
+  inputAmount: BigNumber;
   memo: string
 };
 
@@ -25,7 +27,8 @@ export type CallDepositParams = {
   asset: Asset,
   memo: string,
   ethClient: Client,
-  amount: number
+  // amount: number
+  amount: BigNumber
 };
 
 export type EstimateApprovalFee = {ethClient: EthClient, contractAddress: string, asset: Asset};
@@ -44,17 +47,32 @@ export class EthUtilsService {
 
     let checkSummedAddress;
     const wallet = ethClient.getWallet();
-    const decimal = await this.getAssetDecimal(sourceAsset, ethClient);
+    // const decimal = await this.getAssetDecimal(sourceAsset, ethClient);
+    const abi = (environment.network === 'testnet')
+      ? TCRopstenAbi
+      : TCAbi;
+
+    // testing
+    const gasPrices = await ethClient.estimateGasPrices();
+    const gasPrice = gasPrices.fast.amount().toFixed(0);
+    console.log('gas price is: ', gasPrice);
+    console.log('inboundAddress.gas_rate: ', ethInbound.gas_rate);
+    console.log('inbound address formatted is: ',
+      baseAmount(ethers.utils.parseUnits(ethInbound.gas_rate, 'gwei').toString(), ETH_DECIMAL
+    ).amount().toFixed(0));
+    // end testing
 
     if (sourceAsset.symbol === 'ETH') {
       checkSummedAddress = '0x0000000000000000000000000000000000000000';
     } else {
       const assetAddress = sourceAsset.symbol.slice(sourceAsset.ticker.length + 1);
-      const strip0x = assetAddress.substr(2);
+      const strip0x = (assetAddress.substr(0, 2).toUpperCase() === '0X')
+        ? assetAddress.substr(2)
+        : assetAddress;
       checkSummedAddress = ethers.utils.getAddress(strip0x);
     }
 
-    const contract = new ethers.Contract(ethInbound.router, TCRopstenAbi, wallet);
+    const contract = new ethers.Contract(ethInbound.router, abi, wallet);
 
     const params = [
       // Vault Address
@@ -64,17 +82,20 @@ export class EthUtilsService {
       checkSummedAddress,
 
       // Amount
-      assetToBase(assetAmount(inputAmount, decimal)).amount().toFixed(),
+      // assetToBase(assetAmount(inputAmount, decimal)).amount().toFixed(),
+      inputAmount.toFixed(),
 
       // Memo
       memo
     ];
 
     const estimateGas = await contract.estimateGas.deposit(...params);
-    const prices = await ethClient.estimateGasPrices();
-    const minimumWeiCost = prices.fast.amount().multipliedBy(estimateGas.toNumber());
+    const minimumCost = baseAmount(
+      ethers.utils.parseUnits(ethInbound.gas_rate, 'gwei').toString(),
+      ETH_DECIMAL
+    ).amount().multipliedBy(estimateGas.toNumber());
 
-    return minimumWeiCost;
+    return minimumCost;
   }
 
   async getAssetDecimal(asset: Asset, client: Client): Promise<number> {
@@ -95,18 +116,6 @@ export class EthUtilsService {
       throw new Error('asset chain not ETH');
     }
 
-  }
-
-  async estimateApproveFee({ethClient, contractAddress, asset}: EstimateApprovalFee) {
-    const wallet = ethClient.getWallet();
-    const assetAddress = asset.symbol.slice(asset.ticker.length + 1);
-    const strip0x = (assetAddress.toUpperCase().indexOf('0X') === 0) ? assetAddress.substr(2) : assetAddress;
-    const checkSummedAddress = ethers.utils.getAddress(strip0x);
-    const contract = new ethers.Contract(checkSummedAddress, erc20ABI, wallet);
-    const estimateGas = await contract.estimateGas.approve(contractAddress, checkSummedAddress);
-    const prices = await ethClient.estimateGasPrices();
-    const minimumWeiCost = prices.average.amount().multipliedBy(estimateGas.toNumber());
-    return minimumWeiCost;
   }
 
   async maximumSpendableBalance(ethParams: {asset: Asset, balance: number, client: EthClient}) {
@@ -138,6 +147,16 @@ export class EthUtilsService {
       ? TCRopstenAbi
       : TCRopstenAbi;
     const ethAddress = await ethClient.getAddress();
+    const gasPrices = await ethClient.estimateGasPrices();
+    const deprecatedEthClientgasPrice = gasPrices.fast.amount().toFixed(0);
+    console.log('gas price is: ', deprecatedEthClientgasPrice);
+    console.log('inboundAddress.gas_rate: ', inboundAddress.gas_rate);
+    console.log('inboundAddress format units is: ',
+      baseAmount(
+        ethers.utils.parseUnits(inboundAddress.gas_rate, 'gwei').toString(),
+        ETH_DECIMAL
+      ).amount().toFixed(0));
+    const gasPrice = baseAmount(ethers.utils.parseUnits(inboundAddress.gas_rate, 'gwei').toString(), ETH_DECIMAL).amount().toFixed(0);
 
     if (asset.ticker === 'ETH') {
 
@@ -145,10 +164,13 @@ export class EthUtilsService {
       const unsignedTx = await contract.populateTransaction.deposit(
         inboundAddress.address, // not sure if this is correct...
         '0x0000000000000000000000000000000000000000',
-        ethers.utils.parseEther(String(amount)),
-        // memo,
+        // ethers.utils.parseEther(String(amount)),
+
+        amount.toFixed(),
+
         memo,
-        {from: ethAddress, value: ethers.utils.parseEther(String(amount))}
+        // {from: ethAddress, value: ethers.utils.parseEther(String(amount)), gasPrice}
+        {from: ethAddress, value: amount.toFixed(), gasPrice}
       );
       console.log({unsignedTx});
       const contractRes = await ethClient
@@ -165,13 +187,15 @@ export class EthUtilsService {
       const strip0x = assetAddress.substr(2);
       const checkSummedAddress = ethers.utils.getAddress(strip0x);
       // const tokenContract = new ethers.Contract(checkSummedAddress, erc20ABI);
-      const decimal: BigNumber = await ethClient.call(checkSummedAddress, erc20ABI, 'decimals', []);
+      // const decimal: BigNumber = await ethClient.call(checkSummedAddress, erc20ABI, 'decimals', []);
+      // const tokenContract = new ethers.Contract(checkSummedAddress, erc20ABI, wallet);
       // const decimal = await tokenContract.decimals();
       const params = [
         inboundAddress.address, // vault
         checkSummedAddress, // asset
-        assetToBase(assetAmount(amount, decimal.toNumber())).amount().toFixed(), // amount
-        memo
+        amount.toFixed(), // amount
+        memo,
+        { gasPrice }
       ];
       const vaultContract = new ethers.Contract(inboundAddress.router, abi);
       const unsignedTx = await vaultContract.populateTransaction.deposit(
@@ -223,6 +247,21 @@ export class EthUtilsService {
       console.log(error);
     }
 
+  }
+
+  async estimateERC20Time(token: string, tokenAmount: number): Promise<number> {
+    const tokenPool = await this.midgardService.getPool(token).toPromise();
+    const ethPool = await this.midgardService.getPool('ETH.ETH').toPromise();
+    const assetUnitsPerEth = (+tokenPool.assetPriceUSD) / (+ethPool.assetPriceUSD);
+    const totalInEth = (tokenAmount * assetUnitsPerEth);
+    const chainBlockReward = 3;
+    const chainBlockTime = 15; // seconds
+    const estimatedMinutes = (Math.ceil( totalInEth / chainBlockReward) * (chainBlockTime / 60));
+    return (estimatedMinutes < 1) ? 1 : estimatedMinutes;
+  }
+
+  getErc20ValueInEth(ethPool: PoolDTO, tokenPool: PoolDTO) {
+    return (+tokenPool.assetPriceUSD) / (+ethPool.assetPriceUSD);
   }
 
 }

@@ -30,11 +30,11 @@
 
           <!-- THORChain -->
           <div *ngIf="thorAddress" class="uni-input user-address" (click)="selectAddress(thorAddress, 'THOR')">
-            <label>RUNE Address</label>
+            <label>THOR Address</label>
 
             <div class="flex items-center w-full py-3">
               <div class="asset-icon-container">
-                <img class="asset-icon" src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/RUNE-B1A/logo.png" />
+                <img class="asset-icon" src="assets/images/token-icons/thorchain-logo.png" />
               </div>
               <span>{{thorAddress.substring(0, 8) + '...' + thorAddress.substring(thorAddress.length - 4, thorAddress.length)}}</span>
             </div>

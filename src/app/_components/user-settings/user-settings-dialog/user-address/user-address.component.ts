@@ -135,6 +135,10 @@ export class UserAddressComponent implements OnInit {
         this.explorerPath = `${this.explorerPathsService.litecoinExplorerUrl}/${this.address}`;
         break;
 
+      case 'BCH':
+        this.explorerPath = `${this.explorerPathsService.bchExplorerUrl}/address/${this.address}`;
+        break;
+
       default:
         break;
     }
@@ -152,7 +156,7 @@ export class UserAddressComponent implements OnInit {
         return 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png';
 
       case 'THOR':
-        return 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/RUNE-B1A/logo.png';
+        return 'assets/images/token-icons/thorchain-logo.png';
     }
   }
 

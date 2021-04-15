@@ -6,7 +6,6 @@ import { LastBlock } from 'src/app/_classes/last-block';
 import { LastBlockService } from 'src/app/_services/last-block.service';
 import { MidgardService } from 'src/app/_services/midgard.service';
 import { ReconnectDialogComponent } from './_components/reconnect-dialog/reconnect-dialog.component';
-import { environment } from 'src/environments/environment';
 import { UserService } from './_services/user.service';
 import { Chain } from '@xchainjs/xchain-util';
 import { AssetAndBalance } from './_classes/asset-and-balance';
@@ -22,7 +21,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
   killPolling: Subject<void> = new Subject();
   subs: Subscription[];
-  isTestnet: boolean;
   chainBalanceErrors: Chain[];
   nonNativeRuneAssets: AssetAndBalance[];
 
@@ -32,7 +30,6 @@ export class AppComponent implements OnInit, OnDestroy {
     private lastBlockService: LastBlockService,
     private userService: UserService,
   ) {
-    this.isTestnet = (environment.network === 'testnet');
 
     const chainBalanceErrors$ = this.userService.chainBalanceErrors$.subscribe(
       (chains) => this.chainBalanceErrors = chains

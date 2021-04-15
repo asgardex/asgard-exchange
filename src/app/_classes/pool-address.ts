@@ -4,6 +4,7 @@ export interface PoolAddressDTO {
   address: string;
   router: string;
   halted: boolean;
+  gas_rate: string;
 }
 
 export class PoolAddress {
@@ -12,6 +13,7 @@ export class PoolAddress {
   address: string;
   router: string;
   halted: boolean;
+  gasRate: number;
 
   constructor(dto: PoolAddressDTO) {
     this.chain = dto.chain;
@@ -19,6 +21,7 @@ export class PoolAddress {
     this.address = dto.address;
     this.halted = dto.halted;
     this.router = dto.router;
+    this.gasRate = +dto.gas_rate;
   }
 
 }

@@ -59,6 +59,7 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 /** EXTERNAL */
 import { QRCodeModule } from 'angularx-qrcode';
@@ -78,6 +79,7 @@ import { HaskoinService } from './_services/haskoin.service';
 import { ModalSectionHeaderModule } from './_components/modal-section-header/modal-section-header.module';
 import { ReconnectXDEFIDialogComponent } from './_components/reconnect-xdefi-dialog/reconnect-xdefi-dialog.component';
 import { KeystoreCreateStorePhraseComponent } from './_components/connect/keystore-create-store-phrase/keystore-create-store-phrase.component';
+import { TransactionUtilsService } from './_services/transaction-utils.service';
 
 
 @NgModule({
@@ -134,7 +136,8 @@ import { KeystoreCreateStorePhraseComponent } from './_components/connect/keysto
     TransactionSuccessModalModule,
     DirectivesModule,
     ModalSectionHeaderModule,
-    PhraseWordsListModule
+    PhraseWordsListModule,
+    MatTooltipModule
   ],
   providers: [
     BinanceService,
@@ -151,6 +154,7 @@ import { KeystoreCreateStorePhraseComponent } from './_components/connect/keysto
     SochainService,
     ThorchainPricesService,
     HaskoinService,
+    TransactionUtilsService,
   ],
   bootstrap: [AppComponent],
 })

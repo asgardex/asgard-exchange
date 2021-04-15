@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 /** MATERIAL */
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 /** COMPONENTS */
 import { SwapComponent } from './swap.component';
@@ -28,6 +29,7 @@ import { DirectivesModule } from '../_directives/directives.module';
     FormsModule,
     MatButtonModule,
     MatIconModule,
+    MatTooltipModule,
     MatProgressSpinnerModule,
     TransactionProcessingModalModule,
     TransactionSuccessModalModule,

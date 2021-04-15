@@ -65,8 +65,8 @@
 
       <div class="flex justify-between pb-2 items-center">
         <span class="tx-detail-label"></span>
-        <!-- TODO: estimate this on the fly -->
-        <span>+ {{asset.ticker}} Network Gas</span>
+        <span *ngIf="networkFee">{{networkFee | number:"1.0-8"}} {{asset.ticker}}.{{asset.chain}}  Network Fee</span>
+        <span *ngIf="!networkFee">...</span>
       </div>
 
     </div>

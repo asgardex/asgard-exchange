@@ -11,7 +11,7 @@ import { environment } from 'src/environments/environment';
 export class ConnectComponent implements OnInit {
 
   modalDimensions = {
-    maxWidth: '420px',
+    maxWidth: '520px',
     width: '50vw',
     minWidth: '260px'
   };

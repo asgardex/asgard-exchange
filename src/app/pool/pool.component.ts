@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Balances } from '@xchainjs/xchain-client';
-import { Subscription } from 'rxjs';
+import { combineLatest, Subscription } from 'rxjs';
 import { User } from '../_classes/user';
 import { MidgardService } from '../_services/midgard.service';
 import { UserService } from '../_services/user.service';
@@ -24,10 +24,17 @@ export class PoolComponent implements OnInit, OnDestroy {
   balances: Balances;
   createablePools: string[];
   memberPools: MemberPool[];
+  addresses: string[];
+  maxLiquidityRune: number;
+  totalPooledRune: number;
+  depositsDisabled: boolean;
+  txStreamInitSuccess: boolean;
 
   constructor(private userService: UserService, private midgardService: MidgardService, private txStatusService: TransactionStatusService) {
 
     this.subs = [];
+    this.memberPools = [];
+    this.depositsDisabled = false;
 
     const user$ = this.userService.user$.subscribe(
       (user) => {
@@ -44,15 +51,15 @@ export class PoolComponent implements OnInit, OnDestroy {
     );
 
     const pendingTx$ = this.txStatusService.txs$.subscribe(
-      (tx) => {
+      (_) => {
 
-        if (tx) {
-          // have to call this twice to break the midgard cache
+        if (!this.txStreamInitSuccess) {
+          this.txStreamInitSuccess = true;
+        } else {
           setTimeout( () => {
             this.getAccountPools();
           }, 3000);
         }
-
       }
     );
 
@@ -62,6 +69,7 @@ export class PoolComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.getPools();
+    this.getPoolCap();
   }
 
   getPools() {
@@ -87,35 +95,75 @@ export class PoolComponent implements OnInit, OnDestroy {
 
   }
 
+  getPoolCap() {
+    const mimir$ = this.midgardService.getMimir();
+    const network$ = this.midgardService.getNetwork();
+    const combined = combineLatest([mimir$, network$]);
+    const sub = combined.subscribe( ([mimir, network]) => {
+
+      this.totalPooledRune = +network.totalPooledRune / (10 ** 8);
+
+      if (mimir && mimir['mimir//MAXLIQUIDITYRUNE']) {
+        this.maxLiquidityRune = mimir['mimir//MAXLIQUIDITYRUNE'] / (10 ** 8);
+
+        this.depositsDisabled = (this.totalPooledRune / mimir['mimir//MAXLIQUIDITYRUNE'] >= .9);
+
+      }
+
+    });
+
+    this.subs.push(sub);
+  }
+
+  async getAddresses(): Promise<string[]> {
+    const thorClient = this.user.clients.thorchain;
+    const thorAddress = await thorClient.getAddress();
+
+    const btcClient = this.user.clients.bitcoin;
+    const btcAddress = await btcClient.getAddress();
+
+    const ltcClient = this.user.clients.litecoin;
+    const ltcAddress = await ltcClient.getAddress();
+
+    const bchClient = this.user.clients.bitcoinCash;
+    const bchAddress = await bchClient.getAddress();
+
+    const bnbClient = this.user.clients.binance;
+    const bnbAddress = await bnbClient.getAddress();
+
+    const ethClient = this.user.clients.ethereum;
+    const ethAddress = await ethClient.getAddress();
+
+    return [thorAddress, btcAddress, ltcAddress, bchAddress, bnbAddress, ethAddress];
+  }
+
   async getAccountPools() {
     this.loading = true;
+    this.memberPools = [];
 
     if (this.user) {
 
-      const client = this.user.clients.thorchain; // only need to query binance bc all pools are balanced by RUNE
-      const address = await client.getAddress();
+      if (!this.addresses) {
+        this.addresses = await this.getAddresses();
+      }
 
-      this.midgardService.getMember(address).subscribe(
-        (res) => {
-          this.memberPools = res.pools;
-          this.loading = false;
-        },
-        (err) => {
-
-          if (err.status === 404) {
-            this.memberPools = [];
-          } else {
-            this.userPoolError = true;
+      for (const address of this.addresses) {
+        this.midgardService.getMember(address).subscribe(
+          (res) => {
+            for (const pool of res.pools) {
+              const match = this.memberPools.find( (existingPool) => existingPool.pool === pool.pool );
+              if (!match) {
+                const memberPools = this.memberPools;
+                memberPools.push(pool);
+                this.memberPools = [...memberPools];
+              }
+            }
           }
-
-          this.loading = false;
-          console.error('error fetching account pool: ', err);
-        }
-      );
-
-
+        );
+      }
     }
 
+    this.loading = false;
   }
 
   ngOnDestroy(): void {

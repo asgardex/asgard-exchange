@@ -281,6 +281,10 @@ input[type=number] {
 
 }
 
+.gradient-btn {
+  background-image: linear-gradient(90deg,darken(#3f9, 20%), darken(#31c099, 20%)),linear-gradient(90deg,darken(#0cf, 20%),#282c34);
+}
+
 /**
  *
  */
@@ -462,4 +466,11 @@ main {
 
 .cdk-global-scrollblock {
   top: auto !important;
+}
+
+.swap-details {
+  padding: 6px 1rem 0;
+  font-weight: 500;
+  font-size: 14px;
+  color: rgb(195, 197, 203);
 }
