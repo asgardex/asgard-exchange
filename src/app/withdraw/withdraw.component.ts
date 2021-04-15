@@ -14,7 +14,7 @@ import { Asset } from '../_classes/asset';
 import { MemberPool } from '../_classes/member';
 import { User } from '../_classes/user';
 import { LastBlockService } from '../_services/last-block.service';
-import { MidgardService } from '../_services/midgard.service';
+import { MidgardService, ThorchainQueue } from '../_services/midgard.service';
 import { TransactionUtilsService } from '../_services/transaction-utils.service';
 import { UserService } from '../_services/user.service';
 import { ConfirmWithdrawModalComponent } from './confirm-withdraw-modal/confirm-withdraw-modal.component';
@@ -61,6 +61,7 @@ export class WithdrawComponent implements OnInit {
   outboundTransactionFee: number;
 
   networkFee: number;
+  queue: ThorchainQueue;
 
   constructor(
     private dialog: MatDialog,
@@ -105,6 +106,7 @@ export class WithdrawComponent implements OnInit {
   ngOnInit(): void {
 
     this.getConstants();
+    this.getThorchainQueue();
 
     const params$ = this.route.paramMap.subscribe( (params) => {
 
@@ -143,6 +145,14 @@ export class WithdrawComponent implements OnInit {
 
     }
 
+  }
+
+  getThorchainQueue() {
+    this.midgardService.getQueue().subscribe(
+      (res) => {
+        this.queue = res;
+      }
+    );
   }
 
   calculate() {
@@ -208,6 +218,11 @@ export class WithdrawComponent implements OnInit {
       return true;
     }
 
+    /** THORChain is backed up */
+    if (this.queue && this.queue.outbound >= 12) {
+      return true;
+    }
+
     /** No asset amount set */
     if (!this.removeAssetAmount || (this.removeAssetAmount && this.removeAssetAmount <= 0)) {
       return true;
@@ -230,6 +245,11 @@ export class WithdrawComponent implements OnInit {
     /** No user connected */
     if (!this.user) {
       return 'Please Connect Wallet';
+    }
+
+    /** THORChain is backed up */
+    if (this.queue && this.queue.outbound >= 12) {
+      return 'THORChain Network Latency. Try Later';
     }
 
     /** No asset amount set */

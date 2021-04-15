@@ -21,7 +21,7 @@ import {
   assetToString,
 } from '@xchainjs/xchain-util';
 import { PoolDetail } from '../_classes/pool-detail';
-import { MidgardService } from '../_services/midgard.service';
+import { MidgardService, ThorchainQueue } from '../_services/midgard.service';
 import { BinanceService } from '../_services/binance.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmSwapModalComponent } from './confirm-swap-modal/confirm-swap-modal.component';
@@ -178,6 +178,7 @@ export class SwapComponent implements OnInit, OnDestroy {
   ethPool: PoolDTO;
   inputNetworkFee: number;
   outputNetworkFee: number;
+  queue: ThorchainQueue;
 
   constructor(
     private dialog: MatDialog,
@@ -231,6 +232,15 @@ export class SwapComponent implements OnInit, OnDestroy {
     this.getPools();
     this.getEthRouter();
     this.getProxiedInboundAddresses();
+    this.getThorchainQueue();
+  }
+
+  getThorchainQueue() {
+    this.midgardService.getQueue().subscribe(
+      (res) => {
+        this.queue = res;
+      }
+    );
   }
 
   isRune(asset: Asset): boolean {
@@ -326,6 +336,7 @@ export class SwapComponent implements OnInit, OnDestroy {
       || (this.targetAssetUnitDisplay <= this.userService.minimumSpendable(this.selectedTargetAsset))
       || !this.user || !this.balances
       || this.ethContractApprovalRequired
+      || this.queue && this.queue.outbound >= 12
       || (this.slip * 100) > this.slippageTolerance
       || (this.selectedSourceAsset.chain === 'BNB' && this.insufficientBnb); // source is BNB and not enough funds to cover fee
   }
@@ -335,6 +346,11 @@ export class SwapComponent implements OnInit, OnDestroy {
     /** User Not connected */
     if (!this.user || !this.balances) {
       return 'Please connect wallet';
+    }
+
+    /** THORChain is backed up */
+    if (this.queue && this.queue.outbound >= 12) {
+      return 'THORChain Network Latency';
     }
 
     /** No target asset selected */
