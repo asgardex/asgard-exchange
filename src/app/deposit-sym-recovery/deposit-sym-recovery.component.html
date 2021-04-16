@@ -60,7 +60,14 @@
       </div>
 
       <div class="flex">
-        <button *ngIf="searchingAsset && missingAsset" class="main-action-btn w-full" (click)="submitDeposit()" mat-flat-button [disabled]="submitDisabled()">
+
+        <div class="w-1/2 mr-2">
+          <button *ngIf="searchingAsset && missingAsset" class="main-action-btn w-full" (click)="withdrawPendingDeposit()" mat-flat-button>
+            Withdraw Pending
+          </button>
+        </div>
+
+        <button *ngIf="searchingAsset && missingAsset" class="main-action-btn w-1/2" (click)="submitDeposit()" mat-flat-button [disabled]="submitDisabled()">
           {{mainButtonText()}}
         </button>
       </div>
@@ -71,6 +78,13 @@
       <div>
         <mat-progress-spinner mode="indeterminate" diameter="30"></mat-progress-spinner>
       </div>
+    </div>
+
+    <div class="flex flex-col clear-both border-t border-gray-700" *ngIf="txState === 'SUCCESS'">
+      <span class="text-sm my-4">Resubmitting the deposit was a success. Please wait for the transaction to go through.</span>
+      <button class="main-action-btn w-full" (click)="back()" mat-flat-button>
+        Back To Pools
+      </button>
     </div>
 
   </div>

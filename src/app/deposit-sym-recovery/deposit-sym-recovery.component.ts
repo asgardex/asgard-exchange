@@ -3,7 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { getValueOfAssetInRune } from '@thorchain/asgardex-util';
 import { Balances } from '@xchainjs/xchain-client';
-import { assetToString, BaseAmount, baseAmount } from '@xchainjs/xchain-util';
+import { assetAmount, assetToBase, assetToString, BaseAmount, baseAmount } from '@xchainjs/xchain-util';
 import { combineLatest, Subscription } from 'rxjs';
 import { Asset, isNonNativeRuneToken } from '../_classes/asset';
 import { AssetAndBalance } from '../_classes/asset-and-balance';
@@ -286,7 +286,7 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
       return 'Amount too low';
     }
 
-    return 'Resubmit Missing Deposit';
+    return 'Resubmit Deposit';
 
   }
 
@@ -406,10 +406,48 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
     } catch (error) {
       console.error('error depositing: ', error);
       this.txState = TransactionConfirmationState.PENDING_CONFIRMATION;
-      // this.txState = TransactionConfirmationState.ERROR;
       this.error = error;
     }
 
+  }
+
+  async withdrawPendingDeposit() {
+    this.txState = TransactionConfirmationState.SUBMITTING;
+
+    const thorClient = this.user.clients.thorchain;
+    if (!thorClient) {
+      console.error('no thor client found!');
+      return;
+    }
+
+    const txCost = assetToBase(assetAmount(0.00000001));
+
+    // unstake 100%
+    const memo = `WITHDRAW:${this.searchingAsset.chain}.${this.searchingAsset.symbol}:100`;
+
+    // withdraw RUNE
+    try {
+      const hash = await thorClient.deposit({
+        amount: txCost,
+        memo,
+      });
+
+      this.txState = TransactionConfirmationState.SUCCESS;
+      // this.hash = hash;
+      this.txStatusService.addTransaction({
+        chain: 'THOR',
+        hash: hash,
+        ticker: `${this.searchingAsset.ticker}-RUNE`,
+        symbol: this.searchingAsset.symbol,
+        status: TxStatus.PENDING,
+        action: TxActions.WITHDRAW,
+        isThorchainTx: true
+      });
+    } catch (error) {
+      console.error('error making RUNE withdraw: ', error);
+      this.txState = TransactionConfirmationState.PENDING_CONFIRMATION;
+      this.error = error;
+    }
   }
 
   ngOnDestroy() {

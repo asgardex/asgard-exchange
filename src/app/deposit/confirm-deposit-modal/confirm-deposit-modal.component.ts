@@ -216,6 +216,11 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
       return;
     }
 
+    console.log('pending hash is: ', hash);
+
+    // TESTING
+    // return;
+
     console.log('PROCEEDING TO RUNE DEPOSIT');
 
     // deposit RUNE
