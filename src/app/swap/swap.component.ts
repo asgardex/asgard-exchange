@@ -555,6 +555,7 @@ export class SwapComponent implements OnInit, OnDestroy {
         (toRune)
           ? this.selectedSourceAsset
           : this.selectedTargetAsset,
+        this.inboundAddresses,
         poolDetail
       );
 
@@ -612,8 +613,8 @@ export class SwapComponent implements OnInit, OnDestroy {
         runeBalance: baseAmount(targetPool.runeDepth),
       };
 
-      this.inputNetworkFee = this.txUtilsService.calculateNetworkFee(this.selectedSourceAsset, sourcePool);
-      this.outputNetworkFee = this.txUtilsService.calculateNetworkFee(this.selectedTargetAsset, targetPool);
+      this.inputNetworkFee = this.txUtilsService.calculateNetworkFee(this.selectedSourceAsset, this.inboundAddresses, sourcePool);
+      this.outputNetworkFee = this.txUtilsService.calculateNetworkFee(this.selectedTargetAsset, this.inboundAddresses, targetPool);
 
       const basePrice = getDoubleSwapOutput(assetToBase(assetAmount(1)), pool2, pool1);
       this.basePrice = basePrice.amount().div(10 ** 8).toNumber();

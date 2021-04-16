@@ -205,7 +205,9 @@ export class DepositComponent implements OnInit, OnDestroy {
     this.runeAmount = runeAmount.amount().isLessThan(0) ? 0 : runeAmount.amount().div(10 ** 8 ).toNumber();
   }
 
-  getPoolDetail(asset: string) {
+  async getPoolDetail(asset: string) {
+
+    const inboundAddresses = await this.midgardService.getInboundAddresses().toPromise();
 
     this.midgardService.getPool(asset).subscribe(
       (res) => {
@@ -215,7 +217,7 @@ export class DepositComponent implements OnInit, OnDestroy {
             runeBalance: baseAmount(res.runeDepth),
           };
 
-          this.networkFee = this.txUtilsService.calculateNetworkFee(this.asset, res);
+          this.networkFee = this.txUtilsService.calculateNetworkFee(this.asset, inboundAddresses, res);
 
         }
       },

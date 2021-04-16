@@ -167,7 +167,7 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
     const ethClient = this.swapData.user.clients.ethereum;
     const litecoinClient = this.swapData.user.clients.litecoin;
 
-    const targetAddress = await this.userService.getTokenAddress(this.swapData.user, this.swapData.targetAsset.chain);
+    const targetAddress = this.userService.getTokenAddress(this.swapData.user, this.swapData.targetAsset.chain);
 
     const floor = this.slipLimitService.getSlipLimitFromAmount(this.swapData.outputValue);
 

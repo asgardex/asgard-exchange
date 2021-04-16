@@ -284,7 +284,9 @@ export class WithdrawComponent implements OnInit {
     this.router.navigate(['/', 'pool']);
   }
 
-  getPoolDetail(asset: string) {
+  async getPoolDetail(asset: string) {
+
+    const inboundAddresses = await this.midgardService.getInboundAddresses().toPromise();
 
     this.midgardService.getPool(asset).subscribe(
       (res) => {
@@ -298,7 +300,7 @@ export class WithdrawComponent implements OnInit {
           this.runeBasePrice = getValueOfAssetInRune(assetToBase(assetAmount(1)), this.assetPoolData).amount().div(10 ** 8).toNumber();
           this.assetBasePrice = getValueOfRuneInAsset(assetToBase(assetAmount(1)), this.assetPoolData).amount().div(10 ** 8).toNumber();
 
-          this.networkFee = this.txUtilsService.calculateNetworkFee(this.asset, res);
+          this.networkFee = this.txUtilsService.calculateNetworkFee(this.asset, inboundAddresses, res);
 
           this.calculate();
         }

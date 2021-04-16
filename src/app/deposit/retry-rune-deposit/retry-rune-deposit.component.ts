@@ -41,6 +41,7 @@ export class RetryRuneDepositComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.userService.fetchBalances();
   }
 
   async resubmitRuneDeposit() {
@@ -54,7 +55,7 @@ export class RetryRuneDepositComponent implements OnInit, OnDestroy {
       const thorClient = this.user.clients.thorchain;
 
       // get token address
-      const address = await this.userService.getTokenAddress(this.user, this.asset.chain);
+      const address = this.userService.getTokenAddress(this.user, this.asset.chain);
       if (!address || address === '') {
         console.error('no address found');
         return;
