@@ -37,6 +37,7 @@ export const environment = {
    network: '${isTestnet ? 'testnet' : 'chaosnet'}',
    etherscanKey: '${process.env.ETHERSCAN_KEY}',
    infuraProjectId: '${process.env.INFURA_PROJECT_ID}',
+   appLocked: ${process.env.APP_LOCKED ?? false}
 };
 `;
 // write the content to the respective file

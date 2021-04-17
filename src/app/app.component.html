@@ -22,7 +22,19 @@
         </div>
       </div>
 
-      <main [ngClass]="{'py-8 xl:py-32': notificationsExist(), 'py-32': !notificationsExist()}" class="flex flex-col justify-center items-center clear-both px-4 sm:px-0">
+      <main *ngIf="appLocked" class="flex flex-col justify-center items-center clear-both px-4 sm:px-0">
+        <div class="container flex items-center justify-center">
+          <div class="py-4">
+            <mat-icon style="font-size: 48px; height: 48px; width: 48px;">construction</mat-icon>
+          </div>
+          <span>
+            THORChain is undergoing updates.<br />
+            Please try again later.
+          </span>
+        </div>
+      </main>
+
+      <main *ngIf="!appLocked" [ngClass]="{'py-8 xl:py-32': notificationsExist(), 'py-32': !notificationsExist()}" class="flex flex-col justify-center items-center clear-both px-4 sm:px-0">
         <router-outlet></router-outlet>
       </main>
 
