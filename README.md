@@ -12,7 +12,7 @@ After your environments folder is build out, running `ng serve` will work fine.
 
 ## Site Construction and Temporary App Pause
 
-In the case site construction, you can lock up THORChain swaps, deposits, and withdraws. Simply set `APP_LOCKED` in your env to true. Users will still have access to wallet transfer features, but THORChain features will be locked.
+In the case site construction, you can lock up THORChain swaps, deposits, and withdraws. Simply set `APP_LOCKED` in your env to true and rebuild the app. Users will still have access to wallet transfer features, but THORChain features will be locked.
 
 ## Code scaffolding
 
