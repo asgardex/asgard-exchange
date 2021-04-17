@@ -59,17 +59,27 @@
         </span>
       </div>
 
-      <div class="flex">
+      <div *ngIf="outboundQueue < 12" class="flex">
 
         <div class="w-1/2 mr-2">
-          <button *ngIf="searchingAsset && missingAsset" class="main-action-btn w-full" (click)="withdrawPendingDeposit()" mat-flat-button>
-            Withdraw Pending
+          <button *ngIf="searchingAsset && missingAsset" class="main-action-btn w-full" (click)="withdrawPendingDeposit()" mat-flat-button [disabled]="runeBalance < 0.2">
+            <span *ngIf="runeBalance >= 0.2">Withdraw All</span>
+            <span *ngIf="runeBalance < 0.2">Insufficient RUNE</span>
           </button>
         </div>
 
         <button *ngIf="searchingAsset && missingAsset" class="main-action-btn w-1/2" (click)="submitDeposit()" mat-flat-button [disabled]="submitDisabled()">
           {{mainButtonText()}}
         </button>
+
+      </div>
+
+      <div *ngIf="outboundQueue >= 12" class="flex">
+
+        <button class="main-action-btn w-full" mat-flat-button disabled>
+          THORChain Network Latency
+        </button>
+
       </div>
 
     </div>

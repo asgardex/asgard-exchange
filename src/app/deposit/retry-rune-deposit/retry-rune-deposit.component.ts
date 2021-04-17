@@ -79,6 +79,35 @@ export class RetryRuneDepositComponent implements OnInit, OnDestroy {
 
   }
 
+  async withdrawPendingDeposit() {
+    this.loading = true;
+
+    const thorClient = this.user.clients.thorchain;
+    if (!thorClient) {
+      console.error('no thor client found!');
+      return;
+    }
+
+    const txCost = assetToBase(assetAmount(0.00000001));
+
+    // unstake 100%
+    const memo = `WITHDRAW:${this.asset.chain}.${this.asset.symbol}:100`;
+
+    // withdraw RUNE
+    try {
+      const hash = await thorClient.deposit({
+        amount: txCost,
+        memo,
+      });
+
+      this.retrySuccess.next(hash);
+
+    } catch (error) {
+      console.error('error retrying RUNE transfer: ', error);
+      this.resubmitError = error;
+    }
+  }
+
   ngOnDestroy() {
     for (const sub of this.subs) {
       sub.unsubscribe();

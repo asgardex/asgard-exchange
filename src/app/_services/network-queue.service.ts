@@ -1,22 +1,22 @@
 import { Injectable } from '@angular/core';
 import { Observable, timer } from 'rxjs';
-import { MidgardService } from './midgard.service';
+import { retry, share, switchMap } from 'rxjs/operators';
+import { MidgardService, ThorchainQueue } from './midgard.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class NetworkQueueService {
 
-  // networkQueue$: Observable<Ne>
+  networkQueue$: Observable<ThorchainQueue>;
 
   constructor(private midgardService: MidgardService) {
 
-  //   this.allCurrencies$ = timer(1, 3000).pipe(
-  //     switchMap(() => http.get<CurrencyInfo[]>('http://localhost:8000/currencyInfo')),
-  //     retry(),
-  //     share(),
-  //     takeUntil(this.stopPolling)
-  //  );
+    this.networkQueue$ = timer(0, 60000).pipe(
+      switchMap(() => this.midgardService.getQueue()),
+      retry(),
+      share(),
+   );
 
   }
 }

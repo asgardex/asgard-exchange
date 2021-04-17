@@ -14,6 +14,7 @@ import { TransactionConfirmationState } from '../_const/transaction-confirmation
 import { EthUtilsService } from '../_services/eth-utils.service';
 import { KeystoreDepositService } from '../_services/keystore-deposit.service';
 import { MidgardService } from '../_services/midgard.service';
+import { NetworkQueueService } from '../_services/network-queue.service';
 import { TransactionStatusService, TxActions, TxStatus } from '../_services/transaction-status.service';
 import { TransactionUtilsService } from '../_services/transaction-utils.service';
 import { UserService } from '../_services/user.service';
@@ -41,6 +42,9 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
   inboundAddresses: PoolAddressDTO[];
   txState: TransactionConfirmationState;
   error: string;
+  outboundQueue: number;
+  depositsDisabled: boolean;
+  runeBalance: number;
 
   constructor(
     private router: Router,
@@ -50,15 +54,22 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
     private ethUtilsService: EthUtilsService,
     private keystoreDepositService: KeystoreDepositService,
     private txUtilsService: TransactionUtilsService,
-    private txStatusService: TransactionStatusService
+    private txStatusService: TransactionStatusService,
+    private networkQueueService: NetworkQueueService
   ) {
+    this.outboundQueue = 0;
     this.rune = new Asset('THOR.RUNE');
+    this.depositsDisabled = false;
     this.txState = TransactionConfirmationState.PENDING_CONFIRMATION;
     const balances$ = this.userService.userBalances$.subscribe(
       (balances) => {
         this.balances = balances;
-        // this.runeBalance = this.userService.findBalance(balances, this.rune);
+        this.runeBalance = this.userService.findBalance(balances, this.rune);
       }
+    );
+
+    const queue$ = this.networkQueueService.networkQueue$.subscribe(
+      (queue) => this.outboundQueue = queue.outbound
     );
 
     const user$ = this.userService.user$.subscribe(
@@ -67,20 +78,14 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
       }
     );
 
-    this.subs = [balances$, user$];
+    this.subs = [balances$, user$, queue$];
   }
 
   ngOnInit(): void {
     this.getPools();
+    this.getPoolCap();
   }
 
-  // getRuneNativeTxFee() {
-  //   this.midgardService.getConstants().subscribe(
-  //     (constants) => {
-  //       this.runeNativeTxFee = constants.int_64_values.NativeTransactionFee;
-  //     }
-  //   );
-  // }
 
   getPools() {
     this.midgardService.getPools().subscribe(
@@ -122,11 +127,6 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
       if (result) {
         this.searchingAsset = result;
         this.searchLiquidityProviders(this.searchingAsset);
-        // this.getPoolDetail(assetToString(this.asset));
-        // if (this.balances) {
-        //   this.assetBalance = this.userService.findBalance(this.balances, this.asset);
-        // }
-        // this.selectedAssetChange.emit(result);
       } else {
         console.log('nothing selected');
       }
@@ -204,6 +204,24 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
     }
   }
 
+  getPoolCap() {
+    const mimir$ = this.midgardService.getMimir();
+    const network$ = this.midgardService.getNetwork();
+    const combined = combineLatest([mimir$, network$]);
+    const sub = combined.subscribe( ([mimir, network]) => {
+
+      const totalPooledRune = +network.totalPooledRune / (10 ** 8);
+
+      if (mimir && mimir['mimir//MAXLIQUIDITYRUNE']) {
+        const maxLiquidityRune = mimir['mimir//MAXLIQUIDITYRUNE'] / (10 ** 8);
+        this.depositsDisabled = (totalPooledRune / maxLiquidityRune >= .9);
+      }
+
+    });
+
+    this.subs.push(sub);
+  }
+
   submitDisabled(): boolean {
     /** Wallet not connected */
     if (!this.balances) {
@@ -220,6 +238,10 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
     }
 
     if (!this.missingAssetBalance) {
+      return true;
+    }
+
+    if (this.depositsDisabled) {
       return true;
     }
 
@@ -262,6 +284,10 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
       return 'No missing Asset';
     }
 
+    if (this.depositsDisabled) {
+      return 'Pool Cap > 90%';
+    }
+
     if (!this.missingAssetBalance) {
       return 'Insufficient Balance';
     }
@@ -286,7 +312,7 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
       return 'Amount too low';
     }
 
-    return 'Resubmit Deposit';
+    return `Resubmit ${this.missingAsset.chain}.${this.missingAsset.ticker}`;
 
   }
 
@@ -436,7 +462,7 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
       // this.hash = hash;
       this.txStatusService.addTransaction({
         chain: 'THOR',
-        hash: hash,
+        hash,
         ticker: `${this.searchingAsset.ticker}-RUNE`,
         symbol: this.searchingAsset.symbol,
         status: TxStatus.PENDING,

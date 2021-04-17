@@ -43,9 +43,17 @@
       </app-asset-input>
 
       <div class="clear-both">
-        <div mat-dialog-content class="confirm-modal-content">
-          <button *ngIf="!loading" (click)="resubmitRuneDeposit()" mat-flat-button color="primary" class="main-action-btn w-full">
-            <span>Resubmit RUNE Deposit</span>
+        <div mat-dialog-content class="confirm-modal-content flex">
+
+          <div class="w-1/2 mr-2">
+            <button class="main-action-btn w-full" (click)="withdrawPendingDeposit()" mat-flat-button [disabled]="(runeBalance < 0.2)">
+              <span *ngIf="runeBalance >= 0.2">Withdraw All</span>
+              <span *ngIf="runeBalance < 0.2">Insufficient RUNE</span>
+            </button>
+          </div>
+
+          <button *ngIf="!loading" (click)="resubmitRuneDeposit()" mat-flat-button color="primary" class="main-action-btn w-1/2">
+            <span>Resubmit RUNE</span>
           </button>
         </div>
       </div>
