@@ -326,10 +326,6 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
     this.txState = TransactionConfirmationState.SUBMITTING;
     this.error = null;
 
-    console.log('missing asset is: ', assetToString(this.missingAsset));
-    console.log('submitting the missing amount: ', this.missingAssetAmount);
-    console.log('asset balance is: ', this.missingAssetBalance);
-
     try {
 
       const inboundAddresses = await this.midgardService.getInboundAddresses().toPromise();
@@ -415,8 +411,6 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
 
       }
 
-      console.log('hash is: ', hash);
-
       this.txStatusService.addTransaction({
         chain: this.missingAsset.chain,
         hash,
@@ -448,7 +442,7 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
 
     const txCost = assetToBase(assetAmount(0.00000001));
 
-    // unstake 100%
+    // withdraw 100%
     const memo = `WITHDRAW:${this.searchingAsset.chain}.${this.searchingAsset.symbol}:100`;
 
     // withdraw RUNE
@@ -459,7 +453,6 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
       });
 
       this.txState = TransactionConfirmationState.SUCCESS;
-      // this.hash = hash;
       this.txStatusService.addTransaction({
         chain: 'THOR',
         hash,

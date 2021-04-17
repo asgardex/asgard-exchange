@@ -72,7 +72,6 @@ export class KeystoreDepositService {
 
   constructor(private ethUtilsService: EthUtilsService, private userService: UserService) { }
 
-  // async ethereumDeposit(client: EthereumClient, thorchainAddress: string, recipientPool: PoolAddressDTO) {
   async ethereumDeposit(
     {asset, inputAmount, balances, client, thorchainAddress, recipientPool}: EthDepositParams
   ): Promise<string> {
@@ -237,9 +236,6 @@ export class KeystoreDepositService {
   }
 
   async runeDeposit({client, inputAmount, memo}: RuneDepositParams): Promise<string> {
-
-    console.log('about to send RUNE: ', assetToBase(assetAmount(inputAmount)).amount().toFixed());
-
     return await client.deposit({
       amount: assetToBase(assetAmount(inputAmount)),
       memo,

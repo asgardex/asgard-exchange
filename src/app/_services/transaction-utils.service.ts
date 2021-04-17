@@ -10,21 +10,13 @@ import { MidgardService } from './midgard.service';
 })
 export class TransactionUtilsService {
 
-  // private _inboundAddresses: PoolAddressDTO[];
   private _outboundTransactionFee: number;
   private _ethPool: PoolDTO;
 
   constructor(private midgardService: MidgardService) {
-    // this._getInboundAddresses();
     this._getOutboundTxFee();
     this._getPools();
   }
-
-  // _getInboundAddresses() {
-  //   this.midgardService.getInboundAddresses().subscribe(
-  //     (res) => this._inboundAddresses = res
-  //   );
-  // }
 
   _getOutboundTxFee() {
     this.midgardService.getConstants().subscribe(
