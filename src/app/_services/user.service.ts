@@ -74,13 +74,15 @@ export class UserService {
     this._chainBalanceErrors = [];
     this.chainBalanceErrorsSource.next([]);
 
-    for (const [key, _value] of Object.entries(this._user.clients)) {
-      if (key === 'binance') {
-        this.getBinanceBalances();
-      } else if (key === 'ethereum') {
-        this.getEthereumBalances();
-      } else {
-        this.getGeneralBalance(key);
+    if (this._user && this._user.clients) {
+      for (const [key, _value] of Object.entries(this._user.clients)) {
+        if (key === 'binance') {
+          this.getBinanceBalances();
+        } else if (key === 'ethereum') {
+          this.getEthereumBalances();
+        } else {
+          this.getGeneralBalance(key);
+        }
       }
     }
 
