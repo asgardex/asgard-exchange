@@ -338,7 +338,11 @@ export class SwapComponent implements OnInit, OnDestroy {
       || this.ethContractApprovalRequired
       || (this.queue && this.queue.outbound >= 12)
       || (this.slip * 100) > this.slippageTolerance
-      || (this.selectedSourceAsset.chain === 'BNB' && this.insufficientBnb); // source is BNB and not enough funds to cover fee
+      || (this.selectedSourceAsset.chain === 'BNB' && this.insufficientBnb) // source is BNB and not enough funds to cover fee
+
+      /** TEMPORARILY RESTRICT BTC/LTC -> ERC20 DUE TO BYTE SIZE ERROR */
+      || ( (this.selectedSourceAsset.chain === 'BTC' || this.selectedSourceAsset.chain === 'LTC')
+        && (this.selectedTargetAsset.chain === 'ETH' && this.selectedTargetAsset.symbol !== 'ETH') );
   }
 
   mainButtonText(): string {
@@ -356,6 +360,12 @@ export class SwapComponent implements OnInit, OnDestroy {
     /** No target asset selected */
     if (!this.selectedTargetAsset) {
       return 'Select a token';
+    }
+
+    /** TEMPORARILY RESTRICT BTC/LTC -> ERC20 DUE TO BYTE SIZE ERROR */
+    if ( (this.selectedSourceAsset.chain === 'BTC' || this.selectedSourceAsset.chain === 'LTC')
+      && (this.selectedTargetAsset.chain === 'ETH' && this.selectedTargetAsset.symbol !== 'ETH') ) {
+      return `${this.selectedSourceAsset.chain} -> ERC20 Temporarily Suspended`;
     }
 
     /** No source amount set */
