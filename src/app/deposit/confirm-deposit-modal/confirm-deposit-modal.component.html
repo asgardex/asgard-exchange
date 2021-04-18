@@ -128,7 +128,8 @@
     [runeAmount]="data.runeAmount"
     [user]="data.user"
     [errorMessage]="error"
-    (retrySuccess)="runeDepositSuccess($event)">
+    (retrySuccess)="runeDepositSuccess($event)"
+    (withdrawSuccess)="withdrawSuccess($event)">
   </app-retry-rune-deposit>
 
 </div>

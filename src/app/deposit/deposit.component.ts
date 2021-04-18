@@ -255,7 +255,8 @@ export class DepositComponent implements OnInit, OnDestroy {
     || this.ethContractApprovalRequired
     || (this.assetAmount <= this.userService.minimumSpendable(this.asset))
     || (this.balances
-      && (this.runeAmount > this.runeBalance || this.assetAmount > this.userService.maximumSpendableBalance(this.asset, this.assetBalance))
+      // && (this.runeAmount > this.runeBalance || this.assetAmount > this.userService.maximumSpendableBalance(this.asset, this.assetBalance))
+      && ((this.runeBalance - this.runeAmount < 2) || this.assetAmount > this.userService.maximumSpendableBalance(this.asset, this.assetBalance))
     );
   }
 
@@ -281,8 +282,12 @@ export class DepositComponent implements OnInit, OnDestroy {
       return 'Enter an amount';
     }
 
-    /** RUNE amount exceeds RUNE balance */
-    if (this.runeAmount > this.runeBalance) {
+    /** RUNE amount exceeds RUNE balance. Leave 2 RUNE in balance */
+    // if (this.runeAmount > this.runeBalance ) {
+    //   return 'Insufficient balance';
+    // }
+    /** RUNE amount exceeds RUNE balance. Leave 2 RUNE in balance */
+    if (this.runeBalance - this.runeAmount < 2) {
       return 'Insufficient balance';
     }
 

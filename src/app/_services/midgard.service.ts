@@ -16,6 +16,12 @@ export interface MimirResponse {
   [key: string]: number;
 }
 
+export interface ThornodeTx {
+  observed_tx: {
+    status: string;
+  }
+}
+
 export interface ThorchainQueue {
   swap: number;
   outbound: number;
@@ -81,6 +87,10 @@ export class MidgardService {
   getTransaction(txId: string): Observable<TransactionDTO> {
     const params = new HttpParams().set('offset', '0').set('limit', '1').set('txid', txId);
     return this.http.get<TransactionDTO>(`${this.v2BasePath}/actions`, {params});
+  }
+
+  getThornodeTransaction(hash: string): Observable<ThornodeTx> {
+    return this.http.get<ThornodeTx>(`${this._thornodeBasePath}/thorchain/tx/${hash}`);
   }
 
   getQueue(): Observable<ThorchainQueue> {

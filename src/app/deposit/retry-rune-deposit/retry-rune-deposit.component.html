@@ -64,5 +64,5 @@
 
 <app-transaction-processing-modal
   *ngIf="loading"
-  transactionDetail="Resubmitting RUNE Deposit">
+  [transactionDetail]="processingMessage">
 </app-transaction-processing-modal>

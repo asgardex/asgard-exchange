@@ -19,16 +19,20 @@ export class RetryRuneDepositComponent implements OnInit, OnDestroy {
   @Input() user: User;
   @Input() errorMessage: string;
   @Output() retrySuccess: EventEmitter<string>;
+  @Output() withdrawSuccess: EventEmitter<string>;
 
   rune: Asset;
   loading: boolean;
   runeBalance: number;
   resubmitError: string;
   subs: Subscription[];
+  processingMessage: string;
 
   constructor(private userService: UserService) {
     this.rune = new Asset('THOR.RUNE');
     this.retrySuccess = new EventEmitter<string>();
+    this.withdrawSuccess = new EventEmitter<string>();
+    this.processingMessage = '';
 
     const balances$ = this.userService.userBalances$.subscribe(
       (balances) => this.runeBalance = this.userService.findBalance(
@@ -46,6 +50,7 @@ export class RetryRuneDepositComponent implements OnInit, OnDestroy {
 
   async resubmitRuneDeposit() {
 
+    this.processingMessage = 'Resubmitting RUNE Deposit';
     this.loading = true;
     this.resubmitError = null;
 
@@ -80,6 +85,7 @@ export class RetryRuneDepositComponent implements OnInit, OnDestroy {
   }
 
   async withdrawPendingDeposit() {
+    this.processingMessage = `Withdrawing ${this.asset.ticker}`;
     this.loading = true;
 
     const thorClient = this.user.clients.thorchain;
@@ -100,7 +106,7 @@ export class RetryRuneDepositComponent implements OnInit, OnDestroy {
         memo,
       });
 
-      this.retrySuccess.next(hash);
+      this.withdrawSuccess.next(hash);
 
     } catch (error) {
       console.error('error retrying RUNE transfer: ', error);

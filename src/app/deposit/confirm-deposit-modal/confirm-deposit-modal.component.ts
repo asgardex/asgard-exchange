@@ -207,6 +207,12 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
 
     console.log('pending hash is: ', hash);
 
+    // testing
+    this.txState = 'RETRY_RUNE_DEPOSIT';
+    this.error = 'RUNE didnt go through';
+    return;
+
+
     // deposit RUNE
     try {
       const runeHash = await this.keystoreDepositService.runeDeposit({
@@ -235,6 +241,21 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
       action: TxActions.DEPOSIT,
       symbol: this.data.asset.symbol,
       isThorchainTx: true
+    });
+    this.txState = TransactionConfirmationState.SUCCESS;
+  }
+
+  withdrawSuccess(hash: string) {
+    this.hash = hash;
+    this.txStatusService.addTransaction({
+      chain: 'THOR',
+      hash,
+      ticker: `${this.data.asset.ticker}-RUNE`,
+      status: TxStatus.PENDING,
+      action: TxActions.WITHDRAW,
+      symbol: this.data.asset.symbol,
+      isThorchainTx: true,
+      pollThornodeDirectly: true
     });
     this.txState = TransactionConfirmationState.SUCCESS;
   }

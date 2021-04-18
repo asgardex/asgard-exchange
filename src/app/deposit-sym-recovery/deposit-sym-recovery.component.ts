@@ -460,7 +460,8 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
         symbol: this.searchingAsset.symbol,
         status: TxStatus.PENDING,
         action: TxActions.WITHDRAW,
-        isThorchainTx: true
+        isThorchainTx: true,
+        pollThornodeDirectly: true
       });
     } catch (error) {
       console.error('error making RUNE withdraw: ', error);
