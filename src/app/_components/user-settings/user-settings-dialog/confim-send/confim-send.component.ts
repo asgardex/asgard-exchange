@@ -126,7 +126,7 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
 
           // find recipient pool
       const matchingAddress = inboundAddresses.find( (pool) => pool.chain === this.asset.asset.chain );
-      if (!matchingAddress) {
+      if (!matchingAddress && (this.asset.asset.chain !== 'THOR' && this.asset.asset.symbol !== 'RUNE')) {
         console.error('no recipient pool found');
         return;
       }
