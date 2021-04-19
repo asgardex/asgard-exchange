@@ -22,12 +22,15 @@
       <input [(ngModel)]="recipientAddress" name="recipient-address" placeholder="Enter Recipient {{asset.asset.ticker}} Address" autocomplete="off" />
     </div>
 
-    <div class="flex justify-end items-center" style="height: 38px">
-      <div>
-        <button mat-flat-button color="accent" [disabled]="!amountSpendable || recipientAddress.length < 12 || amount <= 0" (click)="confirmSend.next({amount: amount, recipientAddress: recipientAddress})">
-          <span>Next</span>
-        </button>
-      </div>
+    <div class="flex justify-end items-center">
+      <button
+        (click)="confirmSend.next({amount: amount, recipientAddress: recipientAddress})"
+        class="main-action-btn w-full"
+        mat-flat-button
+        color="primary"
+        [disabled]="nextDisabled()">
+        {{mainButtonText()}}
+      </button>
     </div>
 
   </div>
