@@ -19,7 +19,7 @@ export interface MimirResponse {
 export interface ThornodeTx {
   observed_tx: {
     status: string;
-  }
+  };
 }
 
 export interface ThorchainQueue {
@@ -102,7 +102,9 @@ export class MidgardService {
   }
 
   getThorchainLiquidityProviders(asset: string): Observable<LiquidityProvider[]> {
-    return this.http.get<LiquidityProvider[]>(`${this._thornodeBasePath}/thorchain/pool/${asset}/liquidity_providers`);
+    return this.http.get<LiquidityProvider[]>(
+      `${this._thornodeBasePath}/thorchain/pool/${asset}/liquidity_providers`
+    );
   }
 
 }
