@@ -3,12 +3,6 @@ import { Subscription } from 'rxjs';
 import { AssetAndBalance } from 'src/app/_classes/asset-and-balance';
 import { User } from 'src/app/_classes/user';
 import { UserService } from 'src/app/_services/user.service';
-import { Client as BinanceClient, } from '@xchainjs/xchain-binance';
-import { Client as BitcoinClient, } from '@xchainjs/xchain-bitcoin';
-import { Client as ThorchainClient, } from '@xchainjs/xchain-thorchain';
-import { Client as EthereumClient } from '@xchainjs/xchain-ethereum/lib';
-import { Client as LitecoinClient } from '@xchainjs/xchain-litecoin';
-import { Client as BitcoinCashClient } from '@xchainjs/xchain-bitcoincash';
 
 @Component({
   selector: 'app-send-asset',
@@ -34,7 +28,6 @@ export class SendAssetComponent implements OnInit, OnDestroy {
   amountSpendable: boolean;
   user: User;
   subs: Subscription[];
-  client: BinanceClient | BitcoinClient | ThorchainClient | EthereumClient | LitecoinClient | BitcoinCashClient;
 
   constructor(private userService: UserService) {
     this.recipientAddress = '';
@@ -56,19 +49,6 @@ export class SendAssetComponent implements OnInit, OnDestroy {
       const user$ = this.userService.user$.subscribe(
         (user) => {
           this.user = user;
-
-          if (this.asset) {
-            switch (this.asset.asset.chain) {
-              case 'BTC':
-                this.client = user.clients.bitcoin
-                break;
-
-              default:
-                break;
-            }
-          }
-
-
         }
       );
 
