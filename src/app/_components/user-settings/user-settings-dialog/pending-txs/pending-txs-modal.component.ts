@@ -3,6 +3,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 import { ExplorerPathsService } from 'src/app/_services/explorer-paths.service';
 import { TransactionStatusService, Tx } from 'src/app/_services/transaction-status.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-pending-txs-modal',
@@ -76,7 +77,17 @@ export class PendingTxsModalComponent implements OnInit, OnDestroy {
 
   explorerPath(tx: Tx): string {
     if (tx.isThorchainTx) {
-      return this.thorchainExplorerUrl + '/' + tx.hash;
+
+      if (tx.pollThornodeDirectly) {
+        let path = `https://viewblock.io/thorchain/tx/${tx.hash}`;
+        if (environment.network === 'testnet') {
+          path += '?network=testnet';
+        }
+        return path;
+      } else {
+        return this.thorchainExplorerUrl + '/' + tx.hash;
+      }
+
     } else if (tx.chain === 'ETH') {
       return `${this.ethereumExplorerUrl}/0x${tx.hash}`;
     } else {

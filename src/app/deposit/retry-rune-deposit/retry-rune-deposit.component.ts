@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Router } from '@angular/router';
 import { assetAmount, assetToBase } from '@xchainjs/xchain-util';
 import { Subscription } from 'rxjs';
 
@@ -20,6 +21,7 @@ export class RetryRuneDepositComponent implements OnInit, OnDestroy {
   @Input() errorMessage: string;
   @Output() retrySuccess: EventEmitter<string>;
   @Output() withdrawSuccess: EventEmitter<string>;
+  @Output() closeModal: EventEmitter<null>;
 
   rune: Asset;
   loading: boolean;
@@ -27,12 +29,15 @@ export class RetryRuneDepositComponent implements OnInit, OnDestroy {
   resubmitError: string;
   subs: Subscription[];
   processingMessage: string;
+  retryCount: number;
 
-  constructor(private userService: UserService) {
+  constructor(private userService: UserService, private router: Router) {
     this.rune = new Asset('THOR.RUNE');
     this.retrySuccess = new EventEmitter<string>();
     this.withdrawSuccess = new EventEmitter<string>();
+    this.closeModal = new EventEmitter<null>();
     this.processingMessage = '';
+    this.retryCount = 0;
 
     const balances$ = this.userService.userBalances$.subscribe(
       (balances) => this.runeBalance = this.userService.findBalance(
@@ -57,6 +62,7 @@ export class RetryRuneDepositComponent implements OnInit, OnDestroy {
     // deposit RUNE
     try {
 
+      this.retryCount++;
       const thorClient = this.user.clients.thorchain;
 
       // get token address
@@ -84,35 +90,11 @@ export class RetryRuneDepositComponent implements OnInit, OnDestroy {
 
   }
 
-  async withdrawPendingDeposit() {
-    this.processingMessage = `Withdrawing ${this.asset.ticker}`;
-    this.loading = true;
-
-    const thorClient = this.user.clients.thorchain;
-    if (!thorClient) {
-      console.error('no thor client found!');
-      return;
-    }
-
-    const txCost = assetToBase(assetAmount(0.00000001));
-
-    // unstake 100%
-    const memo = `WITHDRAW:${this.asset.chain}.${this.asset.symbol}:100`;
-
-    // withdraw RUNE
-    try {
-      const hash = await thorClient.deposit({
-        amount: txCost,
-        memo,
-      });
-
-      this.withdrawSuccess.next(hash);
-
-    } catch (error) {
-      console.error('error retrying RUNE transfer: ', error);
-      this.resubmitError = error;
-    }
+  navigateDepositSymRecovery() {
+    this.router.navigate(['/', 'deposit-sym-recovery']);
+    this.closeModal.emit();
   }
+
 
   ngOnDestroy() {
     for (const sub of this.subs) {

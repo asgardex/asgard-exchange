@@ -207,12 +207,6 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
 
     console.log('pending hash is: ', hash);
 
-    // testing
-    this.txState = 'RETRY_RUNE_DEPOSIT';
-    this.error = 'RUNE didnt go through';
-    return;
-
-
     // deposit RUNE
     try {
       const runeHash = await this.keystoreDepositService.runeDeposit({

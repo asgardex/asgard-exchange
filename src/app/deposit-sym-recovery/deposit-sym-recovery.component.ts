@@ -3,7 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { getValueOfAssetInRune } from '@thorchain/asgardex-util';
 import { Balances } from '@xchainjs/xchain-client';
-import { assetAmount, assetToBase, assetToString, BaseAmount, baseAmount } from '@xchainjs/xchain-util';
+import { assetAmount, assetToBase, assetToString, BaseAmount, baseAmount, bn } from '@xchainjs/xchain-util';
 import { combineLatest, Subscription } from 'rxjs';
 import { Asset, isNonNativeRuneToken } from '../_classes/asset';
 import { AssetAndBalance } from '../_classes/asset-and-balance';
@@ -45,6 +45,7 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
   outboundQueue: number;
   depositsDisabled: boolean;
   runeBalance: number;
+  outboundTransactionFee: number;
 
   constructor(
     private router: Router,
@@ -84,6 +85,16 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.getPools();
     this.getPoolCap();
+    this.getConstants();
+  }
+
+  getConstants() {
+    this.midgardService.getConstants().subscribe(
+      (res) => {
+        this.outboundTransactionFee = bn(res.int_64_values.OutboundTransactionFee).div(10 ** 8).toNumber();
+      },
+      (err) => console.error('error fetching constants: ', err)
+    );
   }
 
 

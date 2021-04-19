@@ -2,7 +2,7 @@
 
   <app-section-head sectionTitle="Sym Deposit Recovery" [displayBackBtn]="true" (back)="back()"></app-section-head>
 
-  <span class="text-sm mb-4">This page is for adding RUNE to complete a symmetrical deposit. It is used when your original token was deposited, but the RUNE transaction failed, so THORChain is not listing you as a member of the pool.</span>
+  <span class="text-sm mb-4">This page is for adding RUNE to complete a symmetrical deposit. It is used when your original token was deposited, but the RUNE transaction failed, so THORChain is not listing you as a member of the pool. <b>It can take time for your transaction to show up as a pending deposit.</b></span>
 
   <div *ngIf="user">
 
@@ -40,10 +40,16 @@
 
         </div>
 
-        <div class="flex justify-between swap-details">
+        <!-- <div class="flex justify-between swap-details">
           <span class="tx-detail-label"></span>
           <span *ngIf="networkFee">{{networkFee | number:"1.0-8"}} {{missingAsset.ticker}}.{{missingAsset.chain}} Network Fee</span>
           <span *ngIf="!networkFee">-</span>
+        </div> -->
+
+        <div class="flex justify-between swap-details">
+          <span class="tx-detail-label"></span>
+          <span *ngIf="outboundTransactionFee">{{outboundTransactionFee | number:"1.0-8"}} THOR.RUNE Network Fee</span>
+          <span *ngIf="!outboundTransactionFee">-</span>
         </div>
 
       </div>
@@ -61,16 +67,17 @@
 
       <div *ngIf="outboundQueue < 12" class="flex">
 
-        <div class="w-1/2 mr-2">
+        <div class="w-full">
           <button *ngIf="searchingAsset && missingAsset" class="main-action-btn w-full" (click)="withdrawPendingDeposit()" mat-flat-button [disabled]="runeBalance < 0.2">
             <span *ngIf="runeBalance >= 0.2">Withdraw All</span>
             <span *ngIf="runeBalance < 0.2">Insufficient RUNE</span>
           </button>
         </div>
 
-        <button *ngIf="searchingAsset && missingAsset" class="main-action-btn w-1/2" (click)="submitDeposit()" mat-flat-button [disabled]="submitDisabled()">
+        <!-- only allow WITHDRAW for now -->
+        <!-- <button *ngIf="searchingAsset && missingAsset" class="main-action-btn w-1/2" (click)="submitDeposit()" mat-flat-button [disabled]="submitDisabled()">
           {{mainButtonText()}}
-        </button>
+        </button> -->
 
       </div>
 

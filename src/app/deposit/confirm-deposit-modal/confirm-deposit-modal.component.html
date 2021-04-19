@@ -129,7 +129,8 @@
     [user]="data.user"
     [errorMessage]="error"
     (retrySuccess)="runeDepositSuccess($event)"
-    (withdrawSuccess)="withdrawSuccess($event)">
+    (withdrawSuccess)="withdrawSuccess($event)"
+    (closeModal)="closeDialog()">
   </app-retry-rune-deposit>
 
 </div>
