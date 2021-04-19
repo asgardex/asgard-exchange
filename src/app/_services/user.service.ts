@@ -374,6 +374,31 @@ export class UserService {
     }
   }
 
+  getChainClient(user: User, chain: Chain) {
+    switch (chain) {
+      case 'BTC':
+        return user.clients.bitcoin;
+
+      case 'ETH':
+        return user.clients.ethereum;
+
+      case 'BNB':
+        return user.clients.binance;
+
+      case 'BCH':
+        return user.clients.bitcoinCash;
+
+      case 'LTC':
+        return user.clients.litecoin;
+
+      case 'THOR':
+        return user.clients.thorchain;
+    }
+
+    throw new Error(`no matching client for chain: ${chain}`);
+
+  }
+
 
 }
 
