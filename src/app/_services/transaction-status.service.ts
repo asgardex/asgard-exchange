@@ -238,28 +238,6 @@ export class TransactionStatusService {
         console.log('res');
       }
 
-      // if (res.count > 0) {
-      //   for (const resTx of res.actions) {
-
-      //     if (resTx.in[0].txID.toUpperCase() === hash.toUpperCase() && resTx.status.toUpperCase() === 'SUCCESS') {
-
-      //       if (resTx.status.toUpperCase() === 'REFUND') {
-      //         this.updateTxStatus(hash, TxStatus.REFUNDED);
-      //       } else {
-      //         this.updateTxStatus(hash, TxStatus.COMPLETE);
-      //       }
-
-      //       this.userService.fetchBalances();
-      //       this.killTxPolling[hash].next();
-      //     } else {
-      //       console.log('still pending...');
-      //       console.log('resTx.in[0].txID.toUpperCase() is ', resTx.in[0].txID.toUpperCase());
-      //       console.log('tx.hash.toUpperCase() is: ', hash.toUpperCase());
-      //       console.log('resTx.status.toUpperCase() is: ', resTx.status.toUpperCase());
-      //     }
-      //   }
-      // }
-
     });
   }
 
