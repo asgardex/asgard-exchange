@@ -580,7 +580,7 @@ export class SwapComponent implements OnInit, OnDestroy {
 
       /** Network Fee */
       // const networkFee = this.calculateNetworkFee(this.selectedTargetAsset, poolDetail);
-      const networkFee = this.txUtilsService.calculateNetworkFee(
+      const nonRuneNetworkFee = this.txUtilsService.calculateNetworkFee(
         (toRune)
           ? this.selectedSourceAsset
           : this.selectedTargetAsset,
@@ -591,9 +591,9 @@ export class SwapComponent implements OnInit, OnDestroy {
       const runeFee = this.outboundTransactionFee ?? 0.2;
 
       if (toRune) {
-        this.inputNetworkFee = networkFee;
+        this.inputNetworkFee = nonRuneNetworkFee;
       } else {
-        this.outputNetworkFee = networkFee;
+        this.outputNetworkFee = nonRuneNetworkFee;
         this.inputNetworkFee = runeFee;
       }
 
@@ -607,11 +607,20 @@ export class SwapComponent implements OnInit, OnDestroy {
             ? valueOfRuneInAsset.amount().multipliedBy(this.outboundTransactionFee ?? 0.2)
             : assetToBase(assetAmount(this.outboundTransactionFee ?? 0.2)).amount()
           )
+        // if TO RUNE, subtract network fee from source nonRune asset
+        .minus(
+          toRune
+            ? assetToBase(assetAmount(nonRuneNetworkFee)).amount()
+            : 0
+        )
         ), pool, toRune);
 
-      /** subtract non-rune network fee */
-      totalAmount = baseAmount(totalAmount.amount().minus(
-        assetToBase(assetAmount(networkFee)).amount()));
+
+      // otherwise, subtract the network fee from the nonRune target asset output
+      if (!toRune) {
+        totalAmount = baseAmount(totalAmount.amount().minus(
+          assetToBase(assetAmount(nonRuneNetworkFee)).amount()));
+      }
 
       if (this.sourceAssetUnit) {
         this.targetAssetUnit = (totalAmount.amount().isLessThan(0)) ? bn(0) : totalAmount.amount();
