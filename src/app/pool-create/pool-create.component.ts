@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { combineLatest, Subscription } from 'rxjs';
 import { CGCoinListItem, CoinGeckoService } from '../_services/coin-gecko.service';
 import { MidgardService } from '../_services/midgard.service';
 import { Asset, isNonNativeRuneToken } from '../_classes/asset';
@@ -90,6 +90,7 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
   ethRouter: string;
   ethContractApprovalRequired: boolean;
   user: User;
+  depositsDisabled: boolean;
 
   constructor(
     private dialog: MatDialog,
@@ -100,6 +101,7 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
     private userService: UserService,
   ) {
     this.rune = new Asset(`THOR.RUNE`);
+    this.depositsDisabled = false;
 
     const balances$ = this.userService.userBalances$.subscribe(
       (balances) => {
@@ -159,9 +161,28 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
     });
 
     this.getCoinGeckoCoinList();
+    this.getPoolCap();
 
     this.subs.push(params$);
 
+  }
+
+  getPoolCap() {
+    const mimir$ = this.midgardService.getMimir();
+    const network$ = this.midgardService.getNetwork();
+    const combined = combineLatest([mimir$, network$]);
+    const sub = combined.subscribe( ([mimir, network]) => {
+
+      const totalPooledRune = +network.totalPooledRune / (10 ** 8);
+
+      if (mimir && mimir['mimir//MAXLIQUIDITYRUNE']) {
+        const maxLiquidityRune = mimir['mimir//MAXLIQUIDITYRUNE'] / (10 ** 8);
+        this.depositsDisabled = (totalPooledRune / maxLiquidityRune >= .9);
+      }
+
+    });
+
+    this.subs.push(sub);
   }
 
   getEthRouter() {
@@ -182,9 +203,9 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
         this.pools = poolNames;
 
         /** MCCN TESTING */
-        // if (this.pools.includes(currentPool)) {
-        //   this.router.navigate(['/', 'deposit', currentPool]);
-        // }
+        if (this.pools.includes(currentPool)) {
+          this.router.navigate(['/', 'deposit', currentPool]);
+        }
 
         this.checkCreateableMarkets();
       }
@@ -247,6 +268,7 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
 
     return !this.balances || !this.runeAmount || !this.assetAmount
     || this.insufficientBnb || this.runeAmount < 1000 || this.ethContractApprovalRequired
+    || this.depositsDisabled
     || (this.balances
       && (this.runeAmount > this.runeBalance || this.assetAmount > this.userService.maximumSpendableBalance(this.asset, this.assetBalance))
     );
@@ -257,7 +279,11 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
 
     if (!this.balances) {
       return 'Please connect wallet';
-    } else if (this.ethContractApprovalRequired) {
+    }
+    else if (this.depositsDisabled) {
+      return 'Pool Cap > 90%';
+    }
+    else if (this.ethContractApprovalRequired) {
       return 'Create Pool';
     } else if (this.balances && (!this.runeAmount || !this.assetAmount)) {
       return 'Enter an amount';
@@ -287,13 +313,9 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
       this.selectableMarkets = this.balances.filter( (balance) => {
         const asset = balance.asset;
 
-        /** MCCN TESTING */
-        // return !this.pools.find((pool) => pool === `${asset.chain}.${asset.symbol}`)
-        //   && !isNonNativeRuneToken(asset)
-        //   && asset.chain !== 'THOR';
-        return !isNonNativeRuneToken(asset)
+        return !this.pools.find((pool) => pool === `${asset.chain}.${asset.symbol}`)
+          && !isNonNativeRuneToken(asset)
           && asset.chain !== 'THOR';
-
 
       }).map( (balance) => {
         return {asset: new Asset(`${balance.asset.chain}.${balance.asset.symbol}`)};
