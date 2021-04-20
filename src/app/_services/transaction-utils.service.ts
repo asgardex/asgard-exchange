@@ -59,7 +59,7 @@ export class TransactionUtilsService {
           else {
             const ethGasVal = (70000 * (+matchingInboundAddress.gas_rate) * (10 ** 9) * 3)  / (10 ** 18);
             const tokenEthValue = (+assetPool.assetPriceUSD) / (+this._ethPool.assetPriceUSD);
-            return ethGasVal / tokenEthValue;
+            return ethGasVal * tokenEthValue;
           }
 
         case 'BNB':
