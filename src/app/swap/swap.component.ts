@@ -337,6 +337,7 @@ export class SwapComponent implements OnInit, OnDestroy {
       || (this.queue && this.queue.outbound >= 12)
       || (this.slip * 100) > this.slippageTolerance
       || (this.selectedSourceAsset.chain === 'BNB' && this.insufficientBnb) // source is BNB and not enough funds to cover fee
+      || (this.selectedSourceAsset.chain === 'THOR') && (this.sourceBalance - this.sourceAssetUnit < 3)
 
       /** TEMPORARILY RESTRICT BTC/LTC -> ERC20 DUE TO BYTE SIZE ERROR */
       || ( (this.selectedSourceAsset.chain === 'BTC' || this.selectedSourceAsset.chain === 'LTC')
@@ -364,6 +365,10 @@ export class SwapComponent implements OnInit, OnDestroy {
     if ( (this.selectedSourceAsset.chain === 'BTC' || this.selectedSourceAsset.chain === 'LTC')
       && (this.selectedTargetAsset.chain === 'ETH' && this.selectedTargetAsset.symbol !== 'ETH') ) {
       return `${this.selectedSourceAsset.chain} -> ERC20 Temporarily Suspended`;
+    }
+
+    if ( (this.selectedSourceAsset.chain === 'THOR') && (this.sourceBalance - this.sourceAssetUnit < 3) ) {
+      return 'Min 3 RUNE in Wallet Required';
     }
 
     /** No source amount set */
