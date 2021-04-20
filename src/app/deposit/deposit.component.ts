@@ -314,7 +314,7 @@ export class DepositComponent implements OnInit, OnDestroy {
     // }
     /** RUNE amount exceeds RUNE balance. Leave 3 RUNE in balance */
     if (this.runeBalance - this.runeAmount < 3) {
-      return 'Insufficient balance';
+      return 'Min 3 RUNE in Wallet Required';
     }
 
     /** ETH tx amount is higher than spendable amount */
