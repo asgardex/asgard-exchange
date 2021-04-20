@@ -256,6 +256,10 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
       return true;
     }
 
+    if (this.runeBalance < 3) {
+      return true;
+    }
+
     if ( (this.missingAsset.chain === 'BNB') && this.userService.findBalance(this.balances, new Asset('BNB.BNB')) < 0.000375 ) {
       return true;
     }
@@ -301,6 +305,10 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
 
     if (!this.missingAssetBalance) {
       return 'Insufficient Balance';
+    }
+
+    if (this.runeBalance < 3) {
+      return 'Min 3 RUNE in Wallet Required';
     }
 
     if ( (this.missingAsset.chain === 'BNB') && this.userService.findBalance(this.balances, new Asset('BNB.BNB')) < 0.000375 ) {
