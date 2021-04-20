@@ -601,14 +601,17 @@ export class SwapComponent implements OnInit, OnDestroy {
        * Total output amount in target units minus 1 RUNE
        */
       // const totalAmount = getSwapOutput(baseAmount(this._sourceAssetTokenValue.amount()), pool, toRune);
-      const totalAmount = getSwapOutput(baseAmount(this._sourceAssetTokenValue.amount()
+      let totalAmount = getSwapOutput(baseAmount(this._sourceAssetTokenValue.amount()
         .minus( // subtract RUNE network fee
           toRune
             ? valueOfRuneInAsset.amount().multipliedBy(this.outboundTransactionFee ?? 0.2)
             : assetToBase(assetAmount(this.outboundTransactionFee ?? 0.2)).amount()
-          ).minus(
-            assetToBase(assetAmount(networkFee)).amount())
+          )
         ), pool, toRune);
+
+        /** subtract non-rune network fee */
+        totalAmount = baseAmount(totalAmount.amount().minus(
+          assetToBase(assetAmount(networkFee)).amount()));
 
       if (this.sourceAssetUnit) {
         this.targetAssetUnit = (totalAmount.amount().isLessThan(0)) ? bn(0) : totalAmount.amount();
