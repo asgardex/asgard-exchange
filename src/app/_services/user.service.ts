@@ -74,13 +74,15 @@ export class UserService {
     this._chainBalanceErrors = [];
     this.chainBalanceErrorsSource.next([]);
 
-    for (const [key, _value] of Object.entries(this._user.clients)) {
-      if (key === 'binance') {
-        this.getBinanceBalances();
-      } else if (key === 'ethereum') {
-        this.getEthereumBalances();
-      } else {
-        this.getGeneralBalance(key);
+    if (this._user && this._user.clients) {
+      for (const [key, _value] of Object.entries(this._user.clients)) {
+        if (key === 'binance') {
+          this.getBinanceBalances();
+        } else if (key === 'ethereum') {
+          this.getEthereumBalances();
+        } else {
+          this.getGeneralBalance(key);
+        }
       }
     }
 
@@ -246,7 +248,7 @@ export class UserService {
       const max = balance - 0.01 - 0.000375;
       return (max >= 0) ? max : 0;
     } else if (asset.chain === 'THOR' && asset.symbol === 'RUNE') {
-      const max = balance - 1;
+      const max = balance - 0.2;
       return (max >= 0) ? max : 0;
     } else {
       return balance;
@@ -335,22 +337,22 @@ export class UserService {
 
   }
 
-  async getTokenAddress(user: User, chain: Chain): Promise<string> {
+  getTokenAddress(user: User, chain: Chain): string {
 
     const clients: AvailableClients = user.clients;
 
     switch (chain) {
       case 'BNB':
         const bnbClient = clients.binance;
-        return await bnbClient.getAddress();
+        return bnbClient.getAddress();
 
       case 'BTC':
         const btcClient = clients.bitcoin;
-        return await btcClient.getAddress();
+        return btcClient.getAddress();
 
       case 'BCH':
         const bchClient = clients.bitcoinCash;
-        const address = await bchClient.getAddress();
+        const address = bchClient.getAddress();
 
         // bch testnet addresses look like bchtest:qpmhkjgp89d8uuyl3je5gw09kgsr5t4ndyj9mzvrcm
         // the colon interferes with the THORChain memo, and needs to be removed
@@ -358,15 +360,15 @@ export class UserService {
 
       case 'ETH':
         const ethClient = clients.ethereum;
-        return await ethClient.getAddress();
+        return ethClient.getAddress();
 
       case 'LTC':
         const litcoinClient = clients.litecoin;
-        return await litcoinClient.getAddress();
+        return litcoinClient.getAddress();
 
       case 'THOR':
         const thorClient = clients.thorchain;
-        return await thorClient.getAddress();
+        return thorClient.getAddress();
 
       default:
         console.error(`${chain} does not match getting token address`);
@@ -398,7 +400,6 @@ export class UserService {
     throw new Error(`no matching client for chain: ${chain}`);
 
   }
-
 
 }
 

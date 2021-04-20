@@ -1,0 +1,111 @@
+<div class="container">
+
+  <app-section-head sectionTitle="Sym Deposit Recovery" [displayBackBtn]="true" (back)="back()"></app-section-head>
+
+  <span class="text-sm mb-4">This page is for adding RUNE to complete a symmetrical deposit. It is used when your original token was deposited, but the RUNE transaction failed, so THORChain is not listing you as a member of the pool. <b>It can take time for your transaction to show up as a pending deposit.</b></span>
+
+  <div *ngIf="user">
+
+    <div *ngIf="txState == 'PENDING_CONFIRMATION'">
+
+      <div class="flex mb-2">
+        <button class="pool-list-item hover:border-white" (click)="selectPool()">
+
+          <div *ngIf="searchingAsset" class="flex justify-between items-center">
+
+            <app-icon-ticker [iconPath]="searchingAsset.iconPath" [ticker]="searchingAsset.ticker + ' Pool'"></app-icon-ticker>
+
+          </div>
+
+          <span *ngIf="!searchingAsset">Search Pool</span>
+
+        </button>
+      </div>
+
+      <div class="flex flex-col clear-both border-t border-gray-700" *ngIf="missingAsset">
+        <div class="mt-6 flex my-3 items-center">
+          <mat-icon class="mr-2">warning</mat-icon>
+          <span class="text-sm">We found a missing deposit</span>
+        </div>
+        <div class="flex justify-between items-center">
+
+          <app-asset-input
+            label="Missing Amount"
+            [(selectedAsset)]="missingAsset"
+            [(assetUnit)]="missingAssetAmount"
+            [balance]="missingAssetBalance"
+            [hideMax]="true"
+            [disabledMarketSelect]="true">
+          </app-asset-input>
+
+        </div>
+
+        <!-- <div class="flex justify-between swap-details">
+          <span class="tx-detail-label"></span>
+          <span *ngIf="networkFee">{{networkFee | number:"1.0-8"}} {{missingAsset.ticker}}.{{missingAsset.chain}} Network Fee</span>
+          <span *ngIf="!networkFee">-</span>
+        </div> -->
+
+        <div class="flex justify-between swap-details">
+          <span class="tx-detail-label"></span>
+          <span *ngIf="outboundTransactionFee">{{outboundTransactionFee | number:"1.0-8"}} THOR.RUNE Network Fee</span>
+          <span *ngIf="!outboundTransactionFee">-</span>
+        </div>
+
+      </div>
+
+      <div *ngIf="!missingAsset && searchingAsset">
+        <button class="main-action-btn w-full" mat-flat-button disabled>No Missing Deposit Found</button>
+      </div>
+
+      <div *ngIf="error">
+        <span class="text-sm mb-4">
+          An error occurred submitting your transaction. <br />
+          {{error}}
+        </span>
+      </div>
+
+      <div *ngIf="outboundQueue < 12" class="flex">
+
+        <div class="w-full">
+          <button *ngIf="searchingAsset && missingAsset" class="main-action-btn w-full" (click)="withdrawPendingDeposit()" mat-flat-button [disabled]="runeBalance < 0.2">
+            <span *ngIf="runeBalance >= 0.2">Withdraw All</span>
+            <span *ngIf="runeBalance < 0.2">Insufficient RUNE</span>
+          </button>
+        </div>
+
+        <!-- only allow WITHDRAW for now -->
+        <!-- <button *ngIf="searchingAsset && missingAsset" class="main-action-btn w-1/2" (click)="submitDeposit()" mat-flat-button [disabled]="submitDisabled()">
+          {{mainButtonText()}}
+        </button> -->
+
+      </div>
+
+      <div *ngIf="outboundQueue >= 12" class="flex">
+
+        <button class="main-action-btn w-full" mat-flat-button disabled>
+          THORChain Network Latency
+        </button>
+
+      </div>
+
+    </div>
+
+    <div *ngIf="txState == 'SUBMITTING'" class="flex justify-center items-center py-4">
+      <div>
+        <mat-progress-spinner mode="indeterminate" diameter="30"></mat-progress-spinner>
+      </div>
+    </div>
+
+    <div class="flex flex-col clear-both border-t border-gray-700" *ngIf="txState === 'SUCCESS'">
+      <span class="text-sm my-4">Resubmitting the deposit was a success. Please wait for the transaction to go through.</span>
+      <button class="main-action-btn w-full" (click)="back()" mat-flat-button>
+        Back To Pools
+      </button>
+    </div>
+
+  </div>
+
+  <button *ngIf="!user" class="main-action-btn" mat-flat-button disabled>Please Connect Wallet</button>
+
+</div>

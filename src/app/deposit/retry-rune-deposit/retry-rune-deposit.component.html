@@ -43,10 +43,16 @@
       </app-asset-input>
 
       <div class="clear-both">
-        <div mat-dialog-content class="confirm-modal-content">
-          <button *ngIf="!loading" (click)="resubmitRuneDeposit()" mat-flat-button color="primary" class="main-action-btn w-full">
-            <span>Resubmit RUNE Deposit</span>
+        <div mat-dialog-content class="confirm-modal-content flex">
+
+          <button *ngIf="!loading && retryCount < 3" (click)="resubmitRuneDeposit()" mat-flat-button color="primary" class="main-action-btn w-full">
+            <span>Resubmit RUNE</span>
           </button>
+
+          <button *ngIf="!loading && retryCount >= 3" (click)="navigateDepositSymRecovery()" mat-flat-button color="primary" class="main-action-btn w-full">
+            <span>Navigate Sym Deposit Recovery</span>
+          </button>
+
         </div>
       </div>
     </div>
@@ -56,5 +62,5 @@
 
 <app-transaction-processing-modal
   *ngIf="loading"
-  transactionDetail="Resubmitting RUNE Deposit">
+  [transactionDetail]="processingMessage">
 </app-transaction-processing-modal>

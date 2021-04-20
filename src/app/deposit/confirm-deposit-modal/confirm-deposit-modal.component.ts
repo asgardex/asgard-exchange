@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { assetAmount, assetToBase, assetToString, baseAmount } from '@xchainjs/xchain-util';
+import { assetAmount, assetToBase, assetToString } from '@xchainjs/xchain-util';
 import { Subscription } from 'rxjs';
 import { PoolAddressDTO } from 'src/app/_classes/pool-address';
 import { User } from 'src/app/_classes/user';
@@ -8,13 +8,11 @@ import { TransactionConfirmationState } from 'src/app/_const/transaction-confirm
 import { MidgardService } from 'src/app/_services/midgard.service';
 import { UserService } from 'src/app/_services/user.service';
 import { TransactionStatusService, TxActions, TxStatus } from 'src/app/_services/transaction-status.service';
-import { Client as BinanceClient } from '@xchainjs/xchain-binance';
-import { Client as BitcoinClient } from '@xchainjs/xchain-bitcoin';
-import { Client as EthereumClient, ETH_DECIMAL } from '@xchainjs/xchain-ethereum/lib';
-import { Client as LitecoinClient } from '@xchainjs/xchain-litecoin';
-import { Client as BchClient } from '@xchainjs/xchain-bitcoincash';
+import { ETH_DECIMAL } from '@xchainjs/xchain-ethereum/lib';
 import { EthUtilsService } from 'src/app/_services/eth-utils.service';
 import { Balances } from '@xchainjs/xchain-client';
+import { KeystoreDepositService } from 'src/app/_services/keystore-deposit.service';
+import { Asset } from 'src/app/_classes/asset';
 
 export interface ConfirmDepositData {
   asset;
@@ -51,6 +49,7 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
     private midgardService: MidgardService,
     private ethUtilsService: EthUtilsService,
     private userService: UserService,
+    private keystoreDepositService: KeystoreDepositService
   ) {
     this.loading = true;
     this.txState = TransactionConfirmationState.PENDING_CONFIRMATION;
@@ -113,7 +112,7 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
     let hash = '';
 
     // get token address
-    const address = await this.userService.getTokenAddress(this.data.user, this.data.asset.chain);
+    const address = this.userService.getTokenAddress(this.data.user, this.data.asset.chain);
     if (!address || address === '') {
       console.error('no address found');
       return;
@@ -132,28 +131,61 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
       // deposit using xchain
       switch (this.data.asset.chain) {
         case 'BNB':
-          const bnbClient = this.data.user.clients.binance;
-          hash = await this.binanceDeposit(bnbClient, thorchainAddress, recipientPool);
+          hash = await this.keystoreDepositService.binanceDeposit({
+            asset: this.data.asset as Asset,
+            inputAmount: this.data.assetAmount,
+            client: this.data.user.clients.binance,
+            thorchainAddress,
+            recipientPool
+          });
           break;
 
         case 'BTC':
-          const btcClient = this.data.user.clients.bitcoin;
-          hash = await this.bitcoinDeposit(btcClient, thorchainAddress, recipientPool);
+          hash = await this.keystoreDepositService.bitcoinDeposit({
+            asset: this.data.asset as Asset,
+            inputAmount: this.data.assetAmount,
+            client: this.data.user.clients.bitcoin,
+            balances: this.balances,
+            thorchainAddress,
+            recipientPool,
+            estimatedFee: this.data.estimatedFee
+          });
           break;
 
         case 'LTC':
-          const ltcClient = this.data.user.clients.litecoin;
-          hash = await this.litecoinDeposit(ltcClient, thorchainAddress, recipientPool);
+          hash = await this.keystoreDepositService.litecoinDeposit({
+            asset: this.data.asset as Asset,
+            inputAmount: this.data.assetAmount,
+            client: this.data.user.clients.litecoin,
+            balances: this.balances,
+            thorchainAddress,
+            recipientPool,
+            estimatedFee: this.data.estimatedFee
+          });
           break;
 
         case 'BCH':
-          const bchClient = this.data.user.clients.bitcoinCash;
-          hash = await this.bchDeposit(bchClient, thorchainAddress, recipientPool);
+          hash = await this.keystoreDepositService.bchDeposit({
+            asset: this.data.asset as Asset,
+            inputAmount: this.data.assetAmount,
+            client: this.data.user.clients.bitcoinCash,
+            balances: this.balances,
+            thorchainAddress,
+            recipientPool,
+            estimatedFee: this.data.estimatedFee
+          });
+
           break;
 
         case 'ETH':
-          const ethClient = this.data.user.clients.ethereum;
-          hash = await this.ethereumDeposit(ethClient, thorchainAddress, recipientPool);
+          hash = await this.keystoreDepositService.ethereumDeposit({
+            asset: this.data.asset as Asset,
+            inputAmount: this.data.assetAmount,
+            balances: this.balances,
+            client: this.data.user.clients.ethereum,
+            thorchainAddress,
+            recipientPool
+          });
           break;
 
         default:
@@ -173,13 +205,14 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
       return;
     }
 
+    console.log('pending hash is: ', hash);
+
     // deposit RUNE
     try {
-      const runeMemo = `+:${asset.chain}.${asset.symbol}:${address}`;
-
-      const runeHash = await thorClient.deposit({
-        amount: assetToBase(assetAmount(this.data.runeAmount)),
-        memo: runeMemo,
+      const runeHash = await this.keystoreDepositService.runeDeposit({
+        client: thorClient,
+        inputAmount: this.data.runeAmount,
+        memo: `+:${asset.chain}.${asset.symbol}:${address}`
       });
 
       this.runeDepositSuccess(runeHash);
@@ -206,189 +239,19 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
     this.txState = TransactionConfirmationState.SUCCESS;
   }
 
-  async ethereumDeposit(client: EthereumClient, thorchainAddress: string, recipientPool: PoolAddressDTO) {
-    try {
-      const asset = this.data.asset;
-      const targetTokenMemo = `+:${asset.chain}.${asset.symbol}:${thorchainAddress}`;
-
-      const decimal = await this.ethUtilsService.getAssetDecimal(this.data.asset, client);
-      let amount = assetToBase(assetAmount(this.data.assetAmount, decimal)).amount();
-
-      const balanceAmount = this.userService.findRawBalance(this.balances, this.data.asset);
-      // const balanceAmount = assetToBase(assetAmount(this.data.asset.balance.amount(), decimal)).amount();
-
-      if (amount.isGreaterThan(balanceAmount)) {
-        amount = balanceAmount;
-      }
-
-
-      const hash = await this.ethUtilsService.callDeposit({
-        inboundAddress: recipientPool,
-        asset,
-        memo: targetTokenMemo,
-        amount,
-        ethClient: client
-      });
-
-      return hash;
-    } catch (error) {
-      throw(error);
-    }
-  }
-
-  async binanceDeposit(client: BinanceClient, thorchainAddress: string, recipientPool: PoolAddressDTO): Promise<string> {
-    // deposit token
-    try {
-
-      const asset = this.data.asset;
-      const targetTokenMemo = `+:${asset.chain}.${asset.symbol}:${thorchainAddress}`;
-      const hash = await client.transfer({
-        asset: {
-          chain: asset.chain,
-          symbol: asset.symbol,
-          ticker: asset.ticker
-        },
-        amount: assetToBase(assetAmount(this.data.assetAmount)),
-        recipient: recipientPool.address,
-        memo: targetTokenMemo,
-      });
-
-      return hash;
-    } catch (error) {
-      throw(error);
-    }
-  }
-
-  async bitcoinDeposit(client: BitcoinClient, thorchainAddress: string, recipientPool: PoolAddressDTO): Promise<string> {
-    // deposit token
-    try {
-      const asset = this.data.asset;
-      const targetTokenMemo = `+:${asset.chain}.${asset.symbol}:${thorchainAddress}`;
-
-      // TODO -> consolidate this with BTC, BCH, LTC
-      const balanceAmount = this.userService.findRawBalance(this.balances, this.data.asset);
-      const toBase = assetToBase(assetAmount(this.data.assetAmount));
-      const feeToBase = assetToBase(assetAmount(this.data.estimatedFee));
-      const amount = (balanceAmount
-        // subtract fee
-        .minus(feeToBase.amount())
-        // subtract amount
-        .minus(toBase.amount())
-        .isGreaterThan(0))
-          ? toBase.amount() // send full amount, fee can be deducted from remaining balance
-          : toBase.amount().minus(feeToBase.amount()); // after deductions, not enough to process, subtract fee from amount
-
-      if (amount.isLessThan(0)) {
-        this.error = 'Insufficient funds. Try sending a smaller amount';
-        this.txState = TransactionConfirmationState.ERROR;
-        return;
-      }
-      // TODO -> consolidate this with BTC, BCH, LTC
-
-      const hash = await client.transfer({
-        asset: {
-          chain: this.data.asset.chain,
-          symbol: this.data.asset.symbol,
-          ticker: this.data.asset.ticker
-        },
-        amount: baseAmount(amount),
-        recipient: recipientPool.address,
-        memo: targetTokenMemo,
-        feeRate: +recipientPool.gas_rate
-      });
-
-      return hash;
-    } catch (error) {
-      throw(error);
-    }
-  }
-
-  async bchDeposit(client: BchClient, thorchainAddress: string, recipientPool: PoolAddressDTO): Promise<string> {
-    // deposit token
-    try {
-      const asset = this.data.asset;
-      const targetTokenMemo = `+:${asset.chain}.${asset.symbol}:${thorchainAddress}`;
-
-      // TODO -> consolidate this with BTC, BCH, LTC
-      const balanceAmount = this.userService.findRawBalance(this.balances, this.data.asset);
-      const toBase = assetToBase(assetAmount(this.data.assetAmount));
-      const feeToBase = assetToBase(assetAmount(this.data.estimatedFee));
-      const amount = (balanceAmount
-        // subtract fee
-        .minus(feeToBase.amount())
-        // subtract amount
-        .minus(toBase.amount())
-        .isGreaterThan(0))
-          ? toBase.amount() // send full amount, fee can be deducted from remaining balance
-          : toBase.amount().minus(feeToBase.amount()); // after deductions, not enough to process, subtract fee from amount
-
-      if (amount.isLessThan(0)) {
-        this.error = 'Insufficient funds. Try sending a smaller amount';
-        this.txState = TransactionConfirmationState.ERROR;
-        return;
-      }
-      // TODO -> consolidate this with BTC, BCH, LTC
-
-      const hash = await client.transfer({
-        asset: {
-          chain: this.data.asset.chain,
-          symbol: this.data.asset.symbol,
-          ticker: this.data.asset.ticker
-        },
-        amount: baseAmount(amount),
-        recipient: recipientPool.address,
-        memo: targetTokenMemo,
-        feeRate: +recipientPool.gas_rate
-      });
-
-      return hash;
-    } catch (error) {
-      throw(error);
-    }
-  }
-
-  async litecoinDeposit(client: LitecoinClient, thorchainAddress: string, recipientPool: PoolAddressDTO): Promise<string> {
-    // deposit token
-    try {
-      const asset = this.data.asset;
-      const targetTokenMemo = `+:${asset.chain}.${asset.symbol}:${thorchainAddress}`;
-
-      // TODO -> consolidate this with BTC, BCH, LTC
-      const balanceAmount = this.userService.findRawBalance(this.balances, this.data.asset);
-      const toBase = assetToBase(assetAmount(this.data.assetAmount));
-      const feeToBase = assetToBase(assetAmount(this.data.estimatedFee));
-      const amount = (balanceAmount
-        // subtract fee
-        .minus(feeToBase.amount())
-        // subtract amount
-        .minus(toBase.amount())
-        .isGreaterThan(0))
-          ? toBase.amount() // send full amount, fee can be deducted from remaining balance
-          : toBase.amount().minus(feeToBase.amount()); // after deductions, not enough to process, subtract fee from amount
-
-      if (amount.isLessThan(0)) {
-        this.error = 'Insufficient funds. Try sending a smaller amount';
-        this.txState = TransactionConfirmationState.ERROR;
-        return;
-      }
-      // TODO -> consolidate this with BTC, BCH, LTC
-
-      const hash = await client.transfer({
-        asset: {
-          chain: this.data.asset.chain,
-          symbol: this.data.asset.symbol,
-          ticker: this.data.asset.ticker
-        },
-        amount: baseAmount(amount),
-        recipient: recipientPool.address,
-        memo: targetTokenMemo,
-        feeRate: +recipientPool.gas_rate
-      });
-
-      return hash;
-    } catch (error) {
-      throw(error);
-    }
+  withdrawSuccess(hash: string) {
+    this.hash = hash;
+    this.txStatusService.addTransaction({
+      chain: 'THOR',
+      hash,
+      ticker: `${this.data.asset.ticker}-RUNE`,
+      status: TxStatus.PENDING,
+      action: TxActions.WITHDRAW,
+      symbol: this.data.asset.symbol,
+      isThorchainTx: true,
+      pollThornodeDirectly: true
+    });
+    this.txState = TransactionConfirmationState.SUCCESS;
   }
 
   async estimateEthGasPrice() {

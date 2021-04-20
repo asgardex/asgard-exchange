@@ -33,6 +33,7 @@ import { SlippageToleranceService } from '../_services/slippage-tolerance.servic
 import { PoolAddressDTO } from '../_classes/pool-address';
 import { ThorchainPricesService } from '../_services/thorchain-prices.service';
 import { TransactionUtilsService } from '../_services/transaction-utils.service';
+import { NetworkQueueService } from '../_services/network-queue.service';
 
 export enum SwapType {
   DOUBLE_SWAP = 'double_swap',
@@ -187,7 +188,8 @@ export class SwapComponent implements OnInit, OnDestroy {
     private binanceService: BinanceService,
     private slipLimitService: SlippageToleranceService,
     private thorchainPricesService: ThorchainPricesService,
-    private txUtilsService: TransactionUtilsService) {
+    private txUtilsService: TransactionUtilsService,
+    private networkQueueService: NetworkQueueService) {
 
     this.selectedSourceAsset = new Asset('THOR.RUNE');
     this.ethContractApprovalRequired = false;
@@ -218,11 +220,15 @@ export class SwapComponent implements OnInit, OnDestroy {
       }
     );
 
+    const queue$ = this.networkQueueService.networkQueue$.subscribe(
+      (queue) => this.queue = queue
+    );
+
     const slippageTolerange$ = this.slipLimitService.slippageTolerance$.subscribe(
       (limit) => this.slippageTolerance = limit
     );
 
-    this.subs = [balances$, user$, slippageTolerange$];
+    this.subs = [balances$, user$, slippageTolerange$, queue$];
 
   }
 
@@ -232,16 +238,8 @@ export class SwapComponent implements OnInit, OnDestroy {
     this.getPools();
     this.getEthRouter();
     this.getProxiedInboundAddresses();
-    this.getThorchainQueue();
   }
 
-  getThorchainQueue() {
-    this.midgardService.getQueue().subscribe(
-      (res) => {
-        this.queue = res;
-      }
-    );
-  }
 
   isRune(asset: Asset): boolean {
     return asset && asset.ticker === 'RUNE'; // covers BNB and native
@@ -581,6 +579,7 @@ export class SwapComponent implements OnInit, OnDestroy {
         (toRune)
           ? this.selectedSourceAsset
           : this.selectedTargetAsset,
+        this.inboundAddresses,
         poolDetail
       );
 
@@ -638,8 +637,8 @@ export class SwapComponent implements OnInit, OnDestroy {
         runeBalance: baseAmount(targetPool.runeDepth),
       };
 
-      this.inputNetworkFee = this.txUtilsService.calculateNetworkFee(this.selectedSourceAsset, sourcePool);
-      this.outputNetworkFee = this.txUtilsService.calculateNetworkFee(this.selectedTargetAsset, targetPool);
+      this.inputNetworkFee = this.txUtilsService.calculateNetworkFee(this.selectedSourceAsset, this.inboundAddresses, sourcePool);
+      this.outputNetworkFee = this.txUtilsService.calculateNetworkFee(this.selectedTargetAsset, this.inboundAddresses, targetPool);
 
       const basePrice = getDoubleSwapOutput(assetToBase(assetAmount(1)), pool2, pool1);
       this.basePrice = basePrice.amount().div(10 ** 8).toNumber();

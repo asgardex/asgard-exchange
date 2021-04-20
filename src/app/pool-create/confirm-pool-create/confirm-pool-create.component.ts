@@ -110,10 +110,10 @@ export class ConfirmPoolCreateComponent implements OnInit, OnDestroy {
     const clients = this.user.clients;
     const asset = this.data.asset;
     const thorClient = clients.thorchain;
-    const thorchainAddress = await thorClient.getAddress();
+    const thorchainAddress = thorClient.getAddress();
 
     // get token address
-    const address = await this.userService.getTokenAddress(this.user, this.data.asset.chain);
+    const address = this.userService.getTokenAddress(this.user, this.data.asset.chain);
     if (!address || address === '') {
       console.error('no address found');
       return;

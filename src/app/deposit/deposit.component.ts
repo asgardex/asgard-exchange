@@ -224,7 +224,9 @@ export class DepositComponent implements OnInit, OnDestroy {
     this.runeAmount = runeAmount.amount().isLessThan(0) ? 0 : runeAmount.amount().div(10 ** 8 ).toNumber();
   }
 
-  getPoolDetail(asset: string) {
+  async getPoolDetail(asset: string) {
+
+    const inboundAddresses = await this.midgardService.getInboundAddresses().toPromise();
 
     this.midgardService.getPool(asset).subscribe(
       (res) => {
@@ -234,7 +236,7 @@ export class DepositComponent implements OnInit, OnDestroy {
             runeBalance: baseAmount(res.runeDepth),
           };
 
-          this.networkFee = this.txUtilsService.calculateNetworkFee(this.asset, res);
+          this.networkFee = this.txUtilsService.calculateNetworkFee(this.asset, inboundAddresses, res);
 
         }
       },
@@ -273,7 +275,10 @@ export class DepositComponent implements OnInit, OnDestroy {
     || this.depositsDisabled
     || (this.assetAmount <= this.userService.minimumSpendable(this.asset))
     || (this.balances
-      && (this.runeAmount > this.runeBalance || this.assetAmount > this.userService.maximumSpendableBalance(this.asset, this.assetBalance))
+      // && (this.runeAmount > this.runeBalance
+      // || this.assetAmount > this.userService.maximumSpendableBalance(this.asset, this.assetBalance))
+      && ((this.runeBalance - this.runeAmount < 3)
+        || this.assetAmount > this.userService.maximumSpendableBalance(this.asset, this.assetBalance))
     );
   }
 
@@ -303,8 +308,12 @@ export class DepositComponent implements OnInit, OnDestroy {
       return 'Enter an amount';
     }
 
-    /** RUNE amount exceeds RUNE balance */
-    if (this.runeAmount > this.runeBalance) {
+    /** RUNE amount exceeds RUNE balance. Leave 2 RUNE in balance */
+    // if (this.runeAmount > this.runeBalance ) {
+    //   return 'Insufficient balance';
+    // }
+    /** RUNE amount exceeds RUNE balance. Leave 3 RUNE in balance */
+    if (this.runeBalance - this.runeAmount < 3) {
       return 'Insufficient balance';
     }
 

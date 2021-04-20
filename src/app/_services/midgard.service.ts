@@ -10,9 +10,16 @@ import { MemberDTO } from '../_classes/member';
 import { shareReplay } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { NetworkSummary } from '../_classes/network';
+import { LiquidityProvider } from '../_classes/liquidity-provider';
 
 export interface MimirResponse {
   [key: string]: number;
+}
+
+export interface ThornodeTx {
+  observed_tx: {
+    status: string;
+  };
 }
 
 export interface ThorchainQueue {
@@ -27,6 +34,7 @@ export interface ThorchainQueue {
 export class MidgardService {
 
   private v2BasePath: string;
+  private _thornodeBasePath: string;
   private _constants$: Observable<MidgardConstants>;
   private _mimir$: Observable<MimirResponse>;
 
@@ -35,13 +43,13 @@ export class MidgardService {
       ? 'https://testnet.midgard.thorchain.info/v2'
       : 'https://midgard.thorchain.info/v2';
 
-    const thornodeBaseUrl = environment.network === 'testnet'
+    this._thornodeBasePath = environment.network === 'testnet'
       ? 'https://testnet.thornode.thorchain.info'
       : 'https://thornode.thorchain.info';
 
     // cached since constants are constant
     this._constants$ = this.http.get<MidgardConstants>(`${this.v2BasePath}/thorchain/constants`).pipe(shareReplay());
-    this._mimir$ = this.http.get<MimirResponse>(`${thornodeBaseUrl}/thorchain/mimir`).pipe(shareReplay());
+    this._mimir$ = this.http.get<MimirResponse>(`${this._thornodeBasePath}/thorchain/mimir`).pipe(shareReplay());
   }
   /**
    * V2 Endpoints
@@ -81,12 +89,22 @@ export class MidgardService {
     return this.http.get<TransactionDTO>(`${this.v2BasePath}/actions`, {params});
   }
 
+  getThornodeTransaction(hash: string): Observable<ThornodeTx> {
+    return this.http.get<ThornodeTx>(`${this._thornodeBasePath}/thorchain/tx/${hash}`);
+  }
+
   getQueue(): Observable<ThorchainQueue> {
     return this.http.get<ThorchainQueue>(`${this.v2BasePath}/thorchain/queue`);
   }
 
   getMimir(): Observable<MimirResponse> {
     return this._mimir$;
+  }
+
+  getThorchainLiquidityProviders(asset: string): Observable<LiquidityProvider[]> {
+    return this.http.get<LiquidityProvider[]>(
+      `${this._thornodeBasePath}/thorchain/pool/${asset}/liquidity_providers`
+    );
   }
 
 }
