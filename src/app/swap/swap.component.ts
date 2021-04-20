@@ -609,9 +609,9 @@ export class SwapComponent implements OnInit, OnDestroy {
           )
         ), pool, toRune);
 
-        /** subtract non-rune network fee */
-        totalAmount = baseAmount(totalAmount.amount().minus(
-          assetToBase(assetAmount(networkFee)).amount()));
+      /** subtract non-rune network fee */
+      totalAmount = baseAmount(totalAmount.amount().minus(
+        assetToBase(assetAmount(networkFee)).amount()));
 
       if (this.sourceAssetUnit) {
         this.targetAssetUnit = (totalAmount.amount().isLessThan(0)) ? bn(0) : totalAmount.amount();
