@@ -10,6 +10,10 @@ Run `npm run start` for local dev. This will build out the `src/environments` fo
 Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 After your environments folder is build out, running `ng serve` will work fine.
 
+## Site Construction and Temporary App Pause
+
+In the case site construction, you can lock up THORChain swaps, deposits, and withdraws. Simply set `APP_LOCKED` in your env to true and rebuild the app. Users will still have access to wallet transfer features, but THORChain features will be locked.
+
 ## Code scaffolding
 
 Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.

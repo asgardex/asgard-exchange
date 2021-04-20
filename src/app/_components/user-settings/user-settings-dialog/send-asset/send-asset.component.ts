@@ -46,9 +46,66 @@ export class SendAssetComponent implements OnInit, OnDestroy {
         }
       );
 
-      this.subs = [balances$];
+      const user$ = this.userService.user$.subscribe(
+        (user) => {
+          this.user = user;
+        }
+      );
+
+      this.subs = [balances$, user$];
 
     }
+
+  }
+
+  nextDisabled(): boolean {
+
+    if (!this.user) {
+      return true;
+    }
+
+    if (!this.asset) {
+      return true;
+    }
+
+    const client = this.userService.getChainClient(this.user, this.asset.asset.chain);
+    if (!client) {
+      return true;
+    }
+
+    return !this.amountSpendable
+      || !client.validateAddress(this.recipientAddress)
+      || this.amount <= 0;
+  }
+
+  mainButtonText(): string {
+
+    if (!this.user) {
+      return 'Connect Wallet';
+    }
+
+    if (!this.asset) {
+      return 'No Asset';
+    }
+
+    const client = this.userService.getChainClient(this.user, this.asset.asset.chain);
+    if (!client) {
+      return `No ${this.asset.asset.chain} Client Found`;
+    }
+
+    if (!client.validateAddress(this.recipientAddress)) {
+      return `Invalid ${this.asset.asset.chain} Address`;
+    }
+
+    if (this.amount <= 0) {
+      return 'Enter Amount';
+    }
+
+    if (!this.amountSpendable) {
+      return 'Amount not spendable';
+    }
+
+    return 'Next';
 
   }
 
