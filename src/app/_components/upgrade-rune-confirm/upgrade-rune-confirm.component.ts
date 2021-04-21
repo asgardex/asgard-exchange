@@ -222,7 +222,6 @@ export class UpgradeRuneConfirmComponent implements OnInit, OnDestroy {
           if (amount.isGreaterThan(balanceAmount)) {
             amount = balanceAmount;
           }
-
           const hash = await this.ethUtilsService.callDeposit({
             asset: this.asset.asset,
             inboundAddress: matchingPool,

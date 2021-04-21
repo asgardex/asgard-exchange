@@ -173,13 +173,11 @@ export class EthUtilsService {
         {from: ethAddress, value: amount.toFixed(), gasPrice}
       );
       console.log({unsignedTx});
-      const contractRes = await ethClient
+      hash = await ethClient
         .getWallet()
         .sendTransaction(unsignedTx);
-      console.log({contractRes});
+      console.log({hash});
 
-      // tslint:disable-next-line:no-string-literal
-      hash = contractRes['hash'] ? contractRes['hash'] : '';
 
     } else {
 
@@ -195,22 +193,18 @@ export class EthUtilsService {
         checkSummedAddress, // asset
         amount.toFixed(), // amount
         memo,
-        { gasPrice }
       ];
       const vaultContract = new ethers.Contract(inboundAddress.router, abi);
       const unsignedTx = await vaultContract.populateTransaction.deposit(
         ...params,
-        {from: ethAddress}
+        {from: ethAddress, gasPrice}
       );
       console.log({unsignedTx});
-      const contractRes = await ethClient
+      hash = await ethClient
         .getWallet()
         .sendTransaction(unsignedTx);
-      console.log({contractRes});
-      // const contractRes = await ethClient(inboundAddress.router, abi, 'deposit', params);
+      console.log({hash});
 
-      // tslint:disable-next-line:no-string-literal
-      hash = contractRes['hash'] ? contractRes['hash'] : '';
 
     }
 
