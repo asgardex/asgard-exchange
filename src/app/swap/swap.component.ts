@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Asset } from '../_classes/asset';
 import { UserService } from '../_services/user.service';
-import { Subscription } from 'rxjs';
+import { combineLatest, Subscription, timer } from 'rxjs';
 import {
   getDoubleSwapOutput,
   getSwapSlip,
@@ -34,6 +34,7 @@ import { PoolAddressDTO } from '../_classes/pool-address';
 import { ThorchainPricesService } from '../_services/thorchain-prices.service';
 import { TransactionUtilsService } from '../_services/transaction-utils.service';
 import { NetworkQueueService } from '../_services/network-queue.service';
+import { retry, switchMap } from 'rxjs/operators';
 
 export enum SwapType {
   DOUBLE_SWAP = 'double_swap',
@@ -73,24 +74,14 @@ export class SwapComponent implements OnInit, OnDestroy {
     return this._selectedSourceAsset;
   }
   set selectedSourceAsset(asset: Asset) {
-
     this.ethContractApprovalRequired = false;
-
     if (this.selectedSourceAsset) {
       this.targetAssetUnit = null;
       this.calculatingTargetAsset = true;
     }
-
     this._selectedSourceAsset = asset;
-
-    if (!this.isRune(this._selectedSourceAsset)) {
-      this.getPoolDetails(this._selectedSourceAsset.chain, this._selectedSourceAsset.symbol, 'source');
-    } else if (this._selectedSourceAsset && this.isRune(this._selectedSourceAsset)) {
-      this.updateSwapDetails();
-    }
-
+    this.updateSwapDetails();
     this.sourceBalance = this.userService.findBalance(this.balances, asset);
-
     if (asset.chain === 'ETH' && asset.ticker !== 'ETH') {
       this.checkContractApproved();
     }
@@ -127,26 +118,13 @@ export class SwapComponent implements OnInit, OnDestroy {
   }
   set selectedTargetAsset(asset: Asset) {
     this._selectedTargetAsset = asset;
-
     this.targetAssetUnit = null;
     this.calculatingTargetAsset = true;
-
-    // if (this._selectedTargetAsset && this._selectedTargetAsset.symbol !== this.runeSymbol) {
-    if (this._selectedTargetAsset && !this.isRune(this._selectedTargetAsset)) {
-      this.getPoolDetails(this._selectedTargetAsset.chain, this._selectedTargetAsset.symbol, 'target');
-    } else if (this._selectedTargetAsset && this.isRune(this._selectedTargetAsset)) {
-      this.updateSwapDetails();
-    }
-
+    this.updateSwapDetails();
     this.targetBalance = this.userService.findBalance(this.balances, asset);
-
   }
   private _selectedTargetAsset: Asset;
   targetPoolDetail: PoolDetail;
-
-  poolDetailMap: {
-    [key: string]: PoolDTO
-  } = {};
   subs: Subscription[];
 
   slip: number;
@@ -169,11 +147,16 @@ export class SwapComponent implements OnInit, OnDestroy {
   insufficientBnb: boolean;
   selectableMarkets: AssetAndBalance[];
 
+  networkFees: {
+    [key: string]: number
+  } = {};
+
   /**
    * ETH specific
    */
   ethContractApprovalRequired: boolean;
   ethInboundAddress: PoolAddressDTO;
+  availablePools: PoolDTO[];
 
   inboundAddresses: PoolAddressDTO[];
   ethPool: PoolDTO;
@@ -204,11 +187,11 @@ export class SwapComponent implements OnInit, OnDestroy {
         this.insufficientBnb = bnbBalance < 0.000375;
 
         if (this.selectedTargetAsset && !this.isRune(this.selectedTargetAsset)) {
-          this.getPoolDetails(this.selectedTargetAsset.chain, this.selectedTargetAsset.symbol, 'target');
+          this.updateSwapDetails();
         }
 
         if (this.selectedSourceAsset && !this.isRune(this.selectedSourceAsset)) {
-          this.getPoolDetails(this.selectedSourceAsset.chain, this.selectedSourceAsset.symbol, 'source');
+          this.updateSwapDetails();
         }
 
       }
@@ -235,11 +218,67 @@ export class SwapComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.getConstants();
     this.getBinanceFees();
-    this.getPools();
     this.getEthRouter();
-    this.getProxiedInboundAddresses();
+
+    const inboundAddresses$ = this.midgardService.getInboundAddresses();
+    const pools$ = this.midgardService.getPools();
+    const combined = combineLatest([inboundAddresses$, pools$]);
+    const sub = timer(0, 30000).pipe(
+      // combined
+      switchMap(() => combined),
+      retry(),
+    ).subscribe( ([inboundAddresses, pools]) => {
+
+      this.inboundAddresses = inboundAddresses;
+
+      // set ETH pool if available
+      const ethPool = pools.find( (pool) => pool.asset === 'ETH.ETH' );
+      if (ethPool) {
+        this.ethPool = ethPool;
+      }
+
+      this.setAvailablePools(pools);
+      this.setSelectableMarkets();
+
+      // on init, set target asset
+      if (!this.selectedTargetAsset) {
+        const btcMarket = this.selectableMarkets.find( (market) => market.asset.chain === 'BTC' && market.asset.symbol === 'BTC' );
+        if (btcMarket) {
+          this.selectedTargetAsset = btcMarket.asset;
+        }
+      }
+
+      // update network fees
+      this.setNetworkFees();
+
+      // update swap detail values
+      this.updateSwapDetails();
+
+    });
+
+    this.subs.push(sub);
+
   }
 
+  setNetworkFees() {
+    if (!this.availablePools || !this.inboundAddresses) {
+      return;
+    }
+
+    for (const pool of this.availablePools) {
+      const asset = new Asset(pool.asset);
+
+      const assetNetworkFee = this.txUtilsService.calculateNetworkFee(
+        asset,
+        this.inboundAddresses,
+        pool
+      );
+
+      this.networkFees[pool.asset] = assetNetworkFee;
+
+    }
+
+  }
 
   isRune(asset: Asset): boolean {
     return asset && asset.ticker === 'RUNE'; // covers BNB and native
@@ -260,55 +299,37 @@ export class SwapComponent implements OnInit, OnDestroy {
     );
   }
 
-  getProxiedInboundAddresses() {
-    this.midgardService.getInboundAddresses().subscribe(
-      (res) => this.inboundAddresses = res
-    );
+  setAvailablePools(pools: PoolDTO[]) {
+    this.availablePools = pools.filter( (pool) => pool.status === 'available' );
   }
 
-  getPools() {
-    this.midgardService.getPools().subscribe(
-      (res) => {
+  setSelectableMarkets() {
 
-        const ethPool = res.find( (pool) => pool.asset === 'ETH.ETH' );
-        if (ethPool) {
-          this.ethPool = ethPool;
-        }
+    if (!this.availablePools) {
+      this.selectableMarkets = [];
+    } else {
+      this.selectableMarkets = this.availablePools
+      .sort( (a, b) => a.asset.localeCompare(b.asset) )
+      .map((pool) => ({
+        asset: new Asset(pool.asset),
+        assetPriceUSD: +pool.assetPriceUSD
+      }))
+      // filter out until we can add support
+      .filter( (pool) => pool.asset.chain === 'BNB'
+        || pool.asset.chain === 'THOR'
+        || pool.asset.chain === 'BTC'
+        || pool.asset.chain === 'ETH'
+        || pool.asset.chain === 'LTC'
+        || pool.asset.chain === 'BCH'
+      );
 
-        const availablePools = res.filter( (pool) => pool.status === 'available' );
+      // Keeping RUNE at top by default
+      this.selectableMarkets.unshift({
+        asset: new Asset('THOR.RUNE'),
+        assetPriceUSD: this.thorchainPricesService.estimateRunePrice(this.availablePools)
+      });
+    }
 
-        this.selectableMarkets = availablePools
-        .sort( (a, b) => a.asset.localeCompare(b.asset) )
-        .map((pool) => ({
-          asset: new Asset(pool.asset),
-          assetPriceUSD: +pool.assetPriceUSD
-        }))
-        // filter out until we can add support
-        .filter( (pool) => pool.asset.chain === 'BNB'
-          || pool.asset.chain === 'THOR'
-          || pool.asset.chain === 'BTC'
-          || pool.asset.chain === 'ETH'
-          || pool.asset.chain === 'LTC'
-          || pool.asset.chain === 'BCH'
-        );
-
-        // Keeping RUNE at top by default
-        this.selectableMarkets.unshift({
-          asset: new Asset('THOR.RUNE'),
-          assetPriceUSD: this.thorchainPricesService.estimateRunePrice(availablePools)
-        });
-
-        if (!this.selectedTargetAsset) {
-          const btcMarket = this.selectableMarkets.find( (market) => market.asset.chain === 'BTC' && market.asset.symbol === 'BTC' );
-          if (btcMarket) {
-            this.selectedTargetAsset = btcMarket.asset;
-          }
-          console.log('no target asset');
-        }
-
-      },
-      (err) => console.error('error fetching pools:', err)
-    );
   }
 
   async checkContractApproved() {
@@ -336,6 +357,12 @@ export class SwapComponent implements OnInit, OnDestroy {
       || this.ethContractApprovalRequired
       || (this.queue && this.queue.outbound >= 12)
       || (this.slip * 100) > this.slippageTolerance
+
+      // check source asset amount is greater than network fee
+      || this.sourceAssetUnit < this.networkFees[assetToString(this.selectedSourceAsset)]
+      // check target asset amount is greater than outbound network fee * 3
+      || this.targetAssetUnitDisplay < (this.networkFees[assetToString(this.selectedTargetAsset)] * 3)
+
       || (this.selectedSourceAsset.chain === 'BNB' && this.insufficientBnb) // source is BNB and not enough funds to cover fee
       || (this.selectedSourceAsset.chain === 'THOR') && (this.sourceBalance - this.sourceAssetUnit < 3)
 
@@ -374,6 +401,16 @@ export class SwapComponent implements OnInit, OnDestroy {
     /** No source amount set */
     if (!this.sourceAssetUnit) {
       return 'Enter an amount';
+    }
+
+    /** Input Amount is less than network fees */
+    if (this.sourceAssetUnit < this.networkFees[assetToString(this.selectedSourceAsset)]) {
+      return 'Input Amount Less Than Fees';
+    }
+
+    /** Output Amount is less than network fees */
+    if (this.targetAssetUnitDisplay < (this.networkFees[assetToString(this.selectedTargetAsset)] * 3)) {
+      return 'Output Amount Less Than Fees';
     }
 
     /** Source amount is higher than user spendable amount */
@@ -438,27 +475,6 @@ export class SwapComponent implements OnInit, OnDestroy {
     });
   }
 
-  getPoolDetails(chain: string, symbol: string, type: 'source' | 'target') {
-
-    this.poolDetailTargetError = (type === 'target') ? false : this.poolDetailTargetError;
-    this.poolDetailSourceError = (type === 'source') ? false : this.poolDetailSourceError;
-
-    this.midgardService.getPool(`${chain}.${symbol}`).subscribe(
-      (res) => {
-        if (res) {
-          this.poolDetailMap[`${chain}.${symbol}`] = res;
-          this.updateSwapDetails();
-        }
-      },
-      (err) => {
-        console.error('error fetching pool details: ', err);
-        this.poolDetailTargetError = (type === 'target') ? true : this.poolDetailTargetError;
-        this.poolDetailSourceError = (type === 'source') ? true : this.poolDetailSourceError;
-      }
-    );
-
-  }
-
   getConstants() {
     this.midgardService.getConstants().subscribe(
       (res) => {
@@ -500,8 +516,8 @@ export class SwapComponent implements OnInit, OnDestroy {
       if (swapType === SwapType.SINGLE_SWAP) {
         this.calculateSingleSwap();
       } else if (swapType === SwapType.DOUBLE_SWAP
-          && this.poolDetailMap[`${this.selectedTargetAsset.chain}.${this.selectedTargetAsset.symbol}`]
-          && this.poolDetailMap[`${this.selectedSourceAsset.chain}.${this.selectedSourceAsset.symbol}`]) {
+        && this.availablePools.find( (pool) => pool.asset === assetToString(this.selectedTargetAsset) )
+        && this.availablePools.find( (pool) => pool.asset === assetToString(this.selectedSourceAsset))) {
 
         this.calculateDoubleSwap();
 
@@ -551,8 +567,8 @@ export class SwapComponent implements OnInit, OnDestroy {
       : false;
 
     const poolDetail = (toRune)
-      ? this.poolDetailMap[`${this.selectedSourceAsset.chain}.${this.selectedSourceAsset.symbol}`]
-      : this.poolDetailMap[`${this.selectedTargetAsset.chain}.${this.selectedTargetAsset.symbol}`];
+      ? this.availablePools.find( (pool) => pool.asset === assetToString(this.selectedSourceAsset) )
+      : this.availablePools.find( (pool) => pool.asset === assetToString(this.selectedTargetAsset) );
 
     if (poolDetail) {
       const pool: PoolData = {
@@ -641,8 +657,8 @@ export class SwapComponent implements OnInit, OnDestroy {
    */
   calculateDoubleSwap() {
 
-    const sourcePool = this.poolDetailMap[`${this.selectedSourceAsset.chain}.${this.selectedSourceAsset.symbol}`];
-    const targetPool = this.poolDetailMap[`${this.selectedTargetAsset.chain}.${this.selectedTargetAsset.symbol}`];
+    const sourcePool = this.availablePools.find( (pool) => pool.asset === assetToString(this.selectedSourceAsset) );
+    const targetPool = this.availablePools.find( (pool) => pool.asset === assetToString(this.selectedTargetAsset) );
 
     if (sourcePool && targetPool) {
       const pool1: PoolData = {
@@ -683,7 +699,6 @@ export class SwapComponent implements OnInit, OnDestroy {
     this.calculatingTargetAsset = false;
 
   }
-
 
   ngOnDestroy() {
     for (const sub of this.subs) {
