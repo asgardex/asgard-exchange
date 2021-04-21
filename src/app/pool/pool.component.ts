@@ -88,7 +88,8 @@ export class PoolComponent implements OnInit, OnDestroy {
       this.createablePools = this.balances.filter( (balance) => {
         const asset = balance.asset;
         return !this.pools.find((pool) => pool.asset === `${asset.chain}.${asset.symbol}`)
-          && !isNonNativeRuneToken(asset);
+          && !isNonNativeRuneToken(asset)
+          && asset.chain !== 'THOR';
       }).map( (balance) => `${balance.asset.chain}.${balance.asset.symbol}` );
 
     }
@@ -105,9 +106,7 @@ export class PoolComponent implements OnInit, OnDestroy {
 
       if (mimir && mimir['mimir//MAXLIQUIDITYRUNE']) {
         this.maxLiquidityRune = mimir['mimir//MAXLIQUIDITYRUNE'] / (10 ** 8);
-
-        this.depositsDisabled = (this.totalPooledRune / mimir['mimir//MAXLIQUIDITYRUNE'] >= .9);
-
+        this.depositsDisabled = (this.totalPooledRune / this.maxLiquidityRune >= .9);
       }
 
     });

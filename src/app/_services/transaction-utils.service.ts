@@ -10,20 +10,12 @@ import { MidgardService } from './midgard.service';
 })
 export class TransactionUtilsService {
 
-  private _inboundAddresses: PoolAddressDTO[];
   private _outboundTransactionFee: number;
   private _ethPool: PoolDTO;
 
   constructor(private midgardService: MidgardService) {
-    this._getInboundAddresses();
     this._getOutboundTxFee();
     this._getPools();
-  }
-
-  _getInboundAddresses() {
-    this.midgardService.getInboundAddresses().subscribe(
-      (res) => this._inboundAddresses = res
-    );
   }
 
   _getOutboundTxFee() {
@@ -46,9 +38,9 @@ export class TransactionUtilsService {
     );
   }
 
-  calculateNetworkFee(asset: Asset, assetPool?: PoolDTO): number {
+  calculateNetworkFee(asset: Asset, inboundAddresses: PoolAddressDTO[], assetPool?: PoolDTO): number {
 
-    const matchingInboundAddress = this._inboundAddresses.find( (pool) => pool.chain === asset.chain );
+    const matchingInboundAddress = inboundAddresses.find( (pool) => pool.chain === asset.chain );
 
     if (matchingInboundAddress) {
       switch (asset.chain) {
@@ -67,18 +59,19 @@ export class TransactionUtilsService {
           else {
             const ethGasVal = (70000 * (+matchingInboundAddress.gas_rate) * (10 ** 9) * 3)  / (10 ** 18);
             const tokenEthValue = (+assetPool.assetPriceUSD) / (+this._ethPool.assetPriceUSD);
-            return ethGasVal / tokenEthValue;
+            return ethGasVal * tokenEthValue;
           }
 
         case 'BNB':
           return 0.000375;
-
-        case 'THOR':
-          return this._outboundTransactionFee ?? 0.2;
       }
+
+    } else if (asset.chain === 'THOR') {
+      return this._outboundTransactionFee ?? 0.2;
+    } else {
       console.error('calculateNetworkFee no chain match');
     }
-    console.error('calculateNetworkFee no matching inbound address found');
+
   }
 
 }

@@ -48,6 +48,8 @@ import { SlippageToleranceService } from './_services/slippage-tolerance.service
 import { CoinGeckoService } from './_services/coin-gecko.service';
 import { CopyService } from './_services/copy.service';
 import { EthUtilsService } from './_services/eth-utils.service';
+import { TransactionUtilsService } from './_services/transaction-utils.service';
+import { KeystoreDepositService } from './_services/keystore-deposit.service';
 
 /** MATERIAL */
 import { MatButtonModule } from '@angular/material/button';
@@ -79,7 +81,7 @@ import { HaskoinService } from './_services/haskoin.service';
 import { ModalSectionHeaderModule } from './_components/modal-section-header/modal-section-header.module';
 import { ReconnectXDEFIDialogComponent } from './_components/reconnect-xdefi-dialog/reconnect-xdefi-dialog.component';
 import { KeystoreCreateStorePhraseComponent } from './_components/connect/keystore-create-store-phrase/keystore-create-store-phrase.component';
-import { TransactionUtilsService } from './_services/transaction-utils.service';
+import { NetworkQueueService } from './_services/network-queue.service';
 
 
 @NgModule({
@@ -155,6 +157,8 @@ import { TransactionUtilsService } from './_services/transaction-utils.service';
     ThorchainPricesService,
     HaskoinService,
     TransactionUtilsService,
+    KeystoreDepositService,
+    NetworkQueueService
   ],
   bootstrap: [AppComponent],
 })

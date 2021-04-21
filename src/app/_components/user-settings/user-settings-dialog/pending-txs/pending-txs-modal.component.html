@@ -1,6 +1,6 @@
 <div class="container">
 
-  <app-modal-section-header sectionTitle="Transactions" [displayBackBtn]="true" [displayCloseBtn]="true" (back)="back.emit()"></app-modal-section-header>
+  <app-modal-section-header sectionTitle="Transactions" [displayBackBtn]="true" [displayCloseBtn]="true" (back)="back.emit()" (closeModal)="close()"></app-modal-section-header>
 
   <div class="dialog-content">
     <div mat-dialog-content>

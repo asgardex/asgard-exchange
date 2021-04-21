@@ -12,10 +12,9 @@
       <h1 mat-dialog-title class="text-2xl">Transaction Processing</h1>
     </div>
 
-    <!-- <span class="swap-details">Swapping {{this.swapData.inputValue}} {{this.swapData.sourceAsset.ticker}} for {{this.swapData.outputValue}} {{this.swapData.targetAsset.ticker}}</span> -->
     <span *ngIf="transactionDetail" class="swap-details">{{transactionDetail}}</span>
 
-    <span class="addendum">Confirm this transaction in your wallet</span>
+    <span class="swap-details">Confirm this transaction in your wallet</span>
 
   </div>
 

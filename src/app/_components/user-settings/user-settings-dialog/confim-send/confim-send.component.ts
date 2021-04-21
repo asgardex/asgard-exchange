@@ -126,7 +126,7 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
 
           // find recipient pool
       const matchingAddress = inboundAddresses.find( (pool) => pool.chain === this.asset.asset.chain );
-      if (!matchingAddress) {
+      if (!matchingAddress && (this.asset.asset.chain !== 'THOR')) {
         console.error('no recipient pool found');
         return;
       }
@@ -180,7 +180,7 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
 
           // TODO -> consolidate this with BTC, BCH, LTC
           const asset = new AsgrsxAsset(`BTC.BTC`);
-          const estimatedFee = this.txUtilsService.calculateNetworkFee(asset);
+          const estimatedFee = this.txUtilsService.calculateNetworkFee(asset, inboundAddresses);
           const balanceAmount = this.userService.findRawBalance(this.balances, asset);
           const toBase = assetToBase(assetAmount(this.amount));
           const feeToBase = assetToBase(assetAmount(estimatedFee));
@@ -221,7 +221,7 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
 
           // TODO -> consolidate this with BTC, BCH, LTC
           const asset = new AsgrsxAsset(`BCH.BCH`);
-          const estimatedFee = this.txUtilsService.calculateNetworkFee(asset);
+          const estimatedFee = this.txUtilsService.calculateNetworkFee(asset, inboundAddresses);
           const balanceAmount = this.userService.findRawBalance(this.balances, asset);
           const toBase = assetToBase(assetAmount(this.amount));
           const feeToBase = assetToBase(assetAmount(estimatedFee));
@@ -298,7 +298,7 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
 
           // TODO -> consolidate this with BTC, BCH, LTC
           const asset = new AsgrsxAsset(`LTC.LTC`);
-          const estimatedFee = this.txUtilsService.calculateNetworkFee(asset);
+          const estimatedFee = this.txUtilsService.calculateNetworkFee(asset, inboundAddresses);
           const balanceAmount = this.userService.findRawBalance(this.balances, asset);
           const toBase = assetToBase(assetAmount(this.amount));
           const feeToBase = assetToBase(assetAmount(estimatedFee));

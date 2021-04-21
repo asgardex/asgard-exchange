@@ -11,6 +11,7 @@ import { Chain } from '@xchainjs/xchain-util';
 import { AssetAndBalance } from './_classes/asset-and-balance';
 import { Asset } from './_classes/asset';
 import { ReconnectXDEFIDialogComponent } from './_components/reconnect-xdefi-dialog/reconnect-xdefi-dialog.component';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -23,6 +24,7 @@ export class AppComponent implements OnInit, OnDestroy {
   subs: Subscription[];
   chainBalanceErrors: Chain[];
   nonNativeRuneAssets: AssetAndBalance[];
+  appLocked: boolean;
 
   constructor(
     private dialog: MatDialog,
@@ -30,6 +32,8 @@ export class AppComponent implements OnInit, OnDestroy {
     private lastBlockService: LastBlockService,
     private userService: UserService,
   ) {
+
+    this.appLocked = environment.appLocked ?? false;
 
     const chainBalanceErrors$ = this.userService.chainBalanceErrors$.subscribe(
       (chains) => this.chainBalanceErrors = chains

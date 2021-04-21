@@ -5,7 +5,7 @@ import { catchError, switchMap, takeUntil, retryWhen, delay, take } from 'rxjs/o
 import { TransactionDTO } from '../_classes/transaction';
 import { User } from '../_classes/user';
 import { BinanceService } from './binance.service';
-import { MidgardService } from './midgard.service';
+import { MidgardService, ThornodeTx } from './midgard.service';
 import { UserService } from './user.service';
 import { ethers } from 'ethers';
 import { environment } from 'src/environments/environment';
@@ -35,6 +35,11 @@ export interface Tx {
   status: TxStatus;
   action: TxActions;
   isThorchainTx: boolean;
+
+  /**
+   * This is a temporary patch because midgard is not picking up withdraw of pending assets
+   */
+  pollThornodeDirectly?: boolean;
 }
 
 @Injectable({
@@ -84,7 +89,13 @@ export class TransactionStatusService {
       this.killTxPolling[pendingTx.hash] = new Subject();
 
       if (pendingTx.isThorchainTx || pendingTx.chain === 'THOR') {
-        this.pollThorchainTx(pendingTx.hash);
+
+        if (!pendingTx.pollThornodeDirectly) {
+          this.pollThorchainTx(pendingTx.hash);
+        } else {
+          this.pollThornodeTx(pendingTx.hash);
+        }
+
       } else {
 
         if (pendingTx.chain === 'BNB') {
@@ -181,10 +192,6 @@ export class TransactionStatusService {
       if (res.count > 0) {
         for (const resTx of res.actions) {
 
-          // if (resTx.in[0].txID.toUpperCase() === tx.hash.toUpperCase() ) {
-
-          // }
-
           if (resTx.in[0].txID.toUpperCase() === hash.toUpperCase() && resTx.status.toUpperCase() === 'SUCCESS') {
 
             if (resTx.status.toUpperCase() === 'REFUND') {
@@ -202,6 +209,33 @@ export class TransactionStatusService {
             console.log('resTx.status.toUpperCase() is: ', resTx.status.toUpperCase());
           }
         }
+      }
+
+    });
+  }
+
+  /**
+   * This is being used as a temporary patch
+   * Midgard is not picking up WITHDRAW on pending_assets
+   */
+  pollThornodeTx(hash: string) {
+    timer(0, 15000)
+    .pipe(
+      // This kills the request if the user closes the component
+      takeUntil(this.killTxPolling[hash]),
+      // switchMap cancels the last request, if no response have been received since last tick
+      switchMap(() => this.midgardService.getThornodeTransaction(hash)),
+      // catchError handles http throws
+      catchError(error => of(error))
+    ).subscribe( async (res: ThornodeTx) => {
+
+      if (res && res.observed_tx && res.observed_tx.status && res.observed_tx.status.toUpperCase() === 'DONE') {
+        this.updateTxStatus(hash, TxStatus.COMPLETE);
+        this.userService.fetchBalances();
+        this.killTxPolling[hash].next();
+      } else {
+        console.log('still pending...');
+        console.log('res');
       }
 
     });

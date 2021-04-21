@@ -101,6 +101,7 @@ export class DepositComponent implements OnInit, OnDestroy {
   poolNotFoundErr: boolean;
 
   networkFee: number;
+  depositsDisabled: boolean;
 
   constructor(
     private dialog: MatDialog,
@@ -115,6 +116,7 @@ export class DepositComponent implements OnInit, OnDestroy {
     this.ethContractApprovalRequired = false;
     this.rune = new Asset('THOR.RUNE');
     this.subs = [];
+    this.depositsDisabled = false;
   }
 
   ngOnInit(): void {
@@ -169,10 +171,27 @@ export class DepositComponent implements OnInit, OnDestroy {
 
     this.getPools();
     this.getEthRouter();
+    this.getPoolCap();
     this.subs.push(sub);
   }
 
+  getPoolCap() {
+    const mimir$ = this.midgardService.getMimir();
+    const network$ = this.midgardService.getNetwork();
+    const combined = combineLatest([mimir$, network$]);
+    const sub = combined.subscribe( ([mimir, network]) => {
 
+      const totalPooledRune = +network.totalPooledRune / (10 ** 8);
+
+      if (mimir && mimir['mimir//MAXLIQUIDITYRUNE']) {
+        const maxLiquidityRune = mimir['mimir//MAXLIQUIDITYRUNE'] / (10 ** 8);
+        this.depositsDisabled = (totalPooledRune / maxLiquidityRune >= .9);
+      }
+
+    });
+
+    this.subs.push(sub);
+  }
 
   getEthRouter() {
     this.midgardService.getInboundAddresses().subscribe(
@@ -205,7 +224,9 @@ export class DepositComponent implements OnInit, OnDestroy {
     this.runeAmount = runeAmount.amount().isLessThan(0) ? 0 : runeAmount.amount().div(10 ** 8 ).toNumber();
   }
 
-  getPoolDetail(asset: string) {
+  async getPoolDetail(asset: string) {
+
+    const inboundAddresses = await this.midgardService.getInboundAddresses().toPromise();
 
     this.midgardService.getPool(asset).subscribe(
       (res) => {
@@ -215,7 +236,7 @@ export class DepositComponent implements OnInit, OnDestroy {
             runeBalance: baseAmount(res.runeDepth),
           };
 
-          this.networkFee = this.txUtilsService.calculateNetworkFee(this.asset, res);
+          this.networkFee = this.txUtilsService.calculateNetworkFee(this.asset, inboundAddresses, res);
 
         }
       },
@@ -251,9 +272,13 @@ export class DepositComponent implements OnInit, OnDestroy {
 
     return !this.balances || !this.runeAmount || !this.assetAmount || (this.asset.chain === 'BNB' && this.insufficientBnb)
     || this.ethContractApprovalRequired
+    || this.depositsDisabled
     || (this.assetAmount <= this.userService.minimumSpendable(this.asset))
     || (this.balances
-      && (this.runeAmount > this.runeBalance || this.assetAmount > this.userService.maximumSpendableBalance(this.asset, this.assetBalance))
+      // && (this.runeAmount > this.runeBalance
+      // || this.assetAmount > this.userService.maximumSpendableBalance(this.asset, this.assetBalance))
+      && ((this.runeBalance - this.runeAmount < 3)
+        || this.assetAmount > this.userService.maximumSpendableBalance(this.asset, this.assetBalance))
     );
   }
 
@@ -274,14 +299,22 @@ export class DepositComponent implements OnInit, OnDestroy {
       return 'Please connect wallet';
     }
 
+    if (this.depositsDisabled) {
+      return 'Pool Cap > 90%';
+    }
+
     /** User either lacks asset balance or RUNE balance */
     if (this.balances && (!this.runeAmount || !this.assetAmount)) {
       return 'Enter an amount';
     }
 
-    /** RUNE amount exceeds RUNE balance */
-    if (this.runeAmount > this.runeBalance) {
-      return 'Insufficient balance';
+    /** RUNE amount exceeds RUNE balance. Leave 2 RUNE in balance */
+    // if (this.runeAmount > this.runeBalance ) {
+    //   return 'Insufficient balance';
+    // }
+    /** RUNE amount exceeds RUNE balance. Leave 3 RUNE in balance */
+    if (this.runeBalance - this.runeAmount < 3) {
+      return 'Min 3 RUNE in Wallet Required';
     }
 
     /** ETH tx amount is higher than spendable amount */
