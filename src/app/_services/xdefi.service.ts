@@ -565,9 +565,9 @@ export class XDEFIService {
     });
 
 
-    (window as any).xfi.thorchain.on("chainChanged", (obj) => {
-      console.log("changed", obj);
-      if(obj.network !== environment.network) {
+    (window as any).xfi.thorchain.on('chainChanged', (obj) => {
+      console.log('changed', obj);
+      if (obj.network !== environment.network) {
         // alert("XDEFI: Incorrect network, Reloading");
         location.reload();
       }
