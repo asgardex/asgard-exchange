@@ -12,7 +12,7 @@
     "lint": "ng lint",
     "e2e": "ng e2e",
     "serve": "serve dist/asgard-exchange/",
-    "heroku-postbuild": "sh scripts/heroku_build.sh"
+    "heroku-postbuild": "bash scripts/heroku_build.sh"
   },
   "private": true,
   "dependencies": {
