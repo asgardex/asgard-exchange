@@ -335,6 +335,10 @@ export class XDEFIService {
       return (window as any).ethereum.request({
         method: 'eth_sendTransaction',
         params: [unsignedTx],
+      }).then((hash: string) => {
+        return {
+          hash
+        };
       });
     };
     const oldWallet = userEthereumClient.getWallet();
@@ -344,6 +348,9 @@ export class XDEFIService {
       return (window as any).ethereum.request({
         method: 'eth_sendTransaction',
         params: [unsignedTx],
+      }).then((hash: string) => {
+      return {
+      hash};
       });
     };
     oldWallet.signTransaction = (unsignedTx) => {
@@ -567,7 +574,7 @@ export class XDEFIService {
 
     (window as any).xfi.thorchain.on('chainChanged', (obj) => {
       console.log('changed', obj);
-      const envNetwork = environment.network === 'testnet' ? 'testnet': 'mainnet';
+      const envNetwork = environment.network === 'testnet' ? 'testnet' : 'mainnet';
       if (obj.network !== envNetwork) {
         // alert("XDEFI: Incorrect network, Reloading");
         location.reload();
