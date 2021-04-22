@@ -178,7 +178,7 @@ export class EthUtilsService {
         .sendTransaction(unsignedTx);
       console.log({hash});
 
-      hash = typeof(resp) === 'string' ? resp: resp?.hash || ''
+      hash = typeof(resp) === 'string' ? resp : resp?.hash || '';
 
     } else {
 
@@ -206,7 +206,7 @@ export class EthUtilsService {
         .sendTransaction(unsignedTx);
       console.log({hash});
 
-      hash = typeof(resp) === 'string' ? resp: resp?.hash || ''
+      hash = typeof(resp) === 'string' ? resp : resp?.hash || '';
 
     }
 
