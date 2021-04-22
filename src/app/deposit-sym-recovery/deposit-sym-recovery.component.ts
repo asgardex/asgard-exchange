@@ -223,8 +223,8 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
 
       const totalPooledRune = +network.totalPooledRune / (10 ** 8);
 
-      if (mimir && mimir['mimir//MAXLIQUIDITYRUNE']) {
-        const maxLiquidityRune = mimir['mimir//MAXLIQUIDITYRUNE'] / (10 ** 8);
+      if (mimir && mimir['mimir//MAXIMUMLIQUIDITYRUNE']) {
+        const maxLiquidityRune = mimir['mimir//MAXIMUMLIQUIDITYRUNE'] / (10 ** 8);
         this.depositsDisabled = (totalPooledRune / maxLiquidityRune >= .9);
       }
 
