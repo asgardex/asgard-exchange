@@ -173,11 +173,12 @@ export class EthUtilsService {
         {from: ethAddress, value: amount.toFixed(), gasPrice}
       );
       console.log({unsignedTx});
-      hash = await ethClient
+      const resp = await ethClient
         .getWallet()
         .sendTransaction(unsignedTx);
       console.log({hash});
 
+      hash = typeof(resp) === 'string' ? resp: resp?.hash || ''
 
     } else {
 
@@ -200,11 +201,12 @@ export class EthUtilsService {
         {from: ethAddress, gasPrice}
       );
       console.log({unsignedTx});
-      hash = await ethClient
+      const resp = await ethClient
         .getWallet()
         .sendTransaction(unsignedTx);
       console.log({hash});
 
+      hash = typeof(resp) === 'string' ? resp: resp?.hash || ''
 
     }
 
