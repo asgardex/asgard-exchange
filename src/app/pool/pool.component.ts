@@ -104,8 +104,8 @@ export class PoolComponent implements OnInit, OnDestroy {
 
       this.totalPooledRune = +network.totalPooledRune / (10 ** 8);
 
-      if (mimir && mimir['mimir//MAXLIQUIDITYRUNE']) {
-        this.maxLiquidityRune = mimir['mimir//MAXLIQUIDITYRUNE'] / (10 ** 8);
+      if (mimir && mimir['mimir//MAXIMUMLIQUIDITYRUNE']) {
+        this.maxLiquidityRune = mimir['mimir//MAXIMUMLIQUIDITYRUNE'] / (10 ** 8);
         this.depositsDisabled = (this.totalPooledRune / this.maxLiquidityRune >= .9);
       }
 
