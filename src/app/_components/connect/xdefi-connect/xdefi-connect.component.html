@@ -1,0 +1,55 @@
+<div class="container">
+  <app-modal-section-header
+    sectionTitle="XDEFI Connect"
+    [displayBackBtn]="true"
+  ></app-modal-section-header>
+
+  <div class="dialog-content">
+    <div mat-dialog-content>
+      <ul>
+        <li *ngFor="let providerInfo of listProviders" class="flex align-item">
+          <span>- {{ providerInfo.title }}</span>
+          <mat-icon
+            [ngStyle]="{ color: providerInfo.enabled ? 'green' : 'red' }"
+          >
+            {{ providerInfo.enabled ? "check" : "close" }}
+          </mat-icon>
+        </li>
+      </ul>
+      <br />
+      <small
+        >You need to enable all dApps Injection Providers in
+        <b>Settings > dApps Settings </b> then reload the page.</small
+      >
+      <br />
+    </div>
+
+    <div class="flex justify-between items-center" style="height: 38px">
+      <div>
+        <span *ngIf="xdefiError" style="font-size: 0.8rem; color: #2172e5"
+          >XDEFI Login Incorrect</span
+        >
+        <span *ngIf="!isValidNetwork" style="font-size: 0.8rem; color: #2172e5"
+          >Incorrect network!</span
+        >
+      </div>
+      <br />
+      <div>
+        <button
+          *ngIf="!xdefiConnecting"
+          mat-flat-button
+          color="accent"
+          (click)="initUnlock()"
+          [disabled]="xdefiConnecting || !isValidNetwork"
+        >
+          <span>Connect</span>
+        </button>
+        <mat-progress-spinner
+          mode="indeterminate"
+          diameter="30"
+          *ngIf="xdefiConnecting"
+        ></mat-progress-spinner>
+      </div>
+    </div>
+  </div>
+</div>

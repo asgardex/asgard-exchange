@@ -29,16 +29,24 @@ export class ConnectComponent implements OnInit {
 
 }
 
+export enum ConnectionMethod {
+  LEDGER = 'LEDGER',
+  KEYSTORE = 'KEYSTORE',
+  KEYSTORE_CREATE = 'KEYSTORE_CREATE',
+  WALLET_CONNECT = 'WALLET_CONNECT',
+  XDEFI = 'XDEFI',
+}
 export enum ConnectionView {
   KEYSTORE_CONNECT      = 'KEYSTORE_CONNECT',
   KEYSTORE_CREATE       = 'KEYSTORE_CREATE',
-  KEYSTORE_WRITE_PHRASE = 'KEYSTORE_WRITE_PHRASE'
+  KEYSTORE_WRITE_PHRASE = 'KEYSTORE_WRITE_PHRASE',
+  XDEFI = 'XDEFI',
 }
 
 @Component({
   selector: 'app-connect-modal',
   templateUrl: 'connect-modal.component.html',
-  styleUrls: ['./connect.component.scss']
+  styleUrls: ['./connect.component.scss'],
 })
 // tslint:disable-next-line:component-class-suffix
 export class ConnectModal {
@@ -46,12 +54,18 @@ export class ConnectModal {
   connectionView: ConnectionView;
   isTestnet: boolean;
   selectedChain: 'BNB' | 'BTC';
+  isXDEFIConnected: boolean;
   phrase: string;
 
   constructor(
     public dialogRef: MatDialogRef<ConnectModal>,
   ) {
     this.isTestnet = environment.network === 'testnet' ? true : false;
+
+    this.isXDEFIConnected = false;
+    if ((window as any).xfi) {
+      this.isXDEFIConnected = true;
+    }
   }
 
   setSelectedChain(chain: 'BNB' | 'BTC') {
@@ -64,6 +78,13 @@ export class ConnectModal {
 
   connectKeystore() {
     this.connectionView = ConnectionView.KEYSTORE_CONNECT;
+  }
+
+  connectXDEFI() {
+    if (!this.isXDEFIConnected) {
+      return window.open('https://xdefi.io', '_blank');
+    }
+    this.connectionView = ConnectionView.XDEFI;
   }
 
   storePhrasePrompt(phrase: string) {

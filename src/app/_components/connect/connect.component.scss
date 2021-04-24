@@ -28,9 +28,12 @@
     // border: 1px solid rgb(33, 114, 229);
   }
 
+  & a {
+    color: #0000EE;
+  }
+
   &:disabled {
     color: #888d9b;
-
     &:hover {
       // border: 1px solid rgb(64, 68, 79);
       background-color: transparent;

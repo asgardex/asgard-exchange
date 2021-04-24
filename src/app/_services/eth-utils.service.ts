@@ -138,12 +138,15 @@ export class EthUtilsService {
   }
 
   async callDeposit({inboundAddress, asset, memo, ethClient, amount}: CallDepositParams): Promise<string> {
-
+    console.log({
+      method: 'callDeposit',
+      inboundAddress, asset, memo, ethClient, amount
+    });
     let hash;
-    const wallet = ethClient.getWallet();
     const abi = (environment.network) === 'testnet'
       ? TCRopstenAbi
       : TCRopstenAbi;
+    const ethAddress = await ethClient.getAddress();
     const gasPrices = await ethClient.estimateGasPrices();
     const deprecatedEthClientgasPrice = gasPrices.fast.amount().toFixed(0);
     console.log('gas price is: ', deprecatedEthClientgasPrice);
@@ -157,9 +160,8 @@ export class EthUtilsService {
 
     if (asset.ticker === 'ETH') {
 
-      const ethAddress = await ethClient.getAddress();
-      const contract = new ethers.Contract(inboundAddress.router, abi, wallet);
-      const contractRes = await contract.deposit(
+      const contract = new ethers.Contract(inboundAddress.router, abi);
+      const unsignedTx = await contract.populateTransaction.deposit(
         inboundAddress.address, // not sure if this is correct...
         '0x0000000000000000000000000000000000000000',
         // ethers.utils.parseEther(String(amount)),
@@ -170,15 +172,21 @@ export class EthUtilsService {
         // {from: ethAddress, value: ethers.utils.parseEther(String(amount)), gasPrice}
         {from: ethAddress, value: amount.toFixed(), gasPrice}
       );
+      console.log({unsignedTx});
+      const resp = await ethClient
+        .getWallet()
+        .sendTransaction(unsignedTx);
+      console.log({hash});
 
-      // tslint:disable-next-line:no-string-literal
-      hash = contractRes['hash'] ? contractRes['hash'] : '';
+      hash = typeof(resp) === 'string' ? resp : resp?.hash || '';
 
     } else {
 
       const assetAddress = asset.symbol.slice(asset.ticker.length + 1);
       const strip0x = assetAddress.substr(2);
       const checkSummedAddress = ethers.utils.getAddress(strip0x);
+      // const tokenContract = new ethers.Contract(checkSummedAddress, erc20ABI);
+      // const decimal: BigNumber = await ethClient.call(checkSummedAddress, erc20ABI, 'decimals', []);
       // const tokenContract = new ethers.Contract(checkSummedAddress, erc20ABI, wallet);
       // const decimal = await tokenContract.decimals();
       const params = [
@@ -186,13 +194,19 @@ export class EthUtilsService {
         checkSummedAddress, // asset
         amount.toFixed(), // amount
         memo,
-        { gasPrice }
       ];
+      const vaultContract = new ethers.Contract(inboundAddress.router, abi);
+      const unsignedTx = await vaultContract.populateTransaction.deposit(
+        ...params,
+        {from: ethAddress, gasPrice}
+      );
+      console.log({unsignedTx});
+      const resp = await ethClient
+        .getWallet()
+        .sendTransaction(unsignedTx);
+      console.log({hash});
 
-      const contractRes = await ethClient.call(inboundAddress.router, abi, 'deposit', params);
-
-      // tslint:disable-next-line:no-string-literal
-      hash = contractRes['hash'] ? contractRes['hash'] : '';
+      hash = typeof(resp) === 'string' ? resp : resp?.hash || '';
 
     }
 

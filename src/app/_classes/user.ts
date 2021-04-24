@@ -1,6 +1,6 @@
 
 
-export type WalletType = 'keystore' | 'ledger';
+export type WalletType = 'keystore' | 'walletconnect' | 'ledger' | 'XDEFI';
 import { Client as BinanceClient } from '@xchainjs/xchain-binance';
 import { Client as BitcoinClient } from '@xchainjs/xchain-bitcoin';
 import { Client as ThorchainClient } from '@xchainjs/xchain-thorchain';
@@ -23,6 +23,12 @@ export class User {
   wallet: string; // Address
   keystore?: any;
   clients?: AvailableClients;
+
+  signingOperations?: {
+    binance: {
+      transfer
+    }
+  };
 
   // for Ledger
   ledger?: any;
