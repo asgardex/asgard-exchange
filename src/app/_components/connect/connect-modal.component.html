@@ -24,7 +24,7 @@
           <span>Connect Keystore</span>
         </button>
 
-        <button class="connect-option focus:outline-none"  (click)="connectXDEFI()">
+        <button *ngIf="isTestnet" class="connect-option focus:outline-none"  (click)="connectXDEFI()">
           <img width="24px" src="https://www.xdefi.io/favicon.svg" lass="connect-option__logo"/>
           <span *ngIf="isXDEFIConnected">Connect with XDEFI</span>
           <span *ngIf="!isXDEFIConnected">Install XDEFI</span>
