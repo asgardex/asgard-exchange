@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Chain } from '@xchainjs/xchain-util';
 import { BehaviorSubject, of, ReplaySubject, Subject, timer } from 'rxjs';
-import { catchError, switchMap, takeUntil, retryWhen, delay, take } from 'rxjs/operators';
+import { catchError, switchMap, takeUntil, retryWhen, delay, take, retry } from 'rxjs/operators';
 import { TransactionDTO } from '../_classes/transaction';
 import { User } from '../_classes/user';
 import { BinanceService } from './binance.service';
@@ -185,8 +185,8 @@ export class TransactionStatusService {
       takeUntil(this.killTxPolling[hash]),
       // switchMap cancels the last request, if no response have been received since last tick
       switchMap(() => this.midgardService.getTransaction(hash)),
-      // catchError handles http throws
-      catchError(error => of(error))
+      // retry in case CORS error or something fails
+      retry(),
     ).subscribe( async (res: TransactionDTO) => {
 
       if (res.count > 0) {
