@@ -138,18 +138,11 @@ export class EthUtilsService {
   }
 
   async callDeposit({inboundAddress, asset, memo, ethClient, amount}: CallDepositParams): Promise<string> {
-    console.log({
-      method: 'callDeposit',
-      inboundAddress, asset, memo, ethClient, amount
-    });
     let hash;
     const abi = (environment.network) === 'testnet'
       ? TCRopstenAbi
       : TCRopstenAbi;
     const ethAddress = await ethClient.getAddress();
-    const gasPrices = await ethClient.estimateGasPrices();
-    const deprecatedEthClientgasPrice = gasPrices.fast.amount().toFixed(0);
-    console.log('gas price is: ', deprecatedEthClientgasPrice);
     console.log('inboundAddress.gas_rate: ', inboundAddress.gas_rate);
     console.log('inboundAddress format units is: ',
       baseAmount(
@@ -162,17 +155,12 @@ export class EthUtilsService {
 
       const contract = new ethers.Contract(inboundAddress.router, abi);
       const unsignedTx = await contract.populateTransaction.deposit(
-        inboundAddress.address, // not sure if this is correct...
+        inboundAddress.address,
         '0x0000000000000000000000000000000000000000',
-        // ethers.utils.parseEther(String(amount)),
-
         amount.toFixed(),
-
         memo,
-        // {from: ethAddress, value: ethers.utils.parseEther(String(amount)), gasPrice}
         {from: ethAddress, value: amount.toFixed(), gasPrice}
       );
-      console.log({unsignedTx});
       const resp = await ethClient
         .getWallet()
         .sendTransaction(unsignedTx);
@@ -185,10 +173,6 @@ export class EthUtilsService {
       const assetAddress = asset.symbol.slice(asset.ticker.length + 1);
       const strip0x = assetAddress.substr(2);
       const checkSummedAddress = ethers.utils.getAddress(strip0x);
-      // const tokenContract = new ethers.Contract(checkSummedAddress, erc20ABI);
-      // const decimal: BigNumber = await ethClient.call(checkSummedAddress, erc20ABI, 'decimals', []);
-      // const tokenContract = new ethers.Contract(checkSummedAddress, erc20ABI, wallet);
-      // const decimal = await tokenContract.decimals();
       const params = [
         inboundAddress.address, // vault
         checkSummedAddress, // asset
@@ -200,11 +184,9 @@ export class EthUtilsService {
         ...params,
         {from: ethAddress, gasPrice}
       );
-      console.log({unsignedTx});
       const resp = await ethClient
         .getWallet()
         .sendTransaction(unsignedTx);
-      console.log({hash});
 
       hash = typeof(resp) === 'string' ? resp : resp?.hash || '';
 
