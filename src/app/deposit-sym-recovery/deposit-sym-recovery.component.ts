@@ -462,7 +462,7 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
     const txCost = assetToBase(assetAmount(0.00000001));
 
     // withdraw 100%
-    const memo = `WITHDRAW:${this.searchingAsset.chain}.${this.searchingAsset.symbol}:100`;
+    const memo = `WITHDRAW:${this.searchingAsset.chain}.${this.searchingAsset.symbol}:10000`;
 
     // withdraw RUNE
     try {
