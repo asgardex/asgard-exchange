@@ -143,12 +143,6 @@ export class EthUtilsService {
       ? TCRopstenAbi
       : TCRopstenAbi;
     const ethAddress = await ethClient.getAddress();
-    console.log('inboundAddress.gas_rate: ', inboundAddress.gas_rate);
-    console.log('inboundAddress format units is: ',
-      baseAmount(
-        ethers.utils.parseUnits(inboundAddress.gas_rate, 'gwei').toString(),
-        ETH_DECIMAL
-      ).amount().toFixed(0));
     const gasPrice = baseAmount(ethers.utils.parseUnits(inboundAddress.gas_rate, 'gwei').toString(), ETH_DECIMAL).amount().toFixed(0);
 
     if (asset.ticker === 'ETH') {
@@ -164,7 +158,6 @@ export class EthUtilsService {
       const resp = await ethClient
         .getWallet()
         .sendTransaction(unsignedTx);
-      console.log({hash});
 
       hash = typeof(resp) === 'string' ? resp : resp?.hash || '';
 

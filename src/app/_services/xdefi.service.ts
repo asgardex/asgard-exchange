@@ -22,7 +22,6 @@ import { AssetETH, assetToString } from '@xchainjs/xchain-util';
 import { toUtf8Bytes } from '@ethersproject/strings';
 import { Address } from '@xchainjs/xchain-client';
 import { hexlify } from '@ethersproject/bytes';
-import { getDefaultGasPrices } from '@xchainjs/xchain-ethereum/lib/utils';
 
 @Injectable({
   providedIn: 'root',
@@ -214,8 +213,6 @@ export class XDEFIService {
       this.getEthAddress(),
       this.getLtcAddress()
     ]);
-
-    console.log('all addresses');
 
     userThorchainClient.getAddress = () => thorAddress;
     userBinanceClient.getAddress = () => bnbAddress;
