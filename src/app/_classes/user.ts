@@ -24,12 +24,6 @@ export class User {
   keystore?: any;
   clients?: AvailableClients;
 
-  signingOperations?: {
-    binance: {
-      transfer
-    }
-  };
-
   // for Ledger
   ledger?: any;
   hdPath?: number [];

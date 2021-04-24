@@ -53,7 +53,6 @@ export class ConnectModal {
 
   connectionView: ConnectionView;
   isTestnet: boolean;
-  selectedChain: 'BNB' | 'BTC';
   isXDEFIConnected: boolean;
   phrase: string;
 
@@ -66,10 +65,6 @@ export class ConnectModal {
     if ((window as any).xfi) {
       this.isXDEFIConnected = true;
     }
-  }
-
-  setSelectedChain(chain: 'BNB' | 'BTC') {
-    this.selectedChain = chain;
   }
 
   createKeystore() {

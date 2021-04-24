@@ -10,9 +10,7 @@
     "build:testnet": "npm run config -- --environment=prod --configuration=testnet && npm run patchCosmos && ng build --configuration testnet",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e",
-    "serve": "serve dist/asgard-exchange/",
-    "heroku-postbuild": "bash scripts/heroku_build.sh"
+    "e2e": "ng e2e"
   },
   "private": true,
   "dependencies": {
@@ -94,8 +92,5 @@
   },
   "browser": {
     "crypto": false
-  },
-  "engines": {
-    "node": "14.x"
   }
 }
