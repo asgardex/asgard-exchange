@@ -100,7 +100,7 @@
             </div>
           </div>
 
-          <div class="flex justify-end">
+          <div *ngIf="user?.type === 'keystore'" class="flex justify-end">
             <button mat-flat-button (click)="mode = 'VIEW_PHRASE'">
               <mat-icon>visibility</mat-icon>
               View Phrase

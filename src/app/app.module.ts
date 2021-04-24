@@ -6,11 +6,15 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 /** COMPONENTS */
 import { AppComponent } from './app.component';
-import { ConnectComponent, ConnectModal } from './_components/connect/connect.component';
+import {
+  ConnectComponent,
+  ConnectModal,
+} from './_components/connect/connect.component';
 import { ConfimSendComponent } from './_components/user-settings/user-settings-dialog/confim-send/confim-send.component';
 import { ConnectErrorComponent } from './_components/connect/connect-error/connect-error.component';
 import { HeaderComponent } from './_components/header/header.component';
 import { KeystoreConnectComponent } from './_components/connect/keystore-connect/keystore-connect.component';
+import { XDEFIConnectComponent } from './_components/connect/xdefi-connect/xdefi-connect.component';
 import { LastBlockIndicatorComponent } from './_components/last-block-indicator/last-block-indicator.component';
 import { KeystoreCreateComponent } from './_components/connect/keystore-create/keystore-create.component';
 import { PendingTxsModalComponent } from './_components/user-settings/user-settings-dialog/pending-txs/pending-txs-modal.component';
@@ -75,6 +79,7 @@ import { SochainService } from './_services/sochain.service';
 import { ThorchainPricesService } from './_services/thorchain-prices.service';
 import { HaskoinService } from './_services/haskoin.service';
 import { ModalSectionHeaderModule } from './_components/modal-section-header/modal-section-header.module';
+import { ReconnectXDEFIDialogComponent } from './_components/reconnect-xdefi-dialog/reconnect-xdefi-dialog.component';
 import { KeystoreCreateStorePhraseComponent } from './_components/connect/keystore-create-store-phrase/keystore-create-store-phrase.component';
 import { NetworkQueueService } from './_services/network-queue.service';
 
@@ -89,6 +94,7 @@ import { NetworkQueueService } from './_services/network-queue.service';
     ConnectErrorComponent,
     LastBlockIndicatorComponent,
     KeystoreCreateComponent,
+    XDEFIConnectComponent,
     UserSettingsComponent,
     UserSettingsDialogComponent,
     PendingTxsModalComponent,
@@ -97,6 +103,7 @@ import { NetworkQueueService } from './_services/network-queue.service';
     SendAssetComponent,
     ConfimSendComponent,
     ReconnectDialogComponent,
+    ReconnectXDEFIDialogComponent,
     SlippageToleranceComponent,
     TestnetWarningComponent,
     ViewPhraseComponent,
@@ -153,6 +160,6 @@ import { NetworkQueueService } from './_services/network-queue.service';
     KeystoreDepositService,
     NetworkQueueService
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

@@ -151,7 +151,10 @@ export class UpgradeRuneConfirmComponent implements OnInit, OnDestroy {
 
             if (this.user.type === 'keystore') {
               this.keystoreTransfer(matchingPool);
-            } else {
+            } else if (this.user.type === 'XDEFI') {
+              this.keystoreTransfer(matchingPool);
+            }
+            else {
               console.error('no matching user type');
             }
 
@@ -219,7 +222,6 @@ export class UpgradeRuneConfirmComponent implements OnInit, OnDestroy {
           if (amount.isGreaterThan(balanceAmount)) {
             amount = balanceAmount;
           }
-
           const hash = await this.ethUtilsService.callDeposit({
             asset: this.asset.asset,
             inboundAddress: matchingPool,

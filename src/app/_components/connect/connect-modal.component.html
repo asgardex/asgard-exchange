@@ -24,6 +24,12 @@
           <span>Connect Keystore</span>
         </button>
 
+        <button *ngIf="isTestnet" class="connect-option focus:outline-none"  (click)="connectXDEFI()">
+          <img width="24px" src="https://www.xdefi.io/favicon.svg" lass="connect-option__logo"/>
+          <span *ngIf="isXDEFIConnected">Connect with XDEFI</span>
+          <span *ngIf="!isXDEFIConnected">Install XDEFI</span>
+        </button>
+
       </div>
 
     </div>
@@ -37,6 +43,9 @@
 
   <!-- KEYSTORE CONNECT -->
   <app-keystore-connect *ngIf="connectionView == 'KEYSTORE_CONNECT'" (back)="clearConnectionMethod()" (closeModal)="close()"></app-keystore-connect>
+
+  <!-- XDEFI CONNECT -->
+  <app-xdefi-connect *ngIf="connectionView == 'XDEFI'" (back)="clearConnectionMethod()" (closeModal)="close()"></app-xdefi-connect>
 
 </div>
 

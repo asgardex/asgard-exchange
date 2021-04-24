@@ -138,61 +138,50 @@ export class EthUtilsService {
   }
 
   async callDeposit({inboundAddress, asset, memo, ethClient, amount}: CallDepositParams): Promise<string> {
-
     let hash;
-    const wallet = ethClient.getWallet();
     const abi = (environment.network) === 'testnet'
       ? TCRopstenAbi
       : TCRopstenAbi;
-    const gasPrices = await ethClient.estimateGasPrices();
-    const deprecatedEthClientgasPrice = gasPrices.fast.amount().toFixed(0);
-    console.log('gas price is: ', deprecatedEthClientgasPrice);
-    console.log('inboundAddress.gas_rate: ', inboundAddress.gas_rate);
-    console.log('inboundAddress format units is: ',
-      baseAmount(
-        ethers.utils.parseUnits(inboundAddress.gas_rate, 'gwei').toString(),
-        ETH_DECIMAL
-      ).amount().toFixed(0));
+    const ethAddress = await ethClient.getAddress();
     const gasPrice = baseAmount(ethers.utils.parseUnits(inboundAddress.gas_rate, 'gwei').toString(), ETH_DECIMAL).amount().toFixed(0);
 
     if (asset.ticker === 'ETH') {
 
-      const ethAddress = await ethClient.getAddress();
-      const contract = new ethers.Contract(inboundAddress.router, abi, wallet);
-      const contractRes = await contract.deposit(
-        inboundAddress.address, // not sure if this is correct...
+      const contract = new ethers.Contract(inboundAddress.router, abi);
+      const unsignedTx = await contract.populateTransaction.deposit(
+        inboundAddress.address,
         '0x0000000000000000000000000000000000000000',
-        // ethers.utils.parseEther(String(amount)),
-
         amount.toFixed(),
-
         memo,
-        // {from: ethAddress, value: ethers.utils.parseEther(String(amount)), gasPrice}
         {from: ethAddress, value: amount.toFixed(), gasPrice}
       );
+      const resp = await ethClient
+        .getWallet()
+        .sendTransaction(unsignedTx);
 
-      // tslint:disable-next-line:no-string-literal
-      hash = contractRes['hash'] ? contractRes['hash'] : '';
+      hash = typeof(resp) === 'string' ? resp : resp?.hash || '';
 
     } else {
 
       const assetAddress = asset.symbol.slice(asset.ticker.length + 1);
       const strip0x = assetAddress.substr(2);
       const checkSummedAddress = ethers.utils.getAddress(strip0x);
-      // const tokenContract = new ethers.Contract(checkSummedAddress, erc20ABI, wallet);
-      // const decimal = await tokenContract.decimals();
       const params = [
         inboundAddress.address, // vault
         checkSummedAddress, // asset
         amount.toFixed(), // amount
         memo,
-        { gasPrice }
       ];
+      const vaultContract = new ethers.Contract(inboundAddress.router, abi);
+      const unsignedTx = await vaultContract.populateTransaction.deposit(
+        ...params,
+        {from: ethAddress, gasPrice}
+      );
+      const resp = await ethClient
+        .getWallet()
+        .sendTransaction(unsignedTx);
 
-      const contractRes = await ethClient.call(inboundAddress.router, abi, 'deposit', params);
-
-      // tslint:disable-next-line:no-string-literal
-      hash = contractRes['hash'] ? contractRes['hash'] : '';
+      hash = typeof(resp) === 'string' ? resp : resp?.hash || '';
 
     }
 
