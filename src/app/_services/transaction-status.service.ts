@@ -97,12 +97,6 @@ export class TransactionStatusService {
 
       if (pendingTx.isThorchainTx || pendingTx.chain === 'THOR') {
 
-        // if (!pendingTx.pollThornodeDirectly) {
-        //   this.pollThorchainTx(pendingTx.hash);
-        // } else {
-        //   this.pollThornodeTx(pendingTx.hash);
-        // }
-
         if (pendingTx.pollRpc) {
           /**
            * THOR.RUNE transfers to different wallet
