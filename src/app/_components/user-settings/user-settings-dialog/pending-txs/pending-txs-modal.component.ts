@@ -79,11 +79,12 @@ export class PendingTxsModalComponent implements OnInit, OnDestroy {
     if (tx.isThorchainTx) {
 
       if (tx.pollThornodeDirectly) {
-        let path = `https://viewblock.io/thorchain/tx/${tx.hash}`;
-        if (environment.network === 'testnet') {
-          path += '?network=testnet';
-        }
-        return path;
+        return this.getViewBlockPath(tx.hash);
+      }  else if (tx.pollRpc) {
+        /**
+         * For THOR transfers
+         */
+        return this.getViewBlockPath(tx.hash);
       } else {
         return this.thorchainExplorerUrl + '/' + tx.hash;
       }
@@ -93,6 +94,14 @@ export class PendingTxsModalComponent implements OnInit, OnDestroy {
     } else {
       return this.explorerUrl(tx.chain) + '/' + tx.hash;
     }
+  }
+
+  getViewBlockPath(hash): string {
+    let path = `https://viewblock.io/thorchain/tx/${hash}`;
+    if (environment.network === 'testnet') {
+      path += '?network=testnet';
+    }
+    return path;
   }
 
   close(): void {

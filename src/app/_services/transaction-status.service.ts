@@ -11,6 +11,7 @@ import { ethers } from 'ethers';
 import { environment } from 'src/environments/environment';
 import { SochainService, SochainTxResponse } from './sochain.service';
 import { HaskoinService, HaskoinTxResponse } from './haskoin.service';
+import { RpcTxSearchRes, ThorchainRpcService } from './thorchain-rpc.service';
 
 export const enum TxStatus {
   PENDING = 'PENDING',
@@ -40,6 +41,11 @@ export interface Tx {
    * This is a temporary patch because midgard is not picking up withdraw of pending assets
    */
   pollThornodeDirectly?: boolean;
+
+  /**
+   * This is for THOR.RUNE transfers, which are not picked up by midgard or thornode tx endpoints
+   */
+  pollRpc?: boolean;
 }
 
 @Injectable({
@@ -62,7 +68,8 @@ export class TransactionStatusService {
     private midgardService: MidgardService,
     private binanceService: BinanceService,
     private sochainService: SochainService,
-    private haskoinService: HaskoinService
+    private haskoinService: HaskoinService,
+    private rpcService: ThorchainRpcService,
   ) {
     this._txs = [];
 
@@ -90,10 +97,24 @@ export class TransactionStatusService {
 
       if (pendingTx.isThorchainTx || pendingTx.chain === 'THOR') {
 
-        if (!pendingTx.pollThornodeDirectly) {
-          this.pollThorchainTx(pendingTx.hash);
+        if (pendingTx.pollRpc) {
+          /**
+           * THOR.RUNE transfers to different wallet
+           */
+          this.pollRpc(pendingTx.hash);
+
+        } else if (pendingTx.pollThornodeDirectly) {
+          /**
+           * This is a temporary patch because midgard is not picking up withdraw of pending assets
+           */
+           this.pollThornodeTx(pendingTx.hash);
+
         } else {
-          this.pollThornodeTx(pendingTx.hash);
+          /**
+           * Poll Midgard
+           */
+           this.pollThorchainTx(pendingTx.hash);
+
         }
 
       } else {
@@ -239,6 +260,45 @@ export class TransactionStatusService {
       }
 
     });
+  }
+
+  /**
+   * Temporary patch until it's easier to track THOR.RUNE wallet transfers
+   */
+  pollRpc(hash: string) {
+    if (!this.user) {
+      return;
+    }
+
+    const thorAddress = this.user.clients.thorchain.getAddress();
+    if (!thorAddress) {
+      return;
+    }
+
+    timer(5000, 45000)
+    .pipe(
+      // This kills the request if the user closes the component
+      takeUntil(this.killTxPolling[hash]),
+      // switchMap cancels the last request, if no response have been received since last tick
+      switchMap(() => this.rpcService.txSearch(thorAddress)),
+      retryWhen(errors => errors.pipe(delay(10000), take(10)))
+    ).subscribe( async (res: RpcTxSearchRes) => {
+
+      if (res && res.result && res.result.txs && res.result.txs.length > 0) {
+
+        const match = res.result.txs.find( (tx) => tx.hash === hash );
+        if (match) {
+          this.updateTxStatus(hash, TxStatus.COMPLETE);
+          this.userService.fetchBalances();
+          this.killTxPolling[hash].next();
+        }
+
+      } else {
+        console.log('continue polling rpc: ', res);
+      }
+
+    });
+
   }
 
   pollBchTx(tx: Tx) {

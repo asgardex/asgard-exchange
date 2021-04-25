@@ -346,6 +346,7 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
       symbol: asset.symbol,
       isThorchainTx,
       hash,
+      pollRpc: (asset.chain === 'THOR')
     });
   }
 
