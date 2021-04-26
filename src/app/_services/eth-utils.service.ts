@@ -122,6 +122,10 @@ export class EthUtilsService {
 
     const {asset, balance, client } = ethParams;
 
+    if (balance <= 0) {
+      return balance;
+    }
+
     if (asset.chain === 'ETH' && asset.symbol === 'ETH') {
         const estimate = await client.estimateFeesWithGasPricesAndLimits({
           asset,
