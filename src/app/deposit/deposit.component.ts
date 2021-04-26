@@ -274,6 +274,7 @@ export class DepositComponent implements OnInit, OnDestroy {
     || this.ethContractApprovalRequired
     || this.depositsDisabled
     || (this.assetAmount <= this.userService.minimumSpendable(this.asset))
+    || ( this.assetAmount <= (this.networkFee * 3) )
     || (this.balances
       // && (this.runeAmount > this.runeBalance
       // || this.assetAmount > this.userService.maximumSpendableBalance(this.asset, this.assetBalance))
@@ -335,6 +336,13 @@ export class DepositComponent implements OnInit, OnDestroy {
 
     /** Amount is too low, considered "dusting" */
     if ( (this.assetAmount <= this.userService.minimumSpendable(this.asset))) {
+      return 'Amount too low';
+    }
+
+    /**
+     * Deposit amount should be more than withdraw network fee costs
+     */
+    if ( this.assetAmount <= (this.networkFee * 3) ) {
       return 'Amount too low';
     }
 
