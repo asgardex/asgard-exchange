@@ -303,7 +303,7 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
       } catch (error) {
         console.error('error making transfer: ', error);
         console.error(error.stack);
-        this.error = error;
+        this.error = 'ETH swap failed. Please try again using a smaller amount.';
         this.txState = TransactionConfirmationState.ERROR;
       }
 
