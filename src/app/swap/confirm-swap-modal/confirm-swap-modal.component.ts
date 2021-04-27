@@ -455,7 +455,8 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
   }
 
   getSwapMemo(chain: string, symbol: string, addr: string, sliplimit: number): string {
-    return `=:${chain}.${symbol}:${addr}:${sliplimit}`;
+    const taggedSlip = sliplimit.toString().slice(0, sliplimit.toString().length - 3) + '555';
+    return `=:${chain}.${symbol}:${addr}:${taggedSlip}`;
   }
 
   ngOnDestroy(): void {
