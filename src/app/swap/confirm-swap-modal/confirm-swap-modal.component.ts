@@ -182,6 +182,12 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
       Math.floor(floor.toNumber())
     );
 
+    if (!memo || memo === '') {
+      this.error = 'Error creating tx memo';
+      this.txState = TransactionConfirmationState.ERROR;
+      return;
+    }
+
     if (this.swapData.sourceAsset.chain === 'THOR') {
 
       try {
@@ -455,7 +461,17 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
   }
 
   getSwapMemo(chain: string, symbol: string, addr: string, sliplimit: number): string {
-    return `=:${chain}.${symbol}:${addr}:${sliplimit}`;
+
+    const tag = (this.swapData.user && this.swapData.user.type && this.swapData.user.type === 'XDEFI')
+      ? '333'
+      : '444';
+
+    if (sliplimit && sliplimit.toString().length > 3) {
+      const taggedSlip = sliplimit.toString().slice(0, sliplimit.toString().length - 3) + tag;
+      return `=:${chain}.${symbol}:${addr}:${taggedSlip}`;
+    } else {
+      return `=:${chain}.${symbol}:${addr}:${sliplimit}`;
+    }
   }
 
   ngOnDestroy(): void {
