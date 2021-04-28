@@ -39,29 +39,29 @@
           </mat-select>
         </div>
 
-        <div *ngIf="action === 'SWAP' || action === 'ADD' || action === 'WITHDRAW'" class="uni-input">
+        <div *ngIf="action === 'SWAP' || action === 'ADD' || action === 'WITHDRAW'" class="uni-input focus:outline-none focus:ring-0">
           <label>Asset</label>
           <input type="text" [ngModel]="memoAsset" (ngModelChange)="onMemoAssetChange($event)">
         </div>
 
-        <div *ngIf="action === 'SWAP' || action === 'BOND' || action === 'UNBOND' || action === 'LEAVE'">
-          <div class="uni-input">
-            <label>Address</label>
+        <div *ngIf="action === 'SWAP' || action === 'BOND' || action === 'UNBOND' || action === 'LEAVE' || action === 'ADD'">
+          <div class="uni-input focus:outline-none focus:ring-0">
+            <label>Address <span *ngIf="action === 'ADD'">(Optional)</span></label>
             <input type="text" [ngModel]="destinationAddress" (ngModelChange)="updateDestinationAddress($event)">
           </div>
         </div>
 
-        <div class="uni-input" *ngIf="action === 'SWAP'">
+        <div class="uni-input focus:outline-none focus:ring-0" *ngIf="action === 'SWAP'">
           <label>Limit</label>
           <input type="text" [ngModel]="swapLimit" (ngModelChange)="updateSwapLimit($event)">
         </div>
 
-        <div class="uni-input" *ngIf="action === 'UNBOND'">
+        <div class="uni-input focus:outline-none focus:ring-0" *ngIf="action === 'UNBOND'">
           <label>Unbond Amount</label>
           <input type="number" [ngModel]="memoAmount" (ngModelChange)="updateUnbondAmount($event)">
         </div>
 
-        <div class="uni-input" *ngIf="action === 'WITHDRAW'">
+        <div class="uni-input focus:outline-none focus:ring-0" *ngIf="action === 'WITHDRAW'">
 
           <span>Amount</span>
 

@@ -83,6 +83,7 @@ export class DepositFormComponent implements OnInit {
     let position;
     switch (this.action) {
       case ActionOptions.SWAP:
+      case ActionOptions.ADD:
         position = 2;
         break;
 
