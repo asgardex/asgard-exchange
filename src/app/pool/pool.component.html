@@ -23,15 +23,29 @@
 
       <button *ngIf="depositsDisabled" class="main-action-btn w-full" mat-flat-button color="primary" disabled>Pool Cap > 90%</button>
 
-      <a
-        *ngIf="createablePools && createablePools.length > 0"
-        [routerLink]="['/', 'create-pool']"
-        [queryParams]="{pool: createablePools[0]}"
-        class="float-right text-white mt-3"
-        style="text-decoration: none; font-size: 0.8rem;"
-      >
-        Create Pool
-      </a>
+      <div class="flex float-right mt-3 items-center">
+
+        <a
+          *ngIf="createablePools && createablePools.length > 0"
+          [routerLink]="['/', 'create-pool']"
+          [queryParams]="{pool: createablePools[0]}"
+          class="text-white"
+          style="text-decoration: none; font-size: 0.8rem;"
+        >
+          Create Pool
+        </a>
+
+        <span class="text-gray-600 ml-2 text-xs" *ngIf="createablePools && createablePools.length > 0"> | </span>
+
+        <a
+          [routerLink]="['/', 'deposit-sym-recovery']"
+          class="text-white ml-2"
+          style="text-decoration: none; font-size: 0.8rem;"
+        >
+          Pending Deposits
+        </a>
+      </div>
+
     </div>
 
     <div class="section-label flex items-center justify-between">
