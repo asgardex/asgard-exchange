@@ -54,11 +54,6 @@
 
         <div>
 
-          <!-- <div class="flex justify-between" style="margin-bottom: 6px;">
-            <span class="tx-detail-label">Price</span>
-            <span>{{swapData.basePrice | number:"1.2-4"}} {{swapData.sourceAsset.ticker}} per {{swapData.targetAsset.ticker}}</span>
-          </div> -->
-
           <div class="flex justify-between mb-2">
             <div class="tx-detail-label flex items-end">
               Estimated Tx Time
@@ -67,20 +62,9 @@
             <div class="flex items-end"><{{estimatedMinutes}} min</div>
           </div>
 
-          <div *ngIf="swapData.sourceAsset.chain === 'BNB'" class="flex justify-between mb-2">
+          <div *ngIf="swapData.networkFeeInSource" class="flex justify-between mb-2">
             <span class="tx-detail-label">Total Fee</span>
-            <span>{{swapData.bnbFee | number:"0.0-6"}} BNB</span>
-          </div>
-
-          <div *ngIf="swapData.sourceAsset.chain === 'ETH'" class="flex justify-between mb-2">
-            <span class="tx-detail-label">Total Fee</span>
-            <span *ngIf="ethNetworkFee">{{ (ethNetworkFee) | number:"0.0-6"}} ETH</span>
-            <span *ngIf="!ethNetworkFee"> - ETH</span>
-          </div>
-
-          <div *ngIf="swapData.outboundTransactionFee" class="flex justify-between mb-2">
-            <span class="tx-detail-label">Total Fee</span>
-            <span>{{swapData.outboundTransactionFee}} Rune</span>
+            <span>{{swapData.networkFeeInSource | number:"1.0-4"}} {{swapData.sourceAsset.ticker}}</span>
           </div>
 
           <div class="flex justify-between">
@@ -89,11 +73,7 @@
           </div>
         </div>
 
-        <div *ngIf="loading" style="height: 56px;" class="flex justify-center items-center w-full mt-4">
-          <mat-progress-spinner mode="indeterminate" diameter="30"></mat-progress-spinner>
-        </div>
-
-        <button *ngIf="!loading" (click)="submitTransaction()" mat-flat-button color="primary" class="main-action-btn w-full" [disabled]="insufficientChainBalance">
+        <button (click)="submitTransaction()" mat-flat-button color="primary" class="main-action-btn w-full" [disabled]="insufficientChainBalance">
           <span *ngIf="!insufficientChainBalance">Confirm Swap</span>
           <span *ngIf="insufficientChainBalance">Insufficient {{swapData.sourceAsset.chain}}</span>
         </button>

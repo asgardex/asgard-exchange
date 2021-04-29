@@ -33,13 +33,13 @@
 
         <div class="flex items-center">
           <div class="asset-icon-container flex items-center mr-4">
-            <img *ngIf="data.rune && data.rune.iconPath" [src]="data.rune.iconPath" appImgFallback />
-            <mat-icon *ngIf="!data.rune || !data.rune.iconPath">help_outline</mat-icon>
+            <img *ngIf="rune && rune.iconPath" [src]="rune.iconPath" appImgFallback />
+            <mat-icon *ngIf="!rune || !rune.iconPath">help_outline</mat-icon>
           </div>
           <span class="text-xl mr-2">{{data.runeAmount}}</span>
         </div>
 
-        <span *ngIf="data.rune">{{data.rune.ticker}}</span>
+        <span *ngIf="rune">{{rune.ticker}}</span>
 
       </div>
 
@@ -62,23 +62,23 @@
 
           <div class="flex justify-between mb-2">
             <span class="tx-detail-label">Rates</span>
-            <span>1 {{data.rune.ticker}} = {{data.assetBasePrice | number:"1.2-4"}} {{data.asset.ticker}}</span>
+            <span>1 {{rune.ticker}} = {{data.assetBasePrice | number:"1.2-4"}} {{data.asset.ticker}}</span>
           </div>
 
           <div class="flex justify-between mb-2">
             <span class="tx-detail-label"></span>
-            <span>1 {{data.asset.ticker}} = {{data.runeBasePrice | number:"1.2-4"}} {{data.rune.ticker}}</span>
+            <span>1 {{data.asset.ticker}} = {{data.runeBasePrice | number:"1.2-4"}} {{rune.ticker}}</span>
           </div>
 
           <div class="flex justify-between mb-2">
-            <span class="tx-detail-label">RUNE Fee</span>
-            <span>{{data.outboundTransactionFee}}</span>
+            <span class="tx-detail-label">Fees</span>
+            <span>{{data.runeFee}} RUNE</span>
           </div>
 
-          <div class="flex justify-between mb-2">
-            <span class="tx-detail-label">{{data.asset.ticker}} Fee</span>
-            <!-- TODO: calculate this -->
-            <span>{{data.asset.ticker}} Network Gas</span>
+          <div class="flex justify-between pb-2 items-center">
+            <span class="tx-detail-label"></span>
+            <span *ngIf="data.networkFee">{{data.networkFee | number:"1.0-4"}} {{data.asset.chain}}.{{data.asset.ticker}}</span>
+            <span *ngIf="!data.networkFee">-</span>
           </div>
 
         </div>
@@ -95,7 +95,7 @@
 
   <app-transaction-processing-modal
     *ngIf="txState == 'SUBMITTING'"
-    transactionDetail="Withdrawing {{data.assetAmount}} {{data.asset.ticker}} + {{data.runeAmount}} {{data.rune.ticker}}"
+    transactionDetail="Withdrawing {{data.assetAmount}} {{data.asset.ticker}} + {{data.runeAmount}} {{rune.ticker}}"
     (closeDialog)="closeDialog()">
   </app-transaction-processing-modal>
 

@@ -100,6 +100,7 @@ export class DepositComponent implements OnInit, OnDestroy {
   maximumSpendable: number;
   poolNotFoundErr: boolean;
 
+  runeFee: number;
   networkFee: number;
   depositsDisabled: boolean;
 
@@ -236,7 +237,8 @@ export class DepositComponent implements OnInit, OnDestroy {
             runeBalance: baseAmount(res.runeDepth),
           };
 
-          this.networkFee = this.txUtilsService.calculateNetworkFee(this.asset, inboundAddresses, res);
+          this.networkFee = this.txUtilsService.calculateNetworkFee(this.asset, inboundAddresses, 'INBOUND', res);
+          this.runeFee = this.txUtilsService.calculateNetworkFee(new Asset('THOR.RUNE'), inboundAddresses, 'INBOUND', res);
 
         }
       },
@@ -274,7 +276,9 @@ export class DepositComponent implements OnInit, OnDestroy {
     || this.ethContractApprovalRequired
     || this.depositsDisabled
     || (this.assetAmount <= this.userService.minimumSpendable(this.asset))
-    || ( this.assetAmount <= (this.networkFee * 3) )
+    || ( this.assetAmount <= (
+      // outbound fee plus inbound fee
+      (this.networkFee * 3) + this.networkFee) )
     || (this.balances
       // && (this.runeAmount > this.runeBalance
       // || this.assetAmount > this.userService.maximumSpendableBalance(this.asset, this.assetBalance))
@@ -340,9 +344,9 @@ export class DepositComponent implements OnInit, OnDestroy {
     }
 
     /**
-     * Deposit amount should be more than withdraw network fee costs
+     * Deposit amount should be more than outbound fee + inbound fee network fee costs
      */
-    if ( this.assetAmount <= (this.networkFee * 3) ) {
+    if ( this.assetAmount <= ((this.networkFee * 3) + this.networkFee) ) {
       return 'Amount too low';
     }
 

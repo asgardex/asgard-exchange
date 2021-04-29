@@ -59,14 +59,14 @@
 
       <div class="flex justify-between pb-2 items-center">
         <span class="tx-detail-label">TX Fees</span>
-        <span *ngIf="outboundTransactionFee">{{outboundTransactionFee}} RUNE</span>
-        <span *ngIf="!outboundTransactionFee">...</span>
+        <span *ngIf="runeFee">{{runeFee}} RUNE</span>
+        <span *ngIf="!runeFee">-</span>
       </div>
 
       <div class="flex justify-between pb-2 items-center">
         <span class="tx-detail-label"></span>
-        <span *ngIf="networkFee">{{networkFee | number:"1.0-8"}} {{asset.ticker}}.{{asset.chain}}  Network Fee</span>
-        <span *ngIf="!networkFee">...</span>
+        <span *ngIf="networkFee">{{networkFee | number:"1.0-4"}} {{asset.ticker}}.{{asset.chain}}</span>
+        <span *ngIf="!networkFee">-</span>
       </div>
 
     </div>

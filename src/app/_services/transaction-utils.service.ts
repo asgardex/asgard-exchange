@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { bn } from '@xchainjs/xchain-util';
+import { assetToString, bn } from '@xchainjs/xchain-util';
 import { Asset } from '../_classes/asset';
 import { PoolDTO } from '../_classes/pool';
 import { PoolAddressDTO } from '../_classes/pool-address';
@@ -38,8 +38,12 @@ export class TransactionUtilsService {
     );
   }
 
-  calculateNetworkFee(asset: Asset, inboundAddresses: PoolAddressDTO[], assetPool?: PoolDTO): number {
+  /**
+   * reference https://github.com/thorchain/asgardex-electron/issues/1381
+   */
+  calculateNetworkFee(asset: Asset, inboundAddresses: PoolAddressDTO[], direction: 'INBOUND' | 'OUTBOUND', assetPool?: PoolDTO): number {
 
+    const multiplier = (direction === 'OUTBOUND') ? 3 : 1;
     const matchingInboundAddress = inboundAddresses.find( (pool) => pool.chain === asset.chain );
 
     if (matchingInboundAddress) {
@@ -47,23 +51,23 @@ export class TransactionUtilsService {
         case 'BTC':
         case 'LTC':
         case 'BCH':
-          return (250 * (+matchingInboundAddress.gas_rate) * 3) / (10 ** 8);
+          return (250 * (+matchingInboundAddress.gas_rate) * multiplier) / (10 ** 8);
 
         case 'ETH':
 
           // ETH
           if (asset.symbol === 'ETH') {
-            return (35000 * (+matchingInboundAddress.gas_rate) * (10 ** 9) * 3)  / (10 ** 18);
+            return (35000 * (+matchingInboundAddress.gas_rate) * (10 ** 9) * multiplier)  / (10 ** 18);
           }
           // ERC20
           else {
-            const ethGasVal = (70000 * (+matchingInboundAddress.gas_rate) * (10 ** 9) * 3)  / (10 ** 18);
-            const tokenEthValue = (+assetPool.assetPriceUSD) / (+this._ethPool.assetPriceUSD);
+            const ethGasVal = (70000 * (+matchingInboundAddress.gas_rate) * (10 ** 9) * multiplier)  / (10 ** 18);
+            const tokenEthValue = (+this._ethPool.assetPriceUSD) / (+assetPool.assetPriceUSD);
             return ethGasVal * tokenEthValue;
           }
 
         case 'BNB':
-          return 0.000375;
+          return (multiplier * (+matchingInboundAddress.gas_rate) * 1) / (10 ** 8);
       }
 
     } else if (asset.chain === 'THOR') {

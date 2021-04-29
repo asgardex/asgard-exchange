@@ -8,18 +8,19 @@ import { environment } from 'src/environments/environment';
 import { assetAmount, assetToBase, assetToString } from '@xchainjs/xchain-util';
 import { TransactionStatusService, TxActions, TxStatus } from 'src/app/_services/transaction-status.service';
 import { EthUtilsService } from 'src/app/_services/eth-utils.service';
+import { Asset } from 'src/app/_classes/asset';
 
 // TODO: this is the same as ConfirmStakeData in confirm stake modal
 export interface ConfirmWithdrawData {
   asset;
-  rune;
   assetAmount: number;
   runeAmount: number;
   user: User;
   runeBasePrice: number;
   assetBasePrice: number;
   unstakePercent: number;
-  outboundTransactionFee: number;
+  runeFee: number;
+  networkFee: number;
 }
 
 @Component({
@@ -36,6 +37,7 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
   killPolling: Subject<void> = new Subject();
   error: string;
   estimatedMinutes: number;
+  rune = new Asset('THOR.RUNE');
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: ConfirmWithdrawData,
