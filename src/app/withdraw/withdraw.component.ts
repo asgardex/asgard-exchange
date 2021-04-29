@@ -9,7 +9,6 @@ import {
   bn,
 } from '@xchainjs/xchain-util';
 import { Subscription } from 'rxjs';
-import { environment } from 'src/environments/environment';
 import { Asset } from '../_classes/asset';
 import { MemberPool } from '../_classes/member';
 import { User } from '../_classes/user';
@@ -26,8 +25,6 @@ import { ConfirmWithdrawModalComponent } from './confirm-withdraw-modal/confirm-
 })
 export class WithdrawComponent implements OnInit {
 
-  runeSymbol = environment.network === 'chaosnet' ? 'RUNE-B1A' : 'RUNE-67C';
-
   get withdrawPercent() {
     return this._withdrawPercent;
   }
@@ -39,7 +36,7 @@ export class WithdrawComponent implements OnInit {
 
   subs: Subscription[];
   asset: Asset;
-  rune: Asset;
+  rune = new Asset('THOR.RUNE');
   assetPoolData: PoolData;
   poolUnits: number;
   user: User;
@@ -58,7 +55,7 @@ export class WithdrawComponent implements OnInit {
   assetBasePrice: number;
 
   insufficientBnb: boolean;
-  outboundTransactionFee: number;
+  runeFee: number;
 
   networkFee: number;
   queue: ThorchainQueue;
@@ -72,8 +69,6 @@ export class WithdrawComponent implements OnInit {
     private router: Router,
     private txUtilsService: TransactionUtilsService
   ) {
-
-    this.rune = new Asset(this.runeSymbol);
 
     this.withdrawPercent = 0;
 
@@ -181,7 +176,7 @@ export class WithdrawComponent implements OnInit {
     this.midgardService.getConstants().subscribe(
       (res) => {
         this.lockBlocks = res.int_64_values.LiquidityLockUpBlocks;
-        this.outboundTransactionFee = bn(res.int_64_values.OutboundTransactionFee).div(10 ** 8).toNumber();
+        this.runeFee = bn(res.int_64_values.OutboundTransactionFee).div(10 ** 8).toNumber();
         this.checkCooldown();
       },
       (err) => console.error('error fetching constants: ', err)
@@ -273,20 +268,19 @@ export class WithdrawComponent implements OnInit {
     const dialogRef = this.dialog.open(
       ConfirmWithdrawModalComponent,
       {
-        // width: '50vw',
         maxWidth: '420px',
         width: '50vw',
         minWidth: '310px',
         data: {
           asset: this.asset,
-          rune: this.rune,
           assetAmount: this.removeAssetAmount,
           runeAmount: this.removeRuneAmount,
           user: this.user,
           unstakePercent: this.withdrawPercent,
           runeBasePrice,
           assetBasePrice,
-          outboundTransactionFee: this.outboundTransactionFee
+          runeFee: this.runeFee,
+          networkFee: this.networkFee
         }
       }
     );
