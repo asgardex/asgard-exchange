@@ -276,7 +276,7 @@ export class SwapComponent implements OnInit, OnDestroy {
       const assetInboundFee = this.txUtilsService.calculateNetworkFee(
         asset,
         this.inboundAddresses,
-        'OUTBOUND',
+        'INBOUND',
         pool
       );
 
