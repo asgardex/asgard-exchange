@@ -320,7 +320,7 @@ export class WithdrawComponent implements OnInit {
           this.runeBasePrice = getValueOfAssetInRune(assetToBase(assetAmount(1)), this.assetPoolData).amount().div(10 ** 8).toNumber();
           this.assetBasePrice = getValueOfRuneInAsset(assetToBase(assetAmount(1)), this.assetPoolData).amount().div(10 ** 8).toNumber();
 
-          this.networkFee = this.txUtilsService.calculateNetworkFee(this.asset, inboundAddresses, res);
+          this.networkFee = this.txUtilsService.calculateNetworkFee(this.asset, inboundAddresses, 'OUTBOUND', res);
 
           this.calculate();
         }

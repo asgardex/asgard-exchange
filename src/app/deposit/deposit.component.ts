@@ -236,7 +236,7 @@ export class DepositComponent implements OnInit, OnDestroy {
             runeBalance: baseAmount(res.runeDepth),
           };
 
-          this.networkFee = this.txUtilsService.calculateNetworkFee(this.asset, inboundAddresses, res);
+          this.networkFee = this.txUtilsService.calculateNetworkFee(this.asset, inboundAddresses, 'OUTBOUND', res);
 
         }
       },

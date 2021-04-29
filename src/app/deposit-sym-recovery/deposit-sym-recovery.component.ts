@@ -195,7 +195,7 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
         this.getMaximumSpendableEth(this.missingAsset, this.missingAssetBalance);
       }
 
-      this.networkFee = this.txUtilsService.calculateNetworkFee(this.missingAsset, this.inboundAddresses, pool);
+      this.networkFee = this.txUtilsService.calculateNetworkFee(this.missingAsset, this.inboundAddresses, 'OUTBOUND', pool);
 
       this.updateRuneAmount(matches[0].pending_asset, poolData);
 

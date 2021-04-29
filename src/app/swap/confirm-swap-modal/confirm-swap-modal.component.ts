@@ -9,7 +9,6 @@ import { Subscription } from 'rxjs';
 import { TransactionStatusService, TxActions, TxStatus } from 'src/app/_services/transaction-status.service';
 import { SlippageToleranceService } from 'src/app/_services/slippage-tolerance.service';
 import BigNumber from 'bignumber.js';
-import { ETH_DECIMAL } from '@xchainjs/xchain-ethereum/lib';
 import { EthUtilsService } from 'src/app/_services/eth-utils.service';
 import {
   baseAmount,
@@ -24,14 +23,12 @@ import { Balances } from '@xchainjs/xchain-client';
 export interface SwapData {
   sourceAsset;
   targetAsset;
-  outboundTransactionFee: number;
-  bnbFee: number;
   basePrice: number;
   inputValue: number;
   outputValue: BigNumber;
   user: User;
   slip: number;
-  estimatedFee: number;
+  networkFeeInSource: number;
 }
 
 @Component({
@@ -49,7 +46,6 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
   error: string;
   ethNetworkFee: number;
   insufficientChainBalance: boolean;
-  loading: boolean;
   estimatedMinutes: number;
   balances: Balances;
 
@@ -62,7 +58,6 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
     private slipLimitService: SlippageToleranceService,
     private ethUtilsService: EthUtilsService
   ) {
-    this.loading = true;
     this.txState = TransactionConfirmationState.PENDING_CONFIRMATION;
     this.insufficientChainBalance = false;
 
@@ -83,19 +78,7 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-
     this.estimateTime();
-
-    const sourceAsset = this.swapData.sourceAsset;
-    if (sourceAsset.chain === 'ETH') {
-
-      // ESTIMATE GAS HERE
-      this.estimateEthGasPrice();
-
-    } else {
-      this.loading = false;
-    }
-
   }
 
   async estimateTime() {
@@ -240,10 +223,7 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
         // TODO -> consolidate this with BTC, BCH, LTC
         const balanceAmount = this.userService.findRawBalance(this.balances, this.swapData.sourceAsset);
         const toBase = assetToBase(assetAmount(amountNumber));
-        const feeToBase = assetToBase(assetAmount(this.swapData.estimatedFee));
-        if (balanceAmount.minus(feeToBase.amount()).minus(toBase.amount()).isGreaterThan(0)) {
-
-        }
+        const feeToBase = assetToBase(assetAmount(this.swapData.networkFeeInSource));
         const amount = (balanceAmount
           // subtract fee
           .minus(feeToBase.amount())
@@ -320,7 +300,7 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
         // TODO -> consolidate this with BTC, BCH, LTC
         const balanceAmount = this.userService.findRawBalance(this.balances, this.swapData.sourceAsset);
         const toBase = assetToBase(assetAmount(amountNumber));
-        const feeToBase = assetToBase(assetAmount(this.swapData.estimatedFee));
+        const feeToBase = assetToBase(assetAmount(this.swapData.networkFeeInSource));
         const amount = (balanceAmount
           // subtract fee
           .minus(feeToBase.amount())
@@ -361,7 +341,7 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
         // TODO -> consolidate this with BTC, BCH, LTC
         const balanceAmount = this.userService.findRawBalance(this.balances, this.swapData.sourceAsset);
         const toBase = assetToBase(assetAmount(amountNumber));
-        const feeToBase = assetToBase(assetAmount(this.swapData.estimatedFee));
+        const feeToBase = assetToBase(assetAmount(this.swapData.networkFeeInSource));
         const amount = (balanceAmount
           // subtract fee
           .minus(feeToBase.amount())
@@ -408,56 +388,6 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
       symbol: asset.symbol,
       hash,
     });
-  }
-
-  async estimateEthGasPrice() {
-
-    const user = this.swapData.user;
-    const sourceAsset = this.swapData.sourceAsset;
-    const targetAsset = this.swapData.targetAsset;
-
-    if (user && user.clients && user.clients.ethereum) {
-
-      const ethClient = user.clients.ethereum;
-      const targetAddress = await ethClient.getAddress();
-      const ethBalances = await ethClient.getBalance();
-      const ethBalance = ethBalances[0];
-
-      // get inbound addresses
-      this.midgardService.getInboundAddresses().subscribe(
-        async (addresses) => {
-
-          const ethInbound = addresses.find( (inbound) => inbound.chain === 'ETH' );
-
-          const decimal = await this.ethUtilsService.getAssetDecimal(this.swapData.sourceAsset, ethClient);
-          let amount = assetToBase(assetAmount(this.swapData.inputValue, decimal)).amount();
-
-          const balanceAmount = this.userService.findRawBalance(this.balances, this.swapData.sourceAsset);
-          // const balanceAmount = assetToBase(assetAmount(this.swapData.sourceAsset.balance.amount(), decimal)).amount();
-
-          if (amount.isGreaterThan(balanceAmount)) {
-            amount = balanceAmount;
-          }
-
-          const estimatedFeeWei = await this.ethUtilsService.estimateFee({
-            sourceAsset,
-            ethClient,
-            ethInbound,
-            inputAmount: amount,
-            memo: `=:${targetAsset.chain}.${targetAsset.symbol}:${targetAddress}`
-          });
-
-          this.ethNetworkFee = estimatedFeeWei.dividedBy(10 ** ETH_DECIMAL).toNumber();
-
-          this.insufficientChainBalance = estimatedFeeWei.isGreaterThan(ethBalance.amount.amount());
-
-          this.loading = false;
-
-        }
-      );
-
-    }
-
   }
 
   getSwapMemo(chain: string, symbol: string, addr: string, sliplimit: number): string {
