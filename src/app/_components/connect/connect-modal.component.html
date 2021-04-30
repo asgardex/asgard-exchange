@@ -14,20 +14,20 @@
     <div>
       <div mat-dialog-content>
 
-        <button class="connect-option focus:outline-none" (click)="createKeystore()">
+        <button class="connect-option focus:outline-none flex items-center w-full h-14 hover:bg-gray-600 hover:bg-opacity-25" (click)="connectXDEFI()">
+          <img width="48px" src="/assets/images/XDEFI-Brandmark-White.png" lass="connect-option__logo"/>
+          <span class="ml-1" *ngIf="isXDEFIConnected">Connect with XDEFI</span>
+          <span class="ml-1" *ngIf="!isXDEFIConnected">Install XDEFI</span>
+        </button>
+
+        <button class="connect-option focus:outline-none pl-3 flex items-center w-full h-14 hover:bg-gray-600 hover:bg-opacity-25" (click)="createKeystore()">
           <mat-icon class="connect-option__logo">add</mat-icon>
-          <span>Create Keystore</span>
+          <span class="ml-4">Create Keystore</span>
         </button>
 
-        <button class="connect-option focus:outline-none" (click)="connectKeystore()">
+        <button class="connect-option focus:outline-none pl-3 flex items-center w-full h-14 hover:bg-gray-600 hover:bg-opacity-25" (click)="connectKeystore()">
           <mat-icon class="connect-option__logo">vpn_key</mat-icon>
-          <span>Connect Keystore</span>
-        </button>
-
-        <button class="connect-option focus:outline-none" (click)="connectXDEFI()">
-          <img width="24px" src="https://www.xdefi.io/favicon.svg" lass="connect-option__logo"/>
-          <span *ngIf="isXDEFIConnected">Connect with XDEFI</span>
-          <span *ngIf="!isXDEFIConnected">Install XDEFI</span>
+          <span class="ml-4">Connect Keystore</span>
         </button>
 
       </div>
