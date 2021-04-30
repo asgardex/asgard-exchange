@@ -1,55 +1,6 @@
 /**
  * Connect Styling
  */
- .connect-option {
-  background-color: transparent;
-  display: flex;
-  flex-direction: row;
-  -webkit-box-align: center;
-  align-items: center;
-  -webkit-box-pack: justify;
-  margin-top: 0px;
-  color: white;
-  width: 100%;
-  padding: 4px 20px;
-  height: 56px;
-
-  span {
-    display: flex;
-    flex-flow: row nowrap;
-    font-size: 1rem;
-    font-weight: 500;
-    margin-left: 10px;
-  }
-
-  &:hover {
-    cursor: pointer;
-    background-color: rgba(255, 255, 255, 0.05);
-    // border: 1px solid rgb(33, 114, 229);
-  }
-
-  & a {
-    color: #0000EE;
-  }
-
-  &:disabled {
-    color: #888d9b;
-    &:hover {
-      // border: 1px solid rgb(64, 68, 79);
-      background-color: transparent;
-      cursor: inherit;
-    }
-
-  }
-
-  &__logo {
-    width: 24px;
-  }
-
-  #ledger-logo {
-    background-color: white;
-    border-radius: 5px;
-    padding: 3px;
-  }
-
+ .connect-option__logo {
+  width: 24px;
 }
