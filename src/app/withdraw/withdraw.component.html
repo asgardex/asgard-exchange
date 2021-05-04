@@ -3,6 +3,23 @@
   <app-section-head sectionTitle="Remove Liquidity" [displayBackBtn]="true" (back)="back()"></app-section-head>
 
   <div class="relative">
+
+    <div class="px-4 h-12 flex items-center">
+      <div *ngIf="withdrawOptions.sym && asset">
+        <button (click)="setSelectedWithdrawOption('SYM')" class="mr-2 text-sm" [ngClass]="{'underline': withdrawType === 'SYM'}">{{asset.ticker}} + RUNE</button>
+        <span *ngIf="withdrawOptions.asymAsset || withdrawOptions.asymRune" class="text-xs text-gray-500 mr-2">/</span>
+      </div>
+
+      <div *ngIf="withdrawOptions.asymAsset && asset">
+        <button (click)="setSelectedWithdrawOption('ASYM_ASSET')" class="mr-2 text-sm" [ngClass]="{'underline': withdrawType === 'ASYM_ASSET'}">{{asset.ticker}}</button>
+        <span *ngIf="withdrawOptions.asymRune" class="text-xs text-gray-500 mr-2">/</span>
+      </div>
+
+      <div>
+        <button (click)="setSelectedWithdrawOption('ASYM_RUNE')" *ngIf="withdrawOptions.asymRune" class="text-sm" [ngClass]="{'underline': withdrawType === 'ASYM_RUNE'}">RUNE</button>
+      </div>
+    </div>
+
     <div class="uni-input">
 
       <span>Amount</span>
@@ -31,14 +48,14 @@
 
       <div *ngIf="asset" class="unstake-calc flex justify-between">
         <span *ngIf="removeAssetAmount">{{removeAssetAmount | number:"0.0-6"}}</span>
-        <span *ngIf="!removeAssetAmount">-</span>
+        <span *ngIf="!removeAssetAmount">0</span>
         <app-icon-ticker [iconPath]="asset.iconPath" [ticker]="asset.ticker"></app-icon-ticker>
 
       </div>
 
       <div class="unstake-calc flex justify-between">
         <span *ngIf="removeRuneAmount">{{removeRuneAmount | number:"0.0-6"}}</span>
-        <span *ngIf="!removeRuneAmount">-</span>
+        <span *ngIf="!removeRuneAmount">0</span>
         <app-icon-ticker [iconPath]="rune.iconPath" [ticker]="rune.ticker"></app-icon-ticker>
 
       </div>
@@ -47,25 +64,15 @@
 
     <div *ngIf="asset" class="prices py-2 px-4 text-sm">
 
-      <div class="flex justify-between pb-2 items-center">
-        <span class="tx-detail-label">Prices</span>
-        <span>1 {{rune.ticker}} = {{assetBasePrice | number:"1.2-4"}} {{asset.ticker}}</span>
-      </div>
-
-      <div class="flex justify-between pb-2 items-center">
-        <span></span>
-        <span>1 {{asset.ticker}} = {{runeBasePrice | number:"1.2-4"}} {{rune.ticker}}</span>
-      </div>
-
-      <div class="flex justify-between pb-2 items-center">
-        <span class="tx-detail-label">TX Fees</span>
+      <div *ngIf="withdrawType !== 'ASYM_ASSET'" class="flex justify-between pb-2 items-center">
+        <span class="tx-detail-label">Fees</span>
         <span *ngIf="runeFee">{{runeFee}} RUNE</span>
         <span *ngIf="!runeFee">-</span>
       </div>
 
-      <div class="flex justify-between pb-2 items-center">
-        <span class="tx-detail-label"></span>
-        <span *ngIf="networkFee">{{networkFee | number:"1.0-4"}} {{asset.ticker}}.{{asset.chain}}</span>
+      <div *ngIf="withdrawType === 'ASYM_ASSET'" class="flex justify-between pb-2 items-center">
+        <span class="tx-detail-label">Fees</span>
+        <span *ngIf="networkFee">{{networkFee | number:"1.0-4"}} {{asset.ticker}}</span>
         <span *ngIf="!networkFee">-</span>
       </div>
 

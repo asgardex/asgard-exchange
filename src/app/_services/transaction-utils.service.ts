@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
-import { assetToString, bn } from '@xchainjs/xchain-util';
+import { ETH_DECIMAL } from '@xchainjs/xchain-ethereum';
+import { assetToString, BaseAmount, baseAmount, bn, Chain } from '@xchainjs/xchain-util';
+import { ethers } from 'ethers';
 import { Asset } from '../_classes/asset';
 import { PoolDTO } from '../_classes/pool';
 import { PoolAddressDTO } from '../_classes/pool-address';
@@ -76,6 +78,38 @@ export class TransactionUtilsService {
       console.error('calculateNetworkFee no chain match');
     }
 
+  }
+
+  getMinAmountByChain(chain: Chain): BaseAmount {
+    if (chain === 'BNB') {
+      return baseAmount(1);
+    }
+    // 1000 satoshi
+    if (chain === 'BTC') {
+      return baseAmount(10001);
+    }
+    // 1 Thor
+    if (chain === 'THOR') {
+      return baseAmount(1);
+    }
+    // 0 ETH
+    if (chain === 'ETH') {
+      // this isn't working for withdraws
+      // return baseAmount(0);
+
+      // need to send 0.00000001 ETH as temporary workaround
+      return baseAmount(ethers.utils.parseUnits('10', 'gwei').toString(), ETH_DECIMAL);
+    }
+    // 1000 satoshi
+    if (chain === 'LTC') {
+      return baseAmount(10001);
+    }
+    // 1000 satoshi
+    if (chain === 'BCH') {
+      return baseAmount(10001);
+    }
+
+    return baseAmount(1);
   }
 
 }

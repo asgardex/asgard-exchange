@@ -239,4 +239,8 @@ export class EthUtilsService {
     return (+tokenPool.assetPriceUSD) / (+ethPool.assetPriceUSD);
   }
 
+  strip0x(hash: string): string {
+    return (hash.toUpperCase().indexOf('0X') === 0) ? hash.substr(2) : hash;
+  }
+
 }

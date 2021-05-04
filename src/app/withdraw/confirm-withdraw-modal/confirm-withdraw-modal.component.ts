@@ -4,11 +4,13 @@ import { Subject, Subscription } from 'rxjs';
 import { User } from '../../_classes/user';
 import { TransactionConfirmationState } from '../../_const/transaction-confirmation-state';
 import { UserService } from '../../_services/user.service';
-import { environment } from 'src/environments/environment';
 import { assetAmount, assetToBase, assetToString } from '@xchainjs/xchain-util';
 import { TransactionStatusService, TxActions, TxStatus } from 'src/app/_services/transaction-status.service';
 import { EthUtilsService } from 'src/app/_services/eth-utils.service';
 import { Asset } from 'src/app/_classes/asset';
+import { WithdrawTypeOptions } from 'src/app/_const/withdraw-type-options';
+import { TransactionUtilsService } from 'src/app/_services/transaction-utils.service';
+import { MidgardService } from 'src/app/_services/midgard.service';
 
 // TODO: this is the same as ConfirmStakeData in confirm stake modal
 export interface ConfirmWithdrawData {
@@ -16,11 +18,10 @@ export interface ConfirmWithdrawData {
   assetAmount: number;
   runeAmount: number;
   user: User;
-  runeBasePrice: number;
-  assetBasePrice: number;
   unstakePercent: number;
   runeFee: number;
   networkFee: number;
+  withdrawType: WithdrawTypeOptions;
 }
 
 @Component({
@@ -30,7 +31,6 @@ export interface ConfirmWithdrawData {
 })
 export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
 
-  runeSymbol = environment.network === 'chaosnet' ? 'RUNE-B1A' : 'RUNE-67C';
   txState: TransactionConfirmationState;
   hash: string;
   subs: Subscription[];
@@ -43,8 +43,10 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
     @Inject(MAT_DIALOG_DATA) public data: ConfirmWithdrawData,
     public dialogRef: MatDialogRef<ConfirmWithdrawModalComponent>,
     private txStatusService: TransactionStatusService,
+    private txUtilsService: TransactionUtilsService,
     private userService: UserService,
     private ethUtilsService: EthUtilsService,
+    private midgardService: MidgardService
   ) {
     this.txState = TransactionConfirmationState.PENDING_CONFIRMATION;
     const user$ = this.userService.user$.subscribe(
@@ -73,18 +75,28 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
   async submitTransaction(): Promise<void> {
     this.txState = TransactionConfirmationState.SUBMITTING;
 
-    const thorClient = this.data.user.clients.thorchain;
-    if (!thorClient) {
-      console.error('no thor client found!');
-      return;
-    }
-
-    const txCost = assetToBase(assetAmount(0.00000001));
-
     const memo = `WITHDRAW:${this.data.asset.chain}.${this.data.asset.symbol}:${this.data.unstakePercent * 100}`;
 
+    if (this.data.withdrawType === 'ASYM_ASSET') {
+      this.assetWithdraw(memo);
+    } else {
+      this.runeWithdraw(memo);
+    }
+
+  }
+
+  async runeWithdraw(memo: string) {
     // withdraw RUNE
     try {
+
+      const txCost = assetToBase(assetAmount(0.00000001));
+
+      const thorClient = this.data.user.clients.thorchain;
+      if (!thorClient) {
+        console.error('no thor client found!');
+        return;
+      }
+
       const hash = await thorClient.deposit({
         amount: txCost,
         memo,
@@ -94,6 +106,92 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
     } catch (error) {
       console.error('error making RUNE withdraw: ', error);
       this.error = error;
+      this.txState = TransactionConfirmationState.ERROR;
+    }
+  }
+
+  async assetWithdraw(memo: string) {
+
+    try {
+
+      const asset = this.data.asset;
+
+      const inboundAddresses = await this.midgardService.getInboundAddresses().toPromise();
+      if (!inboundAddresses) {
+        console.error('no inbound addresses found');
+        this.error = 'No Inbound Addresses Found. Please try again later.';
+        this.txState = TransactionConfirmationState.ERROR;
+        return;
+      }
+
+      const matchingInboundAddress = inboundAddresses.find( (inbound) => inbound.chain === asset.chain );
+      if (!matchingInboundAddress) {
+        console.error('no matching inbound addresses found');
+        this.error = 'No Matching Inbound Address Found. Please try again later.';
+        this.txState = TransactionConfirmationState.ERROR;
+        return;
+      }
+
+      const minAmount = this.txUtilsService.getMinAmountByChain(asset.chain);
+      let hash = '';
+      switch (asset.chain) {
+        case 'ETH':
+          const ethClient = this.data.user.clients.ethereum;
+          if (!ethClient) {
+            console.error('no ETH client found for withdraw');
+            this.error = 'No Eth Client Found. Please try again later.';
+            this.txState = TransactionConfirmationState.ERROR;
+            return;
+          }
+          const ethHash = await this.ethUtilsService.callDeposit({
+            inboundAddress: matchingInboundAddress,
+            ethClient,
+            asset: new Asset('ETH.ETH'),
+            amount: minAmount.amount(),
+            memo
+          });
+
+          hash = this.ethUtilsService.strip0x(ethHash);
+
+          break;
+
+        case 'BTC':
+        case 'BCH':
+        case 'LTC':
+        case 'BNB':
+          const client = this.userService.getChainClient(this.data.user, asset.chain);
+          if (!client) {
+            console.error('no client found for withdraw');
+            this.error = 'No Client Found. Please try again later.';
+            this.txState = TransactionConfirmationState.ERROR;
+            return;
+          }
+
+          hash = await client.transfer({
+            asset: {
+              chain: asset.chain,
+              symbol: asset.symbol,
+              ticker: asset.ticker
+            },
+            amount: minAmount,
+            recipient: matchingInboundAddress.address,
+            memo,
+            feeRate: +matchingInboundAddress.gas_rate
+          });
+          break;
+      }
+
+      if (hash.length > 0) {
+        this.txSuccess(hash);
+      } else {
+        console.error('hash empty');
+        this.error = 'Error withdrawing, hash is empty. Please try again later';
+        this.txState = TransactionConfirmationState.ERROR;
+      }
+
+    } catch (error) {
+      console.error(error);
+      this.error = 'Error withdrawing. Please try again later';
       this.txState = TransactionConfirmationState.ERROR;
     }
 
