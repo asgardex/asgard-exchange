@@ -32,6 +32,11 @@ export class KeystoreCreateComponent implements OnInit {
   }
 
   async createKeystore() {
+
+    if (this.password !== this.confirmPassword) {
+      return;
+    }
+
     this.loading = true;
 
     try {
