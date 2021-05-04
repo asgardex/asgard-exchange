@@ -115,7 +115,6 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
     try {
 
       const asset = this.data.asset;
-      console.log('asset is: ', asset);
 
       const inboundAddresses = await this.midgardService.getInboundAddresses().toPromise();
       if (!inboundAddresses) {
@@ -149,7 +148,7 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
             ethClient,
             asset: new Asset('ETH.ETH'),
             amount: minAmount.amount(),
-            memo: `${memo}:ETH.ETH`,
+            memo
           });
 
           hash = this.ethUtilsService.strip0x(ethHash);

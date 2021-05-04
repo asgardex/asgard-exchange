@@ -94,7 +94,6 @@ export class TransactionUtilsService {
     }
     // 0 ETH
     if (chain === 'ETH') {
-      console.log('hitting ETH min amount');
       // this isn't working for withdraws
       // return baseAmount(0);
 
