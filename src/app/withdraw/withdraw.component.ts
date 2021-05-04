@@ -317,17 +317,11 @@ export class WithdrawComponent implements OnInit {
 
   calculateAsymRune() {
 
-    console.log('calculating asym rune');
-
     if (this.asymRuneMemberPool && this.poolUnits) {
 
       const poolShare = this.getAsymAssetShare(this.asymRuneMemberPool, this.assetPoolData.runeBalance);
-
-      console.log('asym rune is: ', poolShare.toNumber());
-
       const runeAmountAfterFee = poolShare
         .div(10 ** 8).multipliedBy(this.withdrawPercent / 100).minus(this.runeFee).toNumber();
-
       this.removeRuneAmount = (runeAmountAfterFee <= 0) ? 0 : runeAmountAfterFee;
 
     }
