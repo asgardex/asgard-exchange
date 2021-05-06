@@ -22,9 +22,14 @@
       <input [(ngModel)]="recipientAddress" name="recipient-address" placeholder="Enter Recipient {{asset.asset.ticker}} Address" autocomplete="off" />
     </div>
 
+    <div *ngIf="asset.asset.chain === 'BNB'" class="uni-input">
+      <label>Memo (Optional)</label>
+      <input [(ngModel)]="memo" name="memo" placeholder="Leave blank if not required by recipient" autocomplete="off" />
+    </div>
+
     <div class="flex justify-end items-center">
       <button
-        (click)="confirmSend.next({amount: amount, recipientAddress: recipientAddress})"
+        (click)="confirmSend.next({amount: amount, recipientAddress: recipientAddress, memo: memo})"
         class="main-action-btn w-full"
         mat-flat-button
         color="primary"

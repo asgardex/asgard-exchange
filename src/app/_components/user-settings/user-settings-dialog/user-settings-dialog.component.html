@@ -151,6 +151,7 @@
   *ngIf="mode === 'CONFIRM_SEND'"
   [amount]="amountToSend"
   [recipientAddress]="recipient"
+  [memo]="memo"
   [asset]="selectedAsset"
   (back)="mode = 'SEND'"
   (transactionSuccessful)="transactionSuccessful()">

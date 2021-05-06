@@ -37,6 +37,7 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
   _asset: AssetAndBalance;
   @Input() amount: number;
   @Input() recipientAddress: string;
+  @Input() memo: string;
   @Output() back: EventEmitter<null>;
   @Output() transactionSuccessful: EventEmitter<null>;
 
@@ -163,6 +164,7 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
             asset: this.asset.asset,
             amount: assetToBase(assetAmount(this.amount)),
             recipient: this.recipientAddress,
+            memo: this.memo ?? ''
           });
           this.pushTxStatus(hash, this.asset.asset, false);
           this.transactionSuccessful.next();
