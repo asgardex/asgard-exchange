@@ -73,19 +73,7 @@
         [disabled]="formInvalid()"
         [ngClass]="ethContractApprovalRequired ? 'w-1/2' : 'w-full'"
       >
-        <!-- {{mainButtonText()}} -->
-
-        <!-- TEMPORARILY DISABLE BTC/LTC TO ERC20 -->
-        <!-- LINK TO GITLAB ISSUE -->
-        <div class="flex flex-col">
-          <span>{{mainButtonText()}}</span>
-          <a class="underline text-blue-400" *ngIf="( (this.selectedSourceAsset.chain === 'BTC' || this.selectedSourceAsset.chain === 'LTC')
-            && (this.selectedTargetAsset.chain === 'ETH' && this.selectedTargetAsset.symbol !== 'ETH') )"
-            target="_blank" href="https://gitlab.com/thorchain/thornode/-/issues/886">
-              View Gitlab Issue
-          </a>
-        </div>
-
+        {{mainButtonText()}}
       </button>
     </div>
 

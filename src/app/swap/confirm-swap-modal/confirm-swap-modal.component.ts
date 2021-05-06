@@ -240,6 +240,11 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
         }
         // TODO -> consolidate this with BTC, BCH, LTC
 
+        if (memo.length > 80) {
+          this.error = 'Memo exceeds 80. Report to https://github.com/asgardex/asgard-exchange/issues.';
+          this.txState = TransactionConfirmationState.ERROR;
+          return;
+        }
 
         const hash = await bitcoinClient.transfer({
           amount: baseAmount(amount),
@@ -316,6 +321,12 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
           return;
         }
         // TODO -> consolidate this with BTC, BCH, LTC
+
+        if (memo.length > 80) {
+          this.error = 'Memo exceeds 80. Report to https://github.com/asgardex/asgard-exchange/issues.';
+          this.txState = TransactionConfirmationState.ERROR;
+          return;
+        }
 
         const hash = await litecoinClient.transfer({
           amount: baseAmount(amount),
@@ -395,6 +406,13 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
     const tag = (this.swapData.user && this.swapData.user.type && this.swapData.user.type === 'XDEFI')
       ? '333'
       : '444';
+
+    /** shorten ERC20 tokens */
+    if (chain === 'ETH' && symbol !== 'ETH') {
+      const ticker = symbol.split('-')[0];
+      const trimmedAddress = symbol.substring(symbol.length - 3);
+      symbol = `${ticker}-${trimmedAddress.toUpperCase()}`;
+    }
 
     if (sliplimit && sliplimit.toString().length > 3) {
       const taggedSlip = sliplimit.toString().slice(0, sliplimit.toString().length - 3) + tag;
