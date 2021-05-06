@@ -36,6 +36,7 @@ export class UserSettingsDialogComponent implements OnInit, OnDestroy {
   amountToSend: number;
   recipient: string;
   pools: PoolDTO[];
+  memo: string;
 
   constructor(
     private userService: UserService,
@@ -107,9 +108,10 @@ export class UserSettingsDialogComponent implements OnInit, OnDestroy {
     this.mode = 'ASSET';
   }
 
-  confirmSend(p: {amount: number, recipientAddress: string}) {
+  confirmSend(p: {amount: number, recipientAddress: string, memo: string}) {
     this.amountToSend = p.amount;
     this.recipient = p.recipientAddress;
+    this.memo = p.memo;
     this.mode = 'CONFIRM_SEND';
   }
 
@@ -128,6 +130,7 @@ export class UserSettingsDialogComponent implements OnInit, OnDestroy {
     this.mode = 'PENDING_TXS';
     this.amountToSend = null;
     this.recipient = null;
+    this.memo = null;
     this.selectedAsset = null;
     this.selectedAddress = null;
   }

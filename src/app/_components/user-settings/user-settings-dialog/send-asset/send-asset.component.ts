@@ -12,7 +12,7 @@ import { UserService } from 'src/app/_services/user.service';
 export class SendAssetComponent implements OnInit, OnDestroy {
 
   @Output() back: EventEmitter<null>;
-  @Output() confirmSend: EventEmitter<{amount: number, recipientAddress: string}>;
+  @Output() confirmSend: EventEmitter<{amount: number, recipientAddress: string, memo: string}>;
   @Input() asset: AssetAndBalance;
 
   get amount() {
@@ -28,11 +28,13 @@ export class SendAssetComponent implements OnInit, OnDestroy {
   amountSpendable: boolean;
   user: User;
   subs: Subscription[];
+  memo: string;
 
   constructor(private userService: UserService) {
     this.recipientAddress = '';
+    this.memo = '';
     this.back = new EventEmitter<null>();
-    this.confirmSend = new EventEmitter<{amount: number, recipientAddress: string}>();
+    this.confirmSend = new EventEmitter<{amount: number, recipientAddress: string, memo: string}>();
     this.amountSpendable = false;
   }
 
