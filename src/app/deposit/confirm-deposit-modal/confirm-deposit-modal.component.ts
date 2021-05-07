@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { assetAmount, assetToBase, assetToString } from '@xchainjs/xchain-util';
+import { assetToString } from '@xchainjs/xchain-util';
 import { Subscription } from 'rxjs';
 import { PoolAddressDTO } from 'src/app/_classes/pool-address';
 import { User } from 'src/app/_classes/user';
@@ -8,7 +8,6 @@ import { TransactionConfirmationState } from 'src/app/_const/transaction-confirm
 import { MidgardService } from 'src/app/_services/midgard.service';
 import { UserService } from 'src/app/_services/user.service';
 import { TransactionStatusService, TxActions, TxStatus } from 'src/app/_services/transaction-status.service';
-import { ETH_DECIMAL } from '@xchainjs/xchain-ethereum/lib';
 import { EthUtilsService } from 'src/app/_services/eth-utils.service';
 import { Balances } from '@xchainjs/xchain-client';
 import { KeystoreDepositService } from 'src/app/_services/keystore-deposit.service';
@@ -23,6 +22,7 @@ export interface ConfirmDepositData {
   runeBasePrice: number;
   assetBasePrice: number;
   estimatedFee: number;
+  runeFee: number;
 }
 
 @Component({
@@ -36,7 +36,6 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
   hash: string;
   subs: Subscription[];
   error: string;
-  ethNetworkFee: number;
   insufficientChainBalance: boolean;
   loading: boolean;
   estimatedMinutes: number;
@@ -69,15 +68,8 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-
     this.estimateTime();
-
-    if (this.data.asset.chain === 'ETH') {
-      this.estimateEthGasPrice();
-    } else {
-      this.loading = false;
-    }
-
+    this.loading = false;
   }
 
   async estimateTime() {
@@ -254,52 +246,6 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
     this.txState = TransactionConfirmationState.SUCCESS;
   }
 
-  async estimateEthGasPrice() {
-
-    const user = this.data.user;
-    const sourceAsset = this.data.asset;
-
-    if (user && user.clients && user.clients.ethereum && user.clients.thorchain) {
-      const ethClient = user.clients.ethereum;
-      const thorClient = user.clients.thorchain;
-      const thorchainAddress = await thorClient.getAddress();
-      const ethBalances = await ethClient.getBalance();
-      const ethBalance = ethBalances[0];
-
-      // get inbound addresses
-      this.midgardService.getInboundAddresses().subscribe(
-        async (addresses) => {
-
-          const ethInbound = addresses.find( (inbound) => inbound.chain === 'ETH' );
-          const decimal = await this.ethUtilsService.getAssetDecimal(this.data.asset, ethClient);
-          let amount = assetToBase(assetAmount(this.data.assetAmount, decimal)).amount();
-          const balanceAmount = this.userService.findRawBalance(this.balances, this.data.asset);
-
-          if (amount.isGreaterThan(balanceAmount)) {
-            amount = balanceAmount;
-          }
-
-          const estimatedFeeWei = await this.ethUtilsService.estimateFee({
-            sourceAsset,
-            ethClient,
-            ethInbound,
-            inputAmount: amount,
-            memo: `+:${sourceAsset.chain}.${sourceAsset.symbol}:${thorchainAddress}`
-          });
-
-          this.ethNetworkFee = estimatedFeeWei.dividedBy(10 ** ETH_DECIMAL).toNumber();
-
-          this.insufficientChainBalance = estimatedFeeWei.isGreaterThan(ethBalance.amount.amount());
-
-          this.loading = false;
-
-        }
-      );
-
-    }
-
-  }
-
   closeDialog(transactionSucess?: boolean) {
     this.dialogRef.close(transactionSucess);
   }
@@ -309,6 +255,5 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
       sub.unsubscribe();
     }
   }
-
 
 }
