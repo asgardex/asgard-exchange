@@ -23,11 +23,13 @@
       By clicking the button below, you will be upgrading it off of the {{asset.asset.chain}} chain to native RUNE. Your native RUNE will show up in your RUNE wallet in user settings.
     </small>
 
-    <div *ngIf="loading" style="height: 56px;" class="flex justify-center items-center w-full mt-4">
-      <mat-progress-spinner mode="indeterminate" diameter="30"></mat-progress-spinner>
+    <div class="flex justify-between mt-4 mb-2">
+      <span class="tx-detail-label">Fees</span>
+      <span class="text-sm" *ngIf="networkFee && asset">{{networkFee | number:"0.0-4"}} {{asset.asset.chain}}</span>
+      <span class="text-sm" *ngIf="!networkFee || !asset">-</span>
     </div>
 
-    <button *ngIf="!loading" [disabled]="insufficientChainBalance" (click)="submitTransaction()" mat-flat-button color="accent" class="main-action-btn w-full">
+    <button [disabled]="insufficientChainBalance" (click)="submitTransaction()" mat-flat-button color="accent" class="main-action-btn w-full">
       <span *ngIf="!insufficientChainBalance">Upgrade RUNE</span>
       <span *ngIf="insufficientChainBalance">Insufficient {{asset.asset.chain}} Balance</span>
     </button>

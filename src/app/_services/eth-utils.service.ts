@@ -17,7 +17,6 @@ export type EstimateFeeParams = {
   sourceAsset: Asset,
   ethClient: Client,
   ethInbound: PoolAddressDTO,
-  // inputAmount: number,
   inputAmount: BigNumber;
   memo: string
 };
@@ -27,7 +26,6 @@ export type CallDepositParams = {
   asset: Asset,
   memo: string,
   ethClient: Client,
-  // amount: number
   amount: BigNumber
 };
 
@@ -42,61 +40,6 @@ const testnetBasketABI = [{"inputs":[],"stateMutability":"nonpayable","type":"co
 export class EthUtilsService {
 
   constructor(private midgardService: MidgardService) { }
-
-  async estimateFee({sourceAsset, ethClient, ethInbound, inputAmount, memo}: EstimateFeeParams): Promise<BigNumber> {
-
-    let checkSummedAddress;
-    const wallet = ethClient.getWallet();
-    // const decimal = await this.getAssetDecimal(sourceAsset, ethClient);
-    const abi = (environment.network === 'testnet')
-      ? TCRopstenAbi
-      : TCAbi;
-
-    // testing
-    const gasPrices = await ethClient.estimateGasPrices();
-    const gasPrice = gasPrices.fast.amount().toFixed(0);
-    console.log('gas price is: ', gasPrice);
-    console.log('inboundAddress.gas_rate: ', ethInbound.gas_rate);
-    console.log('inbound address formatted is: ',
-      baseAmount(ethers.utils.parseUnits(ethInbound.gas_rate, 'gwei').toString(), ETH_DECIMAL
-    ).amount().toFixed(0));
-    // end testing
-
-    if (sourceAsset.symbol === 'ETH') {
-      checkSummedAddress = '0x0000000000000000000000000000000000000000';
-    } else {
-      const assetAddress = sourceAsset.symbol.slice(sourceAsset.ticker.length + 1);
-      const strip0x = (assetAddress.substr(0, 2).toUpperCase() === '0X')
-        ? assetAddress.substr(2)
-        : assetAddress;
-      checkSummedAddress = ethers.utils.getAddress(strip0x);
-    }
-
-    const contract = new ethers.Contract(ethInbound.router, abi, wallet);
-
-    const params = [
-      // Vault Address
-      ethInbound.address,
-
-      // Token Address
-      checkSummedAddress,
-
-      // Amount
-      // assetToBase(assetAmount(inputAmount, decimal)).amount().toFixed(),
-      inputAmount.toFixed(),
-
-      // Memo
-      memo
-    ];
-
-    const estimateGas = await contract.estimateGas.deposit(...params);
-    const minimumCost = baseAmount(
-      ethers.utils.parseUnits(ethInbound.gas_rate, 'gwei').toString(),
-      ETH_DECIMAL
-    ).amount().multipliedBy(estimateGas.toNumber());
-
-    return minimumCost;
-  }
 
   async getAssetDecimal(asset: Asset, client: Client): Promise<number> {
 
@@ -145,7 +88,7 @@ export class EthUtilsService {
     let hash;
     const abi = (environment.network) === 'testnet'
       ? TCRopstenAbi
-      : TCRopstenAbi;
+      : TCAbi;
     const ethAddress = await ethClient.getAddress();
     const gasPrice = baseAmount(ethers.utils.parseUnits(inboundAddress.gas_rate, 'gwei').toString(), ETH_DECIMAL).amount().toFixed(0);
 
