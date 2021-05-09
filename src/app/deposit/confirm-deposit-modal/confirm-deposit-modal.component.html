@@ -72,15 +72,14 @@
             <span>1 {{data.asset.ticker}} = {{data.runeBasePrice | number:"1.2-4"}} {{data.rune.ticker}}</span>
           </div>
 
-          <div *ngIf="data.asset.chain === 'BNB'" class="flex justify-between mb-2">
-            <span class="tx-detail-label">BNB Fee</span>
-            <span>0.0003</span>
+          <div *ngIf="data.estimatedFee" class="flex justify-between mb-2">
+            <span class="tx-detail-label">Fees</span>
+            <span>{{data.estimatedFee | number:"0.0-4"}} {{data.asset.ticker}}</span>
           </div>
 
-          <div *ngIf="data.asset.chain === 'ETH'" class="flex justify-between mb-2">
-            <span class="tx-detail-label">Total Fee</span>
-            <span *ngIf="ethNetworkFee">{{ (ethNetworkFee) | number:"0.0-6"}} ETH</span>
-            <span *ngIf="!ethNetworkFee"> - ETH</span>
+          <div *ngIf="data.runeFee" class="flex justify-between mb-2">
+            <span class="tx-detail-label"></span>
+            <span>{{data.runeFee | number:"0.0-2"}} RUNE</span>
           </div>
 
         </div>

@@ -53,28 +53,24 @@
 
         <div>
 
-          <div class="flex justify-between mb-2">
-            <span *ngIf="data.asset && data.asset.chain" class="tx-detail-label">{{data.asset.chain}} Fee</span>
-            <span *ngIf="!data.asset.chain" class="tx-detail-label">- Fee</span>
-            <span *ngIf="networkFee">{{networkFee | number:"0.0-5"}}</span>
-            <span *ngIf="!networkFee">-</span>
+          <div *ngIf="data.networkFee" class="flex justify-between mb-2">
+            <span class="tx-detail-label">Fees</span>
+            <span>{{data.networkFee | number:"0.0-6"}} {{data.asset.chain}}</span>
+          </div>
+
+          <div *ngIf="data.runeFee" class="flex justify-between mb-2">
+            <span class="tx-detail-label"></span>
+            <span>{{data.runeFee | number:"0.0-2"}} RUNE</span>
           </div>
 
         </div>
 
-        <div *ngIf="loading" style="height: 56px;" class="flex justify-center items-center w-full mt-4">
-          <mat-progress-spinner mode="indeterminate" diameter="30"></mat-progress-spinner>
-        </div>
-
         <button
-          *ngIf="!loading"
           (click)="submitTransaction()"
           mat-flat-button
           color="primary"
-          class="main-action-btn w-full"
-          [disabled]="insufficientChainBalance">
-            <span *ngIf="!insufficientChainBalance">Confirm Deposit</span>
-            <span *ngIf="insufficientChainBalance">Insufficient {{data.asset.chain}} Balance</span>
+          class="main-action-btn w-full">
+            <span>Confirm Deposit</span>
         </button>
 
       </div>

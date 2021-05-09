@@ -11,6 +11,7 @@ import { ConfirmPoolCreateComponent } from './confirm-pool-create/confirm-pool-c
 import { MatDialog } from '@angular/material/dialog';
 import { User } from '../_classes/user';
 import { baseAmount } from '@xchainjs/xchain-util';
+import { TransactionUtilsService } from '../_services/transaction-utils.service';
 
 @Component({
   selector: 'app-pool-create',
@@ -81,9 +82,9 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
   balances: Balances;
   subs: Subscription[];
   coinGeckoList: CGCoinListItem[];
-  insufficientBnb: boolean;
   runeBalance: number;
   assetBalance: number;
+  chainBalance: number;
   pools: string[];
   selectableMarkets: AssetAndBalance[];
 
@@ -92,6 +93,10 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
   user: User;
   depositsDisabled: boolean;
 
+  networkFee: number;
+  runeFee: number;
+  minRuneDepositAmount = 1000;
+
   constructor(
     private dialog: MatDialog,
     private route: ActivatedRoute,
@@ -99,6 +104,7 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
     private midgardService: MidgardService,
     private cgService: CoinGeckoService,
     private userService: UserService,
+    private txUtilsService: TransactionUtilsService
   ) {
     this.rune = new Asset(`THOR.RUNE`);
     this.depositsDisabled = false;
@@ -109,11 +115,12 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
         this.runeBalance = this.userService.findBalance(this.balances, this.rune);
         if (this.asset) {
           this.assetBalance = this.userService.findBalance(this.balances, this.asset);
+          const chainAsset = (this.asset.chain === 'BNB')
+            ? new Asset('BNB.BNB')
+            : new Asset('ETH.ETH');
+          this.chainBalance = this.userService.findBalance(this.balances, chainAsset);
         }
 
-        // allows us to ensure enough bnb balance
-        const bnbBalance = this.userService.findBalance(this.balances, new Asset('BNB.BNB'));
-        this.insufficientBnb = bnbBalance < 0.000375;
         this.checkCreateableMarkets();
       }
     );
@@ -150,6 +157,8 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
           this.assetBalance = this.userService.findBalance(this.balances, this.asset);
         }
 
+        this.getFees();
+
         if (this.asset.chain === 'ETH' && this.asset.ticker !== 'ETH') {
           this.checkContractApproved(this.asset);
         }
@@ -165,6 +174,15 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
 
     this.subs.push(params$);
 
+  }
+
+  async getFees() {
+    const inboundAddresses = await this.midgardService.getInboundAddresses().toPromise();
+    const asset = this.asset.chain === 'BNB'
+      ? new Asset('BNB.BNB')
+      : new Asset('ETH.ETH');
+    this.networkFee = this.txUtilsService.calculateNetworkFee(asset, inboundAddresses, 'INBOUND');
+    this.runeFee = this.txUtilsService.calculateNetworkFee(new Asset('THOR.RUNE'), inboundAddresses, 'INBOUND');
   }
 
   getPoolCap() {
@@ -258,7 +276,6 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
     if (this.assetUsdValue && this.runeUsdValue) {
       const totalAssetValue = this.assetAmount * this.assetUsdValue;
       this.recommendedRuneAmount = totalAssetValue / this.runeUsdValue;
-      // this.runeAmount = totalAssetValue / this.runeUsdValue;
     } else {
       this.recommendedRuneAmount = null;
     }
@@ -267,7 +284,8 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
   formDisabled(): boolean {
 
     return !this.balances || !this.runeAmount || !this.assetAmount
-    || this.insufficientBnb || this.runeAmount < 1000 || this.ethContractApprovalRequired
+    || this.runeAmount < this.minRuneDepositAmount || this.ethContractApprovalRequired
+    || this.chainBalance <= this.networkFee
     || this.depositsDisabled
     || (this.balances
       && (this.runeAmount > this.runeBalance || this.assetAmount > this.userService.maximumSpendableBalance(this.asset, this.assetBalance))
@@ -290,10 +308,10 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
     } else if (this.balances && (this.runeAmount > this.runeBalance
       || this.assetAmount > this.userService.maximumSpendableBalance(this.asset, this.assetBalance))) {
       return 'Insufficient balance';
-    } else if (this.insufficientBnb) {
-      return 'Insufficient BNB for Fee';
+    } else if (this.chainBalance <= this.networkFee) {
+      return `Insufficient ${this.asset.chain}`;
     }
-    else if (this.runeAmount < 1000) {
+    else if (this.runeAmount < this.minRuneDepositAmount) {
       return 'Not enough RUNE to create pool';
     }
     else if (this.balances && this.runeAmount && this.assetAmount
@@ -338,6 +356,8 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
           rune: this.rune,
           assetAmount: this.assetAmount,
           runeAmount: this.runeAmount,
+          networkFee: this.networkFee,
+          runeFee: this.runeFee
         }
       }
     );

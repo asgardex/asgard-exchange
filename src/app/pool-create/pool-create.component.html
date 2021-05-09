@@ -38,6 +38,18 @@
       *A minimum of 1,000 RUNE + balancing asset is required to create a pool
     </div>
 
+    <div class="flex justify-between swap-details">
+      <span class="tx-detail-label">Fees</span>
+      <span *ngIf="networkFee">{{networkFee | number:"1.0-6"}} {{asset.chain}}</span>
+      <span *ngIf="!networkFee">-</span>
+    </div>
+
+    <div class="flex justify-between swap-details">
+      <span class="tx-detail-label"></span>
+      <span *ngIf="runeFee">{{runeFee | number:"1.0-4"}} RUNE</span>
+      <span *ngIf="!runeFee">-</span>
+    </div>
+
     <div class="flex">
       <app-approve-eth-contract
         *ngIf="ethContractApprovalRequired"
