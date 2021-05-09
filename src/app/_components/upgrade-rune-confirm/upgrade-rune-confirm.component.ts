@@ -78,11 +78,13 @@ export class UpgradeRuneConfirmComponent implements OnInit, OnDestroy {
   }
 
   checkSufficientFunds() {
-    const balance = (this.asset.asset.chain === 'BNB')
-      ? this.userService.findBalance(this.balances, new Asset('BNB.BNB'))
-      : this.userService.findBalance(this.balances, new Asset('ETH.ETH'));
+    if (this.asset && this.asset.asset) {
+      const balance = (this.asset.asset.chain === 'BNB')
+        ? this.userService.findBalance(this.balances, new Asset('BNB.BNB'))
+        : this.userService.findBalance(this.balances, new Asset('ETH.ETH'));
 
-    this.insufficientChainBalance = balance < this.networkFee;
+      this.insufficientChainBalance = balance < this.networkFee;
+    }
   }
 
   submitTransaction() {
