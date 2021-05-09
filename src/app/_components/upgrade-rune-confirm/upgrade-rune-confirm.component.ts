@@ -70,9 +70,11 @@ export class UpgradeRuneConfirmComponent implements OnInit, OnDestroy {
   }
 
   async estimateFees() {
-    const asset = (this.asset.asset.chain === 'BNB') ? new Asset('BNB.BNB') : new Asset('ETH.ETH');
-    const inboundAddresses = await this.midgardService.getInboundAddresses().toPromise();
-    this.networkFee = this.txUtilsService.calculateNetworkFee(asset, inboundAddresses, 'INBOUND');
+    if (this.asset && this.asset.asset) {
+      const asset = (this.asset.asset.chain === 'BNB') ? new Asset('BNB.BNB') : new Asset('ETH.ETH');
+      const inboundAddresses = await this.midgardService.getInboundAddresses().toPromise();
+      this.networkFee = this.txUtilsService.calculateNetworkFee(asset, inboundAddresses, 'INBOUND');
+    }
   }
 
   checkSufficientFunds() {
