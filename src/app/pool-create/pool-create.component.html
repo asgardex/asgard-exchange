@@ -40,7 +40,7 @@
 
     <div class="flex justify-between swap-details">
       <span class="tx-detail-label">Fees</span>
-      <span *ngIf="networkFee">{{networkFee | number:"1.0-6"}} {{asset.ticker}}.{{asset.chain}}</span>
+      <span *ngIf="networkFee">{{networkFee | number:"1.0-6"}} {{asset.chain}}</span>
       <span *ngIf="!networkFee">-</span>
     </div>
 

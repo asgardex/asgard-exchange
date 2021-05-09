@@ -95,6 +95,7 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
 
   networkFee: number;
   runeFee: number;
+  minRuneDepositAmount = 1000;
 
   constructor(
     private dialog: MatDialog,
@@ -283,7 +284,7 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
   formDisabled(): boolean {
 
     return !this.balances || !this.runeAmount || !this.assetAmount
-    || this.runeAmount < 1000 || this.ethContractApprovalRequired
+    || this.runeAmount < this.minRuneDepositAmount || this.ethContractApprovalRequired
     || this.chainBalance <= this.networkFee
     || this.depositsDisabled
     || (this.balances
@@ -310,7 +311,7 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
     } else if (this.chainBalance <= this.networkFee) {
       return `Insufficient ${this.asset.chain}`;
     }
-    else if (this.runeAmount < 1000) {
+    else if (this.runeAmount < this.minRuneDepositAmount) {
       return 'Not enough RUNE to create pool';
     }
     else if (this.balances && this.runeAmount && this.assetAmount
