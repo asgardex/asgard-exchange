@@ -135,4 +135,4 @@ export const getChainAsset = (chain: Chain): Asset => {
       default:
         return null;
     }
-}
+};
