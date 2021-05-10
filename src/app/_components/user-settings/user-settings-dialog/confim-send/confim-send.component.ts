@@ -274,6 +274,8 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
           decimal = decimals.toNumber();
         }
 
+        const gasPrice = baseAmount(ethers.utils.parseUnits(matchingAddress.gas_rate, 'gwei').toString(), ETH_DECIMAL);
+
         try {
           const hash = await ethClient.transfer({
             asset: {
@@ -283,6 +285,7 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
             },
             amount: assetToBase(assetAmount(this.amount, decimal)),
             recipient: this.recipientAddress,
+            gasPrice
           });
           this.pushTxStatus(hash, this.asset.asset, false);
           this.transactionSuccessful.next();
