@@ -111,3 +111,28 @@ export const isNonNativeRuneToken = (asset: {chain: Chain, ticker: string, symbo
 
   return runeTokens.includes(`${asset.chain}.${asset.symbol}`.toUpperCase());
 };
+
+export const getChainAsset = (chain: Chain): Asset => {
+    switch (chain) {
+      case 'BTC':
+        return  new Asset('BTC.BTC');
+
+      case 'LTC':
+        return new Asset('LTC.LTC');
+
+      case 'BCH':
+        return new Asset('BCH.BCH');
+
+      case 'ETH':
+        return new Asset('ETH.ETH');
+
+      case 'BNB':
+        return new Asset('BNB.BNB');
+
+      case 'THOR':
+        return new Asset('THOR.RUNE');
+
+      default:
+        return null;
+    }
+};
