@@ -296,7 +296,7 @@ export class DepositComponent implements OnInit, OnDestroy {
      * check balance + amount < chain_network_fee
      */
     || ( assetToString(getChainAsset(this.asset.chain)) === assetToString(this.asset)
-      && (this.sourceChainBalance + this.assetAmount <= this.chainNetworkFee) )
+      && (this.sourceChainBalance - this.assetAmount - this.chainNetworkFee <= 0) )
 
     || ( this.assetBalance <= this.assetAmount )
 
@@ -339,7 +339,7 @@ export class DepositComponent implements OnInit, OnDestroy {
      * check balance + amount < chain_network_fee
      */
     if ( assetToString(getChainAsset(this.asset.chain)) === assetToString(this.asset)
-      && (this.sourceChainBalance + this.assetAmount <= this.chainNetworkFee) ) {
+      && (this.sourceChainBalance - this.assetAmount - this.chainNetworkFee <= 0) ) {
         return `Insufficient ${this.asset.chain}`;
       }
 
