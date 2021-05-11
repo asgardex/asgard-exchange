@@ -8,10 +8,9 @@ describe('UserAddressAddTokenComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ UserAddressAddTokenComponent ],
-      imports: [ HttpClientTestingModule ]
-    })
-    .compileComponents();
+      declarations: [UserAddressAddTokenComponent],
+      imports: [HttpClientTestingModule],
+    }).compileComponents();
   });
 
   beforeEach(() => {

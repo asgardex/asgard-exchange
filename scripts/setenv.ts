@@ -12,26 +12,22 @@ const isTestnet = configuration === 'testnet';
 let targetPath;
 
 if (isTestnet) {
-
   if (isProduction) {
     targetPath = `./src/environments/environment.testnet.ts`; // testnet prod
   } else {
     targetPath = `./src/environments/environment.ts`; // testnet dev
   }
-
 } else {
-
   if (isProduction) {
     targetPath = `./src/environments/environment.prod.ts`; // mainnet prod
   } else {
     targetPath = `./src/environments/environment.ts`; // mainnet dev
   }
-
 }
 
 // we have access to our environment variables
 // in the process.env object thanks to dotenv
-const environmentFileContent = `
+const environmentFileContent = `// prettier-ignore
 export const environment = {
    production: ${isProduction},
    network: '${isTestnet ? 'testnet' : 'chaosnet'}',
@@ -42,8 +38,8 @@ export const environment = {
 `;
 // write the content to the respective file
 writeFile(targetPath, environmentFileContent, (err) => {
-   if (err) {
-      console.log(err);
-   }
-   console.log(`Wrote variables to ${targetPath}`);
+  if (err) {
+    console.log(err);
+  }
+  console.log(`Wrote variables to ${targetPath}`);
 });

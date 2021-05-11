@@ -1,4 +1,3 @@
-
 import BigNumber from 'bignumber.js';
 import { TokenAmount } from '@thorchain/asgardex-token';
 

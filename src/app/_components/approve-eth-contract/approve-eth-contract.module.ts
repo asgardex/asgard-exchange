@@ -7,8 +7,6 @@ import { ApproveEthContractModalComponent } from './approve-eth-contract-modal/a
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialogModule } from '@angular/material/dialog';
 
-
-
 @NgModule({
   declarations: [ApproveEthContractComponent, ApproveEthContractModalComponent],
   imports: [
@@ -16,8 +14,8 @@ import { MatDialogModule } from '@angular/material/dialog';
     MatButtonModule,
     MatProgressSpinnerModule,
     MatIconModule,
-    MatDialogModule
+    MatDialogModule,
   ],
-  exports: [ApproveEthContractComponent]
+  exports: [ApproveEthContractComponent],
 })
-export class ApproveEthContractModule { }
+export class ApproveEthContractModule {}

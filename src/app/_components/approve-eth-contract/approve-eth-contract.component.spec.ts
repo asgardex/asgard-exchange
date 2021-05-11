@@ -9,13 +9,10 @@ describe('ApproveEthContractComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ApproveEthContractComponent ],
-      imports: [ HttpClientTestingModule, MatDialogModule ],
-      providers: [
-        { provide: MAT_DIALOG_DATA, useValue: {} },
-      ],
-    })
-    .compileComponents();
+      declarations: [ApproveEthContractComponent],
+      imports: [HttpClientTestingModule, MatDialogModule],
+      providers: [{ provide: MAT_DIALOG_DATA, useValue: {} }],
+    }).compileComponents();
   });
 
   beforeEach(() => {

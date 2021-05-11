@@ -10,4 +10,3 @@ export interface PoolDTO {
   status: string;
   units: string;
 }
-

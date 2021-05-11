@@ -7,7 +7,11 @@ import { User } from 'src/app/_classes/user';
 import { TransactionConfirmationState } from 'src/app/_const/transaction-confirmation-state';
 import { MidgardService } from 'src/app/_services/midgard.service';
 import { UserService } from 'src/app/_services/user.service';
-import { TransactionStatusService, TxActions, TxStatus } from 'src/app/_services/transaction-status.service';
+import {
+  TransactionStatusService,
+  TxActions,
+  TxStatus,
+} from 'src/app/_services/transaction-status.service';
 import { EthUtilsService } from 'src/app/_services/eth-utils.service';
 import { Balances } from '@xchainjs/xchain-client';
 import { KeystoreDepositService } from 'src/app/_services/keystore-deposit.service';
@@ -28,10 +32,9 @@ export interface ConfirmDepositData {
 @Component({
   selector: 'app-confirm-deposit-modal',
   templateUrl: './confirm-deposit-modal.component.html',
-  styleUrls: ['./confirm-deposit-modal.component.scss']
+  styleUrls: ['./confirm-deposit-modal.component.scss'],
 })
 export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
-
   txState: TransactionConfirmationState | 'RETRY_RUNE_DEPOSIT';
   hash: string;
   subs: Subscription[];
@@ -52,16 +55,14 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
   ) {
     this.loading = true;
     this.txState = TransactionConfirmationState.PENDING_CONFIRMATION;
-    const user$ = this.userService.user$.subscribe(
-      (user) => {
-        if (!user) {
-          this.closeDialog();
-        }
+    const user$ = this.userService.user$.subscribe((user) => {
+      if (!user) {
+        this.closeDialog();
       }
-    );
+    });
 
     const balances$ = this.userService.userBalances$.subscribe(
-      (balances) => this.balances = balances
+      (balances) => (this.balances = balances)
     );
 
     this.subs = [user$, balances$];
@@ -74,29 +75,29 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
 
   async estimateTime() {
     if (this.data.asset.chain === 'ETH' && this.data.asset.symbol !== 'ETH') {
-      this.estimatedMinutes = await this.ethUtilsService.estimateERC20Time(assetToString(this.data.asset), this.data.assetAmount);
+      this.estimatedMinutes = await this.ethUtilsService.estimateERC20Time(
+        assetToString(this.data.asset),
+        this.data.assetAmount
+      );
     } else {
-      this.estimatedMinutes = this.txStatusService.estimateTime(this.data.asset.chain, this.data.assetAmount);
+      this.estimatedMinutes = this.txStatusService.estimateTime(
+        this.data.asset.chain,
+        this.data.assetAmount
+      );
     }
   }
 
   submitTransaction(): void {
     this.txState = TransactionConfirmationState.SUBMITTING;
 
-    this.midgardService.getInboundAddresses().subscribe(
-      async (res) => {
-
-        if (res && res.length > 0) {
-          this.deposit(res);
-        }
-
+    this.midgardService.getInboundAddresses().subscribe(async (res) => {
+      if (res && res.length > 0) {
+        this.deposit(res);
       }
-    );
+    });
   }
 
-
   async deposit(pools: PoolAddressDTO[]) {
-
     const clients = this.data.user.clients;
     const asset = this.data.asset;
     const thorClient = clients.thorchain;
@@ -104,14 +105,19 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
     let hash = '';
 
     // get token address
-    const address = this.userService.getTokenAddress(this.data.user, this.data.asset.chain);
+    const address = this.userService.getTokenAddress(
+      this.data.user,
+      this.data.asset.chain
+    );
     if (!address || address === '') {
       console.error('no address found');
       return;
     }
 
     // find recipient pool
-    const recipientPool = pools.find( (pool) => pool.chain === this.data.asset.chain );
+    const recipientPool = pools.find(
+      (pool) => pool.chain === this.data.asset.chain
+    );
     if (!recipientPool) {
       console.error('no recipient pool found');
       return;
@@ -119,7 +125,6 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
 
     // Deposit token
     try {
-
       // deposit using xchain
       switch (this.data.asset.chain) {
         case 'BNB':
@@ -128,7 +133,7 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
             inputAmount: this.data.assetAmount,
             client: this.data.user.clients.binance,
             thorchainAddress,
-            recipientPool
+            recipientPool,
           });
           break;
 
@@ -140,7 +145,7 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
             balances: this.balances,
             thorchainAddress,
             recipientPool,
-            estimatedFee: this.data.estimatedFee
+            estimatedFee: this.data.estimatedFee,
           });
           break;
 
@@ -152,7 +157,7 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
             balances: this.balances,
             thorchainAddress,
             recipientPool,
-            estimatedFee: this.data.estimatedFee
+            estimatedFee: this.data.estimatedFee,
           });
           break;
 
@@ -164,7 +169,7 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
             balances: this.balances,
             thorchainAddress,
             recipientPool,
-            estimatedFee: this.data.estimatedFee
+            estimatedFee: this.data.estimatedFee,
           });
 
           break;
@@ -176,7 +181,7 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
             balances: this.balances,
             client: this.data.user.clients.ethereum,
             thorchainAddress,
-            recipientPool
+            recipientPool,
           });
           break;
 
@@ -189,7 +194,6 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
         console.error('no hash set');
         return;
       }
-
     } catch (error) {
       console.error('error making token transfer: ', error);
       this.txState = TransactionConfirmationState.ERROR;
@@ -204,17 +208,15 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
       const runeHash = await this.keystoreDepositService.runeDeposit({
         client: thorClient,
         inputAmount: this.data.runeAmount,
-        memo: `+:${asset.chain}.${asset.symbol}:${address}`
+        memo: `+:${asset.chain}.${asset.symbol}:${address}`,
       });
 
       this.runeDepositSuccess(runeHash);
-
     } catch (error) {
       console.error('error making RUNE transfer: ', error);
       this.txState = 'RETRY_RUNE_DEPOSIT';
       this.error = error;
     }
-
   }
 
   runeDepositSuccess(runeHash: string) {
@@ -226,7 +228,7 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
       status: TxStatus.PENDING,
       action: TxActions.DEPOSIT,
       symbol: this.data.asset.symbol,
-      isThorchainTx: true
+      isThorchainTx: true,
     });
     this.txState = TransactionConfirmationState.SUCCESS;
   }
@@ -241,7 +243,7 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
       action: TxActions.WITHDRAW,
       symbol: this.data.asset.symbol,
       isThorchainTx: true,
-      pollThornodeDirectly: true
+      pollThornodeDirectly: true,
     });
     this.txState = TransactionConfirmationState.SUCCESS;
   }
@@ -255,5 +257,4 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
       sub.unsubscribe();
     }
   }
-
 }

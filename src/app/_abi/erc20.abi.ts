@@ -1,4 +1,5 @@
-// tslint:disable:quotemark object-literal-key-quotes whitespace
+/* eslint-disable @typescript-eslint/quotes, quote-props */
+// prettier-ignore
 export const erc20ABI = [
   {
     "inputs": [],

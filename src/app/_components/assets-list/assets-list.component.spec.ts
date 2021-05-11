@@ -9,10 +9,9 @@ describe('AssetsListComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ AssetsListComponent ],
-      imports: [MatIconModule]
-    })
-    .compileComponents();
+      declarations: [AssetsListComponent],
+      imports: [MatIconModule],
+    }).compileComponents();
   });
 
   beforeEach(() => {

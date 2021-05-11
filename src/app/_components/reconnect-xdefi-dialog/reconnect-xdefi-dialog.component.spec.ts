@@ -10,17 +10,18 @@ describe('ReconnectDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ReconnectXDEFIDialogComponent ],
-      imports: [ MatIconModule, HttpClientTestingModule ],
+      declarations: [ReconnectXDEFIDialogComponent],
+      imports: [MatIconModule, HttpClientTestingModule],
       providers: [
-        { provide: MAT_DIALOG_DATA, useValue: {
-            keystore: null
-          }
+        {
+          provide: MAT_DIALOG_DATA,
+          useValue: {
+            keystore: null,
+          },
         },
-        { provide: MatDialogRef, useValue: { close: (dialogResult: any) => { } } }
-      ]
-    })
-    .compileComponents();
+        { provide: MatDialogRef, useValue: { close: () => {} } },
+      ],
+    }).compileComponents();
   });
 
   beforeEach(() => {

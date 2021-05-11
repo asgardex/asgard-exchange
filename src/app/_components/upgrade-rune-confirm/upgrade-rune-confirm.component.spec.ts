@@ -9,10 +9,9 @@ describe('UpgradeRuneConfirmComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ UpgradeRuneConfirmComponent ],
-      imports: [ HttpClientTestingModule ]
-    })
-    .compileComponents();
+      declarations: [UpgradeRuneConfirmComponent],
+      imports: [HttpClientTestingModule],
+    }).compileComponents();
   });
 
   beforeEach(() => {

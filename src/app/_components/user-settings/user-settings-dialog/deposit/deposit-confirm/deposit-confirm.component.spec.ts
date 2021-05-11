@@ -9,10 +9,9 @@ describe('DepositConfirmComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ DepositConfirmComponent ],
-      imports: [ HttpClientTestingModule ]
-    })
-    .compileComponents();
+      declarations: [DepositConfirmComponent],
+      imports: [HttpClientTestingModule],
+    }).compileComponents();
   });
 
   beforeEach(() => {

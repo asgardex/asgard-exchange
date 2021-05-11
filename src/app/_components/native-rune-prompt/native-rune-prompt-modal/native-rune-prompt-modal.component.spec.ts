@@ -10,17 +10,18 @@ describe('NativeRunePromptModalComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ NativeRunePromptModalComponent ],
+      declarations: [NativeRunePromptModalComponent],
       providers: [
-        { provide: MAT_DIALOG_DATA, useValue: {
-          asset: new Asset('BNB.RUNE'),
-          amount: 1000
-        }
-      },
-      { provide: MatDialogRef, useValue: { close: (dialogResult: any) => { } } }
-      ]
-    })
-    .compileComponents();
+        {
+          provide: MAT_DIALOG_DATA,
+          useValue: {
+            asset: new Asset('BNB.RUNE'),
+            amount: 1000,
+          },
+        },
+        { provide: MatDialogRef, useValue: { close: () => {} } },
+      ],
+    }).compileComponents();
   });
 
   beforeEach(() => {

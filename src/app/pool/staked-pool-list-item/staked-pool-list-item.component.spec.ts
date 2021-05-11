@@ -10,10 +10,9 @@ describe('StakedPoolListItemComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ StakedPoolListItemComponent ],
-      imports: [ IconTickerModule, MatIconModule ]
-    })
-    .compileComponents();
+      declarations: [StakedPoolListItemComponent],
+      imports: [IconTickerModule, MatIconModule],
+    }).compileComponents();
   });
 
   beforeEach(() => {

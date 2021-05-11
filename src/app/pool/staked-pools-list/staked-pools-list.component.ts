@@ -1,15 +1,13 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { MemberPool } from 'src/app/_classes/member';
 import { PoolDTO } from 'src/app/_classes/pool';
 
 @Component({
   selector: 'app-staked-pools-list',
   templateUrl: './staked-pools-list.component.html',
-  styleUrls: ['./staked-pools-list.component.scss']
+  styleUrls: ['./staked-pools-list.component.scss'],
 })
-export class StakedPoolsListComponent implements OnInit {
-
-
+export class StakedPoolsListComponent {
   @Input() set pools(pools: PoolDTO[]) {
     this._pools = pools;
     this.mapPools();
@@ -30,25 +28,20 @@ export class StakedPoolsListComponent implements OnInit {
   _memberPools: MemberPool[];
 
   mappedPools: {
-    poolData: PoolDTO,
-    memberData: MemberPool
+    poolData: PoolDTO;
+    memberData: MemberPool;
   }[];
 
-  constructor() { }
-
-  ngOnInit(): void { }
+  constructor() {}
 
   mapPools() {
-
     if (this.pools && this.memberPools) {
-      this.mappedPools = this.memberPools.map( (memberPool) => {
+      this.mappedPools = this.memberPools.map((memberPool) => {
         return {
-          poolData: this.pools.find( (pool) => pool.asset === memberPool.pool ),
-          memberData: memberPool
+          poolData: this.pools.find((pool) => pool.asset === memberPool.pool),
+          memberData: memberPool,
         };
       });
     }
-
   }
-
 }

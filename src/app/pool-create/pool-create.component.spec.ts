@@ -7,7 +7,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { of } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 
-const spyParamMap = jasmine.createSpyObj({get: null});
+const spyParamMap = jasmine.createSpyObj({ get: null });
 const mockActivatedRoute = { queryParamMap: of(spyParamMap) };
 
 describe('PoolCreateComponent', () => {
@@ -16,13 +16,10 @@ describe('PoolCreateComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ PoolCreateComponent ],
-      imports: [ MatDialogModule, HttpClientTestingModule, RouterTestingModule ],
-      providers: [
-        { provide: ActivatedRoute, useValue: mockActivatedRoute }
-      ]
-    })
-    .compileComponents();
+      declarations: [PoolCreateComponent],
+      imports: [MatDialogModule, HttpClientTestingModule, RouterTestingModule],
+      providers: [{ provide: ActivatedRoute, useValue: mockActivatedRoute }],
+    }).compileComponents();
   });
 
   beforeEach(() => {

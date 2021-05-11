@@ -8,8 +8,6 @@ import { DirectivesModule } from 'src/app/_directives/directives.module';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ModalSectionHeaderModule } from '../modal-section-header/modal-section-header.module';
 
-
-
 @NgModule({
   declarations: [UpgradeRuneConfirmComponent],
   imports: [
@@ -19,8 +17,8 @@ import { ModalSectionHeaderModule } from '../modal-section-header/modal-section-
     TransactionProcessingModalModule,
     DirectivesModule,
     MatProgressSpinnerModule,
-    ModalSectionHeaderModule
+    ModalSectionHeaderModule,
   ],
-  exports: [UpgradeRuneConfirmComponent]
+  exports: [UpgradeRuneConfirmComponent],
 })
-export class UpgradeRuneConfirmModule { }
+export class UpgradeRuneConfirmModule {}

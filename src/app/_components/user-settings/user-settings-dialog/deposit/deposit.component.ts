@@ -1,14 +1,13 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { AssetAndBalance } from 'src/app/_classes/asset-and-balance';
 import { ActionOptions } from './action-options.enum';
 
 @Component({
   selector: 'app-deposit',
   templateUrl: './deposit.component.html',
-  styleUrls: ['./deposit.component.scss']
+  styleUrls: ['./deposit.component.scss'],
 })
-export class DepositComponent implements OnInit {
-
+export class DepositComponent {
   @Output() back: EventEmitter<null>;
   @Input() asset: AssetAndBalance;
 
@@ -34,10 +33,6 @@ export class DepositComponent implements OnInit {
     this.memoAmount = 0;
   }
 
-  ngOnInit(): void {
-
-  }
-
   transactionSubmitted(hash: string) {
     this.txHash = hash;
     this.depositState = 'TX_SUBMITTED';
@@ -53,7 +48,5 @@ export class DepositComponent implements OnInit {
     } else {
       this.depositState = 'FORM';
     }
-
   }
-
 }

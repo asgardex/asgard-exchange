@@ -10,10 +10,9 @@ describe('ConfimSendComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ConfimSendComponent ],
-      imports: [ MatIconModule, HttpClientTestingModule ]
-    })
-    .compileComponents();
+      declarations: [ConfimSendComponent],
+      imports: [MatIconModule, HttpClientTestingModule],
+    }).compileComponents();
   });
 
   beforeEach(() => {

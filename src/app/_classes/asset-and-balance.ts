@@ -2,7 +2,7 @@ import { AssetAmount } from '@xchainjs/xchain-util';
 import { Asset } from './asset';
 
 export type AssetAndBalance = {
-  asset: Asset,
+  asset: Asset;
   balance?: AssetAmount;
-  assetPriceUSD?: number
+  assetPriceUSD?: number;
 };

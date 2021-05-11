@@ -12,10 +12,14 @@ describe('SendAssetComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ SendAssetComponent ],
-      imports: [ AssetInputModule, MatIconModule, MatDialogModule, HttpClientTestingModule ]
-    })
-    .compileComponents();
+      declarations: [SendAssetComponent],
+      imports: [
+        AssetInputModule,
+        MatIconModule,
+        MatDialogModule,
+        HttpClientTestingModule,
+      ],
+    }).compileComponents();
   });
 
   beforeEach(() => {

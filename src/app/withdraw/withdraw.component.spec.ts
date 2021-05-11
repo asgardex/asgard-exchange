@@ -14,15 +14,18 @@ describe('WithdrawComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ WithdrawComponent ],
-      providers: [
-        { provide: MAT_DIALOG_DATA, useValue: {} },
-      ],
+      declarations: [WithdrawComponent],
+      providers: [{ provide: MAT_DIALOG_DATA, useValue: {} }],
       imports: [
-        MatDialogModule, RouterTestingModule, HttpClientTestingModule, AssetInputModule, MatSliderModule, IconTickerModule, MatIconModule
-      ]
-    })
-    .compileComponents();
+        MatDialogModule,
+        RouterTestingModule,
+        HttpClientTestingModule,
+        AssetInputModule,
+        MatSliderModule,
+        IconTickerModule,
+        MatIconModule,
+      ],
+    }).compileComponents();
   });
 
   beforeEach(() => {

@@ -10,8 +10,8 @@ describe('TransactionStatusService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [ HttpClientTestingModule ],
-      providers: [ MidgardService, UserService ]
+      imports: [HttpClientTestingModule],
+      providers: [MidgardService, UserService],
     });
     service = TestBed.inject(TransactionStatusService);
   });

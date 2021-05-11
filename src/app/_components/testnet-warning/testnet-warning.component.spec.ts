@@ -8,9 +8,8 @@ describe('TestnetWarningComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ TestnetWarningComponent ]
-    })
-    .compileComponents();
+      declarations: [TestnetWarningComponent],
+    }).compileComponents();
   });
 
   beforeEach(() => {

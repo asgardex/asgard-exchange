@@ -10,14 +10,13 @@ describe('UserSettingsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ UserSettingsComponent ],
-      imports: [ MatDialogModule, HttpClientTestingModule ],
+      declarations: [UserSettingsComponent],
+      imports: [MatDialogModule, HttpClientTestingModule],
       providers: [
         TransactionStatusService,
         { provide: MAT_DIALOG_DATA, useValue: {} },
-      ]
-    })
-    .compileComponents();
+      ],
+    }).compileComponents();
   });
 
   beforeEach(() => {

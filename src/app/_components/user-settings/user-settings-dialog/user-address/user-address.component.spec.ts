@@ -10,10 +10,9 @@ describe('UserAddressComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ UserAddressComponent ],
-      imports: [ MatSnackBarModule, MatIconModule, HttpClientTestingModule ]
-    })
-    .compileComponents();
+      declarations: [UserAddressComponent],
+      imports: [MatSnackBarModule, MatIconModule, HttpClientTestingModule],
+    }).compileComponents();
   });
 
   beforeEach(() => {

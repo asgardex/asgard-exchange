@@ -10,18 +10,21 @@ describe('ApproveEthContractModalComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ApproveEthContractModalComponent ],
+      declarations: [ApproveEthContractModalComponent],
       imports: [HttpClientTestingModule],
       providers: [
-        { provide: MAT_DIALOG_DATA, useValue: {
-          contractAddress: '0x9d496De78837f5a2bA64Cb40E62c19FBcB67f55a',
-          asset: new Asset('ETH.DAI-0XAD6D458402F60FD3BD25163575031ACDCE07538D')
-          }
+        {
+          provide: MAT_DIALOG_DATA,
+          useValue: {
+            contractAddress: '0x9d496De78837f5a2bA64Cb40E62c19FBcB67f55a',
+            asset: new Asset(
+              'ETH.DAI-0XAD6D458402F60FD3BD25163575031ACDCE07538D'
+            ),
+          },
         },
-        { provide: MatDialogRef, useValue: { close: (dialogResult: any) => { } } }
+        { provide: MatDialogRef, useValue: { close: () => {} } },
       ],
-    })
-    .compileComponents();
+    }).compileComponents();
   });
 
   beforeEach(() => {

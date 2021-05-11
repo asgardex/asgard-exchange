@@ -9,10 +9,9 @@ describe('TransactionProcessingModalComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ TransactionProcessingModalComponent ],
-      imports: [ MatIconModule ]
-    })
-    .compileComponents();
+      declarations: [TransactionProcessingModalComponent],
+      imports: [MatIconModule],
+    }).compileComponents();
   });
 
   beforeEach(() => {

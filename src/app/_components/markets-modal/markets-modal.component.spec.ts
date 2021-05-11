@@ -11,14 +11,13 @@ describe('MarketsModalComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ MarketsModalComponent ],
-      imports: [ HttpClientTestingModule, MatIconModule ],
+      declarations: [MarketsModalComponent],
+      imports: [HttpClientTestingModule, MatIconModule],
       providers: [
         { provide: MAT_DIALOG_DATA, useValue: {} },
-        { provide: MatDialogRef, useValue: {} }
-      ]
-    })
-    .compileComponents();
+        { provide: MatDialogRef, useValue: {} },
+      ],
+    }).compileComponents();
   });
 
   beforeEach(() => {

@@ -1,17 +1,19 @@
-import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, OnDestroy, Output } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 import { ExplorerPathsService } from 'src/app/_services/explorer-paths.service';
-import { TransactionStatusService, Tx } from 'src/app/_services/transaction-status.service';
+import {
+  TransactionStatusService,
+  Tx,
+} from 'src/app/_services/transaction-status.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-pending-txs-modal',
   templateUrl: './pending-txs-modal.component.html',
-  styleUrls: ['./pending-txs-modal.component.scss']
+  styleUrls: ['./pending-txs-modal.component.scss'],
 })
-export class PendingTxsModalComponent implements OnInit, OnDestroy {
-
+export class PendingTxsModalComponent implements OnDestroy {
   txs: Tx[];
   subs: Subscription[];
   bitcoinExplorerUrl: string;
@@ -27,7 +29,6 @@ export class PendingTxsModalComponent implements OnInit, OnDestroy {
     private explorerPathsService: ExplorerPathsService,
     private txStatusService: TransactionStatusService
   ) {
-
     this.back = new EventEmitter<null>();
     this.txs = [];
 
@@ -38,16 +39,11 @@ export class PendingTxsModalComponent implements OnInit, OnDestroy {
     this.litecoinExplorerUrl = `${this.explorerPathsService.litecoinExplorerUrl}`;
     this.bchExplorerUrl = `${this.explorerPathsService.bchExplorerUrl}/tx`;
 
-    const pendingTxs$ = this.txStatusService.txs$.subscribe( (txs) => {
+    const pendingTxs$ = this.txStatusService.txs$.subscribe((txs) => {
       this.txs = txs;
     });
 
     this.subs = [pendingTxs$];
-
-  }
-
-  ngOnInit(): void {
-
   }
 
   explorerUrl(chain: string): string {
@@ -77,10 +73,9 @@ export class PendingTxsModalComponent implements OnInit, OnDestroy {
 
   explorerPath(tx: Tx): string {
     if (tx.isThorchainTx) {
-
       if (tx.pollThornodeDirectly) {
         return this.getViewBlockPath(tx.hash);
-      }  else if (tx.pollRpc) {
+      } else if (tx.pollRpc) {
         /**
          * For THOR transfers
          */
@@ -88,7 +83,6 @@ export class PendingTxsModalComponent implements OnInit, OnDestroy {
       } else {
         return this.thorchainExplorerUrl + '/' + tx.hash;
       }
-
     } else if (tx.chain === 'ETH') {
       return `${this.ethereumExplorerUrl}/0x${tx.hash}`;
     } else {
@@ -113,5 +107,4 @@ export class PendingTxsModalComponent implements OnInit, OnDestroy {
       sub.unsubscribe();
     }
   }
-
 }

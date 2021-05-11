@@ -11,13 +11,10 @@ describe('PendingTxsModalComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ PendingTxsModalComponent ],
-      imports: [ MatIconModule, HttpClientTestingModule ],
-      providers: [
-        { provide: MatDialogRef, useValue: { close: (dialogResult: any) => { } } }
-      ]
-    })
-    .compileComponents();
+      declarations: [PendingTxsModalComponent],
+      imports: [MatIconModule, HttpClientTestingModule],
+      providers: [{ provide: MatDialogRef, useValue: { close: () => {} } }],
+    }).compileComponents();
   });
 
   beforeEach(() => {

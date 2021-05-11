@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 import { User } from 'src/app/_classes/user';
@@ -8,37 +8,31 @@ import { UserSettingsDialogComponent } from './user-settings-dialog/user-setting
 @Component({
   selector: 'app-user-settings',
   templateUrl: './user-settings.component.html',
-  styleUrls: ['./user-settings.component.scss']
+  styleUrls: ['./user-settings.component.scss'],
 })
-export class UserSettingsComponent implements OnInit, OnDestroy {
-
+export class UserSettingsComponent implements OnDestroy {
   @Input() user: User;
   pendingTxCount: number;
   modalDimensions = {
     maxWidth: '520px',
     width: '50vw',
-    minWidth: '260px'
+    minWidth: '260px',
   };
   subs: Subscription[];
 
-  constructor(private dialog: MatDialog, private txStatusService: TransactionStatusService) {
+  constructor(
+    private dialog: MatDialog,
+    private txStatusService: TransactionStatusService
+  ) {
     this.pendingTxCount = 0;
-    const pendingTx$ = this.txStatusService.txs$.subscribe(
-      (_txs) => {
-        this.pendingTxCount = this.txStatusService.getPendingTxCount();
-      }
-    );
+    const pendingTx$ = this.txStatusService.txs$.subscribe((_txs) => {
+      this.pendingTxCount = this.txStatusService.getPendingTxCount();
+    });
     this.subs = [pendingTx$];
   }
 
-  ngOnInit(): void {
-  }
-
   openUserSettings() {
-    this.dialog.open(
-      UserSettingsDialogComponent,
-      this.modalDimensions
-    );
+    this.dialog.open(UserSettingsDialogComponent, this.modalDimensions);
   }
 
   ngOnDestroy() {
@@ -46,5 +40,4 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
       sub.unsubscribe();
     }
   }
-
 }

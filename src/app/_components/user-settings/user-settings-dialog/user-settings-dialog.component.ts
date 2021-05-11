@@ -12,10 +12,9 @@ import { UserService } from 'src/app/_services/user.service';
 @Component({
   selector: 'app-user-settings-dialog',
   templateUrl: './user-settings-dialog.component.html',
-  styleUrls: ['./user-settings-dialog.component.scss']
+  styleUrls: ['./user-settings-dialog.component.scss'],
 })
 export class UserSettingsDialogComponent implements OnInit, OnDestroy {
-
   user: User;
   subs: Subscription[];
   binanceAddress: string;
@@ -26,9 +25,18 @@ export class UserSettingsDialogComponent implements OnInit, OnDestroy {
   bchAddress: string;
   loading: boolean;
   pendingTxCount: number;
-  mode: 'ADDRESSES' | 'ADDRESS' | 'PENDING_TXS'
-    | 'ASSET' | 'SEND' | 'CONFIRM_SEND' | 'UPGRADE_RUNE'
-    | 'CONFIRM_UPGRADE_RUNE' | 'VIEW_PHRASE' | 'DEPOSIT' | 'CONFIRM_DEPOSIT'
+  mode:
+    | 'ADDRESSES'
+    | 'ADDRESS'
+    | 'PENDING_TXS'
+    | 'ASSET'
+    | 'SEND'
+    | 'CONFIRM_SEND'
+    | 'UPGRADE_RUNE'
+    | 'CONFIRM_UPGRADE_RUNE'
+    | 'VIEW_PHRASE'
+    | 'DEPOSIT'
+    | 'CONFIRM_DEPOSIT'
     | 'ADDRESS_ADD_TOKEN';
   selectedAddress: string;
   selectedChain: Chain;
@@ -49,34 +57,28 @@ export class UserSettingsDialogComponent implements OnInit, OnDestroy {
     this.pendingTxCount = 0;
     this.mode = 'ADDRESSES';
 
-    const user$ = this.userService.user$.subscribe(
-      async (user) => {
+    const user$ = this.userService.user$.subscribe(async (user) => {
+      if (user) {
+        this.loading = true;
 
-        if (user) {
+        this.user = user;
 
-          this.loading = true;
-
-          this.user = user;
-
-          if (this.user.clients) {
-            this.binanceAddress = await this.user.clients.binance.getAddress();
-            this.bitcoinAddress = await this.user.clients.bitcoin.getAddress();
-            this.thorAddress = await this.user.clients.thorchain.getAddress();
-            this.ethereumAddress = await this.user.clients.ethereum.getAddress();
-            this.litecoinAddress = await this.user.clients.litecoin.getAddress();
-            this.bchAddress = await this.user.clients.bitcoinCash.getAddress();
-          }
-
-          this.loading = false;
-
-        } else {
-          this.pendingTxCount = 0;
+        if (this.user.clients) {
+          this.binanceAddress = await this.user.clients.binance.getAddress();
+          this.bitcoinAddress = await this.user.clients.bitcoin.getAddress();
+          this.thorAddress = await this.user.clients.thorchain.getAddress();
+          this.ethereumAddress = await this.user.clients.ethereum.getAddress();
+          this.litecoinAddress = await this.user.clients.litecoin.getAddress();
+          this.bchAddress = await this.user.clients.bitcoinCash.getAddress();
         }
 
+        this.loading = false;
+      } else {
+        this.pendingTxCount = 0;
       }
-    );
+    });
 
-    const txs$ = this.txStatusService.txs$.subscribe( (_) => {
+    const txs$ = this.txStatusService.txs$.subscribe((_) => {
       this.pendingTxCount = this.txStatusService.getPendingTxCount();
     });
 
@@ -88,7 +90,7 @@ export class UserSettingsDialogComponent implements OnInit, OnDestroy {
   }
 
   getPools() {
-    this.midgardService.getPools().subscribe( (res) => this.pools = res );
+    this.midgardService.getPools().subscribe((res) => (this.pools = res));
   }
 
   selectAddress(address: string, chain: Chain) {
@@ -108,14 +110,14 @@ export class UserSettingsDialogComponent implements OnInit, OnDestroy {
     this.mode = 'ASSET';
   }
 
-  confirmSend(p: {amount: number, recipientAddress: string, memo: string}) {
+  confirmSend(p: { amount: number; recipientAddress: string; memo: string }) {
     this.amountToSend = p.amount;
     this.recipient = p.recipientAddress;
     this.memo = p.memo;
     this.mode = 'CONFIRM_SEND';
   }
 
-  confirmUpgradeRune(p: {amount: number}) {
+  confirmUpgradeRune(p: { amount: number }) {
     this.amountToSend = p.amount;
     this.mode = 'CONFIRM_UPGRADE_RUNE';
     console.log(this.mode);
@@ -147,5 +149,4 @@ export class UserSettingsDialogComponent implements OnInit, OnDestroy {
       sub.unsubscribe();
     }
   }
-
 }

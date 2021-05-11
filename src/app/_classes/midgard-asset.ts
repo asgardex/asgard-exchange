@@ -1,5 +1,3 @@
-
-
 export interface MidgardAsset {
   asset: string;
   dateCreated: number;

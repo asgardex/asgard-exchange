@@ -8,9 +8,8 @@ describe('SlippageToleranceComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ SlippageToleranceComponent ]
-    })
-    .compileComponents();
+      declarations: [SlippageToleranceComponent],
+    }).compileComponents();
   });
 
   beforeEach(() => {

@@ -4,15 +4,9 @@ import { TransactionProcessingModalComponent } from './transaction-processing-mo
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 
-
-
 @NgModule({
   declarations: [TransactionProcessingModalComponent],
-  imports: [
-    CommonModule,
-    MatProgressSpinnerModule,
-    MatIconModule
-  ],
-  exports: [TransactionProcessingModalComponent]
+  imports: [CommonModule, MatProgressSpinnerModule, MatIconModule],
+  exports: [TransactionProcessingModalComponent],
 })
-export class TransactionProcessingModalModule { }
+export class TransactionProcessingModalModule {}

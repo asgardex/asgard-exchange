@@ -8,9 +8,8 @@ describe('KeystoreCreateStorePhraseComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ KeystoreCreateStorePhraseComponent ]
-    })
-    .compileComponents();
+      declarations: [KeystoreCreateStorePhraseComponent],
+    }).compileComponents();
   });
 
   beforeEach(() => {

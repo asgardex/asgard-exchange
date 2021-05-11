@@ -9,22 +9,21 @@ export type HaskoinTxResponse = {
   block: {
     mempool?: number;
     height?: number;
-  }
+  };
 };
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class HaskoinService {
-
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   getTx(hash: string): Observable<HaskoinTxResponse> {
-    const url = environment.network === 'testnet'
-      ? 'https://api.haskoin.com/bchtest'
-      : 'https://api.haskoin.com/bch';
+    const url =
+      environment.network === 'testnet'
+        ? 'https://api.haskoin.com/bchtest'
+        : 'https://api.haskoin.com/bch';
 
     return this.http.get<HaskoinTxResponse>(`${url}/transaction/${hash}`);
-
   }
 }

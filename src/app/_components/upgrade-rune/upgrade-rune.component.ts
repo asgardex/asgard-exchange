@@ -6,13 +6,12 @@ import { UserService } from 'src/app/_services/user.service';
 @Component({
   selector: 'app-upgrade-rune',
   templateUrl: './upgrade-rune.component.html',
-  styleUrls: ['./upgrade-rune.component.scss']
+  styleUrls: ['./upgrade-rune.component.scss'],
 })
 export class UpgradeRuneComponent implements OnInit {
-
   @Input() asset: AssetAndBalance;
   @Output() back: EventEmitter<null>;
-  @Output() confirmUpgrade: EventEmitter<{amount: number}>;
+  @Output() confirmUpgrade: EventEmitter<{ amount: number }>;
   get amount() {
     return this._amount;
   }
@@ -31,27 +30,25 @@ export class UpgradeRuneComponent implements OnInit {
 
   constructor(private userService: UserService) {
     this.back = new EventEmitter<null>();
-    this.confirmUpgrade = new EventEmitter<{amount: number}>();
+    this.confirmUpgrade = new EventEmitter<{ amount: number }>();
     this.amountSpendable = false;
   }
 
   ngOnInit(): void {
     if (this.asset) {
-
-      const balances$ = this.userService.userBalances$.subscribe(
-        (balances) => {
-          this.balance = this.userService.findBalance(balances, this.asset.asset);
-        }
-      );
+      const balances$ = this.userService.userBalances$.subscribe((balances) => {
+        this.balance = this.userService.findBalance(balances, this.asset.asset);
+      });
 
       this.subs = [balances$];
-
     }
   }
 
   checkSpendable(): void {
-    const maximumSpendableBalance = this.userService.maximumSpendableBalance(this.asset.asset, this.balance);
-    this.amountSpendable = (this.amount <= maximumSpendableBalance);
+    const maximumSpendableBalance = this.userService.maximumSpendableBalance(
+      this.asset.asset,
+      this.balance
+    );
+    this.amountSpendable = this.amount <= maximumSpendableBalance;
   }
-
 }

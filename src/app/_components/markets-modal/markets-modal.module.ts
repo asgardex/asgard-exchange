@@ -11,7 +11,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
-
 @NgModule({
   declarations: [MarketsModalComponent],
   imports: [
@@ -20,8 +19,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     CommonModule,
     MatProgressSpinnerModule,
     FormsModule,
-    AssetsListModule
+    AssetsListModule,
   ],
-  exports: [MarketsModalComponent]
+  exports: [MarketsModalComponent],
 })
-export class MarketsModalModule { }
+export class MarketsModalModule {}

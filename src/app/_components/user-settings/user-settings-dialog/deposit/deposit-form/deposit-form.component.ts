@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { AssetAndBalance } from 'src/app/_classes/asset-and-balance';
 import { CGCoinListItem } from 'src/app/_services/coin-gecko.service';
 import { ActionOptions } from '../action-options.enum';
@@ -6,10 +6,9 @@ import { ActionOptions } from '../action-options.enum';
 @Component({
   selector: 'app-deposit-form',
   templateUrl: './deposit-form.component.html',
-  styleUrls: ['./deposit-form.component.scss']
+  styleUrls: ['./deposit-form.component.scss'],
 })
-export class DepositFormComponent implements OnInit {
-
+export class DepositFormComponent {
   @Input() asset: AssetAndBalance;
   @Output() confirm: EventEmitter<null>;
 
@@ -30,12 +29,10 @@ export class DepositFormComponent implements OnInit {
     return this._depositAmount;
   }
   set depositAmount(amount: number) {
-
     if (amount !== this.depositAmount) {
       this.depositAmountChange.next(amount);
       this._depositAmount = amount;
     }
-
   }
   _depositAmount: number;
 
@@ -69,9 +66,6 @@ export class DepositFormComponent implements OnInit {
     this.confirm = new EventEmitter();
   }
 
-  ngOnInit(): void {
-  }
-
   onMemoAssetChange(memoAsset: string) {
     this.memoAssetChange.next(memoAsset);
     this.updateMemo(1, memoAsset);
@@ -92,12 +86,10 @@ export class DepositFormComponent implements OnInit {
       case ActionOptions.LEAVE:
         position = 1;
         break;
-
     }
 
     this.updateMemo(position, address);
   }
-
 
   updateAction(action: ActionOptions) {
     this.destinationAddressChange.next('');
@@ -116,7 +108,6 @@ export class DepositFormComponent implements OnInit {
       this.depositAmountChange.next(null);
       this.depositAmount = null;
     }
-
   }
 
   updateSwapLimit(limit: string): void {
@@ -130,36 +121,27 @@ export class DepositFormComponent implements OnInit {
   }
 
   updateMemo(position: number, val: string): void {
-
     const splitMemo = this.memo.split(':');
     let memo = '';
 
     if (+position > splitMemo.length) {
-
       for (let i = 0; i <= position; i++) {
-
         if (splitMemo[i]) {
           memo += `${splitMemo[i]}:`;
         } else {
-
           if (i !== position) {
             memo += ':';
           }
-
         }
 
         if (i === position) {
           memo += val;
         }
-
       }
-
     } else if (+position === splitMemo.length) {
       memo = `${this.memo}:${val}`;
     } else {
-
-      memo = splitMemo.reduce( (updatedMemo, segment, index) => {
-
+      memo = splitMemo.reduce((updatedMemo, segment, index) => {
         if (index === +position) {
           updatedMemo += val;
         } else {
@@ -172,7 +154,6 @@ export class DepositFormComponent implements OnInit {
 
         return updatedMemo;
       }, '');
-
     }
 
     if (memo.charAt(memo.length - 1) === ':') {
@@ -180,7 +161,6 @@ export class DepositFormComponent implements OnInit {
     }
 
     this.memoChange.next(memo);
-
   }
 
   confirmSend() {

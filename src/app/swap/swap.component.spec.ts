@@ -10,16 +10,20 @@ describe('SwapComponent', () => {
   let component: SwapComponent;
   let fixture: ComponentFixture<SwapComponent>;
 
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
-      declarations: [ SwapComponent ],
-      providers: [
-        { provide: MAT_DIALOG_DATA, useValue: {} },
-      ],
-      imports: [ MatDialogModule, HttpClientTestingModule, AssetInputModule, MatIconModule ]
+  beforeEach(
+    waitForAsync(() => {
+      TestBed.configureTestingModule({
+        declarations: [SwapComponent],
+        providers: [{ provide: MAT_DIALOG_DATA, useValue: {} }],
+        imports: [
+          MatDialogModule,
+          HttpClientTestingModule,
+          AssetInputModule,
+          MatIconModule,
+        ],
+      }).compileComponents();
     })
-    .compileComponents();
-  }));
+  );
 
   beforeEach(() => {
     fixture = TestBed.createComponent(SwapComponent);

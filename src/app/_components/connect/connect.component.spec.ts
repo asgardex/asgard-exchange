@@ -9,16 +9,15 @@ describe('ConnectComponent', () => {
   let component: ConnectComponent;
   let fixture: ComponentFixture<ConnectComponent>;
 
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
-      declarations: [ ConnectComponent ],
-      providers: [
-        { provide: MAT_DIALOG_DATA, useValue: {} },
-      ],
-      imports: [ MatDialogModule, HttpClientTestingModule, MatIconModule ]
+  beforeEach(
+    waitForAsync(() => {
+      TestBed.configureTestingModule({
+        declarations: [ConnectComponent],
+        providers: [{ provide: MAT_DIALOG_DATA, useValue: {} }],
+        imports: [MatDialogModule, HttpClientTestingModule, MatIconModule],
+      }).compileComponents();
     })
-    .compileComponents();
-  }));
+  );
 
   beforeEach(() => {
     fixture = TestBed.createComponent(ConnectComponent);

@@ -10,10 +10,9 @@ describe('XDEFIConnectComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ XDEFIConnectComponent ],
-      imports: [ HttpClientTestingModule, MatIconModule ]
-    })
-    .compileComponents();
+      declarations: [XDEFIConnectComponent],
+      imports: [HttpClientTestingModule, MatIconModule],
+    }).compileComponents();
   });
 
   beforeEach(() => {

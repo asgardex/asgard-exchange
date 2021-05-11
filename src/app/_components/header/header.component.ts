@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { User } from 'src/app/_classes/user';
 import { UserService } from 'src/app/_services/user.service';
@@ -7,10 +7,9 @@ import { environment } from 'src/environments/environment';
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
-  styleUrls: ['./header.component.scss']
+  styleUrls: ['./header.component.scss'],
 })
-export class HeaderComponent implements OnInit, OnDestroy {
-
+export class HeaderComponent implements OnDestroy {
   isTestnet: boolean;
   user: User;
   subs: Subscription[];
@@ -19,14 +18,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.isTestnet = environment.network === 'testnet' ? true : false;
 
     const user$ = this.userService.user$.subscribe(
-      (user) => this.user = user
+      (user) => (this.user = user)
     );
 
     this.subs = [user$];
-
-  }
-
-  ngOnInit(): void {
   }
 
   ngOnDestroy() {
@@ -34,5 +29,4 @@ export class HeaderComponent implements OnInit, OnDestroy {
       sub.unsubscribe();
     }
   }
-
 }

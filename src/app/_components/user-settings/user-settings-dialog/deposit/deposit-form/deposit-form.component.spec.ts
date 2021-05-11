@@ -9,10 +9,9 @@ describe('DepositFormComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ DepositFormComponent ],
-      imports: [ HttpClientTestingModule ]
-    })
-    .compileComponents();
+      declarations: [DepositFormComponent],
+      imports: [HttpClientTestingModule],
+    }).compileComponents();
   });
 
   beforeEach(() => {

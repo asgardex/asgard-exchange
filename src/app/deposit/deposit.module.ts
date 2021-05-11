@@ -16,10 +16,12 @@ import { DirectivesModule } from '../_directives/directives.module';
 import { SectionHeadModule } from '../_components/section-head/section-head.module';
 import { RetryRuneDepositComponent } from './retry-rune-deposit/retry-rune-deposit.component';
 
-
-
 @NgModule({
-  declarations: [DepositComponent, ConfirmDepositModalComponent, RetryRuneDepositComponent],
+  declarations: [
+    DepositComponent,
+    ConfirmDepositModalComponent,
+    RetryRuneDepositComponent,
+  ],
   imports: [
     CommonModule,
     MatButtonModule,
@@ -36,13 +38,13 @@ import { RetryRuneDepositComponent } from './retry-rune-deposit/retry-rune-depos
     RouterModule.forChild([
       {
         path: ':asset',
-        component: DepositComponent
+        component: DepositComponent,
       },
       {
         path: '',
-        redirectTo: '/pool'
-      }
-    ])
-  ]
+        redirectTo: '/pool',
+      },
+    ]),
+  ],
 })
-export class DepositModule { }
+export class DepositModule {}
