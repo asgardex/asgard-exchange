@@ -23,5 +23,4 @@ export class PoolAddress {
     this.router = dto.router;
     this.gasRate = +dto.gas_rate;
   }
-
 }

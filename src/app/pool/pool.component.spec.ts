@@ -8,13 +8,14 @@ describe('PoolComponent', () => {
   let component: PoolComponent;
   let fixture: ComponentFixture<PoolComponent>;
 
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
-      declarations: [ PoolComponent ],
-      imports: [ HttpClientTestingModule, MatIconModule ]
+  beforeEach(
+    waitForAsync(() => {
+      TestBed.configureTestingModule({
+        declarations: [PoolComponent],
+        imports: [HttpClientTestingModule, MatIconModule],
+      }).compileComponents();
     })
-    .compileComponents();
-  }));
+  );
 
   beforeEach(() => {
     fixture = TestBed.createComponent(PoolComponent);

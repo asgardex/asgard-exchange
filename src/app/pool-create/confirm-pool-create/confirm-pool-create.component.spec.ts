@@ -10,20 +10,21 @@ describe('ConfirmPoolCreateComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ConfirmPoolCreateComponent ],
+      declarations: [ConfirmPoolCreateComponent],
       providers: [
-        { provide: MAT_DIALOG_DATA, useValue: {
+        {
+          provide: MAT_DIALOG_DATA,
+          useValue: {
             asset: new Asset('BUSD'),
             rune: new Asset('RUNE-B1A'),
             assetAmount: 100,
             runeAmount: 100,
-          }
+          },
         },
-        { provide: MatDialogRef, useValue: { close: (dialogResult: any) => { } } }
+        { provide: MatDialogRef, useValue: { close: () => {} } },
       ],
-      imports: [ HttpClientTestingModule ]
-    })
-    .compileComponents();
+      imports: [HttpClientTestingModule],
+    }).compileComponents();
   });
 
   beforeEach(() => {

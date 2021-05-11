@@ -9,9 +9,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { IconTickerModule } from '../_components/icon-ticker/icon-ticker.module';
 
-
 @NgModule({
-  declarations: [PoolComponent, StakedPoolsListComponent, StakedPoolListItemComponent],
+  declarations: [
+    PoolComponent,
+    StakedPoolsListComponent,
+    StakedPoolListItemComponent,
+  ],
   imports: [
     CommonModule,
     MatButtonModule,
@@ -21,9 +24,9 @@ import { IconTickerModule } from '../_components/icon-ticker/icon-ticker.module'
     RouterModule.forChild([
       {
         path: '',
-        component: PoolComponent
-      }
-    ])
-  ]
+        component: PoolComponent,
+      },
+    ]),
+  ],
 })
-export class PoolModule { }
+export class PoolModule {}

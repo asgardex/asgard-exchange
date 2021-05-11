@@ -8,9 +8,8 @@ describe('LastBlockIndicatorComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ LastBlockIndicatorComponent ]
-    })
-    .compileComponents();
+      declarations: [LastBlockIndicatorComponent],
+    }).compileComponents();
   });
 
   beforeEach(() => {

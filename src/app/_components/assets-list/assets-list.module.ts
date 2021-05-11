@@ -6,8 +6,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { DirectivesModule } from 'src/app/_directives/directives.module';
 
-
-
 @NgModule({
   declarations: [AssetsListComponent],
   imports: [
@@ -15,8 +13,8 @@ import { DirectivesModule } from 'src/app/_directives/directives.module';
     MatProgressSpinnerModule,
     MatIconModule,
     MatButtonModule,
-    DirectivesModule
+    DirectivesModule,
   ],
-  exports: [AssetsListComponent]
+  exports: [AssetsListComponent],
 })
-export class AssetsListModule { }
+export class AssetsListModule {}

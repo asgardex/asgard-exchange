@@ -8,9 +8,8 @@ describe('StakedPoolsListComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ StakedPoolsListComponent ]
-    })
-    .compileComponents();
+      declarations: [StakedPoolsListComponent],
+    }).compileComponents();
   });
 
   beforeEach(() => {

@@ -1,12 +1,10 @@
-
 export enum PoolDetailStatusEnum {
   Bootstrapped = 'bootstrapped',
   Enabled = 'enabled',
-  Disabled = 'disabled'
+  Disabled = 'disabled',
 }
 
 export interface PoolDetail {
-
   asset?: string;
   assetDepth?: string;
   assetROI?: string;

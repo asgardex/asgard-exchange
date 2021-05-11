@@ -1,12 +1,11 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
   selector: 'app-modal-section-header',
   templateUrl: './modal-section-header.component.html',
-  styleUrls: ['./modal-section-header.component.scss']
+  styleUrls: ['./modal-section-header.component.scss'],
 })
-export class ModalSectionHeaderComponent implements OnInit {
-
+export class ModalSectionHeaderComponent {
   @Input() sectionTitle?: string | null;
   @Input() sectionTitleIcon?: string | null;
   @Input() displayBackBtn: boolean;
@@ -20,8 +19,4 @@ export class ModalSectionHeaderComponent implements OnInit {
     this.back = new EventEmitter<null>();
     this.closeModal = new EventEmitter<null>();
   }
-
-  ngOnInit(): void {
-  }
-
 }

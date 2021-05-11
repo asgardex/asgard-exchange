@@ -9,7 +9,7 @@ import {
   PoolData,
   getValueOfAssetInRune,
   getValueOfRuneInAsset,
-  getSwapOutput
+  getSwapOutput,
 } from '@thorchain/asgardex-util';
 import BigNumber from 'bignumber.js';
 import {
@@ -43,10 +43,9 @@ export enum SwapType {
 @Component({
   selector: 'app-swap',
   templateUrl: './swap.component.html',
-  styleUrls: ['./swap.component.scss']
+  styleUrls: ['./swap.component.scss'],
 })
 export class SwapComponent implements OnInit, OnDestroy {
-
   /**
    * From
    */
@@ -54,7 +53,6 @@ export class SwapComponent implements OnInit, OnDestroy {
     return this._sourceAssetUnit;
   }
   set sourceAssetUnit(val: number) {
-
     this._sourceAssetUnit = val;
     this._sourceAssetTokenValue = assetToBase(assetAmount(val));
 
@@ -64,7 +62,6 @@ export class SwapComponent implements OnInit, OnDestroy {
       this.targetAssetUnit = null;
       this.slip = 0;
     }
-
   }
   private _sourceAssetUnit: number;
   private _sourceAssetTokenValue: BaseAmount;
@@ -94,7 +91,6 @@ export class SwapComponent implements OnInit, OnDestroy {
     }
 
     this.setSourceChainBalance();
-
   }
   private _selectedSourceAsset: Asset;
   selectedSourceBalance: number;
@@ -108,7 +104,9 @@ export class SwapComponent implements OnInit, OnDestroy {
   }
   set targetAssetUnit(val: BigNumber) {
     this._targetAssetUnit = val;
-    this.targetAssetUnitDisplay = (val) ? Number(val.div(10 ** 8).toPrecision()) : null;
+    this.targetAssetUnitDisplay = val
+      ? Number(val.div(10 ** 8).toPrecision())
+      : null;
   }
   private _targetAssetUnit: BigNumber;
 
@@ -142,13 +140,9 @@ export class SwapComponent implements OnInit, OnDestroy {
   poolDetailSourceError: boolean;
   selectableMarkets: AssetAndBalance[];
 
-  inboundFees: {
-    [key: string]: number
-  } = {};
+  inboundFees: { [key: string]: number } = {};
 
-  outboundFees: {
-    [key: string]: number
-  } = {};
+  outboundFees: { [key: string]: number } = {};
 
   /**
    * ETH specific
@@ -173,50 +167,54 @@ export class SwapComponent implements OnInit, OnDestroy {
     private slipLimitService: SlippageToleranceService,
     private thorchainPricesService: ThorchainPricesService,
     private txUtilsService: TransactionUtilsService,
-    private networkQueueService: NetworkQueueService) {
-
+    private networkQueueService: NetworkQueueService
+  ) {
     this.selectedSourceAsset = new Asset('THOR.RUNE');
     this.ethContractApprovalRequired = false;
 
-    const balances$ = this.userService.userBalances$.pipe(debounceTime(500)).subscribe(
-      (balances) => {
+    const balances$ = this.userService.userBalances$
+      .pipe(debounceTime(500))
+      .subscribe((balances) => {
         this.balances = balances;
-        this.sourceBalance = this.userService.findBalance(this.balances, this.selectedSourceAsset);
-        this.targetBalance = this.userService.findBalance(this.balances, this.selectedTargetAsset);
+        this.sourceBalance = this.userService.findBalance(
+          this.balances,
+          this.selectedSourceAsset
+        );
+        this.targetBalance = this.userService.findBalance(
+          this.balances,
+          this.selectedTargetAsset
+        );
 
-        if (this.selectedTargetAsset && !this.isRune(this.selectedTargetAsset)) {
+        if (
+          this.selectedTargetAsset &&
+          !this.isRune(this.selectedTargetAsset)
+        ) {
           this.updateSwapDetails();
         }
 
         if (this.selectedSourceAsset) {
-
           this.setSourceChainBalance();
 
           if (!this.isRune(this.selectedSourceAsset)) {
             this.updateSwapDetails();
           }
-
         }
+      });
 
-      }
-    );
-
-    const user$ = this.userService.user$.subscribe(
-      async (user) => {
-        this.user = user;
-      }
-    );
+    const user$ = this.userService.user$.subscribe(async (user) => {
+      this.user = user;
+    });
 
     const queue$ = this.networkQueueService.networkQueue$.subscribe(
-      (queue) => this.queue = queue
+      (queue) => (this.queue = queue)
     );
 
-    const slippageTolerange$ = this.slipLimitService.slippageTolerance$.subscribe(
-      (limit) => this.slippageTolerance = limit
-    );
+    const slippageTolerange$ =
+      this.slipLimitService.slippageTolerance$.subscribe(
+        (limit) => (this.slippageTolerance = limit)
+      );
 
     this.subs = [balances$, user$, slippageTolerange$, queue$];
-
   }
 
   ngOnInit(): void {
@@ -225,47 +223,51 @@ export class SwapComponent implements OnInit, OnDestroy {
     const inboundAddresses$ = this.midgardService.getInboundAddresses();
     const pools$ = this.midgardService.getPools();
     const combined = combineLatest([inboundAddresses$, pools$]);
-    const sub = timer(0, 30000).pipe(
-      // combined
-      switchMap(() => combined),
-      retry(),
-    ).subscribe( ([inboundAddresses, pools]) => {
+    const sub = timer(0, 30000)
+      .pipe(
+        switchMap(() => combined),
+        retry()
+      )
+      .subscribe(([inboundAddresses, pools]) => {
+        this.inboundAddresses = inboundAddresses;
 
-      this.inboundAddresses = inboundAddresses;
-
-      // set ETH pool if available
-      const ethPool = pools.find( (pool) => pool.asset === 'ETH.ETH' );
-      if (ethPool) {
-        this.ethPool = ethPool;
-      }
-
-      this.setAvailablePools(pools);
-      this.setSelectableMarkets();
-
-      // on init, set target asset
-      if (!this.selectedTargetAsset) {
-        const btcMarket = this.selectableMarkets.find( (market) => market.asset.chain === 'BTC' && market.asset.symbol === 'BTC' );
-        if (btcMarket) {
-          this.selectedTargetAsset = btcMarket.asset;
+        // set ETH pool if available
+        const ethPool = pools.find((pool) => pool.asset === 'ETH.ETH');
+        if (ethPool) {
+          this.ethPool = ethPool;
         }
-      }
 
-      // update network fees
-      this.setNetworkFees();
+        this.setAvailablePools(pools);
+        this.setSelectableMarkets();
 
-      // update swap detail values
-      this.updateSwapDetails();
+        // on init, set target asset
+        if (!this.selectedTargetAsset) {
+          const btcMarket = this.selectableMarkets.find(
+            (market) =>
+              market.asset.chain === 'BTC' && market.asset.symbol === 'BTC'
+          );
+          if (btcMarket) {
+            this.selectedTargetAsset = btcMarket.asset;
+          }
+        }
 
-    });
+        // update network fees
+        this.setNetworkFees();
+
+        // update swap detail values
+        this.updateSwapDetails();
+      });
 
     this.subs.push(sub);
-
   }
 
   setSourceChainBalance() {
     if (this.selectedSourceAsset && this.balances) {
       const sourceChainAsset = getChainAsset(this.selectedSourceAsset.chain);
-      const sourceChainBalance = this.userService.findBalance(this.balances, sourceChainAsset);
+      const sourceChainBalance = this.userService.findBalance(
+        this.balances,
+        sourceChainAsset
+      );
       this.sourceChainBalance = sourceChainBalance ?? 0;
     } else {
       this.sourceChainBalance = 0;
@@ -302,15 +304,14 @@ export class SwapComponent implements OnInit, OnDestroy {
     this.outboundFees['THOR.RUNE'] = this.txUtilsService.calculateNetworkFee(
       new Asset('THOR.RUNE'),
       this.inboundAddresses,
-      'OUTBOUND',
+      'OUTBOUND'
     );
 
     this.inboundFees['THOR.RUNE'] = this.txUtilsService.calculateNetworkFee(
       new Asset('THOR.RUNE'),
       this.inboundAddresses,
-      'INBOUND',
+      'INBOUND'
     );
-
   }
 
   isRune(asset: Asset): boolean {
@@ -322,58 +323,62 @@ export class SwapComponent implements OnInit, OnDestroy {
   }
 
   getEthRouter() {
-    this.midgardService.getInboundAddresses().subscribe(
-      (addresses) => {
-        const ethInbound = addresses.find( (inbound) => inbound.chain === 'ETH' );
-        if (ethInbound) {
-          this.ethInboundAddress = ethInbound;
-        }
+    this.midgardService.getInboundAddresses().subscribe((addresses) => {
+      const ethInbound = addresses.find((inbound) => inbound.chain === 'ETH');
+      if (ethInbound) {
+        this.ethInboundAddress = ethInbound;
       }
-    );
+    });
   }
 
   setAvailablePools(pools: PoolDTO[]) {
-    this.availablePools = pools.filter( (pool) => pool.status === 'available' );
+    this.availablePools = pools.filter((pool) => pool.status === 'available');
   }
 
   setSelectableMarkets() {
-
     if (!this.availablePools) {
       this.selectableMarkets = [];
     } else {
       this.selectableMarkets = this.availablePools
-      .sort( (a, b) => a.asset.localeCompare(b.asset) )
-      .map((pool) => ({
-        asset: new Asset(pool.asset),
-        assetPriceUSD: +pool.assetPriceUSD
-      }))
-      // filter out until we can add support
-      .filter( (pool) => pool.asset.chain === 'BNB'
-        || pool.asset.chain === 'THOR'
-        || pool.asset.chain === 'BTC'
-        || pool.asset.chain === 'ETH'
-        || pool.asset.chain === 'LTC'
-        || pool.asset.chain === 'BCH'
-      );
+        .sort((a, b) => a.asset.localeCompare(b.asset))
+        .map((pool) => ({
+          asset: new Asset(pool.asset),
+          assetPriceUSD: +pool.assetPriceUSD,
+        }))
+        // filter out until we can add support
+        .filter(
+          (pool) =>
+            pool.asset.chain === 'BNB' ||
+            pool.asset.chain === 'THOR' ||
+            pool.asset.chain === 'BTC' ||
+            pool.asset.chain === 'ETH' ||
+            pool.asset.chain === 'LTC' ||
+            pool.asset.chain === 'BCH'
+        );
 
       // Keeping RUNE at top by default
       this.selectableMarkets.unshift({
         asset: new Asset('THOR.RUNE'),
-        assetPriceUSD: this.thorchainPricesService.estimateRunePrice(this.availablePools)
+        assetPriceUSD: this.thorchainPricesService.estimateRunePrice(
+          this.availablePools
+        ),
       });
     }
-
   }
 
   async checkContractApproved() {
-
     if (this.ethInboundAddress && this.user) {
-      const assetAddress = this.selectedSourceAsset.symbol.slice(this.selectedSourceAsset.ticker.length + 1);
+      const assetAddress = this.selectedSourceAsset.symbol.slice(
+        this.selectedSourceAsset.ticker.length + 1
+      );
       const strip0x = assetAddress.substr(2);
-      const isApproved = await this.user.clients.ethereum.isApproved(this.ethInboundAddress.router, strip0x, baseAmount(1));
+      const isApproved = await this.user.clients.ethereum.isApproved(
+        this.ethInboundAddress.router,
+        strip0x,
+        baseAmount(1)
+      );
       this.ethContractApprovalRequired = !isApproved;
     }
-
   }
 
   contractApproved() {
@@ -381,29 +386,41 @@ export class SwapComponent implements OnInit, OnDestroy {
   }
 
   formInvalid(): boolean {
-
-    return !this.sourceAssetUnit || !this.selectedSourceAsset || !this.selectedTargetAsset || !this.targetAssetUnit
-      || (this.sourceAssetUnit > this.userService.maximumSpendableBalance(this.selectedSourceAsset, this.sourceBalance))
-      || (this.sourceAssetUnit <= this.userService.minimumSpendable(this.selectedSourceAsset))
-      || (this.targetAssetUnitDisplay <= this.userService.minimumSpendable(this.selectedTargetAsset))
-      || !this.user || !this.balances
-      || this.ethContractApprovalRequired
-      || (this.queue && this.queue.outbound >= 12)
-      || (this.slip * 100) > this.slippageTolerance
-
+    return (
+      !this.sourceAssetUnit ||
+      !this.selectedSourceAsset ||
+      !this.selectedTargetAsset ||
+      !this.targetAssetUnit ||
+      this.sourceAssetUnit >
+        this.userService.maximumSpendableBalance(
+          this.selectedSourceAsset,
+          this.sourceBalance
+        ) ||
+      this.sourceAssetUnit <=
+        this.userService.minimumSpendable(this.selectedSourceAsset) ||
+      this.targetAssetUnitDisplay <=
+        this.userService.minimumSpendable(this.selectedTargetAsset) ||
+      !this.user ||
+      !this.balances ||
+      this.ethContractApprovalRequired ||
+      (this.queue && this.queue.outbound >= 12) ||
+      this.slip * 100 > this.slippageTolerance ||
       // check target asset amount is greater than outbound network fee * 3
-      || this.targetAssetUnitDisplay < (this.outboundFees[assetToString(this.selectedTargetAsset)])
-
+      this.targetAssetUnitDisplay <
+        this.outboundFees[assetToString(this.selectedTargetAsset)] ||
       // if RUNE, ensure 3 RUNE remain in wallet
-      || (this.selectedSourceAsset.chain === 'THOR') && (this.sourceBalance - this.sourceAssetUnit < 3)
-
+      (this.selectedSourceAsset.chain === 'THOR' &&
+        this.sourceBalance - this.sourceAssetUnit < 3) ||
       // check sufficient underlying chain balance to cover fees
-      || this.sourceChainBalance < (1.5 * this.inboundFees[assetToString(getChainAsset(this.selectedSourceAsset.chain))]);
-
+      this.sourceChainBalance <
+        1.5 *
+          this.inboundFees[
+            assetToString(getChainAsset(this.selectedSourceAsset.chain))
+          ]
+    );
   }
 
   mainButtonText(): string {
-
     /** User Not connected */
     if (!this.user || !this.balances) {
       return 'Please connect wallet';
@@ -419,7 +436,10 @@ export class SwapComponent implements OnInit, OnDestroy {
       return 'Select a token';
     }
 
-    if ( (this.selectedSourceAsset.chain === 'THOR') && (this.sourceBalance - this.sourceAssetUnit < 3) ) {
+    if (
+      this.selectedSourceAsset.chain === 'THOR' &&
+      this.sourceBalance - this.sourceAssetUnit < 3
+    ) {
       return 'Min 3 RUNE in Wallet Required';
     }
 
@@ -429,72 +449,89 @@ export class SwapComponent implements OnInit, OnDestroy {
     }
 
     /** Input Amount is less than network fees */
-    if (this.sourceChainBalance < (1.5 * this.inboundFees[assetToString(getChainAsset(this.selectedSourceAsset.chain))])) {
+    if (
+      this.sourceChainBalance <
+      1.5 *
+        this.inboundFees[
+          assetToString(getChainAsset(this.selectedSourceAsset.chain))
+        ]
+    ) {
       return `Insufficient ${this.selectedSourceAsset.chain}`;
     }
 
     /** Output Amount is less than network fees */
-    if (this.targetAssetUnitDisplay < (this.outboundFees[assetToString(this.selectedTargetAsset)])) {
+    if (
+      this.targetAssetUnitDisplay <
+      this.outboundFees[assetToString(this.selectedTargetAsset)]
+    ) {
       return 'Output Amount Less Than Fees';
     }
 
     /** Source amount is higher than user spendable amount */
-    if (this.sourceAssetUnit > this.userService.maximumSpendableBalance(this.selectedSourceAsset, this.sourceBalance)) {
+    if (
+      this.sourceAssetUnit >
+      this.userService.maximumSpendableBalance(
+        this.selectedSourceAsset,
+        this.sourceBalance
+      )
+    ) {
       return 'Insufficient balance';
     }
 
     /** Amount is too low, considered "dusting" */
-    if ( (this.sourceAssetUnit <= this.userService.minimumSpendable(this.selectedSourceAsset))
-      || (this.targetAssetUnitDisplay <= this.userService.minimumSpendable(this.selectedTargetAsset))) {
-        return 'Amount too low';
-      }
+    if (
+      this.sourceAssetUnit <=
+        this.userService.minimumSpendable(this.selectedSourceAsset) ||
+      this.targetAssetUnitDisplay <=
+        this.userService.minimumSpendable(this.selectedTargetAsset)
+    ) {
+      return 'Amount too low';
+    }
 
     /** Exceeds slip tolerance set in user settings */
-    if ((this.slip * 100) > this.slippageTolerance) {
+    if (this.slip * 100 > this.slippageTolerance) {
       return 'Slip Limit Exceeded';
     }
 
     /** Good to go */
-    if (this.user && this.sourceAssetUnit && this.sourceAssetUnit <= this.sourceBalance && this.selectedTargetAsset) {
+    if (
+      this.user &&
+      this.sourceAssetUnit &&
+      this.sourceAssetUnit <= this.sourceBalance &&
+      this.selectedTargetAsset
+    ) {
       return 'Swap';
     } else {
       console.warn('error creating main button text');
     }
-
   }
 
   openConfirmationDialog() {
-    const dialogRef = this.dialog.open(
-      ConfirmSwapModalComponent,
-      {
-        minWidth: '260px',
-        maxWidth: '420px',
-        width: '50vw',
-        data: {
-          sourceAsset: this.selectedSourceAsset,
-          targetAsset: this.selectedTargetAsset,
-          basePrice: this.basePrice,
-          inputValue: this.sourceAssetUnit,
-          outputValue: this.targetAssetUnit.div(10 ** 8),
-          user: this.user,
-          slip: this.slip,
-          networkFeeInSource: this.networkFeeInSource
-        }
-      }
-    );
+    const dialogRef = this.dialog.open(ConfirmSwapModalComponent, {
+      minWidth: '260px',
+      maxWidth: '420px',
+      width: '50vw',
+      data: {
+        sourceAsset: this.selectedSourceAsset,
+        targetAsset: this.selectedTargetAsset,
+        basePrice: this.basePrice,
+        inputValue: this.sourceAssetUnit,
+        outputValue: this.targetAssetUnit.div(10 ** 8),
+        user: this.user,
+        slip: this.slip,
+        networkFeeInSource: this.networkFeeInSource,
+      },
+    });
 
-    dialogRef.afterClosed().subscribe( (transactionSuccess: boolean) => {
-
+    dialogRef.afterClosed().subscribe((transactionSuccess: boolean) => {
       if (transactionSuccess) {
         this.targetAssetUnit = null;
         this.sourceAssetUnit = null;
       }
-
     });
   }
 
   updateSwapDetails() {
-
     if (this.selectedSourceAsset && this.selectedTargetAsset) {
       this.calculateTargetUnits();
     } else {
@@ -503,33 +540,33 @@ export class SwapComponent implements OnInit, OnDestroy {
   }
 
   async calculateTargetUnits() {
-
     if (this._sourceAssetTokenValue) {
-
-      const swapType = this.isRune(this.selectedSourceAsset) || this.isRune(this.selectedTargetAsset)
-        ? SwapType.SINGLE_SWAP
-        : SwapType.DOUBLE_SWAP;
+      const swapType =
+        this.isRune(this.selectedSourceAsset) ||
+        this.isRune(this.selectedTargetAsset)
+          ? SwapType.SINGLE_SWAP
+          : SwapType.DOUBLE_SWAP;
 
       if (swapType === SwapType.SINGLE_SWAP) {
         this.calculateSingleSwap();
-      } else if (swapType === SwapType.DOUBLE_SWAP
-        && this.availablePools.find( (pool) => pool.asset === assetToString(this.selectedTargetAsset) )
-        && this.availablePools.find( (pool) => pool.asset === assetToString(this.selectedSourceAsset))) {
-
+      } else if (
+        swapType === SwapType.DOUBLE_SWAP &&
+        this.availablePools.find(
+          (pool) => pool.asset === assetToString(this.selectedTargetAsset)
+        ) &&
+        this.availablePools.find(
+          (pool) => pool.asset === assetToString(this.selectedSourceAsset)
+        )
+      ) {
         this.calculateDoubleSwap();
-
       }
-
     } else {
       this.calculatingTargetAsset = false;
     }
-
   }
 
   reverseTransaction() {
-
     if (this.selectedSourceAsset && this.selectedTargetAsset) {
-
       const source = this.selectedSourceAsset;
       const target = this.selectedTargetAsset;
       const targetInput = this.targetAssetUnit;
@@ -539,18 +576,21 @@ export class SwapComponent implements OnInit, OnDestroy {
       this.selectedSourceAsset = target;
 
       if (targetBalance && targetInput) {
+        const max = this.userService.maximumSpendableBalance(
+          target,
+          targetBalance
+        );
 
-        const max = this.userService.maximumSpendableBalance(target, targetBalance);
-
-        this.sourceAssetUnit = (targetBalance < targetInput.div(10 ** 8).toNumber()) // if target balance is less than target input
-          ? max // use balance
-          : targetInput.div(10 ** 8 ).toNumber(); // otherwise use input value
+        this.sourceAssetUnit =
+          targetBalance < targetInput.div(10 ** 8).toNumber() // if target balance is less than target input
+            ? max // use balance
+            : targetInput.div(10 ** 8).toNumber(); // otherwise use input value
       } else {
-        this.sourceAssetUnit = (targetInput) ? targetInput.div(10 ** 8).toNumber() : 0;
+        this.sourceAssetUnit = targetInput
+          ? targetInput.div(10 ** 8).toNumber()
+          : 0;
       }
-
     }
-
   }
 
   /**
@@ -558,14 +598,15 @@ export class SwapComponent implements OnInit, OnDestroy {
    * For example RUNE <==> DAI
    */
   calculateSingleSwap() {
+    const toRune = this.isRune(this.selectedTargetAsset) ? true : false;
 
-    const toRune = this.isRune(this.selectedTargetAsset)
-      ? true
-      : false;
-
-    const poolDetail = (toRune)
-      ? this.availablePools.find( (pool) => pool.asset === assetToString(this.selectedSourceAsset) )
-      : this.availablePools.find( (pool) => pool.asset === assetToString(this.selectedTargetAsset) );
+    const poolDetail = toRune
+      ? this.availablePools.find(
+          (pool) => pool.asset === assetToString(this.selectedSourceAsset)
+        )
+      : this.availablePools.find(
+          (pool) => pool.asset === assetToString(this.selectedTargetAsset)
+        );
 
     if (poolDetail) {
       const pool: PoolData = {
@@ -577,13 +618,20 @@ export class SwapComponent implements OnInit, OnDestroy {
        * TO SHOW BASE PRICE
        */
 
-      const valueOfRuneInAsset = getValueOfRuneInAsset(assetToBase(assetAmount(1)), pool);
-      const valueOfAssetInRune = getValueOfAssetInRune(assetToBase(assetAmount(1)), pool);
+      const valueOfRuneInAsset = getValueOfRuneInAsset(
+        assetToBase(assetAmount(1)),
+        pool
+      );
+      const valueOfAssetInRune = getValueOfAssetInRune(
+        assetToBase(assetAmount(1)),
+        pool
+      );
 
-      const basePrice = (toRune)
-        ? valueOfRuneInAsset
-        : valueOfAssetInRune;
-      this.basePrice = basePrice.amount().div(10 ** 8).toNumber();
+      const basePrice = toRune ? valueOfRuneInAsset : valueOfAssetInRune;
+      this.basePrice = basePrice
+        .amount()
+        .div(10 ** 8)
+        .toNumber();
 
       /**
        * Slip percentage using original input
@@ -591,8 +639,10 @@ export class SwapComponent implements OnInit, OnDestroy {
       const slip = getSwapSlip(this._sourceAssetTokenValue, pool, toRune);
       this.slip = slip.toNumber();
 
-      const inboundFee = this.inboundFees[assetToString(this.selectedSourceAsset)];
-      const outboundFee = this.outboundFees[assetToString(this.selectedTargetAsset)];
+      const inboundFee =
+        this.inboundFees[assetToString(this.selectedSourceAsset)];
+      const outboundFee =
+        this.outboundFees[assetToString(this.selectedTargetAsset)];
       const outboundFeeInSourceVal = this.basePrice * outboundFee;
 
       this.networkFeeInSource = inboundFee + outboundFeeInSourceVal;
@@ -600,24 +650,37 @@ export class SwapComponent implements OnInit, OnDestroy {
       /**
        * Total output amount in target units minus 1 RUNE
        */
-      const swapOutput = getSwapOutput(baseAmount(this._sourceAssetTokenValue.amount()
-        .minus(assetToBase(assetAmount(inboundFee)).amount())
-      ), pool, toRune);
+      const swapOutput = getSwapOutput(
+        baseAmount(
+          this._sourceAssetTokenValue
+            .amount()
+            .minus(assetToBase(assetAmount(inboundFee)).amount())
+        ),
+        pool,
+        toRune
+      );
 
       // sub
-      const totalAmount = baseAmount(swapOutput.amount().minus(
-        assetToBase(assetAmount(outboundFee)).amount()));
+      const totalAmount = baseAmount(
+        swapOutput
+          .amount()
+          .minus(assetToBase(assetAmount(outboundFee)).amount())
+      );
 
       if (this.sourceAssetUnit) {
-        this.targetAssetUnit = (totalAmount.amount().isLessThan(0)) ? bn(0) : totalAmount.amount();
+        this.targetAssetUnit = totalAmount.amount().isLessThan(0)
+          ? bn(0)
+          : totalAmount.amount();
       } else {
-        this.targetAssetUnit = (this.sourceAssetUnit) ? (totalAmount.amount().isLessThan(0)) ? bn(0) : totalAmount.amount() : null;
+        this.targetAssetUnit = this.sourceAssetUnit
+          ? totalAmount.amount().isLessThan(0)
+            ? bn(0)
+            : totalAmount.amount()
+          : null;
       }
-
     }
 
     this.calculatingTargetAsset = false;
-
   }
 
   /**
@@ -626,9 +689,12 @@ export class SwapComponent implements OnInit, OnDestroy {
    * For example DAI <==> BUSD
    */
   calculateDoubleSwap() {
-
-    const sourcePool = this.availablePools.find( (pool) => pool.asset === assetToString(this.selectedSourceAsset) );
-    const targetPool = this.availablePools.find( (pool) => pool.asset === assetToString(this.selectedTargetAsset) );
+    const sourcePool = this.availablePools.find(
+      (pool) => pool.asset === assetToString(this.selectedSourceAsset)
+    );
+    const targetPool = this.availablePools.find(
+      (pool) => pool.asset === assetToString(this.selectedTargetAsset)
+    );
 
     if (sourcePool && targetPool) {
       const pool1: PoolData = {
@@ -653,8 +719,15 @@ export class SwapComponent implements OnInit, OnDestroy {
         targetPool
       );
 
-      const basePrice = getDoubleSwapOutput(assetToBase(assetAmount(1)), pool2, pool1);
-      this.basePrice = basePrice.amount().div(10 ** 8).toNumber();
+      const basePrice = getDoubleSwapOutput(
+        assetToBase(assetAmount(1)),
+        pool2,
+        pool1
+      );
+      this.basePrice = basePrice
+        .amount()
+        .div(10 ** 8)
+        .toNumber();
 
       const outboundFeeInSourceVal = this.basePrice * this.outputNetworkFee;
       this.networkFeeInSource = this.inputNetworkFee + outboundFeeInSourceVal;
@@ -662,20 +735,26 @@ export class SwapComponent implements OnInit, OnDestroy {
       const slip = getDoubleSwapSlip(this._sourceAssetTokenValue, pool1, pool2);
       this.slip = slip.toNumber();
 
-      const total = getDoubleSwapOutput(baseAmount(this._sourceAssetTokenValue.amount()
-        .minus(assetToBase(assetAmount(this.inputNetworkFee)).amount())
-      ), pool1, pool2).amount().minus(assetToBase(assetAmount(this.outputNetworkFee)).amount());
+      const total = getDoubleSwapOutput(
+        baseAmount(
+          this._sourceAssetTokenValue
+            .amount()
+            .minus(assetToBase(assetAmount(this.inputNetworkFee)).amount())
+        ),
+        pool1,
+        pool2
+      )
+        .amount()
+        .minus(assetToBase(assetAmount(this.outputNetworkFee)).amount());
 
       if (this.sourceAssetUnit) {
-        this.targetAssetUnit = (total.isLessThan(0)) ? bn(0) : total;
+        this.targetAssetUnit = total.isLessThan(0) ? bn(0) : total;
       } else {
         this.targetAssetUnit = null;
       }
-
     }
 
     this.calculatingTargetAsset = false;
-
   }
 
   ngOnDestroy() {
@@ -683,5 +762,4 @@ export class SwapComponent implements OnInit, OnDestroy {
       sub.unsubscribe();
     }
   }
-
 }

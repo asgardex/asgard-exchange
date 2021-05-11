@@ -16,10 +16,9 @@ import { environment } from 'src/environments/environment';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit, OnDestroy {
-
   killPolling: Subject<void> = new Subject();
   subs: Subscription[];
   chainBalanceErrors: Chain[];
@@ -30,44 +29,42 @@ export class AppComponent implements OnInit, OnDestroy {
     private dialog: MatDialog,
     private midgardService: MidgardService,
     private lastBlockService: LastBlockService,
-    private userService: UserService,
+    private userService: UserService
   ) {
-
     this.appLocked = environment.appLocked ?? false;
 
     const chainBalanceErrors$ = this.userService.chainBalanceErrors$.subscribe(
-      (chains) => this.chainBalanceErrors = chains
+      (chains) => (this.chainBalanceErrors = chains)
     );
 
     this.nonNativeRuneAssets = [];
 
-    const balances$ = this.userService.userBalances$.subscribe(
-      (balances) => {
-
-        if (balances) {
-          const nonNativeRuneAssets = balances
+    const balances$ = this.userService.userBalances$.subscribe((balances) => {
+      if (balances) {
+        const nonNativeRuneAssets = balances
           // get ETH.RUNE and BNB.RUNE
-          .filter( (balance) => {
-
-            return (balance.asset.chain === 'BNB' && balance.asset.ticker === 'RUNE')
-              || (balance.asset.chain === 'ETH' && balance.asset.ticker === 'RUNE');
-
+          .filter((balance) => {
+            return (
+              (balance.asset.chain === 'BNB' &&
+                balance.asset.ticker === 'RUNE') ||
+              (balance.asset.chain === 'ETH' && balance.asset.ticker === 'RUNE')
+            );
           })
           // filter out 0 amounts
-          .filter( balance => balance.amount.amount().isGreaterThan(0))
+          .filter((balance) => balance.amount.amount().isGreaterThan(0))
           // create Asset
-          .map( (balance) => ({
-            asset: new Asset(`${balance.asset.chain}.${balance.asset.symbol}`)
+          .map((balance) => ({
+            asset: new Asset(`${balance.asset.chain}.${balance.asset.symbol}`),
           }));
 
-          this.nonNativeRuneAssets = this.userService.sortMarketsByUserBalance(balances, nonNativeRuneAssets);
-
-        } else {
-          this.nonNativeRuneAssets = [];
-        }
-
+        this.nonNativeRuneAssets = this.userService.sortMarketsByUserBalance(
+          balances,
+          nonNativeRuneAssets
+        );
+      } else {
+        this.nonNativeRuneAssets = [];
       }
-    );
+    });
 
     this.subs = [chainBalanceErrors$, balances$];
   }
@@ -87,49 +84,46 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   notificationsExist(): boolean {
-    return ( (this.nonNativeRuneAssets && this.nonNativeRuneAssets.length > 0)
-      || (this.chainBalanceErrors && this.chainBalanceErrors.length > 0));
+    return (
+      (this.nonNativeRuneAssets && this.nonNativeRuneAssets.length > 0) ||
+      (this.chainBalanceErrors && this.chainBalanceErrors.length > 0)
+    );
   }
 
   openReconnectDialog(keystore?) {
-    this.dialog.open(
-      ReconnectDialogComponent,
-      {
-        maxWidth: '420px',
-        width: '50vw',
-        minWidth: '260px',
-        data: {
-          keystore
-        }
-      }
-    );
+    this.dialog.open(ReconnectDialogComponent, {
+      maxWidth: '420px',
+      width: '50vw',
+      minWidth: '260px',
+      data: {
+        keystore,
+      },
+    });
   }
 
   openReconnectXDEFIDialog() {
-    this.dialog.open(
-      ReconnectXDEFIDialogComponent,
-      {
-        maxWidth: '420px',
-        width: '50vw',
-        minWidth: '260px',
-      }
-    );
+    this.dialog.open(ReconnectXDEFIDialogComponent, {
+      maxWidth: '420px',
+      width: '50vw',
+      minWidth: '260px',
+    });
   }
 
   pollLastBlock(): void {
     const refreshInterval$ = timer(0, 15000)
-    .pipe(
-      // This kills the request if the user closes the component
-      takeUntil(this.killPolling),
-      // switchMap cancels the last request, if no response have been received since last tick
-      switchMap(() => this.midgardService.getLastBlock()),
-      // catchError handles http throws
-      catchError(error => of(error))
-    ).subscribe( async (res: LastBlock[]) => {
-      if (res.length > 0) {
-        this.lastBlockService.setBlock(res[0].thorchain);
-      }
-    });
+      .pipe(
+        // This kills the request if the user closes the component
+        takeUntil(this.killPolling),
+        // switchMap cancels the last request, if no response have been received since last tick
+        switchMap(() => this.midgardService.getLastBlock()),
+        // catchError handles http throws
+        catchError((error) => of(error))
+      )
+      .subscribe(async (res: LastBlock[]) => {
+        if (res.length > 0) {
+          this.lastBlockService.setBlock(res[0].thorchain);
+        }
+      });
     this.subs.push(refreshInterval$);
   }
 
@@ -139,5 +133,4 @@ export class AppComponent implements OnInit, OnDestroy {
       sub.unsubscribe();
     }
   }
-
 }

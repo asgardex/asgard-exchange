@@ -14,7 +14,6 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ApproveEthContractModule } from '../_components/approve-eth-contract/approve-eth-contract.module';
 import { DirectivesModule } from '../_directives/directives.module';
 
-
 @NgModule({
   declarations: [PoolCreateComponent, ConfirmPoolCreateComponent],
   imports: [
@@ -32,9 +31,9 @@ import { DirectivesModule } from '../_directives/directives.module';
     RouterModule.forChild([
       {
         path: '',
-        component: PoolCreateComponent
-      }
-    ])
-  ]
+        component: PoolCreateComponent,
+      },
+    ]),
+  ],
 })
-export class PoolCreateModule { }
+export class PoolCreateModule {}

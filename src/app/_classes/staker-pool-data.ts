@@ -22,14 +22,11 @@ export class StakerPoolData {
   heightLastStaked: number;
 
   constructor(dto: StakerPoolDataDTO) {
-
     this.asset = new Asset(dto.asset);
     this.units = dto.units;
     this.dateFirstStaked = dto.dateFirstStaked;
     this.heightLastStaked = dto.heightLastStaked;
     this.assetStaked = dto.assetStaked;
     this.runeStaked = dto.runeStaked;
-
   }
-
 }

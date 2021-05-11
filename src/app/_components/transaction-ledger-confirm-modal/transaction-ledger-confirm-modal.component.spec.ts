@@ -8,9 +8,8 @@ describe('TransactionLedgerConfirmModalComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ TransactionLedgerConfirmModalComponent ]
-    })
-    .compileComponents();
+      declarations: [TransactionLedgerConfirmModalComponent],
+    }).compileComponents();
   });
 
   beforeEach(() => {

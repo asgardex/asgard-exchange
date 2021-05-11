@@ -8,7 +8,6 @@ import { User } from 'src/app/_classes/user';
 import { Balances } from '@xchainjs/xchain-client';
 import { AssetAndBalance } from 'src/app/_classes/asset-and-balance';
 
-
 @Component({
   selector: 'app-markets-modal',
   templateUrl: './markets-modal.component.html',
@@ -41,22 +40,23 @@ export class MarketsModalComponent implements OnInit, OnDestroy {
 
   constructor(
     private userService: UserService,
-    @Inject(MAT_DIALOG_DATA) public data: { disabledAssetSymbol: string, selectableMarkets: AssetAndBalance[] },
+    @Inject(MAT_DIALOG_DATA)
+    public data: {
+      disabledAssetSymbol: string;
+      selectableMarkets: AssetAndBalance[];
+    },
     public dialogRef: MatDialogRef<MarketsModalComponent>
   ) {
-
     this.marketListItems = this.data.selectableMarkets;
 
-    const user$ = this.userService.user$.subscribe(
-      (user) => {
-        this.user = user;
-        if (!user) {
-          this.userBalances = [];
-        }
+    const user$ = this.userService.user$.subscribe((user) => {
+      this.user = user;
+      if (!user) {
+        this.userBalances = [];
       }
-    );
+    });
 
-    const balances$ = this.userService.userBalances$.subscribe( (balances) => {
+    const balances$ = this.userService.userBalances$.subscribe((balances) => {
       this.userBalances = balances;
       if (this.marketListItems) {
         this.sortMarketsByUserBalance();
@@ -73,12 +73,13 @@ export class MarketsModalComponent implements OnInit, OnDestroy {
   sortMarketsByUserBalance(): void {
     // Sort first by user balances
     if (this.userBalances && this.marketListItems) {
-
-      this.marketListItems = this.userService.sortMarketsByUserBalance(this.userBalances, this.marketListItems);
+      this.marketListItems = this.userService.sortMarketsByUserBalance(
+        this.userBalances,
+        this.marketListItems
+      );
       this.filteredMarketListItems = this.marketListItems;
     }
   }
-
 
   initList() {
     this.filteredMarketListItems = this.marketListItems;

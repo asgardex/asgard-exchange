@@ -13,7 +13,6 @@ export class Staker {
     this.totalStaked = +dto.totalStaked;
     this.totalROI = +dto.totalROI;
   }
-
 }
 
 export interface StakerDTO {

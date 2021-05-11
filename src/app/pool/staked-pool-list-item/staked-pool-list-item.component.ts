@@ -8,10 +8,9 @@ import { PoolDTO } from 'src/app/_classes/pool';
 @Component({
   selector: 'app-staked-pool-list-item',
   templateUrl: './staked-pool-list-item.component.html',
-  styleUrls: ['./staked-pool-list-item.component.scss']
+  styleUrls: ['./staked-pool-list-item.component.scss'],
 })
 export class StakedPoolListItemComponent implements OnChanges {
-
   expanded: boolean;
 
   /**
@@ -64,27 +63,30 @@ export class StakedPoolListItemComponent implements OnChanges {
   }
 
   getPoolShare(): void {
-
     if (this.memberPoolData && this.poolData) {
-
       const unitData: UnitData = {
         stakeUnits: baseAmount(this.memberPoolData.liquidityUnits),
-        totalUnits: baseAmount(this.poolData.units)
+        totalUnits: baseAmount(this.poolData.units),
       };
 
       const poolData: PoolData = {
         assetBalance: baseAmount(this.poolData.assetDepth),
-        runeBalance: baseAmount(this.poolData.runeDepth)
+        runeBalance: baseAmount(this.poolData.runeDepth),
       };
 
       const poolShare = getPoolShare(unitData, poolData);
 
-      this.pooledRune = poolShare.rune.amount().div(10 ** 8).toNumber();
-      this.pooledAsset = poolShare.asset.amount().div(10 ** 8).toNumber();
-      this.poolShare = Number(this.memberPoolData.liquidityUnits) / Number(this.poolData.units);
-
+      this.pooledRune = poolShare.rune
+        .amount()
+        .div(10 ** 8)
+        .toNumber();
+      this.pooledAsset = poolShare.asset
+        .amount()
+        .div(10 ** 8)
+        .toNumber();
+      this.poolShare =
+        Number(this.memberPoolData.liquidityUnits) /
+        Number(this.poolData.units);
     }
-
   }
-
 }

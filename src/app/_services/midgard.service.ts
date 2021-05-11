@@ -29,27 +29,32 @@ export interface ThorchainQueue {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class MidgardService {
-
   private v2BasePath: string;
   private _thornodeBasePath: string;
   private _constants$: Observable<MidgardConstants>;
   private _mimir$: Observable<MimirResponse>;
 
   constructor(private http: HttpClient) {
-    this.v2BasePath = (environment.network === 'testnet')
-      ? 'https://testnet.midgard.thorchain.info/v2'
-      : 'https://midgard.thorchain.info/v2';
+    this.v2BasePath =
+      environment.network === 'testnet'
+        ? 'https://testnet.midgard.thorchain.info/v2'
+        : 'https://midgard.thorchain.info/v2';
 
-    this._thornodeBasePath = environment.network === 'testnet'
-      ? 'https://testnet.thornode.thorchain.info'
-      : 'https://thornode.thorchain.info';
+    this._thornodeBasePath =
+      environment.network === 'testnet'
+        ? 'https://testnet.thornode.thorchain.info'
+        : 'https://thornode.thorchain.info';
 
     // cached since constants are constant
-    this._constants$ = this.http.get<MidgardConstants>(`${this.v2BasePath}/thorchain/constants`).pipe(shareReplay());
-    this._mimir$ = this.http.get<MimirResponse>(`${this._thornodeBasePath}/thorchain/mimir`).pipe(shareReplay());
+    this._constants$ = this.http
+      .get<MidgardConstants>(`${this.v2BasePath}/thorchain/constants`)
+      .pipe(shareReplay());
+    this._mimir$ = this.http
+      .get<MimirResponse>(`${this._thornodeBasePath}/thorchain/mimir`)
+      .pipe(shareReplay());
   }
   /**
    * V2 Endpoints
@@ -69,7 +74,9 @@ export class MidgardService {
   }
 
   getInboundAddresses(): Observable<PoolAddressDTO[]> {
-    return this.http.get<PoolAddressDTO[]>(`${this.v2BasePath}/thorchain/inbound_addresses`);
+    return this.http.get<PoolAddressDTO[]>(
+      `${this.v2BasePath}/thorchain/inbound_addresses`
+    );
   }
 
   getPools(): Observable<PoolDTO[]> {
@@ -85,12 +92,19 @@ export class MidgardService {
   }
 
   getTransaction(txId: string): Observable<TransactionDTO> {
-    const params = new HttpParams().set('offset', '0').set('limit', '1').set('txid', txId);
-    return this.http.get<TransactionDTO>(`${this.v2BasePath}/actions`, {params});
+    const params = new HttpParams()
+      .set('offset', '0')
+      .set('limit', '1')
+      .set('txid', txId);
+    return this.http.get<TransactionDTO>(`${this.v2BasePath}/actions`, {
+      params,
+    });
   }
 
   getThornodeTransaction(hash: string): Observable<ThornodeTx> {
-    return this.http.get<ThornodeTx>(`${this._thornodeBasePath}/thorchain/tx/${hash}`);
+    return this.http.get<ThornodeTx>(
+      `${this._thornodeBasePath}/thorchain/tx/${hash}`
+    );
   }
 
   getQueue(): Observable<ThorchainQueue> {
@@ -101,10 +115,11 @@ export class MidgardService {
     return this._mimir$;
   }
 
-  getThorchainLiquidityProviders(asset: string): Observable<LiquidityProvider[]> {
+  getThorchainLiquidityProviders(
+    asset: string
+  ): Observable<LiquidityProvider[]> {
     return this.http.get<LiquidityProvider[]>(
       `${this._thornodeBasePath}/thorchain/pool/${asset}/liquidity_providers`
     );
   }
-
 }

@@ -4,30 +4,36 @@ import { Observable } from 'rxjs';
 import { Chain } from '@xchainjs/xchain-util';
 
 export type SochainTxResponse = {
-  status: string,
+  status: string;
   data: {
-    txid: string,
-    blockhash: string,
-    confirmations: number,
-    time: number,
+    txid: string;
+    blockhash: string;
+    confirmations: number;
+    time: number;
     // inputs: [ ... ],
     // outputs: [ ... ],
-    tx_hex: string,
-    size: number,
-    version: number,
-    locktime: number
-  }
+    tx_hex: string;
+    size: number;
+    version: number;
+    locktime: number;
+  };
 };
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SochainService {
+  constructor(private http: HttpClient) {}
 
-  constructor(private http: HttpClient) { }
-
-  getTransaction({txID, network, chain}: {txID: string, network: string, chain: Chain}): Observable<SochainTxResponse> {
-
+  getTransaction({
+    txID,
+    network,
+    chain,
+  }: {
+    txID: string;
+    network: string;
+    chain: Chain;
+  }): Observable<SochainTxResponse> {
     let sochainNetwork: string;
 
     if (chain === 'LTC') {
@@ -39,7 +45,8 @@ export class SochainService {
       return;
     }
 
-    return this.http.get<SochainTxResponse>(`https://sochain.com/api/v2/get_tx/${sochainNetwork}/${txID}`);
+    return this.http.get<SochainTxResponse>(
+      `https://sochain.com/api/v2/get_tx/${sochainNetwork}/${txID}`
+    );
   }
-
 }

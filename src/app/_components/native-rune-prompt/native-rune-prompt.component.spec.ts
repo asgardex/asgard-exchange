@@ -9,10 +9,9 @@ describe('NativeRunePromptComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ NativeRunePromptComponent ],
-      imports: [ MatDialogModule, HttpClientTestingModule ]
-    })
-    .compileComponents();
+      declarations: [NativeRunePromptComponent],
+      imports: [MatDialogModule, HttpClientTestingModule],
+    }).compileComponents();
   });
 
   beforeEach(() => {

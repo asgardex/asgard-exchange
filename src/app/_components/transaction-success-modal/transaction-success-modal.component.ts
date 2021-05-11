@@ -1,14 +1,13 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Chain } from '@xchainjs/xchain-util';
 import { ExplorerPathsService } from 'src/app/_services/explorer-paths.service';
 
 @Component({
   selector: 'app-transaction-success-modal',
   templateUrl: './transaction-success-modal.component.html',
-  styleUrls: ['./transaction-success-modal.component.scss']
+  styleUrls: ['./transaction-success-modal.component.scss'],
 })
-export class TransactionSuccessModalComponent implements OnInit {
-
+export class TransactionSuccessModalComponent {
   @Input() chain: Chain;
   @Input() hash: string;
   @Input() label: string;
@@ -29,8 +28,4 @@ export class TransactionSuccessModalComponent implements OnInit {
     this.thorchainExplorerUrl = `${this.explorerPathsService.thorchainExplorerUrl}/txs`;
     this.litecoinExplorerUrl = `${this.explorerPathsService.litecoinExplorerUrl}`;
   }
-
-  ngOnInit(): void {
-  }
-
 }

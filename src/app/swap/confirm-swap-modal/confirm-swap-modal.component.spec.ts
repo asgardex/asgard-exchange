@@ -13,9 +13,11 @@ describe('ConfirmSwapModalComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ConfirmSwapModalComponent ],
+      declarations: [ConfirmSwapModalComponent],
       providers: [
-        { provide: MAT_DIALOG_DATA, useValue: {
+        {
+          provide: MAT_DIALOG_DATA,
+          useValue: {
             sourceAsset: new Asset('RUNE-B1A'),
             targetAsset: new Asset('BNB'),
             runeFee: 100000000,
@@ -23,15 +25,14 @@ describe('ConfirmSwapModalComponent', () => {
             basePrice: 100000000,
             inputValue: 1000000000,
             outputValue: 1100000000,
-            user: new User({type: 'keystore', wallet: ''}),
-            slip: .03
-          }
+            user: new User({ type: 'keystore', wallet: '' }),
+            slip: 0.03,
+          },
         },
-        { provide: MatDialogRef, useValue: { close: (dialogResult: any) => { } } }
+        { provide: MatDialogRef, useValue: { close: () => {} } },
       ],
-      imports: [HttpClientTestingModule, MatIconModule]
-    })
-    .compileComponents();
+      imports: [HttpClientTestingModule, MatIconModule],
+    }).compileComponents();
   });
 
   beforeEach(() => {

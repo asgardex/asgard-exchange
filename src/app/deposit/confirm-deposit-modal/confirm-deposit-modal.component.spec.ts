@@ -13,23 +13,24 @@ describe('ConfirmDepositModalComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ConfirmDepositModalComponent ],
+      declarations: [ConfirmDepositModalComponent],
       providers: [
-        { provide: MAT_DIALOG_DATA, useValue: {
+        {
+          provide: MAT_DIALOG_DATA,
+          useValue: {
             asset: new Asset('BNB'),
             rune: new Asset('RUNE-B1A'),
             assetAmount: 100,
             runeAmount: 100,
-            user: new User({type: 'keystore', wallet: ''}),
+            user: new User({ type: 'keystore', wallet: '' }),
             runeBasePrice: 10000000,
             assetBasePrice: 11000000,
-          }
+          },
         },
-        { provide: MatDialogRef, useValue: { close: (dialogResult: any) => { } } }
+        { provide: MatDialogRef, useValue: { close: () => {} } },
       ],
-      imports: [HttpClientTestingModule, MatIconModule]
-    })
-    .compileComponents();
+      imports: [HttpClientTestingModule, MatIconModule],
+    }).compileComponents();
   });
 
   beforeEach(() => {

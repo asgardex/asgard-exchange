@@ -1,17 +1,19 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { AssetAndBalance } from 'src/app/_classes/asset-and-balance';
 import { CopyService } from 'src/app/_services/copy.service';
 
 @Component({
   selector: 'app-user-asset',
   templateUrl: './user-asset.component.html',
-  styleUrls: ['./user-asset.component.scss']
+  styleUrls: ['./user-asset.component.scss'],
 })
-export class UserAssetComponent implements OnInit {
-
+export class UserAssetComponent {
   @Input() set asset(asset: AssetAndBalance) {
     this._asset = asset;
-    this.usdValue = this.asset.balance.amount().multipliedBy(this.asset.assetPriceUSD).toNumber();
+    this.usdValue = this.asset.balance
+      .amount()
+      .multipliedBy(this.asset.assetPriceUSD)
+      .toNumber();
   }
   get asset() {
     return this._asset;
@@ -32,14 +34,9 @@ export class UserAssetComponent implements OnInit {
     this.deposit = new EventEmitter();
   }
 
-  ngOnInit(): void {
-  }
-
-
   copyToClipboard() {
     if (this.address) {
       this.copyService.copyToClipboard(this.address);
     }
   }
-
 }

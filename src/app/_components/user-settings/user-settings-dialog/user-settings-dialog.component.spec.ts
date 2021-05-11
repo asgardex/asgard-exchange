@@ -12,14 +12,13 @@ describe('UserSettingsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ UserSettingsDialogComponent ],
-      imports: [ MatIconModule, MatIconModule, HttpClientTestingModule ],
+      declarations: [UserSettingsDialogComponent],
+      imports: [MatIconModule, MatIconModule, HttpClientTestingModule],
       providers: [
         TransactionStatusService,
-        { provide: MatDialogRef, useValue: { close: (dialogResult: any) => { } } }
+        { provide: MatDialogRef, useValue: { close: () => {} } },
       ],
-    })
-    .compileComponents();
+    }).compileComponents();
   });
 
   beforeEach(() => {

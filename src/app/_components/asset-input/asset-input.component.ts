@@ -1,4 +1,10 @@
-import { Component, OnInit, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  OnDestroy,
+} from '@angular/core';
 import { Asset } from 'src/app/_classes/asset';
 import { MarketsModalComponent } from '../markets-modal/markets-modal.component';
 import { MatDialog } from '@angular/material/dialog';
@@ -11,10 +17,9 @@ import { Subscription } from 'rxjs';
 @Component({
   selector: 'app-asset-input',
   templateUrl: './asset-input.component.html',
-  styleUrls: ['./asset-input.component.scss']
+  styleUrls: ['./asset-input.component.scss'],
 })
-export class AssetInputComponent implements OnInit, OnDestroy {
-
+export class AssetInputComponent implements OnDestroy {
   /**
    * Selected Asset
    */
@@ -77,23 +82,27 @@ export class AssetInputComponent implements OnInit, OnDestroy {
   subs: Subscription[];
   inputUsdValue: number;
 
-  constructor(private dialog: MatDialog, private userService: UserService, private ethUtilsService: EthUtilsService) {
+  constructor(
+    private dialog: MatDialog,
+    private userService: UserService,
+    private ethUtilsService: EthUtilsService
+  ) {
     const user$ = this.userService.user$.subscribe(
-      (user) => this.user = user
+      (user) => (this.user = user)
     );
     this.subs = [user$];
   }
 
-  ngOnInit(): void {
-  }
-
   checkUsdBalance(): void {
-
     if (!this.balance || !this.selectableMarkets) {
       return;
     }
 
-    const targetPool = this.selectableMarkets.find( (market) => `${market.asset.chain}.${market.asset.ticker}` === `${this.selectedAsset.chain}.${this.selectedAsset.ticker}` );
+    const targetPool = this.selectableMarkets.find(
+      (market) =>
+        `${market.asset.chain}.${market.asset.ticker}` ===
+        `${this.selectedAsset.chain}.${this.selectedAsset.ticker}`
+    );
     if (!targetPool || !targetPool.assetPriceUSD) {
       return;
     }
@@ -101,12 +110,15 @@ export class AssetInputComponent implements OnInit, OnDestroy {
   }
 
   setInputUsdValue(): void {
-
     if (!this.selectedAsset || !this.selectableMarkets) {
       return;
     }
 
-    const targetPool = this.selectableMarkets.find( (market) => `${market.asset.chain}.${market.asset.ticker}` === `${this.selectedAsset.chain}.${this.selectedAsset.ticker}` );
+    const targetPool = this.selectableMarkets.find(
+      (market) =>
+        `${market.asset.chain}.${market.asset.ticker}` ===
+        `${this.selectedAsset.chain}.${this.selectedAsset.ticker}`
+    );
     if (!targetPool || !targetPool.assetPriceUSD) {
       return;
     }
@@ -119,7 +131,6 @@ export class AssetInputComponent implements OnInit, OnDestroy {
   }
 
   async setMax(): Promise<void> {
-
     this.loading = true;
 
     if (this.balance) {
@@ -129,14 +140,17 @@ export class AssetInputComponent implements OnInit, OnDestroy {
           max = await this.ethUtilsService.maximumSpendableBalance({
             asset: this.selectedAsset,
             client: this.user.clients.ethereum,
-            balance: this.balance
+            balance: this.balance,
           });
         } else {
           console.error('no user clients found: ', this.user);
           max = 0;
         }
       } else {
-        max = this.userService.maximumSpendableBalance(this.selectedAsset, this.balance);
+        max = this.userService.maximumSpendableBalance(
+          this.selectedAsset,
+          this.balance
+        );
       }
 
       if (max) {
@@ -147,32 +161,24 @@ export class AssetInputComponent implements OnInit, OnDestroy {
     }
 
     this.loading = false;
-
   }
 
   launchMarketsModal(): void {
+    const dialogRef = this.dialog.open(MarketsModalComponent, {
+      minWidth: '260px',
+      maxWidth: '420px',
+      width: '50vw',
+      data: {
+        disabledAssetSymbol: this.disabledAssetSymbol,
+        selectableMarkets: this.selectableMarkets,
+      },
+    });
 
-    const dialogRef = this.dialog.open(
-      MarketsModalComponent,
-      {
-        minWidth: '260px',
-        maxWidth: '420px',
-        width: '50vw',
-        data: {
-          disabledAssetSymbol: this.disabledAssetSymbol,
-          selectableMarkets: this.selectableMarkets
-        }
-      }
-    );
-
-    dialogRef.afterClosed().subscribe( (result: Asset) => {
-
+    dialogRef.afterClosed().subscribe((result: Asset) => {
       if (result) {
         this.selectedAssetChange.emit(result);
       }
-
     });
-
   }
 
   ngOnDestroy() {
@@ -180,5 +186,4 @@ export class AssetInputComponent implements OnInit, OnDestroy {
       sub.unsubscribe();
     }
   }
-
 }

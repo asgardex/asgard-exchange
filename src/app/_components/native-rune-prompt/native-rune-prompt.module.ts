@@ -9,8 +9,6 @@ import { UpgradeRuneConfirmModule } from '../upgrade-rune-confirm/upgrade-rune-c
 import { TransactionSuccessModalModule } from '../transaction-success-modal/transaction-success-modal.module';
 import { ModalSectionHeaderModule } from '../modal-section-header/modal-section-header.module';
 
-
-
 @NgModule({
   declarations: [NativeRunePromptComponent, NativeRunePromptModalComponent],
   imports: [
@@ -20,8 +18,8 @@ import { ModalSectionHeaderModule } from '../modal-section-header/modal-section-
     UpgradeRuneModule,
     UpgradeRuneConfirmModule,
     TransactionSuccessModalModule,
-    ModalSectionHeaderModule
+    ModalSectionHeaderModule,
   ],
-  exports: [NativeRunePromptComponent]
+  exports: [NativeRunePromptComponent],
 })
-export class NativeRunePromptModule { }
+export class NativeRunePromptModule {}

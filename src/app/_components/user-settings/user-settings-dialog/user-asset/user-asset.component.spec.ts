@@ -11,10 +11,9 @@ describe('UserAssetComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ UserAssetComponent ],
-      imports: [HttpClientTestingModule, MatIconModule, MatSnackBarModule]
-    })
-    .compileComponents();
+      declarations: [UserAssetComponent],
+      imports: [HttpClientTestingModule, MatIconModule, MatSnackBarModule],
+    }).compileComponents();
   });
 
   beforeEach(() => {

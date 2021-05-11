@@ -2,11 +2,10 @@ import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CopyService {
-
-  constructor(private _snackBar: MatSnackBar) { }
+  constructor(private _snackBar: MatSnackBar) {}
 
   // pulled from https://stackoverflow.com/a/58276867/3703043
   copyToClipboard(textToCopy) {
@@ -53,7 +52,5 @@ export class CopyService {
     this._snackBar.open('Copied to Clipboard', '', {
       duration: 2000,
     });
-
   }
-
 }

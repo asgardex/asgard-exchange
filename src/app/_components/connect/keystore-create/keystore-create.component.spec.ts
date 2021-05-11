@@ -10,10 +10,9 @@ describe('KeystoreCreateComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ KeystoreCreateComponent ],
-      imports: [ MatIconModule, HttpClientTestingModule ]
-    })
-    .compileComponents();
+      declarations: [KeystoreCreateComponent],
+      imports: [MatIconModule, HttpClientTestingModule],
+    }).compileComponents();
   });
 
   beforeEach(() => {

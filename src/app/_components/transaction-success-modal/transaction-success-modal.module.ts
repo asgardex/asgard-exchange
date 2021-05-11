@@ -4,15 +4,9 @@ import { TransactionSuccessModalComponent } from './transaction-success-modal.co
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 
-
-
 @NgModule({
   declarations: [TransactionSuccessModalComponent],
-  imports: [
-    CommonModule,
-    MatIconModule,
-    MatButtonModule,
-  ],
-  exports: [TransactionSuccessModalComponent]
+  imports: [CommonModule, MatIconModule, MatButtonModule],
+  exports: [TransactionSuccessModalComponent],
 })
-export class TransactionSuccessModalModule { }
+export class TransactionSuccessModalModule {}

@@ -10,10 +10,9 @@ describe('DepositSymRecoveryComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ DepositSymRecoveryComponent ],
-      imports: [RouterTestingModule, HttpClientTestingModule, MatDialogModule]
-    })
-    .compileComponents();
+      declarations: [DepositSymRecoveryComponent],
+      imports: [RouterTestingModule, HttpClientTestingModule, MatDialogModule],
+    }).compileComponents();
   });
 
   beforeEach(() => {

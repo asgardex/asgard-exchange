@@ -8,9 +8,8 @@ describe('PhraseWordsListComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ PhraseWordsListComponent ]
-    })
-    .compileComponents();
+      declarations: [PhraseWordsListComponent],
+    }).compileComponents();
   });
 
   beforeEach(() => {

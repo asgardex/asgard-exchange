@@ -9,10 +9,9 @@ describe('IconTickerComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ IconTickerComponent ],
-      imports: [ MatIconModule ]
-    })
-    .compileComponents();
+      declarations: [IconTickerComponent],
+      imports: [MatIconModule],
+    }).compileComponents();
   });
 
   beforeEach(() => {

@@ -1,12 +1,11 @@
-import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'app-section-head',
   templateUrl: './section-head.component.html',
-  styleUrls: ['./section-head.component.scss']
+  styleUrls: ['./section-head.component.scss'],
 })
-export class SectionHeadComponent implements OnInit {
-
+export class SectionHeadComponent {
   @Input() sectionTitle: string;
   @Input() displayBackBtn: boolean;
   @Output() back: EventEmitter<null>;
@@ -15,8 +14,4 @@ export class SectionHeadComponent implements OnInit {
     this.back = new EventEmitter<null>();
     this.displayBackBtn = false;
   }
-
-  ngOnInit(): void {
-  }
-
 }

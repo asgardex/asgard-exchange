@@ -8,7 +8,7 @@ describe('CopyService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [ MatSnackBarModule ]
+      imports: [MatSnackBarModule],
     });
     service = TestBed.inject(CopyService);
   });

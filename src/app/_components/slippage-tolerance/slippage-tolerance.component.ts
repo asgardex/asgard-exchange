@@ -1,22 +1,20 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { SlippageToleranceService } from 'src/app/_services/slippage-tolerance.service';
 
 @Component({
   selector: 'app-slippage-tolerance',
   templateUrl: './slippage-tolerance.component.html',
-  styleUrls: ['./slippage-tolerance.component.scss']
+  styleUrls: ['./slippage-tolerance.component.scss'],
 })
-export class SlippageToleranceComponent implements OnInit, OnDestroy {
-
+export class SlippageToleranceComponent implements OnDestroy {
   slippageTolerance$: Subscription;
   tolerance: number;
 
   set customTolerance(num: number) {
     this._customTolerance = num;
-    const tolerance = (num) ? num : 3;
+    const tolerance = num ? num : 3;
     this.setSlippageTolerance(tolerance);
-
   }
   get customTolerance() {
     return this._customTolerance;
@@ -24,17 +22,20 @@ export class SlippageToleranceComponent implements OnInit, OnDestroy {
   private _customTolerance: number;
 
   constructor(private slippageToleranceService: SlippageToleranceService) {
-    this.slippageTolerance$ = this.slippageToleranceService.slippageTolerance$.subscribe(
-      (percent: number) => {
-        this.tolerance = percent;
-        if (!this.customTolerance && percent !== 3 && percent !== 5 && percent !== 10) {
-          this.customTolerance = percent;
+    this.slippageTolerance$ =
+      this.slippageToleranceService.slippageTolerance$.subscribe(
+        (percent: number) => {
+          this.tolerance = percent;
+          if (
+            !this.customTolerance &&
+            percent !== 3 &&
+            percent !== 5 &&
+            percent !== 10
+          ) {
+            this.customTolerance = percent;
+          }
         }
-      }
-    );
-  }
-
-  ngOnInit(): void {
+      );
   }
 
   selectSlippage(num: number) {
@@ -49,5 +50,4 @@ export class SlippageToleranceComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.slippageTolerance$.unsubscribe();
   }
-
 }

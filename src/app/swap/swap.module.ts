@@ -39,10 +39,10 @@ import { DirectivesModule } from '../_directives/directives.module';
     RouterModule.forChild([
       {
         path: '',
-        component: SwapComponent
-      }
-    ])
+        component: SwapComponent,
+      },
+    ]),
   ],
-  entryComponents: [ConfirmSwapModalComponent]
+  entryComponents: [ConfirmSwapModalComponent],
 })
-export class SwapModule { }
+export class SwapModule {}

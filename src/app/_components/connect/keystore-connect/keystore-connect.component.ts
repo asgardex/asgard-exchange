@@ -1,36 +1,35 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, Output, EventEmitter } from '@angular/core';
 import { UserService } from 'src/app/_services/user.service';
 import { KeystoreService } from 'src/app/_services/keystore.service';
 
 export type Keystore = {
-  address: string
+  address: string;
   crypto: {
-    cipher: string
-    ciphertext: string
+    cipher: string;
+    ciphertext: string;
     cipherparams: {
-      iv: string
-    }
-    kdf: string
+      iv: string;
+    };
+    kdf: string;
     kdfparams: {
-      prf: string
-      dklen: number
-      salt: string
-      c: number
-    }
-    mac: string
-  }
-  id: string
-  version: number
-  meta: string
+      prf: string;
+      dklen: number;
+      salt: string;
+      c: number;
+    };
+    mac: string;
+  };
+  id: string;
+  version: number;
+  meta: string;
 };
 
 @Component({
   selector: 'app-keystore-connect',
   templateUrl: './keystore-connect.component.html',
-  styleUrls: ['./keystore-connect.component.scss']
+  styleUrls: ['./keystore-connect.component.scss'],
 })
-export class KeystoreConnectComponent implements OnInit {
-
+export class KeystoreConnectComponent {
   keystorePassword: string;
   keystoreFile: File;
   keystoreFileSelected: boolean;
@@ -40,12 +39,12 @@ export class KeystoreConnectComponent implements OnInit {
   @Output() back: EventEmitter<null>;
   @Output() closeModal: EventEmitter<null>;
 
-  constructor(private userService: UserService, private keystoreService: KeystoreService) {
+  constructor(
+    private userService: UserService,
+    private keystoreService: KeystoreService
+  ) {
     this.back = new EventEmitter<null>();
     this.closeModal = new EventEmitter<null>();
-  }
-
-  ngOnInit(): void {
   }
 
   clearKeystore() {
@@ -62,7 +61,6 @@ export class KeystoreConnectComponent implements OnInit {
     const files = target.files;
 
     if (files && files.length > 0) {
-
       const keystoreFile = files[0];
 
       const reader = new FileReader();
@@ -82,13 +80,10 @@ export class KeystoreConnectComponent implements OnInit {
       reader.addEventListener('load', onLoadHandler);
 
       await reader.readAsText(keystoreFile);
-
     }
-
   }
 
   async initUnlock() {
-
     if (this.keystoreConnecting) {
       return;
     }
@@ -98,16 +93,17 @@ export class KeystoreConnectComponent implements OnInit {
     setTimeout(() => {
       this.keystoreUnlock();
     }, 100);
-
   }
 
   async keystoreUnlock() {
-
     this.keystoreError = false;
 
     try {
       localStorage.setItem('keystore', JSON.stringify(this.keystore));
-      const user = await this.keystoreService.unlockKeystore(this.keystore, this.keystorePassword);
+      const user = await this.keystoreService.unlockKeystore(
+        this.keystore,
+        this.keystorePassword
+      );
       this.userService.setUser(user);
       this.closeModal.emit();
     } catch (error) {
@@ -115,11 +111,9 @@ export class KeystoreConnectComponent implements OnInit {
       this.keystoreError = true;
       console.error(error);
     }
-
   }
 
   backClicked() {
     this.back.emit();
   }
-
 }

@@ -9,10 +9,9 @@ describe('RetryRuneDepositComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ RetryRuneDepositComponent ],
-      imports: [HttpClientTestingModule, RouterTestingModule]
-    })
-    .compileComponents();
+      declarations: [RetryRuneDepositComponent],
+      imports: [HttpClientTestingModule, RouterTestingModule],
+    }).compileComponents();
   });
 
   beforeEach(() => {

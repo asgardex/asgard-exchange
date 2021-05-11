@@ -1,5 +1,3 @@
-
-
 export interface MarketResponse {
   status: number;
   result: MarketDTO[];
@@ -27,7 +25,4 @@ export class Market {
     this.quoteAssetSymbol = marketDTO.quote_asset_symbol;
     this.tickSize = Number(marketDTO.tick_size);
   }
-
 }
-
-

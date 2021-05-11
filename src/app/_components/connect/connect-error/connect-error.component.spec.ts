@@ -9,10 +9,9 @@ describe('ConnectErrorComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ConnectErrorComponent ],
-      imports: [ MatIconModule ]
-    })
-    .compileComponents();
+      declarations: [ConnectErrorComponent],
+      imports: [MatIconModule],
+    }).compileComponents();
   });
 
   beforeEach(() => {

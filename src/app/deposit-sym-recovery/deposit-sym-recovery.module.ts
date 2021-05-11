@@ -9,8 +9,6 @@ import { IconTickerModule } from '../_components/icon-ticker/icon-ticker.module'
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
-
-
 @NgModule({
   declarations: [DepositSymRecoveryComponent],
   imports: [
@@ -24,9 +22,9 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     RouterModule.forChild([
       {
         path: '',
-        component: DepositSymRecoveryComponent
-      }
-    ])
-  ]
+        component: DepositSymRecoveryComponent,
+      },
+    ]),
+  ],
 })
-export class DepositSymRecoveryModule { }
+export class DepositSymRecoveryModule {}

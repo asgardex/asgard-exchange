@@ -1,4 +1,11 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { assetAmount, assetToBase } from '@xchainjs/xchain-util';
 import { Subscription } from 'rxjs';
@@ -10,10 +17,9 @@ import { UserService } from 'src/app/_services/user.service';
 @Component({
   selector: 'app-retry-rune-deposit',
   templateUrl: './retry-rune-deposit.component.html',
-  styleUrls: ['./retry-rune-deposit.component.scss']
+  styleUrls: ['./retry-rune-deposit.component.scss'],
 })
 export class RetryRuneDepositComponent implements OnInit, OnDestroy {
-
   @Input() asset: Asset;
   @Input() assetAmount: number;
   @Input() runeAmount: number;
@@ -40,13 +46,11 @@ export class RetryRuneDepositComponent implements OnInit, OnDestroy {
     this.retryCount = 0;
 
     const balances$ = this.userService.userBalances$.subscribe(
-      (balances) => this.runeBalance = this.userService.findBalance(
-        balances, this.rune
-      )
+      (balances) =>
+        (this.runeBalance = this.userService.findBalance(balances, this.rune))
     );
 
     this.subs = [balances$];
-
   }
 
   ngOnInit(): void {
@@ -54,19 +58,20 @@ export class RetryRuneDepositComponent implements OnInit, OnDestroy {
   }
 
   async resubmitRuneDeposit() {
-
     this.processingMessage = 'Resubmitting RUNE Deposit';
     this.loading = true;
     this.resubmitError = null;
 
     // deposit RUNE
     try {
-
       this.retryCount++;
       const thorClient = this.user.clients.thorchain;
 
       // get token address
-      const address = this.userService.getTokenAddress(this.user, this.asset.chain);
+      const address = this.userService.getTokenAddress(
+        this.user,
+        this.asset.chain
+      );
       if (!address || address === '') {
         console.error('no address found');
         return;
@@ -80,14 +85,12 @@ export class RetryRuneDepositComponent implements OnInit, OnDestroy {
       });
 
       this.retrySuccess.next(runeHash);
-
     } catch (error) {
       console.error('error retrying RUNE transfer: ', error);
       this.resubmitError = error;
     }
 
     this.loading = false;
-
   }
 
   navigateDepositSymRecovery() {
@@ -95,11 +98,9 @@ export class RetryRuneDepositComponent implements OnInit, OnDestroy {
     this.closeModal.emit();
   }
 
-
   ngOnDestroy() {
     for (const sub of this.subs) {
       sub.unsubscribe();
     }
   }
-
 }
