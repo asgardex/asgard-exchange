@@ -5,9 +5,10 @@ import {
   baseAmount,
   assetToBase,
   assetAmount,
+  assetToString,
 } from '@xchainjs/xchain-util';
 import { combineLatest, Subscription } from 'rxjs';
-import { Asset, isNonNativeRuneToken } from '../_classes/asset';
+import { Asset, getChainAsset, isNonNativeRuneToken } from '../_classes/asset';
 import { MidgardService } from '../_services/midgard.service';
 import { UserService } from '../_services/user.service';
 import { MatDialog } from '@angular/material/dialog';
@@ -15,8 +16,8 @@ import { ConfirmDepositModalComponent } from './confirm-deposit-modal/confirm-de
 import { User } from '../_classes/user';
 import { Balances } from '@xchainjs/xchain-client';
 import { AssetAndBalance } from '../_classes/asset-and-balance';
-import { EthUtilsService } from '../_services/eth-utils.service';
 import { TransactionUtilsService } from '../_services/transaction-utils.service';
+import { debounceTime } from 'rxjs/operators';
 
 @Component({
   selector: 'app-deposit',
@@ -90,19 +91,19 @@ export class DepositComponent implements OnInit, OnDestroy {
   assetBalance: number;
 
   user: User;
-  insufficientBnb: boolean;
   subs: Subscription[];
   selectableMarkets: AssetAndBalance[];
 
   ethRouter: string;
   ethContractApprovalRequired: boolean;
 
-  maximumSpendable: number;
   poolNotFoundErr: boolean;
 
   runeFee: number;
   networkFee: number;
+  chainNetworkFee: number;
   depositsDisabled: boolean;
+  sourceChainBalance: number;
 
   constructor(
     private dialog: MatDialog,
@@ -110,7 +111,6 @@ export class DepositComponent implements OnInit, OnDestroy {
     private router: Router,
     private route: ActivatedRoute,
     private midgardService: MidgardService,
-    private ethUtilsService: EthUtilsService,
     private txUtilsService: TransactionUtilsService
   ) {
     this.poolNotFoundErr = false;
@@ -124,7 +124,7 @@ export class DepositComponent implements OnInit, OnDestroy {
 
     const params$ = this.route.paramMap;
     const balances$ = this.userService.userBalances$;
-    const user$ = this.userService.user$;
+    const user$ = this.userService.user$.pipe(debounceTime(500));
 
     const combined = combineLatest([params$, user$, balances$]);
     const sub = combined.subscribe( ([params, user, balances]) => {
@@ -140,16 +140,14 @@ export class DepositComponent implements OnInit, OnDestroy {
       this.runeBalance = this.userService.findBalance(this.balances, this.rune);
       this.assetBalance = this.userService.findBalance(this.balances, this.asset);
 
-      // allows us to ensure enough bnb balance
-      const bnbBalance = this.userService.findBalance(this.balances, new Asset('BNB.BNB'));
-      this.insufficientBnb = bnbBalance < 0.000375;
-
       // Asset
       this.ethContractApprovalRequired = false;
       const asset = params.get('asset');
 
       if (asset) {
         this.asset = new Asset(asset);
+
+        this.setSourceChainBalance();
 
         if (isNonNativeRuneToken(this.asset)) {
           this.back();
@@ -158,10 +156,6 @@ export class DepositComponent implements OnInit, OnDestroy {
 
         this.getPoolDetail(asset);
         this.assetBalance = this.userService.findBalance(this.balances, this.asset);
-
-        if (this.asset.chain === 'ETH') {
-          this.getMaximumSpendableEth();
-        }
 
         if (this.asset.chain === 'ETH' && this.asset.ticker !== 'ETH') {
           this.checkContractApproved(this.asset);
@@ -174,6 +168,16 @@ export class DepositComponent implements OnInit, OnDestroy {
     this.getEthRouter();
     this.getPoolCap();
     this.subs.push(sub);
+  }
+
+  setSourceChainBalance() {
+    if (this.asset && this.balances) {
+      const sourceChainAsset = getChainAsset(this.asset.chain);
+      const sourceChainBalance = this.userService.findBalance(this.balances, sourceChainAsset);
+      this.sourceChainBalance = sourceChainBalance ?? 0;
+    } else {
+      this.sourceChainBalance = 0;
+    }
   }
 
   getPoolCap() {
@@ -238,6 +242,9 @@ export class DepositComponent implements OnInit, OnDestroy {
           };
 
           this.networkFee = this.txUtilsService.calculateNetworkFee(this.asset, inboundAddresses, 'INBOUND', res);
+
+          this.chainNetworkFee = this.txUtilsService.calculateNetworkFee(getChainAsset(this.asset.chain), inboundAddresses, 'INBOUND', res);
+
           this.runeFee = this.txUtilsService.calculateNetworkFee(new Asset('THOR.RUNE'), inboundAddresses, 'INBOUND', res);
 
         }
@@ -272,29 +279,28 @@ export class DepositComponent implements OnInit, OnDestroy {
 
   formDisabled(): boolean {
 
-    return !this.balances || !this.runeAmount || !this.assetAmount || (this.asset.chain === 'BNB' && this.insufficientBnb)
+    return !this.balances || !this.runeAmount || !this.assetAmount
     || this.ethContractApprovalRequired
     || this.depositsDisabled
     || (this.assetAmount <= this.userService.minimumSpendable(this.asset))
+
+    // check sufficient underlying chain balance to cover fees
+    || (this.sourceChainBalance <= this.chainNetworkFee)
+
     || ( this.assetAmount <= (
       // outbound fee plus inbound fee
       (this.networkFee * 3) + this.networkFee) )
-    || (this.balances
-      // && (this.runeAmount > this.runeBalance
-      // || this.assetAmount > this.userService.maximumSpendableBalance(this.asset, this.assetBalance))
-      && ((this.runeBalance - this.runeAmount < 3)
-        || this.assetAmount > this.userService.maximumSpendableBalance(this.asset, this.assetBalance))
-    );
-  }
 
-  async getMaximumSpendableEth() {
-    if (this.asset && this.user) {
-      this.maximumSpendable = await this.ethUtilsService.maximumSpendableBalance({
-        asset: this.asset,
-        client: this.user.clients.ethereum,
-        balance: this.assetBalance ?? 0
-      });
-    }
+    /**
+     * Asset matches chain asset
+     * check balance + amount < chain_network_fee
+     */
+    || ( assetToString(getChainAsset(this.asset.chain)) === assetToString(this.asset)
+      && (this.sourceChainBalance + this.assetAmount <= this.chainNetworkFee) )
+
+    || ( this.assetBalance <= this.assetAmount )
+
+    || (this.runeBalance - this.runeAmount < 3);
   }
 
   mainButtonText(): string {
@@ -313,30 +319,29 @@ export class DepositComponent implements OnInit, OnDestroy {
       return 'Enter an amount';
     }
 
-    /** RUNE amount exceeds RUNE balance. Leave 2 RUNE in balance */
-    // if (this.runeAmount > this.runeBalance ) {
-    //   return 'Insufficient balance';
-    // }
+    /** Asset amount is greater than balance */
+    if ( this.assetBalance <= this.assetAmount ) {
+      return `Insufficient ${this.asset.ticker}`;
+    }
+
     /** RUNE amount exceeds RUNE balance. Leave 3 RUNE in balance */
     if (this.runeBalance - this.runeAmount < 3) {
       return 'Min 3 RUNE in Wallet Required';
     }
 
-    /** ETH tx amount is higher than spendable amount */
-    if ( (this.asset.chain === 'ETH') && this.assetAmount > this.maximumSpendable) {
-      return 'Insufficient balance';
+    /** Checks sufficient chain balance for fee */
+    if (this.sourceChainBalance <= this.chainNetworkFee) {
+      return `Insufficient ${this.asset.chain}`;
     }
 
-    /** Non-ETH chain tx amount is higher than spendable amount */
-    if ((this.asset.chain !== 'ETH')
-      && ( this.assetAmount > this.userService.maximumSpendableBalance(this.asset, this.assetBalance))) {
-      return 'Insufficient balance';
-    }
-
-    /** BNB tx and and insufficient BNB to cover costs */
-    if (this.asset.chain === 'BNB' && this.insufficientBnb) {
-      return 'Insufficient BNB for Fee';
-    }
+    /**
+     * Asset matches chain asset
+     * check balance + amount < chain_network_fee
+     */
+    if ( assetToString(getChainAsset(this.asset.chain)) === assetToString(this.asset)
+      && (this.sourceChainBalance + this.assetAmount <= this.chainNetworkFee) ) {
+        return `Insufficient ${this.asset.chain}`;
+      }
 
     /** Amount is too low, considered "dusting" */
     if ( (this.assetAmount <= this.userService.minimumSpendable(this.asset))) {
@@ -345,6 +350,7 @@ export class DepositComponent implements OnInit, OnDestroy {
 
     /**
      * Deposit amount should be more than outbound fee + inbound fee network fee costs
+     * Ensures sufficient amount to withdraw
      */
     if ( this.assetAmount <= ((this.networkFee * 3) + this.networkFee) ) {
       return 'Amount too low';
