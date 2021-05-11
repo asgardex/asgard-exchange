@@ -298,7 +298,7 @@ export class DepositComponent implements OnInit, OnDestroy {
     || ( assetToString(getChainAsset(this.asset.chain)) === assetToString(this.asset)
       && (this.sourceChainBalance - this.assetAmount - this.chainNetworkFee <= 0) )
 
-    || ( this.assetBalance <= this.assetAmount )
+    || ( this.assetBalance < this.assetAmount )
 
     || (this.runeBalance - this.runeAmount < 3);
   }
@@ -320,13 +320,13 @@ export class DepositComponent implements OnInit, OnDestroy {
     }
 
     /** Asset amount is greater than balance */
-    if ( this.assetBalance <= this.assetAmount ) {
+    if ( this.assetBalance < this.assetAmount ) {
       return `Insufficient ${this.asset.ticker}`;
     }
 
     /** RUNE amount exceeds RUNE balance. Leave 3 RUNE in balance */
     if (this.runeBalance - this.runeAmount < 3) {
-      return 'Min 3 RUNE in Wallet Required';
+      return 'Min 3 RUNE in Wallet';
     }
 
     /** Checks sufficient chain balance for fee */
