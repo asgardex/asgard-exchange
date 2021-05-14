@@ -104,6 +104,9 @@ export class DepositComponent implements OnInit, OnDestroy {
   sourceChainBalance: number;
   inboundAddresses: PoolAddressDTO[];
 
+  haltedChains: string[];
+  isHalted: boolean;
+
   constructor(
     private dialog: MatDialog,
     private userService: UserService,
@@ -117,58 +120,79 @@ export class DepositComponent implements OnInit, OnDestroy {
     this.rune = new Asset('THOR.RUNE');
     this.subs = [];
     this.depositsDisabled = false;
+    this.haltedChains = [];
+    this.isHalted = false;
   }
 
   ngOnInit(): void {
     const params$ = this.route.paramMap;
     const balances$ = this.userService.userBalances$;
     const user$ = this.userService.user$.pipe(debounceTime(500));
+    const inboundAddresses$ = this.midgardService.getInboundAddresses();
 
-    const combined = combineLatest([params$, user$, balances$]);
-    const sub = combined.subscribe(([params, user, balances]) => {
-      // User
-      this.user = user;
-      if (
-        this.asset &&
-        this.asset.chain === 'ETH' &&
-        this.asset.ticker !== 'ETH'
-      ) {
-        this.checkContractApproved(this.asset);
-      }
+    const combined = combineLatest([
+      params$,
+      user$,
+      balances$,
+      inboundAddresses$,
+    ]);
+    const sub = combined.subscribe(
+      ([params, user, balances, inboundAddresses]) => {
+        // Inbound Addresses
+        this.inboundAddresses = inboundAddresses;
+        this.haltedChains = this.inboundAddresses
+          .filter((address) => address.halted)
+          .map((address) => address.chain);
 
-      // Balance
-      this.balances = balances;
-      this.runeBalance = this.userService.findBalance(this.balances, this.rune);
-      this.assetBalance = this.userService.findBalance(
-        this.balances,
-        this.asset
-      );
-
-      // Asset
-      this.ethContractApprovalRequired = false;
-      const asset = params.get('asset');
-
-      if (asset) {
-        this.asset = new Asset(asset);
-
-        this.setSourceChainBalance();
-
-        if (isNonNativeRuneToken(this.asset)) {
-          this.back();
-          return;
+        // User
+        this.user = user;
+        if (
+          this.asset &&
+          this.asset.chain === 'ETH' &&
+          this.asset.ticker !== 'ETH'
+        ) {
+          this.checkContractApproved(this.asset);
         }
 
-        this.getPoolDetail(asset);
+        // Balance
+        this.balances = balances;
+        this.runeBalance = this.userService.findBalance(
+          this.balances,
+          this.rune
+        );
         this.assetBalance = this.userService.findBalance(
           this.balances,
           this.asset
         );
 
-        if (this.asset.chain === 'ETH' && this.asset.ticker !== 'ETH') {
-          this.checkContractApproved(this.asset);
+        // Asset
+        this.ethContractApprovalRequired = false;
+        const asset = params.get('asset');
+
+        if (asset) {
+          this.asset = new Asset(asset);
+
+          this.isHalted = this.haltedChains.includes(this.asset.chain);
+
+          this.setSourceChainBalance();
+
+          if (isNonNativeRuneToken(this.asset)) {
+            this.back();
+            return;
+          }
+
+          this.getPoolDetail(asset);
+          this.assetBalance = this.userService.findBalance(
+            this.balances,
+            this.asset
+          );
+
+          if (this.asset.chain === 'ETH' && this.asset.ticker !== 'ETH') {
+            this.checkContractApproved(this.asset);
+          }
         }
       }
-    });
+    );
 
     this.getPools();
     this.getEthRouter();
@@ -247,10 +271,6 @@ export class DepositComponent implements OnInit, OnDestroy {
   }
 
   async getPoolDetail(asset: string) {
-    this.inboundAddresses = await this.midgardService
-      .getInboundAddresses()
-      .toPromise();
-
     if (!this.inboundAddresses) {
       console.error('error fetching inbound addresses');
       return;
@@ -315,7 +335,10 @@ export class DepositComponent implements OnInit, OnDestroy {
           )
 
           // filter out non-native RUNE tokens
-          .filter((pool) => !isNonNativeRuneToken(pool.asset));
+          .filter((pool) => !isNonNativeRuneToken(pool.asset))
+
+          // filter out halted chains
+          .filter((pool) => !this.haltedChains.includes(pool.asset.chain));
       },
       (err) => console.error('error fetching pools:', err)
     );
@@ -328,6 +351,7 @@ export class DepositComponent implements OnInit, OnDestroy {
       !this.assetAmount ||
       this.ethContractApprovalRequired ||
       this.depositsDisabled ||
+      this.isHalted ||
       this.assetAmount <= this.userService.minimumSpendable(this.asset) ||
       // check sufficient underlying chain balance to cover fees
       this.sourceChainBalance <= this.chainNetworkFee ||
@@ -358,6 +382,10 @@ export class DepositComponent implements OnInit, OnDestroy {
 
     if (this.depositsDisabled) {
       return 'Pool Cap > 90%';
+    }
+
+    if (this.isHalted) {
+      return 'Pool Halted';
     }
 
     /** User either lacks asset balance or RUNE balance */
