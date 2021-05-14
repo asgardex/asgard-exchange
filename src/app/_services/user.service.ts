@@ -12,12 +12,16 @@ import {
   baseToAsset,
   Chain,
   bn,
+  assetToString,
 } from '@xchainjs/xchain-util';
 import { BehaviorSubject, of, Subject, timer } from 'rxjs';
 import { catchError, switchMap, takeUntil } from 'rxjs/operators';
 import { AssetAndBalance } from '../_classes/asset-and-balance';
 import { MidgardService } from './midgard.service';
 import BigNumber from 'bignumber.js';
+import { PoolAddressDTO } from '../_classes/pool-address';
+import { TransactionUtilsService } from './transaction-utils.service';
+import { TxType } from '../_const/tx-type';
 
 export interface MidgardData<T> {
   key: string;
@@ -45,7 +49,10 @@ export class UserService {
 
   asgardexBncClient: BinanceClient;
 
-  constructor(private midgardService: MidgardService) {
+  constructor(
+    private midgardService: MidgardService,
+    private txUtilsService: TransactionUtilsService
+  ) {
     this._balances = [];
     this._chainBalanceErrors = [];
 
@@ -229,16 +236,40 @@ export class UserService {
     }
   }
 
-  maximumSpendableBalance(asset: Asset, balance: number) {
-    if (asset.chain === 'BNB' && asset.symbol === 'BNB') {
-      const max = balance - 0.01 - 0.000375;
-      return max >= 0 ? max : 0;
-    } else if (asset.chain === 'THOR' && asset.symbol === 'RUNE') {
-      const max = balance - 0.2;
-      return max >= 0 ? max : 0;
-    } else {
-      return balance;
+  maximumSpendableBalance(
+    asset: Asset,
+    balance: number,
+    inboundAddresses: PoolAddressDTO[],
+    txType?: TxType
+  ) {
+    let max = balance;
+    let fee: number;
+
+    switch (assetToString(asset)) {
+      case 'THOR.RUNE':
+      case 'BTC.BTC':
+      case 'LTC.LTC':
+      case 'BCH.BCH':
+      case 'BNB.BNB':
+        fee = this.txUtilsService.calculateNetworkFee(
+          asset,
+          inboundAddresses,
+          txType ?? 'INBOUND'
+        );
+        max = balance - fee;
+        break;
+
+      case 'ETH.ETH':
+        fee = this.txUtilsService.calculateNetworkFee(
+          asset,
+          inboundAddresses,
+          txType ?? 'INBOUND'
+        );
+        max = balance - fee * 1.01;
+        break;
     }
+
+    return max >= 0 ? max : 0;
   }
 
   minimumSpendable(asset: Asset) {

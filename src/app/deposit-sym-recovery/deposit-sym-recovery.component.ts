@@ -47,7 +47,6 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
   missingAsset: Asset;
   missingAssetAmount: number;
   missingAssetBalance: number;
-  maximumSpendableEth: number;
   networkFee: number;
   inboundAddresses: PoolAddressDTO[];
   txState: TransactionConfirmationState;
@@ -215,12 +214,6 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
         this.balances,
         this.missingAsset
       );
-      if (this.missingAsset.chain === 'ETH') {
-        this.getMaximumSpendableEth(
-          this.missingAsset,
-          this.missingAssetBalance
-        );
-      }
 
       this.networkFee = this.txUtilsService.calculateNetworkFee(
         this.missingAsset,
@@ -233,20 +226,6 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
     });
 
     this.subs.push(sub);
-  }
-
-  async getMaximumSpendableEth(
-    missingAsset: Asset,
-    missingAssetBalance: number
-  ) {
-    if (missingAsset && this.user) {
-      this.maximumSpendableEth =
-        await this.ethUtilsService.maximumSpendableBalance({
-          asset: missingAsset,
-          client: this.user.clients.ethereum,
-          balance: missingAssetBalance ?? 0,
-        });
-    }
   }
 
   getPoolCap() {
@@ -302,22 +281,18 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
       return true;
     }
 
-    // /** ETH tx amount is higher than spendable amount */
-    if (
-      this.missingAsset.chain === 'ETH' &&
-      this.missingAssetAmount > this.maximumSpendableEth
-    ) {
+    if (!this.inboundAddresses) {
       return true;
     }
 
-    /** Non-ETH chain tx amount is higher than spendable amount */
+    /** tx amount is higher than spendable amount */
     if (
-      this.missingAsset.chain !== 'ETH' &&
       this.missingAssetAmount >
-        this.userService.maximumSpendableBalance(
-          this.missingAsset,
-          this.missingAssetBalance
-        )
+      this.userService.maximumSpendableBalance(
+        this.missingAsset,
+        this.missingAssetBalance,
+        this.inboundAddresses
+      )
     ) {
       return true;
     }
@@ -368,22 +343,18 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
       return 'Insufficient BNB';
     }
 
-    // /** ETH tx amount is higher than spendable amount */
-    if (
-      this.missingAsset.chain === 'ETH' &&
-      this.missingAssetAmount > this.maximumSpendableEth
-    ) {
-      return 'Insufficient ETH';
+    if (!this.inboundAddresses) {
+      return 'Loading';
     }
 
-    /** Non-ETH chain tx amount is higher than spendable amount */
+    /** tx amount is higher than spendable amount */
     if (
-      this.missingAsset.chain !== 'ETH' &&
       this.missingAssetAmount >
-        this.userService.maximumSpendableBalance(
-          this.missingAsset,
-          this.missingAssetBalance
-        )
+      this.userService.maximumSpendableBalance(
+        this.missingAsset,
+        this.missingAssetBalance,
+        this.inboundAddresses
+      )
     ) {
       return 'Insufficient balance';
     }

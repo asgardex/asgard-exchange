@@ -7,8 +7,12 @@ import {
   Output,
 } from '@angular/core';
 import { Subscription } from 'rxjs';
+import { getChainAsset } from 'src/app/_classes/asset';
 import { AssetAndBalance } from 'src/app/_classes/asset-and-balance';
+import { PoolAddressDTO } from 'src/app/_classes/pool-address';
 import { User } from 'src/app/_classes/user';
+import { MidgardService } from 'src/app/_services/midgard.service';
+import { TransactionUtilsService } from 'src/app/_services/transaction-utils.service';
 import { UserService } from 'src/app/_services/user.service';
 
 @Component({
@@ -34,13 +38,19 @@ export class SendAssetComponent implements OnInit, OnDestroy {
   }
   private _amount: number;
   recipientAddress: string;
+  chainBalance: number;
   balance: number;
   amountSpendable: boolean;
   user: User;
   subs: Subscription[];
   memo: string;
+  inboundAddresses: PoolAddressDTO[];
 
-  constructor(private userService: UserService) {
+  constructor(
+    private userService: UserService,
+    private midgardService: MidgardService,
+    private txUtilsService: TransactionUtilsService
+  ) {
     this.recipientAddress = '';
     this.memo = '';
     this.back = new EventEmitter<null>();
@@ -53,9 +63,16 @@ export class SendAssetComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.setInboundAddresses();
+
     if (this.asset) {
       const balances$ = this.userService.userBalances$.subscribe((balances) => {
         this.balance = this.userService.findBalance(balances, this.asset.asset);
+
+        this.chainBalance = this.userService.findBalance(
+          balances,
+          getChainAsset(this.asset?.asset.chain)
+        );
       });
 
       const user$ = this.userService.user$.subscribe((user) => {
@@ -64,6 +81,12 @@ export class SendAssetComponent implements OnInit, OnDestroy {
 
       this.subs = [balances$, user$];
     }
+  }
+
+  setInboundAddresses() {
+    this.midgardService.getInboundAddresses().subscribe({
+      next: (res) => (this.inboundAddresses = res),
+    });
   }
 
   nextDisabled(): boolean {
@@ -83,6 +106,21 @@ export class SendAssetComponent implements OnInit, OnDestroy {
       return true;
     }
 
+    if (!this.inboundAddresses || !this.asset || !this.chainBalance) {
+      return true;
+    }
+
+    if (
+      this.chainBalance <
+      this.txUtilsService.calculateNetworkFee(
+        getChainAsset(this.asset.asset.chain),
+        this.inboundAddresses,
+        'EXTERNAL'
+      )
+    ) {
+      return true;
+    }
+
     return (
       !this.amountSpendable ||
       !client.validateAddress(this.recipientAddress) ||
@@ -95,8 +133,8 @@ export class SendAssetComponent implements OnInit, OnDestroy {
       return 'Connect Wallet';
     }
 
-    if (!this.asset) {
-      return 'No Asset';
+    if (!this.inboundAddresses || !this.asset || !this.chainBalance) {
+      return 'Loading';
     }
 
     const client = this.userService.getChainClient(
@@ -115,6 +153,18 @@ export class SendAssetComponent implements OnInit, OnDestroy {
       return 'Enter Amount';
     }
 
+    /** Insufficient Chain balance */
+    if (
+      this.chainBalance <
+      this.txUtilsService.calculateNetworkFee(
+        getChainAsset(this.asset.asset.chain),
+        this.inboundAddresses,
+        'EXTERNAL'
+      )
+    ) {
+      return `Insufficient ${this.asset.asset.chain}`;
+    }
+
     if (!this.amountSpendable) {
       return 'Amount not spendable';
     }
@@ -125,7 +175,9 @@ export class SendAssetComponent implements OnInit, OnDestroy {
   checkSpendable(): void {
     const maximumSpendableBalance = this.userService.maximumSpendableBalance(
       this.asset.asset,
-      this.balance
+      this.balance,
+      this.inboundAddresses,
+      'EXTERNAL'
     );
     this.amountSpendable = this.amount <= maximumSpendableBalance;
   }

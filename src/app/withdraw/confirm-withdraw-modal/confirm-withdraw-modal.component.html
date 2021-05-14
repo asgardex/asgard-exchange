@@ -86,7 +86,7 @@
 
   <app-transaction-processing-modal
     *ngIf="txState == 'SUBMITTING'"
-    transactionDetail="Withdrawing {{data.assetAmount}} {{data.asset.ticker}} + {{data.runeAmount}} {{rune.ticker}}"
+    transactionDetail="Withdrawing {{+data.assetAmount | number:'0.0-4'}} {{data.asset.ticker}} + {{+data.runeAmount | number:'0.0-2'}} {{rune.ticker}}"
     (closeDialog)="closeDialog()">
   </app-transaction-processing-modal>
 

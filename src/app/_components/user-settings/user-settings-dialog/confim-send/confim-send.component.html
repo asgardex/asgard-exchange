@@ -32,11 +32,7 @@
       <textarea [(ngModel)]="memo" name="memo" [disabled]="true"></textarea>
     </div>
 
-    <div *ngIf="loading" style="height: 56px;" class="flex justify-center items-center w-full mt-4">
-      <mat-progress-spinner mode="indeterminate" diameter="30"></mat-progress-spinner>
-    </div>
-
-    <button *ngIf="!loading" (click)="submitTransaction()" mat-flat-button color="primary" class="main-action-btn w-full" [disabled]="insufficientChainBalance">
+    <button (click)="submitTransaction()" mat-flat-button color="primary" class="main-action-btn w-full" [disabled]="insufficientChainBalance">
       <span *ngIf="insufficientChainBalance">Insufficient {{asset.asset.chain}}</span>
       <span *ngIf="!insufficientChainBalance">Send {{asset.asset.ticker}}</span>
     </button>
