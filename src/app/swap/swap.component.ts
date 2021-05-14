@@ -160,6 +160,8 @@ export class SwapComponent implements OnInit, OnDestroy {
   networkFeeInSource: number;
   sourceChainBalance: number;
 
+  haltedChains: string[];
+
   constructor(
     private dialog: MatDialog,
     private userService: UserService,
@@ -171,6 +173,7 @@ export class SwapComponent implements OnInit, OnDestroy {
   ) {
     this.selectedSourceAsset = new Asset('THOR.RUNE');
     this.ethContractApprovalRequired = false;
+    this.haltedChains = [];
 
     const balances$ = this.userService.userBalances$
       .pipe(debounceTime(500))
@@ -230,6 +233,9 @@ export class SwapComponent implements OnInit, OnDestroy {
       )
       .subscribe(([inboundAddresses, pools]) => {
         this.inboundAddresses = inboundAddresses;
+
+        // check for halted chains
+        this.setHaltedChains();
 
         // set ETH pool if available
         const ethPool = pools.find((pool) => pool.asset === 'ETH.ETH');
@@ -331,8 +337,18 @@ export class SwapComponent implements OnInit, OnDestroy {
     });
   }
 
+  setHaltedChains() {
+    this.haltedChains = this.inboundAddresses
+      .filter((inboundAddress) => inboundAddress.halted)
+      .map((inboundAddress) => inboundAddress.chain);
+  }
+
   setAvailablePools(pools: PoolDTO[]) {
-    this.availablePools = pools.filter((pool) => pool.status === 'available');
+    this.availablePools = pools
+      .filter((pool) => pool.status === 'available')
+      .filter(
+        (pool) => !this.haltedChains.includes(new Asset(pool.asset).chain)
+      );
   }
 
   setSelectableMarkets() {
@@ -393,6 +409,8 @@ export class SwapComponent implements OnInit, OnDestroy {
       !this.selectedTargetAsset ||
       !this.targetAssetUnit ||
       !this.inboundAddresses ||
+      this.haltedChains.includes(this.selectedSourceAsset.chain) ||
+      this.haltedChains.includes(this.selectedTargetAsset?.chain) ||
       this.sourceAssetUnit >
         this.userService.maximumSpendableBalance(
           this.selectedSourceAsset,
@@ -434,9 +452,17 @@ export class SwapComponent implements OnInit, OnDestroy {
       return 'THORChain Network Latency';
     }
 
+    if (this.haltedChains.includes(this.selectedSourceAsset.chain)) {
+      return `${this.selectedSourceAsset.chain} Halted`;
+    }
+
     /** No target asset selected */
     if (!this.selectedTargetAsset) {
       return 'Select a token';
+    }
+
+    if (this.haltedChains.includes(this.selectedTargetAsset.chain)) {
+      return `${this.selectedTargetAsset.chain} Halted`;
     }
 
     if (
