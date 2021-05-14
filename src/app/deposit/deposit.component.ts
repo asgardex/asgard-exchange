@@ -22,6 +22,7 @@ import { Balances } from '@xchainjs/xchain-client';
 import { AssetAndBalance } from '../_classes/asset-and-balance';
 import { TransactionUtilsService } from '../_services/transaction-utils.service';
 import { debounceTime } from 'rxjs/operators';
+import { PoolAddressDTO } from '../_classes/pool-address';
 
 @Component({
   selector: 'app-deposit',
@@ -101,6 +102,7 @@ export class DepositComponent implements OnInit, OnDestroy {
   chainNetworkFee: number;
   depositsDisabled: boolean;
   sourceChainBalance: number;
+  inboundAddresses: PoolAddressDTO[];
 
   constructor(
     private dialog: MatDialog,
@@ -245,9 +247,14 @@ export class DepositComponent implements OnInit, OnDestroy {
   }
 
   async getPoolDetail(asset: string) {
-    const inboundAddresses = await this.midgardService
+    this.inboundAddresses = await this.midgardService
       .getInboundAddresses()
       .toPromise();
+
+    if (!this.inboundAddresses) {
+      console.error('error fetching inbound addresses');
+      return;
+    }
 
     this.midgardService.getPool(asset).subscribe(
       (res) => {
@@ -259,21 +266,21 @@ export class DepositComponent implements OnInit, OnDestroy {
 
           this.networkFee = this.txUtilsService.calculateNetworkFee(
             this.asset,
-            inboundAddresses,
+            this.inboundAddresses,
             'INBOUND',
             res
           );
 
           this.chainNetworkFee = this.txUtilsService.calculateNetworkFee(
             getChainAsset(this.asset.chain),
-            inboundAddresses,
+            this.inboundAddresses,
             'INBOUND',
             res
           );
 
           this.runeFee = this.txUtilsService.calculateNetworkFee(
             new Asset('THOR.RUNE'),
-            inboundAddresses,
+            this.inboundAddresses,
             'INBOUND',
             res
           );
@@ -301,8 +308,10 @@ export class DepositComponent implements OnInit, OnDestroy {
               pool.asset.chain === 'BNB' ||
               pool.asset.chain === 'BTC' ||
               pool.asset.chain === 'ETH' ||
-              pool.asset.chain === 'LTC' ||
-              pool.asset.chain === 'BCH'
+              pool.asset.chain === 'LTC'
+
+            // temporarily disable bch due to https://github.com/asgardex/asgard-exchange/issues/379
+            // pool.asset.chain === 'BCH'
           )
 
           // filter out non-native RUNE tokens
@@ -330,8 +339,12 @@ export class DepositComponent implements OnInit, OnDestroy {
        */
       (assetToString(getChainAsset(this.asset.chain)) ===
         assetToString(this.asset) &&
-        this.sourceChainBalance - this.assetAmount - this.chainNetworkFee <=
-          0) ||
+        this.assetAmount <
+          this.userService.maximumSpendableBalance(
+            this.asset,
+            this.sourceChainBalance,
+            this.inboundAddresses
+          )) ||
       this.assetBalance < this.assetAmount ||
       this.runeBalance - this.runeAmount < 3
     );
@@ -374,7 +387,12 @@ export class DepositComponent implements OnInit, OnDestroy {
     if (
       assetToString(getChainAsset(this.asset.chain)) ===
         assetToString(this.asset) &&
-      this.sourceChainBalance - this.assetAmount - this.chainNetworkFee <= 0
+      this.assetAmount <
+        this.userService.maximumSpendableBalance(
+          this.asset,
+          this.sourceChainBalance,
+          this.inboundAddresses
+        )
     ) {
       return `Insufficient ${this.asset.chain}`;
     }

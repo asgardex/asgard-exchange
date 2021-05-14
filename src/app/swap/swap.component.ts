@@ -352,8 +352,9 @@ export class SwapComponent implements OnInit, OnDestroy {
             pool.asset.chain === 'THOR' ||
             pool.asset.chain === 'BTC' ||
             pool.asset.chain === 'ETH' ||
-            pool.asset.chain === 'LTC' ||
-            pool.asset.chain === 'BCH'
+            pool.asset.chain === 'LTC'
+          // Temporarily disable BCH due to https://github.com/asgardex/asgard-exchange/issues/379
+          // pool.asset.chain === 'BCH'
         );
 
       // Keeping RUNE at top by default
@@ -391,10 +392,12 @@ export class SwapComponent implements OnInit, OnDestroy {
       !this.selectedSourceAsset ||
       !this.selectedTargetAsset ||
       !this.targetAssetUnit ||
+      !this.inboundAddresses ||
       this.sourceAssetUnit >
         this.userService.maximumSpendableBalance(
           this.selectedSourceAsset,
-          this.sourceBalance
+          this.sourceBalance,
+          this.inboundAddresses
         ) ||
       this.sourceAssetUnit <=
         this.userService.minimumSpendable(this.selectedSourceAsset) ||
@@ -451,7 +454,7 @@ export class SwapComponent implements OnInit, OnDestroy {
     /** Input Amount is less than network fees */
     if (
       this.sourceChainBalance <
-      1.5 *
+      1.05 *
         this.inboundFees[
           assetToString(getChainAsset(this.selectedSourceAsset.chain))
         ]
@@ -467,12 +470,17 @@ export class SwapComponent implements OnInit, OnDestroy {
       return 'Output Amount Less Than Fees';
     }
 
+    if (!this.inboundAddresses) {
+      return 'Loading';
+    }
+
     /** Source amount is higher than user spendable amount */
     if (
       this.sourceAssetUnit >
       this.userService.maximumSpendableBalance(
         this.selectedSourceAsset,
-        this.sourceBalance
+        this.sourceBalance,
+        this.inboundAddresses
       )
     ) {
       return 'Insufficient balance';
@@ -578,7 +586,8 @@ export class SwapComponent implements OnInit, OnDestroy {
       if (targetBalance && targetInput) {
         const max = this.userService.maximumSpendableBalance(
           target,
-          targetBalance
+          targetBalance,
+          this.inboundAddresses
         );
 
         this.sourceAssetUnit =

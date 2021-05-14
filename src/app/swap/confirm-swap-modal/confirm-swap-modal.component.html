@@ -89,7 +89,7 @@
   <app-transaction-processing-modal
     *ngIf="txState === 'SUBMITTING'"
     (closeDialog)="closeDialog()"
-    transactionDetail="Swapping {{swapData.inputValue}} {{swapData.sourceAsset.ticker}} for {{swapData.outputValue}} {{swapData.targetAsset.ticker}}">
+    transactionDetail="Swapping {{+swapData.inputValue | number:'0.0-4'}} {{swapData.sourceAsset.ticker}} for {{+swapData.outputValue | number:'0.0-4'}} {{swapData.targetAsset.ticker}}">
   </app-transaction-processing-modal>
 
   <app-transaction-success-modal

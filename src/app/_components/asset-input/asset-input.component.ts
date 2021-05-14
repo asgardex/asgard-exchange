@@ -4,6 +4,7 @@ import {
   Output,
   EventEmitter,
   OnDestroy,
+  OnInit,
 } from '@angular/core';
 import { Asset } from 'src/app/_classes/asset';
 import { MarketsModalComponent } from '../markets-modal/markets-modal.component';
@@ -13,13 +14,16 @@ import { AssetAndBalance } from 'src/app/_classes/asset-and-balance';
 import { EthUtilsService } from 'src/app/_services/eth-utils.service';
 import { User } from 'src/app/_classes/user';
 import { Subscription } from 'rxjs';
+import { PoolAddressDTO } from 'src/app/_classes/pool-address';
+import { MidgardService } from 'src/app/_services/midgard.service';
+import { TxType } from 'src/app/_const/tx-type';
 
 @Component({
   selector: 'app-asset-input',
   templateUrl: './asset-input.component.html',
   styleUrls: ['./asset-input.component.scss'],
 })
-export class AssetInputComponent implements OnDestroy {
+export class AssetInputComponent implements OnInit, OnDestroy {
   /**
    * Selected Asset
    */
@@ -77,20 +81,33 @@ export class AssetInputComponent implements OnDestroy {
   }
   _selectableMarkets: AssetAndBalance[];
 
+  @Input() txType?: TxType;
+
   usdValue: number;
   user: User;
   subs: Subscription[];
   inputUsdValue: number;
+  inboundAddresses: PoolAddressDTO[];
 
   constructor(
     private dialog: MatDialog,
     private userService: UserService,
-    private ethUtilsService: EthUtilsService
+    private midgardService: MidgardService
   ) {
     const user$ = this.userService.user$.subscribe(
       (user) => (this.user = user)
     );
     this.subs = [user$];
+  }
+
+  ngOnInit() {
+    this.setPoolAddresses();
+  }
+
+  setPoolAddresses() {
+    this.midgardService
+      .getInboundAddresses()
+      .subscribe((res) => (this.inboundAddresses = res));
   }
 
   checkUsdBalance(): void {
@@ -133,25 +150,13 @@ export class AssetInputComponent implements OnDestroy {
   async setMax(): Promise<void> {
     this.loading = true;
 
-    if (this.balance) {
-      let max: number;
-      if (this.selectedAsset.chain === 'ETH') {
-        if (this.user && this.user.clients) {
-          max = await this.ethUtilsService.maximumSpendableBalance({
-            asset: this.selectedAsset,
-            client: this.user.clients.ethereum,
-            balance: this.balance,
-          });
-        } else {
-          console.error('no user clients found: ', this.user);
-          max = 0;
-        }
-      } else {
-        max = this.userService.maximumSpendableBalance(
-          this.selectedAsset,
-          this.balance
-        );
-      }
+    if (this.balance && this.inboundAddresses) {
+      const max = this.userService.maximumSpendableBalance(
+        this.selectedAsset,
+        this.balance,
+        this.inboundAddresses,
+        this.txType ?? 'INBOUND'
+      );
 
       if (max) {
         this.assetUnitChange.emit(max);

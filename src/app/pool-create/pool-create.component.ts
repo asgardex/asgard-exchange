@@ -15,6 +15,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { User } from '../_classes/user';
 import { baseAmount } from '@xchainjs/xchain-util';
 import { TransactionUtilsService } from '../_services/transaction-utils.service';
+import { PoolAddressDTO } from '../_classes/pool-address';
 
 @Component({
   selector: 'app-pool-create',
@@ -95,6 +96,7 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
   networkFee: number;
   runeFee: number;
   minRuneDepositAmount = 1000;
+  inboundAddresses: PoolAddressDTO[];
 
   constructor(
     private dialog: MatDialog,
@@ -144,8 +146,11 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
     this.subs = [balances$, user$];
   }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.getEthRouter();
+    this.inboundAddresses = await this.midgardService
+      .getInboundAddresses()
+      .toPromise();
 
     const params$ = this.route.queryParamMap.subscribe((params) => {
       const pool = params.get('pool');
@@ -295,12 +300,14 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
       this.ethContractApprovalRequired ||
       this.chainBalance <= this.networkFee ||
       this.depositsDisabled ||
+      !this.inboundAddresses ||
       (this.balances &&
         (this.runeAmount > this.runeBalance ||
           this.assetAmount >
             this.userService.maximumSpendableBalance(
               this.asset,
-              this.assetBalance
+              this.assetBalance,
+              this.inboundAddresses
             )))
     );
   }
@@ -314,13 +321,16 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
       return 'Create Pool';
     } else if (this.balances && (!this.runeAmount || !this.assetAmount)) {
       return 'Enter an amount';
+    } else if (!this.inboundAddresses) {
+      return 'Loading';
     } else if (
       this.balances &&
       (this.runeAmount > this.runeBalance ||
         this.assetAmount >
           this.userService.maximumSpendableBalance(
             this.asset,
-            this.assetBalance
+            this.assetBalance,
+            this.inboundAddresses
           ))
     ) {
       return 'Insufficient balance';

@@ -12,6 +12,7 @@ import {
   assetToBase,
   assetAmount,
   Asset,
+  assetToString,
 } from '@xchainjs/xchain-util';
 import { Subscription } from 'rxjs';
 import { erc20ABI } from 'src/app/_abi/erc20.abi';
@@ -24,10 +25,9 @@ import {
   TxStatus,
 } from 'src/app/_services/transaction-status.service';
 import { UserService } from 'src/app/_services/user.service';
-import { ethers } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 import { Asset as AsgrsxAsset } from 'src/app/_classes/asset';
 import { Balances } from '@xchainjs/xchain-client';
-import { EthUtilsService } from 'src/app/_services/eth-utils.service';
 import { MidgardService } from 'src/app/_services/midgard.service';
 import { PoolAddressDTO } from 'src/app/_classes/pool-address';
 import { TransactionUtilsService } from 'src/app/_services/transaction-utils.service';
@@ -57,12 +57,10 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
   error: string;
   insufficientChainBalance: boolean;
   balances: Balances;
-  loading: boolean;
 
   constructor(
     private userService: UserService,
     private txStatusService: TransactionStatusService,
-    private ethUtilsService: EthUtilsService,
     private midgardService: MidgardService,
     private txUtilsService: TransactionUtilsService
   ) {
@@ -71,7 +69,6 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
     this.transactionSuccessful = new EventEmitter<null>();
     this.txState = TransactionConfirmationState.PENDING_CONFIRMATION;
     this.insufficientChainBalance = false;
-    this.loading = true;
 
     const user$ = this.userService.user$.subscribe(
       (user) => (this.user = user)
@@ -83,49 +80,8 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     const balances$ = this.userService.userBalances$.subscribe((balances) => {
       this.balances = balances;
-      this.checkSufficientChainBalance();
     });
     this.subs.push(balances$);
-  }
-
-  async checkSufficientChainBalance() {
-    this.loading = true;
-    if (this.balances && this.asset && this.asset.asset.chain === 'BNB') {
-      const bnbBalance = this.userService.findBalance(
-        this.balances,
-        new AsgrsxAsset('BNB.BNB')
-      );
-      this.insufficientChainBalance = bnbBalance < 0.000375;
-    } else if (
-      this.balances &&
-      this.asset &&
-      this.asset.asset.chain === 'ETH' &&
-      this.user &&
-      this.user.clients &&
-      this.user.clients.ethereum
-    ) {
-      const ethClient = this.user.clients.ethereum;
-      const decimal = await this.ethUtilsService.getAssetDecimal(
-        this.asset.asset,
-        ethClient
-      );
-      const amount = assetToBase(assetAmount(this.amount, decimal));
-      const estimateFees = await ethClient.estimateFeesWithGasPricesAndLimits({
-        amount,
-        recipient: this.recipientAddress,
-        asset: this.asset.asset,
-      });
-      const fastest = estimateFees.fees.fastest.amount();
-      const ethBalance = this.userService.findBalance(
-        this.balances,
-        new AsgrsxAsset('ETH.ETH')
-      );
-      this.insufficientChainBalance =
-        ethBalance < fastest.dividedBy(10 ** ETH_DECIMAL).toNumber();
-    } else {
-      console.log('no asset', this.asset);
-    }
-    this.loading = false;
   }
 
   submitTransaction() {
@@ -314,13 +270,17 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
             },
             amount: assetToBase(assetAmount(this.amount, decimal)),
             recipient: this.recipientAddress,
+            gasLimit:
+              assetToString(this.asset.asset) === 'ETH.ETH'
+                ? BigNumber.from(21000) // ETH
+                : BigNumber.from(100000), // ERC20
             gasPrice,
           });
           this.pushTxStatus(hash, this.asset.asset, false);
           this.transactionSuccessful.next();
         } catch (error) {
           console.error('error making transfer: ', error);
-          this.error = error;
+          this.error = 'Insufficient amount. Try sending slightly less.';
           this.txState = TransactionConfirmationState.ERROR;
         }
       } else if (this.asset.asset.chain === 'LTC') {
@@ -365,7 +325,7 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
           this.transactionSuccessful.next();
         } catch (error) {
           console.error('error making transfer: ', error);
-          this.error = error;
+          this.error = 'Insufficient amount. Try sending slightly less.';
           this.txState = TransactionConfirmationState.ERROR;
         }
       }

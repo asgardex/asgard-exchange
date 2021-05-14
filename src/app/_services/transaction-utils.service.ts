@@ -6,6 +6,7 @@ import { Asset } from '../_classes/asset';
 import { PoolDTO } from '../_classes/pool';
 import { PoolAddressDTO } from '../_classes/pool-address';
 import { MidgardService } from './midgard.service';
+import { TxType } from '../_const/tx-type';
 
 @Injectable({
   providedIn: 'root',
@@ -47,7 +48,7 @@ export class TransactionUtilsService {
   calculateNetworkFee(
     asset: Asset,
     inboundAddresses: PoolAddressDTO[],
-    direction: 'INBOUND' | 'OUTBOUND',
+    direction: TxType,
     assetPool?: PoolDTO
   ): number {
     const multiplier = direction === 'OUTBOUND' ? 3 : 1;
@@ -66,8 +67,10 @@ export class TransactionUtilsService {
         case 'ETH':
           // ETH
           if (asset.symbol === 'ETH') {
+            const limit = direction === 'EXTERNAL' ? 21000 : 37000;
+
             // prettier-ignore
-            return (35000 * (+matchingInboundAddress.gas_rate) * (10 ** 9) * multiplier)  / (10 ** 18);
+            return (limit * (+matchingInboundAddress.gas_rate * 10 ** 9) * multiplier) / (10 ** 18);
           }
           // ERC20
           else {

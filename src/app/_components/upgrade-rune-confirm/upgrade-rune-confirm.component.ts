@@ -137,6 +137,9 @@ export class UpgradeRuneConfirmComponent implements OnInit, OnDestroy {
       const thorchainClient = this.user.clients.thorchain;
       const runeAddress = await thorchainClient.getAddress();
       const memo = this.getRuneUpgradeMemo(runeAddress);
+      const inboundAddresses = await this.midgardService
+        .getInboundAddresses()
+        .toPromise();
 
       if (
         thorchainClient &&
@@ -184,11 +187,12 @@ export class UpgradeRuneConfirmComponent implements OnInit, OnDestroy {
             this.balances,
             this.asset.asset
           );
-          const max = await this.ethUtilsService.maximumSpendableBalance({
-            asset: this.asset.asset,
-            balance: balanceFormatted,
-            client,
-          });
+
+          const max = this.userService.maximumSpendableBalance(
+            this.asset.asset,
+            balanceFormatted,
+            inboundAddresses
+          );
 
           if (this.amount >= max) {
             amount = balanceAmount;
