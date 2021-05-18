@@ -13,6 +13,7 @@ import {
   Chain,
   bn,
   assetToString,
+  baseAmount,
 } from '@xchainjs/xchain-util';
 import { BehaviorSubject, of, Subject, timer } from 'rxjs';
 import { catchError, switchMap, takeUntil } from 'rxjs/operators';
@@ -22,6 +23,7 @@ import BigNumber from 'bignumber.js';
 import { PoolAddressDTO } from '../_classes/pool-address';
 import { TransactionUtilsService } from './transaction-utils.service';
 import { TxType } from '../_const/tx-type';
+import { ETH_DECIMAL } from '@xchainjs/xchain-ethereum';
 
 export interface MidgardData<T> {
   key: string;
@@ -157,10 +159,16 @@ export class UserService {
       const client = this._user.clients.ethereum;
 
       // ETH
-      const balances = await client.getBalance();
-      this.pushBalances(balances);
+      const provider = client.getProvider();
+      const ethAddress = client.getAddress();
+      const ethBalance = await provider.getBalance(ethAddress);
+      this.pushBalances([
+        {
+          asset: new Asset('ETH.ETH'),
+          amount: baseAmount(ethBalance.toString(), ETH_DECIMAL),
+        },
+      ]);
 
-      const ethAddress = await client.getAddress();
       const assetsToQuery: { chain: Chain; ticker: string; symbol: string }[] =
         [];
 
