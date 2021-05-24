@@ -328,10 +328,8 @@ export class DepositComponent implements OnInit, OnDestroy {
               pool.asset.chain === 'BNB' ||
               pool.asset.chain === 'BTC' ||
               pool.asset.chain === 'ETH' ||
-              pool.asset.chain === 'LTC'
-
-            // temporarily disable bch due to https://github.com/asgardex/asgard-exchange/issues/379
-            // pool.asset.chain === 'BCH'
+              pool.asset.chain === 'LTC' ||
+              pool.asset.chain === 'BCH'
           )
 
           // filter out non-native RUNE tokens

@@ -368,9 +368,8 @@ export class SwapComponent implements OnInit, OnDestroy {
             pool.asset.chain === 'THOR' ||
             pool.asset.chain === 'BTC' ||
             pool.asset.chain === 'ETH' ||
-            pool.asset.chain === 'LTC'
-          // Temporarily disable BCH due to https://github.com/asgardex/asgard-exchange/issues/379
-          // pool.asset.chain === 'BCH'
+            pool.asset.chain === 'LTC' ||
+            pool.asset.chain === 'BCH'
         );
 
       // Keeping RUNE at top by default
