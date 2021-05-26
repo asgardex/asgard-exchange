@@ -361,7 +361,7 @@ export class DepositComponent implements OnInit, OnDestroy {
        */
       (assetToString(getChainAsset(this.asset.chain)) ===
         assetToString(this.asset) &&
-        this.assetAmount <
+        this.assetAmount >=
           this.userService.maximumSpendableBalance(
             this.asset,
             this.sourceChainBalance,
@@ -413,7 +413,7 @@ export class DepositComponent implements OnInit, OnDestroy {
     if (
       assetToString(getChainAsset(this.asset.chain)) ===
         assetToString(this.asset) &&
-      this.assetAmount <
+      this.assetAmount >=
         this.userService.maximumSpendableBalance(
           this.asset,
           this.sourceChainBalance,

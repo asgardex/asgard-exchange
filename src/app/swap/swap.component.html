@@ -37,22 +37,39 @@
     </app-asset-input>
 
     <div>
-      <div class="flex justify-between swap-details">
+
+      <div class="flex justify-between swap-details h-7">
+        <span *ngIf="selectedTargetAsset">To {{selectedTargetAsset.chain}} Address:</span>
+        <span *ngIf="!selectedTargetAsset">To - Address:</span>
+        <div class="flex items-center" *ngIf="targetAddress.length > 0">
+          {{targetAddress.substring(0, 8)}}...{{targetAddress.substring(targetAddress.length - 4, targetAddress.length)}}
+          <div class="w-4">
+            <mat-icon style="transform: scale(0.7);" class="cursor-pointer text-white" (click)="launchEditTargetAddressModal()">edit</mat-icon>
+          </div>
+        </div>
+        <div *ngIf="!targetAddress || targetAddress.length <= 0" class="flex justify-center"> -
+          <div class="w-4">
+            <mat-icon style="transform: scale(0.7);" [ngClass]="{user: 'text-white cursor-pointer'}" (click)="launchEditTargetAddressModal()">edit</mat-icon>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-between swap-details h-7">
         <span>Price:</span>
         <span *ngIf="basePrice && selectedSourceAsset && selectedTargetAsset">{{basePrice | number:"1.2-6"}} {{selectedSourceAsset.ticker}} per {{selectedTargetAsset.ticker}}</span>
-        <span *ngIf="!basePrice">-</span>
+        <div *ngIf="!basePrice"> - <div class="w-4 float-right"></div></div>
       </div>
 
-      <div class="flex justify-between swap-details">
+      <div class="flex justify-between swap-details h-7">
         <span class="tx-detail-label">Slip</span>
         <span *ngIf="slip">{{slip | percent:"0.2-4" }}</span>
-        <span *ngIf="!slip">-</span>
+        <div *ngIf="!slip"> - <div class="w-4 float-right"></div></div>
       </div>
 
-      <div *ngIf="selectedSourceAsset" class="flex justify-between swap-details">
+      <div *ngIf="selectedSourceAsset" class="flex justify-between swap-details h-7">
         <span class="tx-detail-label">Network Fee</span>
         <span *ngIf="networkFeeInSource">{{networkFeeInSource | number:"1.0-4"}} {{selectedSourceAsset.chain}}.{{selectedSourceAsset.ticker}}</span>
-        <span *ngIf="!networkFeeInSource">-</span>
+        <div *ngIf="!networkFeeInSource"> - <div class="w-4 float-right"></div></div>
       </div>
 
     </div>
