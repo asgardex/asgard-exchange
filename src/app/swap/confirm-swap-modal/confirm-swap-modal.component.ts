@@ -32,6 +32,7 @@ export interface SwapData {
   user: User;
   slip: number;
   networkFeeInSource: number;
+  targetAddress: string;
 }
 
 @Component({
@@ -143,6 +144,18 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
     }
   }
 
+  validateTargetAddress(): boolean {
+    const client = this.userService.getChainClient(
+      this.swapData.user,
+      this.swapData.targetAsset.chain
+    );
+    if (!client) {
+      return false;
+    }
+
+    return client.validateAddress(this.swapData.targetAddress);
+  }
+
   async keystoreTransfer(matchingPool?: PoolAddressDTO) {
     const amountNumber = this.swapData.inputValue;
     const binanceClient = this.swapData.user.clients.binance;
@@ -151,11 +164,6 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
     const ethClient = this.swapData.user.clients.ethereum;
     const litecoinClient = this.swapData.user.clients.litecoin;
 
-    const targetAddress = this.userService.getTokenAddress(
-      this.swapData.user,
-      this.swapData.targetAsset.chain
-    );
-
     const floor = this.slipLimitService.getSlipLimitFromAmount(
       this.swapData.outputValue
     );
@@ -163,12 +171,18 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
     const memo = this.getSwapMemo(
       this.swapData.targetAsset.chain,
       this.swapData.targetAsset.symbol,
-      targetAddress,
+      this.swapData.targetAddress,
       Math.floor(floor.toNumber())
     );
 
     if (!memo || memo === '') {
       this.error = 'Error creating tx memo';
+      this.txState = TransactionConfirmationState.ERROR;
+      return;
+    }
+
+    if (!this.validateTargetAddress()) {
+      this.error = `Invalid ${this.swapData.targetAsset.chain} Address`;
       this.txState = TransactionConfirmationState.ERROR;
       return;
     }
@@ -266,10 +280,6 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
     } else if (this.swapData.sourceAsset.chain === 'ETH') {
       try {
         const sourceAsset = this.swapData.sourceAsset;
-        const targetAsset = this.swapData.targetAsset;
-
-        // temporarily drops slip limit until mainnet
-        const ethMemo = `=:${targetAsset.chain}.${targetAsset.symbol}:${targetAddress}`;
 
         const decimal = await this.ethUtilsService.getAssetDecimal(
           this.swapData.sourceAsset,
@@ -290,7 +300,7 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
         const hash = await this.ethUtilsService.callDeposit({
           inboundAddress: matchingPool,
           asset: sourceAsset,
-          memo: ethMemo,
+          memo: memo,
           amount,
           ethClient,
         });

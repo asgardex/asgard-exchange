@@ -1,0 +1,14 @@
+<app-modal-section-header sectionTitle="Edit Target {{data.chain}} Address" (closeModal)="close()"></app-modal-section-header>
+<div>
+  <div mat-dialog-content>
+    <div class="p-4">
+      <div class="uni-input focus-within:border-white border-transparent border">
+        <label>{{data.chain}} Address</label>
+        <input [(ngModel)]="targetAddress" name="target-address" placeholder="Enter {{data.chain}} Address" class="focus:outline-none focus:ring-0" />
+      </div>
+      <button (click)="updateAddress()" mat-flat-button color="primary" class="main-action-btn w-full" [disabled]="formDisabled()">
+        {{updateAddressBtnText()}}
+      </button>
+    </div>
+  </div>
+</div>

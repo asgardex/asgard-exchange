@@ -20,9 +20,15 @@ import { TransactionSuccessModalModule } from '../_components/transaction-succes
 import { TransactionLedgerConfirmModalModule } from '../_components/transaction-ledger-confirm-modal/transaction-ledger-confirm-modal.module';
 import { ApproveEthContractModule } from '../_components/approve-eth-contract/approve-eth-contract.module';
 import { DirectivesModule } from '../_directives/directives.module';
+import { UpdateTargetAddressModalComponent } from './update-target-address-modal/update-target-address-modal.component';
+import { ModalSectionHeaderModule } from '../_components/modal-section-header/modal-section-header.module';
 
 @NgModule({
-  declarations: [SwapComponent, ConfirmSwapModalComponent],
+  declarations: [
+    SwapComponent,
+    ConfirmSwapModalComponent,
+    UpdateTargetAddressModalComponent,
+  ],
   imports: [
     CommonModule,
     AssetInputModule,
@@ -36,6 +42,7 @@ import { DirectivesModule } from '../_directives/directives.module';
     TransactionLedgerConfirmModalModule,
     DirectivesModule,
     ApproveEthContractModule,
+    ModalSectionHeaderModule,
     RouterModule.forChild([
       {
         path: '',
