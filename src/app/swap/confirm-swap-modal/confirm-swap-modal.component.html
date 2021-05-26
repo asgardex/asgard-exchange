@@ -62,6 +62,11 @@
             <div class="flex items-end"><{{estimatedMinutes}} min</div>
           </div>
 
+          <div *ngIf="swapData.targetAddress" class="flex justify-between mb-2">
+            <span class="tx-detail-label">To Address</span>
+            <span>{{swapData.targetAddress.substring(0, 8)}}...{{swapData.targetAddress.substring(swapData.targetAddress.length - 4, swapData.targetAddress.length)}}</span>
+          </div>
+
           <div *ngIf="swapData.networkFeeInSource" class="flex justify-between mb-2">
             <span class="tx-detail-label">Total Fee</span>
             <span>{{swapData.networkFeeInSource | number:"1.0-4"}} {{swapData.sourceAsset.ticker}}</span>
