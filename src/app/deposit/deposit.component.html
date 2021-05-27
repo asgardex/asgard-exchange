@@ -1,4 +1,4 @@
-<div *ngIf="assetPoolData && !poolNotFoundErr" class="container">
+<div *ngIf="assetPoolData && !poolNotFoundErr && !bchLegacyPooled" class="container">
 
   <app-section-head sectionTitle="Add Liquidity" [displayBackBtn]="true" (back)="back()"></app-section-head>
 
@@ -77,6 +77,21 @@
           {{asset.chain}}.{{asset.ticker}} Pool Not Found
         </div>
         <a class="gradient-btn rounded-lg px-8 py-4" [routerLink]="['/', 'create-pool']" [queryParams]="{pool: asset.chain + '.' + asset.symbol}">Create Pool</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="bchLegacyPooled">
+  <div class="container">
+    <app-section-head sectionTitle="Do not pool BCH" [displayBackBtn]="true" (back)="back()"></app-section-head>
+    <div class="flex flex-col items-center justify-center p-8 text-sm flex-grow">
+      <div class="flex flex-col items-center">
+        <mat-icon>warning</mat-icon>
+        <small>
+          Pooled BCH with a legacy address has been found. Depositing BCH with your current BCH Cash address will put you AT RISK OF LOSING YOUR FUNDS. DO NOT POOL BCH! You MUST withdraw BCH pooled with your legacy address before depositing again.
+          Please create an issue at https://github.com/asgardex/asgard-exchange/issues if you encounter this message.
+        </small>
       </div>
     </div>
   </div>

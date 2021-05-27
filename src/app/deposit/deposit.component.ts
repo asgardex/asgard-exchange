@@ -23,6 +23,7 @@ import { AssetAndBalance } from '../_classes/asset-and-balance';
 import { TransactionUtilsService } from '../_services/transaction-utils.service';
 import { debounceTime } from 'rxjs/operators';
 import { PoolAddressDTO } from '../_classes/pool-address';
+import { toLegacyAddress } from '@xchainjs/xchain-bitcoincash';
 
 @Component({
   selector: 'app-deposit',
@@ -107,6 +108,8 @@ export class DepositComponent implements OnInit, OnDestroy {
   haltedChains: string[];
   isHalted: boolean;
 
+  bchLegacyPooled: boolean;
+
   constructor(
     private dialog: MatDialog,
     private userService: UserService,
@@ -122,6 +125,7 @@ export class DepositComponent implements OnInit, OnDestroy {
     this.depositsDisabled = false;
     this.haltedChains = [];
     this.isHalted = false;
+    this.bchLegacyPooled = false;
   }
 
   ngOnInit(): void {
@@ -146,13 +150,6 @@ export class DepositComponent implements OnInit, OnDestroy {
 
         // User
         this.user = user;
-        if (
-          this.asset &&
-          this.asset.chain === 'ETH' &&
-          this.asset.ticker !== 'ETH'
-        ) {
-          this.checkContractApproved(this.asset);
-        }
 
         // Balance
         this.balances = balances;
@@ -171,6 +168,18 @@ export class DepositComponent implements OnInit, OnDestroy {
 
         if (asset) {
           this.asset = new Asset(asset);
+
+          if (
+            this.asset &&
+            this.asset.chain === 'ETH' &&
+            this.asset.ticker !== 'ETH'
+          ) {
+            this.checkContractApproved(this.asset);
+          }
+
+          if (asset === 'BCH.BCH') {
+            this.checkLegacyBch();
+          }
 
           this.isHalted = this.haltedChains.includes(this.asset.chain);
 
@@ -198,6 +207,34 @@ export class DepositComponent implements OnInit, OnDestroy {
     this.getEthRouter();
     this.getPoolCap();
     this.subs.push(sub);
+  }
+
+  /**
+   * This prevents user from depositing BCH with their Cash Address
+   * if they have a current deposit/pending deposit with a Legacy Address
+   * This prevents users from going through with a new deposit, potentially losing funds.
+   */
+  async checkLegacyBch() {
+    if (!this.user) {
+      return;
+    }
+
+    const client = this.user.clients?.bitcoinCash;
+    if (!client) {
+      return;
+    }
+
+    const cashAddress = client.getAddress();
+    const legacyAddress = toLegacyAddress(cashAddress);
+    console.log('legacy address is: ', legacyAddress);
+    const bchLps = await this.midgardService
+      .getThorchainLiquidityProviders('BCH.BCH')
+      .toPromise();
+
+    const match = bchLps.find((lp) => lp.asset_address === legacyAddress);
+    if (match) {
+      this.bchLegacyPooled = true;
+    }
   }
 
   setSourceChainBalance() {
