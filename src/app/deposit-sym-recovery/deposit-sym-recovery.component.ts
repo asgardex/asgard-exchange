@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { getValueOfAssetInRune } from '@thorchain/asgardex-util';
 import { Balances } from '@xchainjs/xchain-client';
 import {
@@ -14,11 +14,11 @@ import {
 import { combineLatest, Subscription } from 'rxjs';
 import { Asset, isNonNativeRuneToken } from '../_classes/asset';
 import { AssetAndBalance } from '../_classes/asset-and-balance';
+import { LiquidityProvider } from '../_classes/liquidity-provider';
 import { PoolAddressDTO } from '../_classes/pool-address';
 import { User } from '../_classes/user';
 import { MarketsModalComponent } from '../_components/markets-modal/markets-modal.component';
 import { TransactionConfirmationState } from '../_const/transaction-confirmation-state';
-import { EthUtilsService } from '../_services/eth-utils.service';
 import { KeystoreDepositService } from '../_services/keystore-deposit.service';
 import { MidgardService } from '../_services/midgard.service';
 import { NetworkQueueService } from '../_services/network-queue.service';
@@ -47,6 +47,8 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
   missingAsset: Asset;
   missingAssetAmount: number;
   missingAssetBalance: number;
+  pendingAsset: Asset;
+  pendingAmount: number;
   networkFee: number;
   inboundAddresses: PoolAddressDTO[];
   txState: TransactionConfirmationState;
@@ -57,11 +59,11 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
   outboundTransactionFee: number;
 
   constructor(
+    private route: ActivatedRoute,
     private router: Router,
     private midgardService: MidgardService,
     private userService: UserService,
     private dialog: MatDialog,
-    private ethUtilsService: EthUtilsService,
     private keystoreDepositService: KeystoreDepositService,
     private txUtilsService: TransactionUtilsService,
     private txStatusService: TransactionStatusService,
@@ -82,6 +84,9 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
 
     const user$ = this.userService.user$.subscribe((user) => {
       this.user = user;
+      if (this.searchingAsset && !this.missingAsset) {
+        this.searchLiquidityProviders(this.searchingAsset);
+      }
     });
 
     this.subs = [balances$, user$, queue$];
@@ -91,6 +96,17 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
     this.getPools();
     this.getPoolCap();
     this.getConstants();
+
+    const params$ = this.route.paramMap.subscribe((params) => {
+      const asset = params.get('asset');
+
+      if (asset && asset.length > 0) {
+        this.searchingAsset = new Asset(asset);
+        this.searchLiquidityProviders(this.searchingAsset);
+      }
+    });
+
+    this.subs.push(params$);
   }
 
   getConstants() {
@@ -145,10 +161,11 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe((result: Asset) => {
       if (result) {
-        this.searchingAsset = result;
-        this.searchLiquidityProviders(this.searchingAsset);
-      } else {
-        console.log('nothing selected');
+        this.router.navigate([
+          '/',
+          'deposit-sym-recovery',
+          assetToString(result),
+        ]);
       }
     });
   }
@@ -161,15 +178,58 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
       .getInboundAddresses()
       .toPromise();
 
-    const liquidityProviders$ =
-      this.midgardService.getThorchainLiquidityProviders(assetToString(asset));
-    const pool$ = this.midgardService.getPool(assetToString(asset));
-    const combined = combineLatest([liquidityProviders$, pool$]);
-    const sub = combined.subscribe(([providers, pool]) => {
-      if (!pool) {
-        console.error('no pool found');
+    const matches = await this.getLiquidityProviders(asset);
+    if (!matches) {
+      return;
+    }
+
+    const poolData = await this.getPoolData(asset);
+
+    if (matches && poolData) {
+      this.updateRuneAmount(matches[0].pending_asset, poolData);
+    }
+  }
+
+  async getPoolData(
+    asset: Asset
+  ): Promise<{ assetBalance: BaseAmount; runeBalance: BaseAmount }> {
+    try {
+      const pool = await this.midgardService
+        .getPool(assetToString(asset))
+        .toPromise();
+
+      const poolData = {
+        assetBalance: baseAmount(pool.assetDepth),
+        runeBalance: baseAmount(pool.runeDepth),
+      };
+
+      this.missingAssetBalance = this.userService.findBalance(
+        this.balances,
+        this.missingAsset
+      );
+
+      this.networkFee = this.txUtilsService.calculateNetworkFee(
+        this.missingAsset,
+        this.inboundAddresses,
+        'OUTBOUND',
+        pool
+      );
+
+      return poolData;
+    } catch (error) {
+      console.log('error fetching pool data');
+    }
+  }
+
+  async getLiquidityProviders(asset: Asset): Promise<LiquidityProvider[]> {
+    try {
+      if (!this.user) {
         return;
       }
+
+      const providers = await this.midgardService
+        .getThorchainLiquidityProviders(assetToString(asset))
+        .toPromise();
 
       if (!providers) {
         console.error('no providers found');
@@ -205,27 +265,24 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
           ? this.rune
           : asset;
 
-      const poolData = {
-        assetBalance: baseAmount(pool.assetDepth),
-        runeBalance: baseAmount(pool.runeDepth),
-      };
+      this.pendingAsset =
+        +matches[0].pending_asset <= 0 && +matches[0].pending_rune > 0
+          ? this.rune
+          : asset;
 
-      this.missingAssetBalance = this.userService.findBalance(
-        this.balances,
-        this.missingAsset
-      );
+      const pendingAmount =
+        +matches[0].pending_asset <= 0 && +matches[0].pending_rune > 0
+          ? +matches[0].pending_rune
+          : +matches[0].pending_asset;
 
-      this.networkFee = this.txUtilsService.calculateNetworkFee(
-        this.missingAsset,
-        this.inboundAddresses,
-        'OUTBOUND',
-        pool
-      );
+      this.pendingAmount = bn(pendingAmount)
+        .div(10 ** 8)
+        .toNumber();
 
-      this.updateRuneAmount(matches[0].pending_asset, poolData);
-    });
-
-    this.subs.push(sub);
+      return matches;
+    } catch (error) {
+      console.log('error fetching liquidity provider: ', error);
+    }
   }
 
   getPoolCap() {

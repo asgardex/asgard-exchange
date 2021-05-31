@@ -2,7 +2,9 @@
 
   <app-section-head sectionTitle="Sym Deposit Recovery" [displayBackBtn]="true" (back)="back()"></app-section-head>
 
-  <span class="text-sm mb-4">This page is for adding RUNE to complete a symmetrical deposit. It is used when your original token was deposited, but the RUNE transaction failed, so THORChain is not listing you as a member of the pool. <b>It can take time for your transaction to show up as a pending deposit.</b></span>
+  <span class="text-sm mb-4">This page is for withdrawing from a pool with stuck pending funds.
+    <b>This will withdraw all funds from pool, including previous successful deposits.</b>
+    It is used when your original token was deposited, but the RUNE transaction failed, so THORChain is not listing you as a member of the pool. <b>It can take time for your transaction to show up as a pending deposit.</b></span>
 
   <div *ngIf="user">
 
@@ -30,12 +32,12 @@
         <div class="flex justify-between items-center">
 
           <app-asset-input
-            label="Missing Amount"
-            [(selectedAsset)]="missingAsset"
-            [(assetUnit)]="missingAssetAmount"
-            [balance]="missingAssetBalance"
+            label="Pending Amount"
+            [(selectedAsset)]="pendingAsset"
+            [(assetUnit)]="pendingAmount"
             [hideMax]="true"
-            [disabledMarketSelect]="true">
+            [disabledMarketSelect]="true"
+            [disableInput]="true">
           </app-asset-input>
 
         </div>
