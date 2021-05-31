@@ -24,6 +24,10 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
         path: '',
         component: DepositSymRecoveryComponent,
       },
+      {
+        path: ':asset',
+        component: DepositSymRecoveryComponent,
+      },
     ]),
   ],
 })
