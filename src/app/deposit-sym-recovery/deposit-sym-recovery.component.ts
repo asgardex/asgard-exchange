@@ -275,7 +275,6 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
           ? +matches[0].pending_rune
           : +matches[0].pending_asset;
 
-
       this.pendingAmount = bn(pendingAmount)
         .div(10 ** 8)
         .toNumber();
