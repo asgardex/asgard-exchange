@@ -497,6 +497,7 @@ export class XDEFIService {
       }
     };
     userEthereumClient.call = async (
+      walletIndex: number,
       address: Address,
       abi: ethers.ContractInterface,
       func: string,

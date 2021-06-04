@@ -26,12 +26,6 @@
 
     <div>
 
-      <div class="flex justify-between mb-2">
-        <span class="tx-detail-label">Estimated ETH Fee</span>
-        <span *ngIf="fee">{{ (fee) | number:"0.0-6"}} ETH</span>
-        <span *ngIf="!fee"> - ETH</span>
-      </div>
-
       <div *ngIf="loading" style="height: 56px;" class="flex justify-center items-center w-full mt-4">
         <mat-progress-spinner mode="indeterminate" diameter="30"></mat-progress-spinner>
       </div>

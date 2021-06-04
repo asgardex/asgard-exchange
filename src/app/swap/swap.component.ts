@@ -33,7 +33,13 @@ import { PoolAddressDTO } from '../_classes/pool-address';
 import { ThorchainPricesService } from '../_services/thorchain-prices.service';
 import { TransactionUtilsService } from '../_services/transaction-utils.service';
 import { NetworkQueueService } from '../_services/network-queue.service';
-import { debounceTime, retry, switchMap } from 'rxjs/operators';
+import {
+  debounceTime,
+  delay,
+  retryWhen,
+  switchMap,
+  take,
+} from 'rxjs/operators';
 import { UpdateTargetAddressModalComponent } from './update-target-address-modal/update-target-address-modal.component';
 
 export enum SwapType {
@@ -234,7 +240,7 @@ export class SwapComponent implements OnInit, OnDestroy {
     const sub = timer(0, 30000)
       .pipe(
         switchMap(() => combined),
-        retry()
+        retryWhen((errors) => errors.pipe(delay(10000), take(10)))
       )
       .subscribe(([inboundAddresses, pools]) => {
         this.inboundAddresses = inboundAddresses;

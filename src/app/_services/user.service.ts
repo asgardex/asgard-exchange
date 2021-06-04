@@ -109,7 +109,8 @@ export class UserService {
   async getGeneralBalance(key: string) {
     try {
       const client = this._user.clients[key];
-      const balances = await client.getBalance();
+      const address = client.getAddress();
+      const balances = await client.getBalance(address);
       this.pushBalances(balances);
     } catch (error) {
       console.error(error);
@@ -221,13 +222,15 @@ export class UserService {
    */
   pollNativeRuneBalance(currentBalance: number) {
     if (this._user && this._user.clients && this._user.clients.thorchain) {
+      const address = this._user.clients.thorchain.getAddress();
+
       timer(5000, 15000)
         .pipe(
           // This kills the request if the user closes the component
           takeUntil(this.killRunePolling),
           // switchMap cancels the last request, if no response have been received since last tick
           // switchMap(() => this.midgardService.getTransaction(tx.hash)),
-          switchMap(() => this._user.clients.thorchain.getBalance()),
+          switchMap(() => this._user.clients.thorchain.getBalance(address)),
           // catchError handles http throws
           catchError((error) => of(error))
         )
