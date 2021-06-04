@@ -319,7 +319,7 @@ input[type=number] {
 main {
   .container {
     background: rgba(22,25,27, 1);
-    padding: 1.2rem 2rem 2rem 2rem;
+    padding: 2rem 2rem 2rem 2rem;
     min-height: 600px;
     width: 100%;
     max-width: 470px;
@@ -337,37 +337,6 @@ main {
     border-radius: 10px;
   }
 
-  nav {
-    display: flex;
-    flex-flow: row nowrap;
-    -webkit-box-align: center;
-    align-items: center;
-    border-radius: 3rem;
-    justify-content: space-evenly;
-    margin-bottom: 20px;
-
-    a {
-      display: flex;
-      flex-flow: row nowrap;
-      -webkit-box-align: center;
-      align-items: center;
-      -webkit-box-pack: center;
-      justify-content: center;
-      height: 3rem;
-      border-radius: 3rem;
-      outline: none;
-      cursor: pointer;
-      text-decoration: none;
-      color: darken(#c3c5cb, 20%);
-      font-size: 20px;
-
-      &.active {
-        border-radius: 12px;
-        font-weight: 500;
-        color: white;
-      }
-    }
-  }
 }
 
 .confirm-modal-head {

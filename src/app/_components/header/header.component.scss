@@ -1,31 +1,46 @@
 header {
   position: relative;
-  display: flex;
   width: 100%;
-  justify-content: space-between;
   z-index: 1;
+  display: grid;
+  grid-template-columns: 120px 1fr 120px;
+  -webkit-box-pack: justify;
+  justify-content: space-between;
+  -webkit-box-align: center;
+  align-items: center;
+  flex-direction: row;
 
   h1 {
     margin: 0;
     letter-spacing: 1px;
     font-size: 1.2rem;
-    // font-family: 'Cormorant Garamond', serif;
-    font-family: 'VT323', monospace;
 
     a {
       color: white;
       text-decoration: none;
     }
   }
+}
 
-  #testnet-indicator {
-    box-sizing: border-box;
-    min-width: 0px;
-    width: 100%;
-    height: 40px;
-    font-weight: 500;
-    border-radius: 8px;
-    padding: 8px 12px;
-    font-size: 0.8rem;
+#testnet-indicator {
+  border: none;
+  border-bottom: 1px solid rgba(245, 158, 11, 1);
+  font-family: 'VT323', monospace;
+}
+
+
+nav {
+  width: fit-content;
+  justify-self: center;
+  font-family: 'Inter var',sans-serif;
+
+  a {
+    color: darken(#c3c5cb, 20%);
+
+    &.active {
+      border-radius: 0.75rem;
+      color: white;
+      background-color: rgba(255, 255, 255, 0.1)
+    }
   }
 }
