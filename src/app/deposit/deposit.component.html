@@ -1,68 +1,73 @@
 <div *ngIf="assetPoolData && !poolNotFoundErr && !bchLegacyPooled" class="container">
 
-  <app-section-head sectionTitle="Add Liquidity" [displayBackBtn]="true" (back)="back()"></app-section-head>
+  <div *ngIf="loading" class="flex justify-center items-center h-96">
+    <mat-progress-spinner mode="indeterminate" diameter="30"></mat-progress-spinner>
+  </div>
 
-  <div class="relative">
+  <div *ngIf="!loading">
+    <app-section-head sectionTitle="Add Liquidity" [displayBackBtn]="true" (back)="back()"></app-section-head>
 
-    <app-asset-input
-      label="Input"
-      [(selectedAsset)]="asset"
-      [(assetUnit)]="assetAmount"
-      [balance]="assetBalance"
-      [disabledAssetSymbol]="rune.symbol"
-      [selectableMarkets]="selectableMarkets">
-    </app-asset-input>
+    <div class="relative">
 
-    <div class="flex items-center justify-center">
-      <mat-icon [class.disabled]="true" class="to-btn-icon text-sm">add</mat-icon>
+      <app-asset-input
+        label="Input"
+        [(selectedAsset)]="asset"
+        [(assetUnit)]="assetAmount"
+        [balance]="assetBalance"
+        [disabledAssetSymbol]="rune.symbol"
+        [selectableMarkets]="selectableMarkets">
+      </app-asset-input>
+
+      <div class="flex items-center justify-center">
+        <mat-icon [class.disabled]="true" class="to-btn-icon text-sm">add</mat-icon>
+      </div>
+
+      <app-asset-input
+        label="Input"
+        [(selectedAsset)]="rune"
+        [(assetUnit)]="runeAmount"
+        [balance]="runeBalance"
+        [hideMax]="true"
+        [disableInput]="true"
+        [disabledAssetSymbol]="rune.symbol"
+        [disabledMarketSelect]="true">
+      </app-asset-input>
+
+      <div class="flex justify-between swap-details">
+        <span class="tx-detail-label">Fees</span>
+        <span *ngIf="networkFee">{{networkFee | number:"1.0-6"}} {{asset.ticker}}.{{asset.chain}}</span>
+        <span *ngIf="!networkFee">-</span>
+      </div>
+
+      <div class="flex justify-between swap-details">
+        <span class="tx-detail-label"></span>
+        <span *ngIf="runeFee">{{runeFee | number:"1.0-4"}} RUNE</span>
+        <span *ngIf="!runeFee">-</span>
+      </div>
+
+      <div class="flex">
+        <app-approve-eth-contract
+          *ngIf="ethContractApprovalRequired"
+          class="w-1/2 mr-2"
+          [contractAddress]="ethRouter"
+          [asset]="asset"
+          (approved)="contractApproved()">
+        </app-approve-eth-contract>
+
+        <button
+          (click)="openConfirmationDialog()"
+          class="main-action-btn"
+          [ngClass]="ethContractApprovalRequired ? 'w-1/2' : 'w-full'"
+          mat-flat-button
+          color="primary"
+          [disabled]="formDisabled()"
+        >
+          {{mainButtonText()}}
+        </button>
+
+      </div>
+
     </div>
-
-    <app-asset-input
-      label="Input"
-      [(selectedAsset)]="rune"
-      [(assetUnit)]="runeAmount"
-      [balance]="runeBalance"
-      [hideMax]="true"
-      [disableInput]="true"
-      [disabledAssetSymbol]="rune.symbol"
-      [disabledMarketSelect]="true">
-    </app-asset-input>
-
-    <div class="flex justify-between swap-details">
-      <span class="tx-detail-label">Fees</span>
-      <span *ngIf="networkFee">{{networkFee | number:"1.0-6"}} {{asset.ticker}}.{{asset.chain}}</span>
-      <span *ngIf="!networkFee">-</span>
-    </div>
-
-    <div class="flex justify-between swap-details">
-      <span class="tx-detail-label"></span>
-      <span *ngIf="runeFee">{{runeFee | number:"1.0-4"}} RUNE</span>
-      <span *ngIf="!runeFee">-</span>
-    </div>
-
-    <div class="flex">
-      <app-approve-eth-contract
-        *ngIf="ethContractApprovalRequired"
-        class="w-1/2 mr-2"
-        [contractAddress]="ethRouter"
-        [asset]="asset"
-        (approved)="contractApproved()">
-      </app-approve-eth-contract>
-
-      <button
-        (click)="openConfirmationDialog()"
-        class="main-action-btn"
-        [ngClass]="ethContractApprovalRequired ? 'w-1/2' : 'w-full'"
-        mat-flat-button
-        color="primary"
-        [disabled]="formDisabled()"
-      >
-        {{mainButtonText()}}
-      </button>
-
-    </div>
-
-
   </div>
 
 </div>
