@@ -46,6 +46,14 @@ import { ModalSectionHeaderModule } from '../_components/modal-section-header/mo
     RouterModule.forChild([
       {
         path: '',
+        redirectTo: 'THOR.RUNE/BTC.BTC',
+      },
+      {
+        path: ':inputAsset',
+        component: SwapComponent,
+      },
+      {
+        path: ':inputAsset/:outputAsset',
         component: SwapComponent,
       },
     ]),

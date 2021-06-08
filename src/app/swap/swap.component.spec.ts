@@ -5,6 +5,7 @@ import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { AssetInputModule } from '../_components/asset-input/asset-input.module';
 import { MatIconModule } from '@angular/material/icon';
+import { RouterTestingModule } from '@angular/router/testing';
 
 describe('SwapComponent', () => {
   let component: SwapComponent;
@@ -20,6 +21,7 @@ describe('SwapComponent', () => {
           HttpClientTestingModule,
           AssetInputModule,
           MatIconModule,
+          RouterTestingModule,
         ],
       }).compileComponents();
     })
