@@ -41,6 +41,7 @@ import {
   take,
 } from 'rxjs/operators';
 import { UpdateTargetAddressModalComponent } from './update-target-address-modal/update-target-address-modal.component';
+import { ActivatedRoute, Router } from '@angular/router';
 
 export enum SwapType {
   DOUBLE_SWAP = 'double_swap',
@@ -77,27 +78,16 @@ export class SwapComponent implements OnInit, OnDestroy {
     return this._selectedSourceAsset;
   }
   set selectedSourceAsset(asset: Asset) {
-    this.ethContractApprovalRequired = false;
-    if (this.selectedSourceAsset) {
-      this.targetAssetUnit = null;
-      this.calculatingTargetAsset = true;
-    }
-    this._selectedSourceAsset = asset;
-    this.updateSwapDetails();
-    this.sourceBalance = this.userService.findBalance(this.balances, asset);
-    if (asset.chain === 'ETH' && asset.ticker !== 'ETH') {
-      this.checkContractApproved();
-    }
+    const path = this.selectedTargetAsset
+      ? [
+          '/',
+          'swap',
+          assetToString(asset),
+          assetToString(this.selectedTargetAsset),
+        ]
+      : ['/', 'swap', assetToString(asset)];
 
-    /**
-     * If input value is more than balance of newly selected asset
-     * set the input to the max
-     */
-    if (this.sourceBalance < this.sourceAssetUnit) {
-      this.sourceAssetUnit = this.sourceBalance;
-    }
-
-    this.setSourceChainBalance();
+    this.router.navigate(path);
   }
   private _selectedSourceAsset: Asset;
   selectedSourceBalance: number;
@@ -123,12 +113,14 @@ export class SwapComponent implements OnInit, OnDestroy {
     return this._selectedTargetAsset;
   }
   set selectedTargetAsset(asset: Asset) {
-    this._selectedTargetAsset = asset;
-    this.targetAssetUnit = null;
-    this.calculatingTargetAsset = true;
-    this.updateSwapDetails();
-    this.targetBalance = this.userService.findBalance(this.balances, asset);
-    this.setTargetAddress();
+    const path = [
+      '/',
+      'swap',
+      assetToString(this.selectedSourceAsset),
+      assetToString(asset),
+    ];
+
+    this.router.navigate(path);
   }
   private _selectedTargetAsset: Asset;
   targetPoolDetail: PoolDetail;
@@ -178,9 +170,10 @@ export class SwapComponent implements OnInit, OnDestroy {
     private slipLimitService: SlippageToleranceService,
     private thorchainPricesService: ThorchainPricesService,
     private txUtilsService: TransactionUtilsService,
-    private networkQueueService: NetworkQueueService
+    private networkQueueService: NetworkQueueService,
+    private router: Router,
+    private route: ActivatedRoute
   ) {
-    this.selectedSourceAsset = new Asset('THOR.RUNE');
     this.ethContractApprovalRequired = false;
     this.haltedChains = [];
     this.targetAddress = '';
@@ -236,13 +229,14 @@ export class SwapComponent implements OnInit, OnDestroy {
 
     const inboundAddresses$ = this.midgardService.getInboundAddresses();
     const pools$ = this.midgardService.getPools();
-    const combined = combineLatest([inboundAddresses$, pools$]);
+    const params$ = this.route.paramMap;
+    const combined = combineLatest([inboundAddresses$, pools$, params$]);
     const sub = timer(0, 30000)
       .pipe(
         switchMap(() => combined),
         retryWhen((errors) => errors.pipe(delay(10000), take(10)))
       )
-      .subscribe(([inboundAddresses, pools]) => {
+      .subscribe(([inboundAddresses, pools, params]) => {
         this.inboundAddresses = inboundAddresses;
 
         // check for halted chains
@@ -257,25 +251,75 @@ export class SwapComponent implements OnInit, OnDestroy {
         this.setAvailablePools(pools);
         this.setSelectableMarkets();
 
-        // on init, set target asset
-        if (!this.selectedTargetAsset) {
-          const btcMarket = this.selectableMarkets.find(
-            (market) =>
-              market.asset.chain === 'BTC' && market.asset.symbol === 'BTC'
-          );
-          if (btcMarket) {
-            this.selectedTargetAsset = btcMarket.asset;
-          }
-        }
-
         // update network fees
         this.setNetworkFees();
 
-        // update swap detail values
-        this.updateSwapDetails();
+        const inputAsset = params.get('inputAsset');
+        this.setSelectedSourceAsset(
+          new Asset(inputAsset),
+          this.selectableMarkets
+        );
+
+        const outputAsset = params.get('outputAsset');
+        if (
+          outputAsset &&
+          outputAsset.length > 0 &&
+          outputAsset != inputAsset
+        ) {
+          this.setSelectedTargetAsset(
+            new Asset(outputAsset),
+            this.selectableMarkets
+          );
+        }
       });
 
     this.subs.push(sub);
+  }
+
+  setSelectedSourceAsset(asset: Asset, selectableMarkets: AssetAndBalance[]) {
+    // ensure match exists
+    const match = selectableMarkets.find(
+      (market) => assetToString(market.asset) === assetToString(asset)
+    );
+
+    if (match) {
+      this.ethContractApprovalRequired = false;
+      if (this.selectedSourceAsset) {
+        this.targetAssetUnit = null;
+        this.calculatingTargetAsset = true;
+      }
+      this._selectedSourceAsset = asset;
+      this.updateSwapDetails();
+      this.sourceBalance = this.userService.findBalance(this.balances, asset);
+      if (asset.chain === 'ETH' && asset.ticker !== 'ETH') {
+        this.checkContractApproved();
+      }
+
+      /**
+       * If input value is more than balance of newly selected asset
+       * set the input to the max
+       */
+      if (this.sourceBalance < this.sourceAssetUnit) {
+        this.sourceAssetUnit = this.sourceBalance;
+      }
+
+      this.setSourceChainBalance();
+    }
+  }
+
+  setSelectedTargetAsset(asset: Asset, selectableMarkets: AssetAndBalance[]) {
+    // ensure match exists
+    const match = selectableMarkets.find(
+      (market) => assetToString(market.asset) === assetToString(asset)
+    );
+    if (match) {
+      this._selectedTargetAsset = asset;
+      this.targetAssetUnit = null;
+      this.calculatingTargetAsset = true;
+      this.updateSwapDetails();
+      this.targetBalance = this.userService.findBalance(this.balances, asset);
+      this.setTargetAddress();
+    }
   }
 
   setTargetAddress() {
@@ -506,7 +550,7 @@ export class SwapComponent implements OnInit, OnDestroy {
 
     /** No target asset selected */
     if (!this.selectedTargetAsset) {
-      return 'Select a token';
+      return 'Select token';
     }
 
     if (this.haltedChains.includes(this.selectedTargetAsset.chain)) {
@@ -623,7 +667,11 @@ export class SwapComponent implements OnInit, OnDestroy {
   }
 
   async calculateTargetUnits() {
-    if (this._sourceAssetTokenValue) {
+    if (
+      this._sourceAssetTokenValue &&
+      this.availablePools &&
+      this.availablePools.length > 0
+    ) {
       const swapType =
         this.isRune(this.selectedSourceAsset) ||
         this.isRune(this.selectedTargetAsset)
@@ -650,30 +698,12 @@ export class SwapComponent implements OnInit, OnDestroy {
 
   reverseTransaction() {
     if (this.selectedSourceAsset && this.selectedTargetAsset) {
-      const source = this.selectedSourceAsset;
-      const target = this.selectedTargetAsset;
-      const targetInput = this.targetAssetUnit;
-      const targetBalance = this.targetBalance;
-
-      this.selectedTargetAsset = source;
-      this.selectedSourceAsset = target;
-
-      if (targetBalance && targetInput) {
-        const max = this.userService.maximumSpendableBalance(
-          target,
-          targetBalance,
-          this.inboundAddresses
-        );
-
-        this.sourceAssetUnit =
-          targetBalance < targetInput.div(10 ** 8).toNumber() // if target balance is less than target input
-            ? max // use balance
-            : targetInput.div(10 ** 8).toNumber(); // otherwise use input value
-      } else {
-        this.sourceAssetUnit = targetInput
-          ? targetInput.div(10 ** 8).toNumber()
-          : 0;
-      }
+      this.router.navigate([
+        '/',
+        'swap',
+        assetToString(this.selectedTargetAsset),
+        assetToString(this.selectedSourceAsset),
+      ]);
     }
   }
 
