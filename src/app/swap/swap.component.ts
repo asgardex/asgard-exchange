@@ -544,6 +544,11 @@ export class SwapComponent implements OnInit, OnDestroy {
       return 'THORChain Network Latency';
     }
 
+    /** No target asset selected */
+    if (!this.selectedSourceAsset) {
+      return 'Select token';
+    }
+
     if (this.haltedChains.includes(this.selectedSourceAsset.chain)) {
       return `${this.selectedSourceAsset.chain} Halted`;
     }

@@ -199,6 +199,8 @@ export class DepositComponent implements OnInit, OnDestroy {
         this.balances,
         this.asset
       );
+
+      this.setSourceChainBalance();
     });
 
     this.getPools();
