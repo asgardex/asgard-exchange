@@ -12,6 +12,11 @@ export type HaskoinTxResponse = {
   };
 };
 
+export type HaskoinBalanceResponse = {
+  confirmed: number;
+  unconfirmed: number;
+};
+
 @Injectable({
   providedIn: 'root',
 })
@@ -25,5 +30,14 @@ export class HaskoinService {
         : 'https://api.haskoin.com/bch';
 
     return this.http.get<HaskoinTxResponse>(`${url}/transaction/${hash}`);
+  }
+
+  getBalance(
+    address: string,
+    chain: string
+  ): Observable<HaskoinBalanceResponse> {
+    return this.http.get<HaskoinBalanceResponse>(
+      `https://api.haskoin.com/${chain}/address/${address}/balance`
+    );
   }
 }
