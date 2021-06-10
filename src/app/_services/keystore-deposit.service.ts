@@ -11,52 +11,58 @@ import { Client as BitcoinClient } from '@xchainjs/xchain-bitcoin';
 import { Client as LitecoinClient } from '@xchainjs/xchain-litecoin';
 import { Client as BchClient } from '@xchainjs/xchain-bitcoincash';
 import { Client as ThorClient } from '@xchainjs/xchain-thorchain';
+import { PoolTypeOption } from '../_const/pool-type-options';
 
 export interface EthDepositParams {
   asset: Asset;
   inputAmount: number;
   client: Client;
-  thorchainAddress: string;
+  thorchainAddress?: string;
   recipientPool: PoolAddressDTO;
   balances: Balances;
+  poolType: PoolTypeOption;
 }
 
 export interface BinanceDepositParams {
   asset: Asset;
   inputAmount: number;
   client: BinanceClient;
-  thorchainAddress: string;
+  thorchainAddress?: string;
   recipientPool: PoolAddressDTO;
+  poolType: PoolTypeOption;
 }
 
 export interface BitcoinDepositParams {
   asset: Asset;
   inputAmount: number;
   client: BitcoinClient;
-  thorchainAddress: string;
+  thorchainAddress?: string;
   recipientPool: PoolAddressDTO;
   balances: Balances;
   estimatedFee: number;
+  poolType: PoolTypeOption;
 }
 
 export interface LitecoinDepositParams {
   asset: Asset;
   inputAmount: number;
   client: LitecoinClient;
-  thorchainAddress: string;
+  thorchainAddress?: string;
   recipientPool: PoolAddressDTO;
   balances: Balances;
   estimatedFee: number;
+  poolType: PoolTypeOption;
 }
 
 export interface BchDepositParams {
   asset: Asset;
   inputAmount: number;
   client: BchClient;
-  thorchainAddress: string;
+  thorchainAddress?: string;
   recipientPool: PoolAddressDTO;
   balances: Balances;
   estimatedFee: number;
+  poolType: PoolTypeOption;
 }
 
 export interface RuneDepositParams {
@@ -81,8 +87,12 @@ export class KeystoreDepositService {
     client,
     thorchainAddress,
     recipientPool,
+    poolType,
   }: EthDepositParams): Promise<string> {
-    const targetTokenMemo = `+:${asset.chain}.${asset.symbol}:${thorchainAddress}`;
+    const memo =
+      poolType === 'SYM' && thorchainAddress
+        ? this._buildDepositMemo(asset, thorchainAddress)
+        : this._buildDepositMemo(asset);
 
     const decimal = await this.ethUtilsService.getAssetDecimal(asset, client);
     let amount = assetToBase(assetAmount(inputAmount, decimal)).amount();
@@ -96,7 +106,7 @@ export class KeystoreDepositService {
     const hash = await this.ethUtilsService.callDeposit({
       inboundAddress: recipientPool,
       asset,
-      memo: targetTokenMemo,
+      memo,
       amount,
       ethClient: client,
     });
@@ -110,8 +120,12 @@ export class KeystoreDepositService {
     client,
     thorchainAddress,
     recipientPool,
+    poolType,
   }: BinanceDepositParams): Promise<string> {
-    const targetTokenMemo = `+:${asset.chain}.${asset.symbol}:${thorchainAddress}`;
+    const memo =
+      poolType === 'SYM' && thorchainAddress
+        ? this._buildDepositMemo(asset, thorchainAddress)
+        : this._buildDepositMemo(asset);
     const hash = await client.transfer({
       asset: {
         chain: asset.chain,
@@ -120,7 +134,7 @@ export class KeystoreDepositService {
       },
       amount: assetToBase(assetAmount(inputAmount)),
       recipient: recipientPool.address,
-      memo: targetTokenMemo,
+      memo,
     });
 
     return hash;
@@ -134,8 +148,12 @@ export class KeystoreDepositService {
     thorchainAddress,
     recipientPool,
     estimatedFee,
+    poolType,
   }: BitcoinDepositParams): Promise<string> {
-    const targetTokenMemo = `+:${asset.chain}.${asset.symbol}:${thorchainAddress}`;
+    const memo =
+      poolType === 'SYM' && thorchainAddress
+        ? this._buildDepositMemo(asset, thorchainAddress)
+        : this._buildDepositMemo(asset);
 
     // TODO -> consolidate this with BTC, BCH, LTC
     const balanceAmount = this.userService.findRawBalance(balances, asset);
@@ -163,7 +181,7 @@ export class KeystoreDepositService {
       },
       amount: baseAmount(amount),
       recipient: recipientPool.address,
-      memo: targetTokenMemo,
+      memo,
       feeRate: +recipientPool.gas_rate,
     });
 
@@ -178,8 +196,12 @@ export class KeystoreDepositService {
     thorchainAddress,
     recipientPool,
     estimatedFee,
+    poolType,
   }: LitecoinDepositParams): Promise<string> {
-    const targetTokenMemo = `+:${asset.chain}.${asset.symbol}:${thorchainAddress}`;
+    const memo =
+      poolType === 'SYM' && thorchainAddress
+        ? this._buildDepositMemo(asset, thorchainAddress)
+        : this._buildDepositMemo(asset);
 
     // TODO -> consolidate this with BTC, BCH, LTC
     const balanceAmount = this.userService.findRawBalance(balances, asset);
@@ -207,7 +229,7 @@ export class KeystoreDepositService {
       },
       amount: baseAmount(amount),
       recipient: recipientPool.address,
-      memo: targetTokenMemo,
+      memo,
       feeRate: +recipientPool.gas_rate,
     });
 
@@ -222,10 +244,14 @@ export class KeystoreDepositService {
     thorchainAddress,
     recipientPool,
     estimatedFee,
+    poolType,
   }: BchDepositParams): Promise<string> {
     // deposit token
     try {
-      const targetTokenMemo = `+:${asset.chain}.${asset.symbol}:${thorchainAddress}`;
+      const memo =
+        poolType === 'SYM' && thorchainAddress
+          ? this._buildDepositMemo(asset, thorchainAddress)
+          : this._buildDepositMemo(asset);
 
       // TODO -> consolidate this with BTC, BCH, LTC
       const balanceAmount = this.userService.findRawBalance(balances, asset);
@@ -253,7 +279,7 @@ export class KeystoreDepositService {
         },
         amount: baseAmount(amount),
         recipient: recipientPool.address,
-        memo: targetTokenMemo,
+        memo,
         feeRate: +recipientPool.gas_rate,
       });
 
@@ -272,5 +298,11 @@ export class KeystoreDepositService {
       amount: assetToBase(assetAmount(inputAmount)),
       memo,
     });
+  }
+
+  private _buildDepositMemo(asset: Asset, symDepositAddress?: string) {
+    return symDepositAddress
+      ? `+:${asset.chain}.${asset.symbol}:${symDepositAddress}`
+      : `+:${asset.chain}.${asset.symbol}`;
   }
 }

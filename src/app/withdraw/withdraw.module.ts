@@ -14,6 +14,7 @@ import { TransactionLedgerConfirmModalModule } from '../_components/transaction-
 import { DirectivesModule } from '../_directives/directives.module';
 import { SectionHeadModule } from '../_components/section-head/section-head.module';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { PoolTypeOptionsModule } from '../_components/pool-type-options/pool-type-options.module';
 
 @NgModule({
   declarations: [WithdrawComponent, ConfirmWithdrawModalComponent],
@@ -30,6 +31,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     DirectivesModule,
     SectionHeadModule,
     MatTooltipModule,
+    PoolTypeOptionsModule,
     RouterModule.forChild([
       {
         path: ':asset',

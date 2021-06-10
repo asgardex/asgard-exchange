@@ -9,38 +9,43 @@
 
     <div class="relative">
 
+      <app-pool-type-options [asset]="asset" [selectedPoolType]="poolType" [poolTypeOptions]="poolTypeOptions" (selectPoolType)="setPoolTypeOption($event)"></app-pool-type-options>
+
       <app-asset-input
+        *ngIf="poolType === 'SYM' || poolType === 'ASYM_ASSET'"
         label="Input"
         [(selectedAsset)]="asset"
-        [(assetUnit)]="assetAmount"
+        [assetUnit]="assetAmount"
+        (assetUnitChange)="updateValues('ASSET', $event)"
         [balance]="assetBalance"
         [disabledAssetSymbol]="rune.symbol"
         [selectableMarkets]="selectableMarkets">
       </app-asset-input>
 
-      <div class="flex items-center justify-center">
+      <div *ngIf="poolType === 'SYM'" class="flex items-center justify-center">
         <mat-icon [class.disabled]="true" class="to-btn-icon text-sm">add</mat-icon>
       </div>
 
       <app-asset-input
+        *ngIf="poolType === 'SYM' || poolType === 'ASYM_RUNE'"
         label="Input"
         [(selectedAsset)]="rune"
-        [(assetUnit)]="runeAmount"
+        [assetUnit]="runeAmount"
+        (assetUnitChange)="updateValues('RUNE', $event)"
         [balance]="runeBalance"
         [hideMax]="true"
-        [disableInput]="true"
         [disabledAssetSymbol]="rune.symbol"
         [disabledMarketSelect]="true">
       </app-asset-input>
 
-      <div class="flex justify-between swap-details">
-        <span class="tx-detail-label">Fees</span>
+      <div *ngIf="poolType === 'SYM' || poolType === 'ASYM_ASSET'" class="flex justify-between swap-details">
+        <span class="tx-detail-label">Asset Fee</span>
         <span *ngIf="networkFee">{{networkFee | number:"1.0-6"}} {{asset.ticker}}.{{asset.chain}}</span>
         <span *ngIf="!networkFee">-</span>
       </div>
 
-      <div class="flex justify-between swap-details">
-        <span class="tx-detail-label"></span>
+      <div *ngIf="poolType === 'SYM' || poolType === 'ASYM_RUNE'" class="flex justify-between swap-details">
+        <span class="tx-detail-label">RUNE Fee</span>
         <span *ngIf="runeFee">{{runeFee | number:"1.0-4"}} RUNE</span>
         <span *ngIf="!runeFee">-</span>
       </div>
@@ -60,9 +65,9 @@
           [ngClass]="ethContractApprovalRequired ? 'w-1/2' : 'w-full'"
           mat-flat-button
           color="primary"
-          [disabled]="formDisabled()"
+          [disabled]="!formValidation.isValid"
         >
-          {{mainButtonText()}}
+          {{formValidation.message}}
         </button>
 
       </div>

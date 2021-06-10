@@ -323,7 +323,12 @@ export class TransactionStatusService {
         retryWhen((errors) => errors.pipe(delay(10000), take(10)))
       )
       .subscribe(async (res: SochainTxResponse) => {
-        if (res.status === 'success') {
+        if (
+          res.status === 'success' &&
+          res.data &&
+          res.data.confirmations &&
+          res.data.confirmations > 0
+        ) {
           this.updateTxStatus(tx.hash, TxStatus.COMPLETE);
           this.userService.fetchBalances();
           this.killTxPolling[tx.hash].next();

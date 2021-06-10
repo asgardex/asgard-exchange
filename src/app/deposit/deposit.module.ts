@@ -15,6 +15,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { DirectivesModule } from '../_directives/directives.module';
 import { SectionHeadModule } from '../_components/section-head/section-head.module';
 import { RetryRuneDepositComponent } from './retry-rune-deposit/retry-rune-deposit.component';
+import { PoolTypeOptionsModule } from '../_components/pool-type-options/pool-type-options.module';
 
 @NgModule({
   declarations: [
@@ -35,6 +36,7 @@ import { RetryRuneDepositComponent } from './retry-rune-deposit/retry-rune-depos
     DirectivesModule,
     SectionHeadModule,
     MatTooltipModule,
+    PoolTypeOptionsModule,
     RouterModule.forChild([
       {
         path: ':asset',

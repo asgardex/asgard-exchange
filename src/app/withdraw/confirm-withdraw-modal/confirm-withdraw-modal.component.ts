@@ -12,7 +12,7 @@ import {
 } from 'src/app/_services/transaction-status.service';
 import { EthUtilsService } from 'src/app/_services/eth-utils.service';
 import { Asset } from 'src/app/_classes/asset';
-import { WithdrawTypeOptions } from 'src/app/_const/withdraw-type-options';
+import { PoolTypeOption } from 'src/app/_const/pool-type-options';
 import { TransactionUtilsService } from 'src/app/_services/transaction-utils.service';
 import { MidgardService } from 'src/app/_services/midgard.service';
 
@@ -25,7 +25,7 @@ export interface ConfirmWithdrawData {
   unstakePercent: number;
   runeFee: number;
   networkFee: number;
-  withdrawType: WithdrawTypeOptions;
+  withdrawType: PoolTypeOption;
 }
 
 @Component({
