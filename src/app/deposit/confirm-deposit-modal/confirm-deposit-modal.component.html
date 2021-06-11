@@ -13,7 +13,7 @@
         </div>
       </div>
 
-      <div class="flex justify-between transaction-detail">
+      <div *ngIf="data.poolTypeOption === 'SYM' || data.poolTypeOption === 'ASYM_ASSET'" class="flex justify-between transaction-detail">
 
         <div class="flex items-center">
           <div class="asset-icon-container flex items-center mr-4">
@@ -26,11 +26,11 @@
         <span>{{data.asset.ticker}}</span>
       </div>
 
-      <div class="flex">
+      <div *ngIf="data.poolTypeOption === 'SYM'" class="flex">
         <mat-icon class="to-btn-icon disabled ml-1 mb-4 text-sm">add</mat-icon>
       </div>
 
-      <div class="flex justify-between transaction-detail">
+      <div *ngIf="data.poolTypeOption === 'SYM' || data.poolTypeOption === 'ASYM_RUNE'" class="flex justify-between transaction-detail">
 
         <div class="flex items-center">
           <div class="asset-icon-container flex items-center mr-4">
@@ -72,12 +72,12 @@
             <span>1 {{data.asset.ticker}} = {{data.runeBasePrice | number:"1.2-4"}} {{data.rune.ticker}}</span>
           </div>
 
-          <div *ngIf="data.estimatedFee" class="flex justify-between mb-2">
+          <div *ngIf="(data.poolTypeOption === 'SYM' || data.poolTypeOption === 'ASYM_ASSET') && data.estimatedFee" class="flex justify-between mb-2">
             <span class="tx-detail-label">Fees</span>
             <span>{{data.estimatedFee | number:"0.0-4"}} {{data.asset.ticker}}</span>
           </div>
 
-          <div *ngIf="data.runeFee" class="flex justify-between mb-2">
+          <div *ngIf="(data.poolTypeOption === 'SYM' || data.poolTypeOption === 'ASYM_RUNE') && data.runeFee" class="flex justify-between mb-2">
             <span class="tx-detail-label"></span>
             <span>{{data.runeFee | number:"0.0-2"}} RUNE</span>
           </div>
@@ -103,7 +103,7 @@
 
   <app-transaction-processing-modal
     *ngIf="txState == 'SUBMITTING'"
-    transactionDetail="Depositing {{+data.assetAmount | number:'0.0-4'}} {{data.asset.ticker}} + {{+data.runeAmount | number:'0.0-2'}} {{data.rune.ticker}}"
+    transactionDetail="Depositing into {{data.asset.ticker}} pool"
     (closeDialog)="closeDialog()">
   </app-transaction-processing-modal>
 

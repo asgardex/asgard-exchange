@@ -11,7 +11,6 @@ import { MarketsModalComponent } from '../markets-modal/markets-modal.component'
 import { MatDialog } from '@angular/material/dialog';
 import { UserService } from 'src/app/_services/user.service';
 import { AssetAndBalance } from 'src/app/_classes/asset-and-balance';
-import { EthUtilsService } from 'src/app/_services/eth-utils.service';
 import { User } from 'src/app/_classes/user';
 import { Subscription } from 'rxjs';
 import { PoolAddressDTO } from 'src/app/_classes/pool-address';

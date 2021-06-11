@@ -1,0 +1,15 @@
+<div *ngIf="poolTypeOptions" class="px-4 h-12 flex items-center">
+  <div *ngIf="poolTypeOptions.sym && asset">
+    <button (click)="selectPoolType.emit('SYM')" class="mr-2 text-sm" [ngClass]="{'underline': selectedPoolType === 'SYM'}">{{asset.ticker}} + RUNE</button>
+    <span *ngIf="poolTypeOptions.asymAsset || poolTypeOptions.asymRune" class="text-xs text-gray-500 mr-2">/</span>
+  </div>
+
+  <div *ngIf="poolTypeOptions.asymAsset && asset">
+    <button (click)="selectPoolType.emit('ASYM_ASSET')" class="mr-2 text-sm" [ngClass]="{'underline': selectedPoolType === 'ASYM_ASSET'}">{{asset.ticker}}</button>
+    <span *ngIf="poolTypeOptions.asymRune" class="text-xs text-gray-500 mr-2">/</span>
+  </div>
+
+  <div>
+    <button (click)="selectPoolType.emit('ASYM_RUNE')" *ngIf="poolTypeOptions.asymRune" class="text-sm" [ngClass]="{'underline': selectedPoolType === 'ASYM_RUNE'}">RUNE</button>
+  </div>
+</div>

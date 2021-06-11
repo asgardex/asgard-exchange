@@ -472,6 +472,7 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
             thorchainAddress,
             recipientPool,
             estimatedFee: this.networkFee,
+            poolType: 'SYM',
           });
           break;
 
@@ -482,6 +483,7 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
             client: this.user.clients.binance,
             thorchainAddress,
             recipientPool,
+            poolType: 'SYM',
           });
           break;
 
@@ -494,6 +496,7 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
             thorchainAddress,
             recipientPool,
             estimatedFee: this.networkFee,
+            poolType: 'SYM',
           });
           break;
 
@@ -506,6 +509,7 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
             thorchainAddress,
             recipientPool,
             estimatedFee: this.networkFee,
+            poolType: 'SYM',
           });
           break;
 
@@ -517,6 +521,7 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
             client: this.user.clients.ethereum,
             thorchainAddress,
             recipientPool,
+            poolType: 'SYM',
           });
           break;
 

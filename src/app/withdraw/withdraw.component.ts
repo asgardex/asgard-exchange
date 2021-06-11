@@ -26,7 +26,10 @@ import { MidgardService, ThorchainQueue } from '../_services/midgard.service';
 import { TransactionUtilsService } from '../_services/transaction-utils.service';
 import { UserService } from '../_services/user.service';
 import { ConfirmWithdrawModalComponent } from './confirm-withdraw-modal/confirm-withdraw-modal.component';
-import { WithdrawTypeOptions } from '../_const/withdraw-type-options';
+import {
+  AvailablePoolTypeOptions,
+  PoolTypeOption,
+} from '../_const/pool-type-options';
 import { Balances } from '@xchainjs/xchain-client';
 import { debounceTime } from 'rxjs/operators';
 
@@ -73,13 +76,13 @@ export class WithdrawComponent implements OnInit {
   networkFee: number;
   queue: ThorchainQueue;
 
-  withdrawOptions = {
+  withdrawOptions: AvailablePoolTypeOptions = {
     asymAsset: false,
     asymRune: false,
     sym: false,
   };
 
-  withdrawType: WithdrawTypeOptions;
+  withdrawType: PoolTypeOption;
   assetBalance: number;
   runeBalance: number;
   balances: Balances;
@@ -261,7 +264,7 @@ export class WithdrawComponent implements OnInit {
     }
   }
 
-  setSelectedWithdrawOption(option: WithdrawTypeOptions) {
+  setSelectedWithdrawOption(option: PoolTypeOption) {
     this.withdrawType = option;
     this.calculate();
   }
