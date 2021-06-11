@@ -87,8 +87,6 @@ export class UserService {
           this.getBinanceBalances();
         } else if (key === 'ethereum') {
           this.getEthereumBalances();
-        } else if (key === 'bitcoin') {
-          this.getBtcBalance();
         } else {
           this.getGeneralBalance(key);
         }
@@ -109,44 +107,6 @@ export class UserService {
   pushChainBalanceErrors(chain: Chain) {
     this._chainBalanceErrors.push(chain);
     this.chainBalanceErrorsSource.next(this._chainBalanceErrors);
-  }
-
-  async getBtcBalance() {
-    const client = this._user.clients.bitcoin;
-    const address = client.getAddress();
-
-    try {
-      /** TESTNET */
-      if (environment.network === 'testnet') {
-        const balance = await client.getBalance(address);
-        this.pushBalances(balance);
-        return;
-      }
-
-      /** MAINNET */
-      const accountBalance = await this.haskoinService
-        .getBalance(address, 'btc')
-        .toPromise();
-
-      const confirmed = baseAmount(accountBalance.confirmed, BTC_DECIMAL);
-      const unconfirmed = baseAmount(accountBalance.unconfirmed, BTC_DECIMAL);
-
-      const amount = baseAmount(
-        confirmed.amount().plus(unconfirmed.amount()),
-        BTC_DECIMAL
-      );
-
-      const balance = [
-        {
-          asset: new Asset('BTC.BTC'),
-          amount,
-        },
-      ];
-
-      this.pushBalances(balance);
-    } catch (error) {
-      this.pushChainBalanceErrors('BTC');
-    }
   }
 
   async getGeneralBalance(key: string) {
