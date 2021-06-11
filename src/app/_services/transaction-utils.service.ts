@@ -74,11 +74,15 @@ export class TransactionUtilsService {
           }
           // ERC20
           else {
-            // prettier-ignore
-            const ethGasVal = (70000 * (+matchingInboundAddress.gas_rate) * (10 ** 9) * multiplier)  / (10 ** 18);
-            const tokenEthValue =
-              +this._ethPool.assetPriceUSD / +assetPool.assetPriceUSD;
-            return ethGasVal * tokenEthValue;
+            if (this._ethPool) {
+              // prettier-ignore
+              const ethGasVal = (70000 * (+matchingInboundAddress.gas_rate) * (10 ** 9) * multiplier)  / (10 ** 18);
+              const tokenEthValue =
+                +this._ethPool.assetPriceUSD / +assetPool.assetPriceUSD;
+              return ethGasVal * tokenEthValue;
+            } else {
+              console.error('no eth pool found');
+            }
           }
 
         case 'BNB':

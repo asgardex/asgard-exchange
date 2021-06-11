@@ -249,7 +249,6 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
         try {
           assetHash = await this.depositAsset(pools);
           console.log('asset hash is: ', assetHash);
-          this.assetDepositSuccess(this.data.asset, assetHash);
         } catch (error) {
           console.error('error making token transfer: ', error);
           this.txState = TransactionConfirmationState.ERROR;
@@ -261,6 +260,8 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
           this.assetDepositError('Deposit Unsuccessful');
           return;
         }
+
+        this.assetDepositSuccess(this.data.asset, assetHash);
 
         try {
           const runeHash = await this.depositRune(thorClient, this.data.asset);
@@ -324,7 +325,7 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
       status: TxStatus.PENDING,
       action: TxActions.DEPOSIT,
       symbol: this.data.asset.symbol,
-      isThorchainTx: true,
+      isThorchainTx: this.data.poolTypeOption === 'SYM' ? false : true,
     });
   }
 

@@ -205,6 +205,14 @@ export class DepositComponent implements OnInit, OnDestroy {
 
       this.setSourceChainBalance();
 
+      if (
+        this.asset &&
+        this.asset.chain === 'ETH' &&
+        this.asset.ticker !== 'ETH'
+      ) {
+        this.checkContractApproved(this.asset);
+      }
+
       this.validate();
     });
 
@@ -248,11 +256,7 @@ export class DepositComponent implements OnInit, OnDestroy {
   }
 
   updateValues(source: 'ASSET' | 'RUNE', amount?: number) {
-    console.log(`updateValues: amount ${amount}: source ${source}`);
-
     if (source === 'ASSET') {
-      console.log('amount is: ', amount);
-
       this.assetAmount = amount ?? null;
       if (amount) {
         this.updateRuneAmount();
@@ -316,7 +320,12 @@ export class DepositComponent implements OnInit, OnDestroy {
   }
 
   async checkContractApproved(asset: Asset) {
+    console.log('checking contract approved');
+    console.log('eth router is: ', this.ethRouter);
+    console.log('user is: ', this.user);
+    console.log('=================================');
     if (this.ethRouter && this.user) {
+      console.log('eth router and user exist');
       const assetAddress = asset.symbol.slice(asset.ticker.length + 1);
       const strip0x = assetAddress.substr(2);
       const isApproved = await this.user.clients.ethereum.isApproved(
@@ -324,6 +333,7 @@ export class DepositComponent implements OnInit, OnDestroy {
         strip0x,
         baseAmount(1)
       );
+      console.log('is approved?', isApproved);
       this.ethContractApprovalRequired = !isApproved;
     }
   }
@@ -430,7 +440,6 @@ export class DepositComponent implements OnInit, OnDestroy {
     );
   }
 
-
   validate(): void {
     /** Wallet not connected */
     if (!this.balances) {
@@ -501,7 +510,7 @@ export class DepositComponent implements OnInit, OnDestroy {
       this.requiresAsset() &&
       assetToString(getChainAsset(this.asset.chain)) ===
         assetToString(this.asset) &&
-      this.assetAmount >=
+      this.assetAmount + this.networkFee * 4 >=
         this.userService.maximumSpendableBalance(
           this.asset,
           this.sourceChainBalance,
@@ -518,7 +527,7 @@ export class DepositComponent implements OnInit, OnDestroy {
     /** Amount is too low, considered "dusting" */
     if (this.assetAmount <= this.userService.minimumSpendable(this.asset)) {
       this.formValidation = {
-        message: 'Amount too low',
+        message: '!! Amount too low',
         isValid: false,
       };
       return;
@@ -528,7 +537,7 @@ export class DepositComponent implements OnInit, OnDestroy {
      * Deposit amount should be more than outbound fee + inbound fee network fee costs
      * Ensures sufficient amount to withdraw
      */
-    if (this.assetAmount <= this.networkFee * 3 + this.networkFee) {
+    if (this.assetAmount <= this.networkFee * 4) {
       this.formValidation = {
         message: 'Amount too low',
         isValid: false,
@@ -623,7 +632,8 @@ export class DepositComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe((transactionSuccess: boolean) => {
       if (transactionSuccess) {
-        this.assetAmount = 0;
+        this.assetAmount = null;
+        this.runeAmount = null;
       }
     });
   }

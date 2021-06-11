@@ -103,7 +103,7 @@
 
   <app-transaction-processing-modal
     *ngIf="txState == 'SUBMITTING'"
-    transactionDetail="Depositing {{+data.assetAmount | number:'0.0-4'}} {{data.asset.ticker}} + {{+data.runeAmount | number:'0.0-2'}} {{data.rune.ticker}}"
+    transactionDetail="Depositing into {{data.asset.ticker}} pool"
     (closeDialog)="closeDialog()">
   </app-transaction-processing-modal>
 
