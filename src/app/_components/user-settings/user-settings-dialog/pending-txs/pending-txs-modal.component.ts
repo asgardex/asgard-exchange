@@ -72,13 +72,8 @@ export class PendingTxsModalComponent implements OnDestroy {
   }
 
   explorerPath(tx: Tx): string {
-    if (tx.isThorchainTx) {
-      if (tx.pollThornodeDirectly) {
-        return this.getViewBlockPath(tx.hash);
-      } else if (tx.pollRpc) {
-        /**
-         * For THOR transfers
-         */
+    if (tx.isThorchainTx && tx.chain === 'THOR') {
+      if (tx.pollThornodeDirectly || tx.pollRpc) {
         return this.getViewBlockPath(tx.hash);
       } else {
         return this.thorchainExplorerUrl + '/' + tx.hash;
