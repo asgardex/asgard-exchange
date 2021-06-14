@@ -10,7 +10,7 @@
         <ul *ngIf="txs && txs.length > 0">
           <li *ngFor="let tx of txs">
 
-            <a [href]="explorerPath(tx)" target="_blank" class="uni-input">
+            <div class="uni-input hover:border-transparent">
 
               <label class="flex justify-between w-full">
                 <span>{{tx.ticker}}</span>
@@ -19,7 +19,19 @@
 
               <div class="flex items-center justify-between w-full">
 
-                <span>{{tx.hash.substring(0, 4) + '...' + tx.hash.substring(tx.hash.length - 4, tx.hash.length)}}</span>
+                <div class="flex flex-col">
+                  <span>{{tx.hash.substring(0, 4) + '...' + tx.hash.substring(tx.hash.length - 4, tx.hash.length)}}</span>
+                  <div class="flex">
+                    <a class="flex align-center text-sm mr-2 text-green-300" [href]="explorerPath(tx)" target="_blank">
+                      <span>{{tx.chain}} Explorer</span>
+                      <mat-icon style="transform: scale(.5);">open_in_new</mat-icon>
+                    </a>
+                    <a class="flex align-center text-sm text-green-300" *ngIf="tx.isThorchainTx && tx.chain !== 'THOR'" href="{{thorchainExplorerUrl}}/{{tx.hash}}" target="_blank">
+                      <span>THOR Explorer</span>
+                      <mat-icon style="transform: scale(.5);">open_in_new</mat-icon>
+                    </a>
+                  </div>
+                </div>
 
                 <button class="flex items-center justify-center" matSuffix mat-icon-button>
                   <mat-icon *ngIf="tx.status === 'COMPLETE'">check_circle</mat-icon>
@@ -31,7 +43,7 @@
 
               <span *ngIf="tx.action === 'Refund'" style="font-size: 0.6rem; font-style: italic">*Something went wrong submitting your transaction on the network. Your transaction has been refunded.</span>
 
-            </a>
+            </div>
 
           </li>
         </ul>
