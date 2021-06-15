@@ -36,7 +36,7 @@
     "@xchainjs/xchain-crypto": "^0.2.4",
     "@xchainjs/xchain-ethereum": "^0.21.2",
     "@xchainjs/xchain-litecoin": "^0.6.5",
-    "@xchainjs/xchain-thorchain": "^0.15.2",
+    "@xchainjs/xchain-thorchain": "^0.16.1",
     "@xchainjs/xchain-util": "^0.2.8",
     "angularx-qrcode": "^11.0.0",
     "base64-js": "^1.5.1",
