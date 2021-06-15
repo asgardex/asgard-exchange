@@ -67,7 +67,7 @@ export class ConnectModal {
   connectXDEFI() {
     if (!this.isXDEFIConnected) {
       return window.open(
-        'https://xdefi-io.medium.com/how-to-use-asgardex-with-xdefi-wallet-%EF%B8%8F-547081a8d274',
+        'https://www.xdefi.io',
         '_blank'
       );
     }
