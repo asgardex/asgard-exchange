@@ -66,10 +66,7 @@ export class ConnectModal {
 
   connectXDEFI() {
     if (!this.isXDEFIConnected) {
-      return window.open(
-        'https://www.xdefi.io',
-        '_blank'
-      );
+      return window.open('https://www.xdefi.io', '_blank');
     }
     this.connectionView = ConnectionView.XDEFI;
   }
