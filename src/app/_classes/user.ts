@@ -1,4 +1,9 @@
-export type WalletType = 'keystore' | 'walletconnect' | 'ledger' | 'XDEFI';
+export type WalletType =
+  | 'keystore'
+  | 'walletconnect'
+  | 'ledger'
+  | 'XDEFI'
+  | 'metamask';
 import { Client as BinanceClient } from '@xchainjs/xchain-binance';
 import { Client as BitcoinClient } from '@xchainjs/xchain-bitcoin';
 import { Client as ThorchainClient } from '@xchainjs/xchain-thorchain';

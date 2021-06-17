@@ -81,6 +81,7 @@ import { HaskoinService } from './_services/haskoin.service';
 import { ModalSectionHeaderModule } from './_components/modal-section-header/modal-section-header.module';
 import { ReconnectXDEFIDialogComponent } from './_components/reconnect-xdefi-dialog/reconnect-xdefi-dialog.component';
 import { KeystoreCreateStorePhraseComponent } from './_components/connect/keystore-create-store-phrase/keystore-create-store-phrase.component';
+import { MetamaskService } from './_services/metamask.service';
 
 @NgModule({
   declarations: [
@@ -158,6 +159,7 @@ import { KeystoreCreateStorePhraseComponent } from './_components/connect/keysto
     KeystoreDepositService,
     NetworkQueueService,
     ThorchainRpcService,
+    MetamaskService,
   ],
   bootstrap: [AppComponent],
 })

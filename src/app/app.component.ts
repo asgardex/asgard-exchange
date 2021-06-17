@@ -74,11 +74,12 @@ export class AppComponent implements OnInit, OnDestroy {
 
     const keystoreString = localStorage.getItem('keystore');
     const XDEFIConnected = localStorage.getItem('XDEFI_CONNECTED');
+    const lastLoginType = this.userService.getLastLoginType();
 
     const keystore = JSON.parse(keystoreString);
-    if (keystore) {
+    if (keystore && lastLoginType === 'keystore') {
       this.openReconnectDialog(keystore);
-    } else if (XDEFIConnected) {
+    } else if (XDEFIConnected && lastLoginType === 'XDEFI') {
       this.openReconnectXDEFIDialog();
     }
   }

@@ -56,7 +56,7 @@ export class ApproveEthContractComponent implements OnDestroy {
       maxWidth: '420px',
       width: '50vw',
       data: {
-        contractAddress: this.contractAddress,
+        routerAddress: this.contractAddress,
         asset: this.asset,
       },
     });

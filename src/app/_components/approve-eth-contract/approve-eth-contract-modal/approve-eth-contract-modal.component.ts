@@ -1,14 +1,19 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Asset as xchainAsset, baseAmount, bn } from '@xchainjs/xchain-util';
+import { ethers } from 'ethers';
 import { Subscription, combineLatest } from 'rxjs';
 import { Asset } from 'src/app/_classes/asset';
 import { User } from 'src/app/_classes/user';
+import { EthUtilsService } from 'src/app/_services/eth-utils.service';
+import { MetamaskService } from 'src/app/_services/metamask.service';
 import { TransactionStatusService } from 'src/app/_services/transaction-status.service';
 import { UserService } from 'src/app/_services/user.service';
+import { TransactionResponse } from '@ethersproject/abstract-provider';
+import { MidgardService } from 'src/app/_services/midgard.service';
 
 export type ApproveEthContractModalParams = {
-  contractAddress: string;
+  routerAddress: string;
   asset: xchainAsset;
 };
 
@@ -24,12 +29,16 @@ export class ApproveEthContractModalComponent implements OnInit, OnDestroy {
   fee: string;
   ethBalance: number;
   insufficientEthBalance: boolean;
+  metaMaskProvider?: ethers.providers.Web3Provider;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: ApproveEthContractModalParams,
     public dialogRef: MatDialogRef<ApproveEthContractModalComponent>,
     private userService: UserService,
-    private txStatusService: TransactionStatusService
+    private txStatusService: TransactionStatusService,
+    private ethUtilService: EthUtilsService,
+    private metaMaskService: MetamaskService,
+    private midgardService: MidgardService
   ) {
     this.loading = true;
     this.insufficientEthBalance = false;
@@ -39,15 +48,17 @@ export class ApproveEthContractModalComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     const user$ = this.userService.user$;
     const balances$ = this.userService.userBalances$;
+    const metaMaskProvider$ = this.metaMaskService.provider$;
 
-    const combined = combineLatest([user$, balances$]);
+    const combined = combineLatest([user$, balances$, metaMaskProvider$]);
 
-    const sub = combined.subscribe(([user, balances]) => {
+    const sub = combined.subscribe(([user, balances, metaMaskProvider]) => {
       this.user = user;
       this.ethBalance = this.userService.findBalance(
         balances,
         new Asset('ETH.ETH')
       );
+      this.metaMaskProvider = metaMaskProvider;
 
       this.loading = false;
     });
@@ -58,22 +69,50 @@ export class ApproveEthContractModalComponent implements OnInit, OnDestroy {
   async approve() {
     this.loading = true;
 
-    if (this.data.contractAddress && this.user && this.data.asset) {
+    if (this.data.routerAddress && this.user && this.data.asset) {
       const asset = this.data.asset;
-      const contractAddress = this.data.contractAddress;
+      const routerContractAddress = this.data.routerAddress;
 
       const assetAddress = asset.symbol.slice(asset.ticker.length + 1);
       const strip0x = assetAddress.substr(2);
-      const approve = await this.user.clients.ethereum.approve({
-        walletIndex: 0,
-        spender: contractAddress,
-        sender: strip0x,
-        amount: baseAmount(bn(2).pow(96).minus(1)),
-        feeOptionKey: 'fast',
-      });
+      let approve: TransactionResponse;
 
-      this.txStatusService.pollEthContractApproval(approve.hash);
-      this.dialogRef.close(approve.hash);
+      try {
+        if (this.user.type === 'keystore' || this.user.type === 'XDEFI') {
+          const inboundAddresses = await this.midgardService
+            .getInboundAddresses()
+            .toPromise();
+          const ethInbound = inboundAddresses.find(
+            (inbound) => inbound.chain === 'ETH'
+          );
+          if (!ethInbound) {
+            return;
+          }
+
+          const ethClient = this.user.clients.ethereum;
+
+          const keystoreProvider = this.user.clients.ethereum.getProvider();
+          approve = await this.ethUtilService.approveKeystore({
+            contractAddress: strip0x,
+            routerContractAddress,
+            provider: keystoreProvider,
+            ethClient,
+            ethInbound,
+            userAddress: ethClient.getAddress(),
+          });
+        } else if (this.user.type === 'metamask') {
+          approve = await this.ethUtilService.approveMetaMask({
+            contractAddress: strip0x,
+            routerContractAddress,
+            provider: this.metaMaskProvider,
+          });
+        }
+        this.txStatusService.pollEthContractApproval(approve.hash);
+        this.dialogRef.close(approve.hash);
+      } catch (error) {
+        console.log('error is: ', error);
+        this.loading = false;
+      }
     }
 
     this.loading = false;
