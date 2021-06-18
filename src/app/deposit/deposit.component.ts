@@ -28,6 +28,9 @@ import {
   AvailablePoolTypeOptions,
   PoolTypeOption,
 } from '../_const/pool-type-options';
+import { EthUtilsService } from '../_services/eth-utils.service';
+import { MetamaskService } from '../_services/metamask.service';
+import { ethers } from 'ethers';
 
 @Component({
   selector: 'app-deposit',
@@ -105,6 +108,7 @@ export class DepositComponent implements OnInit, OnDestroy {
     message: string;
     isValid: boolean;
   };
+  metaMaskProvider?: ethers.providers.Web3Provider;
 
   constructor(
     private dialog: MatDialog,
@@ -112,7 +116,9 @@ export class DepositComponent implements OnInit, OnDestroy {
     private router: Router,
     private route: ActivatedRoute,
     private midgardService: MidgardService,
-    private txUtilsService: TransactionUtilsService
+    private txUtilsService: TransactionUtilsService,
+    private ethUtilService: EthUtilsService,
+    private metaMaskService: MetamaskService
   ) {
     this.poolNotFoundErr = false;
     this.ethContractApprovalRequired = false;
@@ -205,6 +211,26 @@ export class DepositComponent implements OnInit, OnDestroy {
 
       this.setSourceChainBalance();
 
+      // Metamask - restrict to ASYM deposits
+      if (this.user && this.user.type === 'metamask') {
+        this.poolTypeOptions = {
+          asymAsset: true,
+          asymRune: false,
+          sym: false,
+        };
+        this.setPoolTypeOption('ASYM_ASSET');
+      }
+
+      // Metamask - redirect to ETH if asset chain is not ETH
+      if (
+        this.user &&
+        this.user.type === 'metamask' &&
+        this.asset &&
+        this.asset.chain !== 'ETH'
+      ) {
+        this.router.navigate(['/', 'deposit', 'ETH.ETH']);
+      }
+
       if (
         this.asset &&
         this.asset.chain === 'ETH' &&
@@ -216,10 +242,14 @@ export class DepositComponent implements OnInit, OnDestroy {
       this.validate();
     });
 
+    const metaMaskProvider$ = this.metaMaskService.provider$.subscribe(
+      (provider) => (this.metaMaskProvider = provider)
+    );
+
     this.getPools();
     this.getEthRouter();
     this.getPoolCap();
-    this.subs.push(userSub, combinedPoolSub);
+    this.subs.push(userSub, combinedPoolSub, metaMaskProvider$);
   }
 
   /**
@@ -320,20 +350,36 @@ export class DepositComponent implements OnInit, OnDestroy {
   }
 
   async checkContractApproved(asset: Asset) {
-    console.log('checking contract approved');
-    console.log('eth router is: ', this.ethRouter);
-    console.log('user is: ', this.user);
-    console.log('=================================');
-    if (this.ethRouter && this.user) {
-      console.log('eth router and user exist');
+    if (!this.inboundAddresses) {
+      return;
+    }
+
+    const ethInboundAddress = this.inboundAddresses.find(
+      (inbound) => inbound.chain === 'ETH'
+    );
+
+    if (!ethInboundAddress) {
+      return;
+    }
+
+    if (ethInboundAddress && this.user) {
       const assetAddress = asset.symbol.slice(asset.ticker.length + 1);
       const strip0x = assetAddress.substr(2);
-      const isApproved = await this.user.clients.ethereum.isApproved(
-        this.ethRouter,
+      const provider =
+        this.user.type === 'keystore' || this.user.type === 'XDEFI'
+          ? this.user.clients.ethereum.getProvider()
+          : this.metaMaskProvider;
+      const userAddress =
+        this.user.type === 'keystore' || this.user.type === 'XDEFI'
+          ? this.user.clients.ethereum.getAddress()
+          : await this.metaMaskProvider.getSigner().getAddress();
+
+      const isApproved = await this.ethUtilService.isApproved(
+        provider,
         strip0x,
-        baseAmount(1)
+        ethInboundAddress.router,
+        userAddress
       );
-      console.log('is approved?', isApproved);
       this.ethContractApprovalRequired = !isApproved;
     }
   }
@@ -485,7 +531,10 @@ export class DepositComponent implements OnInit, OnDestroy {
     }
 
     /** RUNE amount exceeds RUNE balance. Leave 3 RUNE in balance */
-    if (this.runeBalance - this.runeAmount < 3) {
+    if (
+      this.poolType !== 'ASYM_ASSET' &&
+      this.runeBalance - this.runeAmount < 3
+    ) {
       this.formValidation = {
         message: 'Min 3 RUNE in Wallet',
         isValid: false,

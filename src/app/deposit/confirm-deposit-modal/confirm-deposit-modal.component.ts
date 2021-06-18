@@ -18,6 +18,8 @@ import { KeystoreDepositService } from 'src/app/_services/keystore-deposit.servi
 import { Asset } from 'src/app/_classes/asset';
 import { PoolTypeOption } from 'src/app/_const/pool-type-options';
 import { Client } from '@xchainjs/xchain-thorchain';
+import { MetamaskService } from 'src/app/_services/metamask.service';
+import { ethers } from 'ethers';
 
 export interface ConfirmDepositData {
   asset;
@@ -46,6 +48,7 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
   loading: boolean;
   estimatedMinutes: number;
   balances: Balances;
+  metaMaskProvider?: ethers.providers.Web3Provider;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: ConfirmDepositData,
@@ -54,7 +57,8 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
     private midgardService: MidgardService,
     private ethUtilsService: EthUtilsService,
     private userService: UserService,
-    private keystoreDepositService: KeystoreDepositService
+    private keystoreDepositService: KeystoreDepositService,
+    private metaMaskService: MetamaskService
   ) {
     this.loading = true;
     this.txState = TransactionConfirmationState.PENDING_CONFIRMATION;
@@ -64,11 +68,15 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
       }
     });
 
+    const metaMaskProvider$ = this.metaMaskService.provider$.subscribe(
+      (provider) => (this.metaMaskProvider = provider)
+    );
+
     const balances$ = this.userService.userBalances$.subscribe(
       (balances) => (this.balances = balances)
     );
 
-    this.subs = [user$, balances$];
+    this.subs = [user$, balances$, metaMaskProvider$];
   }
 
   ngOnInit(): void {
@@ -100,7 +108,266 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
     });
   }
 
-  async depositAsset(pools: PoolAddressDTO[]): Promise<string> {
+  async deposit(pools: PoolAddressDTO[]) {
+    if (this.data.user?.type === 'metamask') {
+      try {
+        const hash = await this.metaMaskDepositAsset(pools);
+        if (hash && hash.length > 0) {
+          this.hash = hash;
+          this.assetDepositSuccess(this.data.asset, hash);
+          this.txState = TransactionConfirmationState.SUCCESS;
+        } else {
+          this.assetDepositError('Deposit Unsuccessful');
+          return;
+        }
+      } catch (error) {
+        this.txState = TransactionConfirmationState.ERROR;
+        this.error = error;
+      }
+    } else if (this.data.user?.type === 'keystore') {
+      const clients = this.data.user.clients;
+      const thorClient = clients.thorchain;
+      let assetHash = '';
+
+      switch (this.data.poolTypeOption) {
+        case 'SYM':
+          try {
+            assetHash = await this.keystoreDepositAsset(pools);
+            console.log('asset hash is: ', assetHash);
+          } catch (error) {
+            console.error('error making token transfer: ', error);
+            this.txState = TransactionConfirmationState.ERROR;
+            this.error = error;
+            return;
+          }
+
+          if (!assetHash || assetHash.length <= 0) {
+            this.assetDepositError('Deposit Unsuccessful');
+            return;
+          }
+
+          this.assetDepositSuccess(this.data.asset, assetHash);
+
+          try {
+            const runeHash = await this.depositRune(
+              thorClient,
+              this.data.asset
+            );
+            console.log('rune hash is: ', runeHash);
+            this.runeDepositSuccess(runeHash);
+          } catch (error) {
+            console.error('error making RUNE transfer: ', error);
+            this.txState = 'RETRY_RUNE_DEPOSIT';
+            this.error = error;
+            return;
+          }
+          break;
+
+        case 'ASYM_ASSET':
+          try {
+            assetHash = await this.keystoreDepositAsset(pools);
+            this.hash = assetHash;
+
+            if (!assetHash || assetHash.length <= 0) {
+              this.assetDepositError('Deposit Unsuccessful');
+              return;
+            }
+
+            console.log('asset hash is: ', assetHash);
+            this.assetDepositSuccess(this.data.asset, assetHash);
+            this.txState = TransactionConfirmationState.SUCCESS;
+          } catch (error) {
+            console.error('error making token transfer: ', error);
+            this.txState = TransactionConfirmationState.ERROR;
+            this.error = error;
+            return;
+          }
+          break;
+
+        case 'ASYM_RUNE':
+          // const assetHash = await this.assetDeposit(pools);
+          try {
+            const runeHash = await this.depositRune(
+              thorClient,
+              this.data.asset
+            );
+            console.log('rune hash is: ', runeHash);
+            this.runeDepositSuccess(runeHash);
+            break;
+          } catch (error) {
+            console.error('error making RUNE transfer: ', error);
+            this.txState = 'RETRY_RUNE_DEPOSIT';
+            this.error = error;
+            return;
+          }
+      }
+    }
+  }
+
+  // async depositAsset(pools: PoolAddressDTO[]): Promise<string> {
+  //   const clients = this.data.user.clients;
+  //   const thorClient = clients.thorchain;
+  //   const thorchainAddress = await thorClient.getAddress();
+  //   let hash = '';
+
+  //   // get token address
+  //   const address = this.userService.getTokenAddress(
+  //     this.data.user,
+  //     this.data.asset.chain
+  //   );
+  //   if (!address || address === '') {
+  //     console.error('no address found');
+  //     return;
+  //   }
+
+  //   // find recipient pool
+  //   const recipientPool = pools.find(
+  //     (pool) => pool.chain === this.data.asset.chain
+  //   );
+  //   if (!recipientPool) {
+  //     console.error('no recipient pool found');
+  //     return;
+  //   }
+
+  //   // Deposit token
+  //   try {
+  //     // deposit using xchain
+  //     switch (this.data.asset.chain) {
+  //       case 'BNB':
+  //         hash = await this.keystoreDepositService.binanceDeposit({
+  //           asset: this.data.asset as Asset,
+  //           inputAmount: this.data.assetAmount,
+  //           client: this.data.user.clients.binance,
+  //           poolType: this.data.poolTypeOption,
+  //           thorchainAddress,
+  //           recipientPool,
+  //         });
+  //         break;
+
+  //       case 'BTC':
+  //         hash = await this.keystoreDepositService.bitcoinDeposit({
+  //           asset: this.data.asset as Asset,
+  //           inputAmount: this.data.assetAmount,
+  //           client: this.data.user.clients.bitcoin,
+  //           balances: this.balances,
+  //           thorchainAddress,
+  //           recipientPool,
+  //           estimatedFee: this.data.estimatedFee,
+  //           poolType: this.data.poolTypeOption,
+  //         });
+  //         break;
+
+  //       case 'LTC':
+  //         hash = await this.keystoreDepositService.litecoinDeposit({
+  //           asset: this.data.asset as Asset,
+  //           inputAmount: this.data.assetAmount,
+  //           client: this.data.user.clients.litecoin,
+  //           balances: this.balances,
+  //           thorchainAddress,
+  //           recipientPool,
+  //           estimatedFee: this.data.estimatedFee,
+  //           poolType: this.data.poolTypeOption,
+  //         });
+  //         break;
+
+  //       case 'BCH':
+  //         hash = await this.keystoreDepositService.bchDeposit({
+  //           asset: this.data.asset as Asset,
+  //           inputAmount: this.data.assetAmount,
+  //           client: this.data.user.clients.bitcoinCash,
+  //           balances: this.balances,
+  //           thorchainAddress,
+  //           recipientPool,
+  //           estimatedFee: this.data.estimatedFee,
+  //           poolType: this.data.poolTypeOption,
+  //         });
+
+  //         break;
+
+  //       case 'ETH':
+  //         hash = await this.keystoreDepositService.ethereumDeposit({
+  //           asset: this.data.asset as Asset,
+  //           inputAmount: this.data.assetAmount,
+  //           balances: this.balances,
+  //           client: this.data.user.clients.ethereum,
+  //           thorchainAddress,
+  //           recipientPool,
+  //           poolType: this.data.poolTypeOption,
+  //         });
+  //         break;
+
+  //       default:
+  //         console.error(`${this.data.asset.chain} does not match`);
+  //         return;
+  //     }
+
+  //     if (hash === '') {
+  //       console.error('no hash set');
+  //       return;
+  //     }
+  //     return hash;
+  //   } catch (error) {
+  //     console.error('error making token transfer: ', error);
+  //     this.txState = TransactionConfirmationState.ERROR;
+  //     this.error = error;
+  //     return;
+  //   }
+  // }
+
+  async metaMaskDepositAsset(pools: PoolAddressDTO[]) {
+    const asset = this.data.asset;
+    if (asset.chain !== 'ETH') {
+      this.txState = TransactionConfirmationState.ERROR;
+      this.error = `Metamask cannot deposit ${asset.chain}`;
+      return;
+    }
+
+    // find recipient pool
+    const recipientPool = pools.find((pool) => pool.chain === 'ETH');
+    if (!recipientPool) {
+      this.txState = TransactionConfirmationState.ERROR;
+      this.error = `Error fetching recipient pool`;
+      return;
+    }
+
+    if (!this.metaMaskProvider) {
+      this.txState = TransactionConfirmationState.ERROR;
+      this.error = `MetaMask Provider not found`;
+      return;
+    }
+
+    const memo = `+:${asset.chain}.${asset.symbol}`;
+    const userAddress = this.data.user.wallet;
+    const signer = this.metaMaskProvider.getSigner();
+
+    try {
+      // const hash = await this.keystoreDepositService.ethereumDeposit({
+      //   asset: this.data.asset as Asset,
+      //   inputAmount: this.data.assetAmount,
+      //   balances: this.balances,
+      //   client: this.data.user.clients.ethereum,
+      //   thorchainAddress,
+      //   recipientPool,
+      //   poolType: this.data.poolTypeOption,
+      // });
+
+      const hash = await this.metaMaskService.callDeposit({
+        ethInboundAddress: recipientPool,
+        asset,
+        input: this.data.assetAmount,
+        memo,
+        userAddress,
+        signer,
+      });
+
+      return hash;
+    } catch (error) {
+      this.txState = TransactionConfirmationState.ERROR;
+      this.error = `Error depositing`;
+    }
+  }
+
+  async keystoreDepositAsset(pools: PoolAddressDTO[]) {
     const clients = this.data.user.clients;
     const thorClient = clients.thorchain;
     const thorchainAddress = await thorClient.getAddress();
@@ -236,79 +503,6 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
       this.txState = 'RETRY_RUNE_DEPOSIT';
       this.error = error;
       return;
-    }
-  }
-
-  async deposit(pools: PoolAddressDTO[]) {
-    const clients = this.data.user.clients;
-    const thorClient = clients.thorchain;
-    let assetHash = '';
-
-    switch (this.data.poolTypeOption) {
-      case 'SYM':
-        try {
-          assetHash = await this.depositAsset(pools);
-          console.log('asset hash is: ', assetHash);
-        } catch (error) {
-          console.error('error making token transfer: ', error);
-          this.txState = TransactionConfirmationState.ERROR;
-          this.error = error;
-          return;
-        }
-
-        if (!assetHash || assetHash.length <= 0) {
-          this.assetDepositError('Deposit Unsuccessful');
-          return;
-        }
-
-        this.assetDepositSuccess(this.data.asset, assetHash);
-
-        try {
-          const runeHash = await this.depositRune(thorClient, this.data.asset);
-          console.log('rune hash is: ', runeHash);
-          this.runeDepositSuccess(runeHash);
-        } catch (error) {
-          console.error('error making RUNE transfer: ', error);
-          this.txState = 'RETRY_RUNE_DEPOSIT';
-          this.error = error;
-          return;
-        }
-        break;
-
-      case 'ASYM_ASSET':
-        try {
-          assetHash = await this.depositAsset(pools);
-          this.hash = assetHash;
-
-          if (!assetHash || assetHash.length <= 0) {
-            this.assetDepositError('Deposit Unsuccessful');
-            return;
-          }
-
-          console.log('asset hash is: ', assetHash);
-          this.assetDepositSuccess(this.data.asset, assetHash);
-          this.txState = TransactionConfirmationState.SUCCESS;
-        } catch (error) {
-          console.error('error making token transfer: ', error);
-          this.txState = TransactionConfirmationState.ERROR;
-          this.error = error;
-          return;
-        }
-        break;
-
-      case 'ASYM_RUNE':
-        // const assetHash = await this.assetDeposit(pools);
-        try {
-          const runeHash = await this.depositRune(thorClient, this.data.asset);
-          console.log('rune hash is: ', runeHash);
-          this.runeDepositSuccess(runeHash);
-          break;
-        } catch (error) {
-          console.error('error making RUNE transfer: ', error);
-          this.txState = 'RETRY_RUNE_DEPOSIT';
-          this.error = error;
-          return;
-        }
     }
   }
 

@@ -110,32 +110,36 @@ export class PoolComponent implements OnInit, OnDestroy {
   }
 
   async getAddresses(): Promise<string[]> {
-    const thorClient = this.user.clients.thorchain;
-    const thorAddress = await thorClient.getAddress();
+    if (this.user && this.user.type === 'metamask') {
+      return [this.user.wallet.toLowerCase()];
+    } else {
+      const thorClient = this.user.clients.thorchain;
+      const thorAddress = await thorClient.getAddress();
 
-    const btcClient = this.user.clients.bitcoin;
-    const btcAddress = await btcClient.getAddress();
+      const btcClient = this.user.clients.bitcoin;
+      const btcAddress = await btcClient.getAddress();
 
-    const ltcClient = this.user.clients.litecoin;
-    const ltcAddress = await ltcClient.getAddress();
+      const ltcClient = this.user.clients.litecoin;
+      const ltcAddress = await ltcClient.getAddress();
 
-    const bchClient = this.user.clients.bitcoinCash;
-    const bchAddress = await bchClient.getAddress();
+      const bchClient = this.user.clients.bitcoinCash;
+      const bchAddress = await bchClient.getAddress();
 
-    const bnbClient = this.user.clients.binance;
-    const bnbAddress = await bnbClient.getAddress();
+      const bnbClient = this.user.clients.binance;
+      const bnbAddress = await bnbClient.getAddress();
 
-    const ethClient = this.user.clients.ethereum;
-    const ethAddress = await ethClient.getAddress();
+      const ethClient = this.user.clients.ethereum;
+      const ethAddress = await ethClient.getAddress();
 
-    return [
-      thorAddress,
-      btcAddress,
-      ltcAddress,
-      bchAddress,
-      bnbAddress,
-      ethAddress,
-    ];
+      return [
+        thorAddress,
+        btcAddress,
+        ltcAddress,
+        bchAddress,
+        bnbAddress,
+        ethAddress,
+      ];
+    }
   }
 
   async getAccountPools() {
