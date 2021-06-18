@@ -166,18 +166,24 @@ export class WithdrawComponent implements OnInit {
 
   async getAccountStaked() {
     if (this.user && this.asset) {
-      const thorclient = this.user.clients.thorchain;
-      const chainClient = this.userService.getChainClient(
-        this.user,
-        this.asset.chain
-      );
-      if (!thorclient || !chainClient) {
-        console.error('no client found');
-        return;
-      }
+      let chainAddress: string;
+      let thorAddress: string;
 
-      const thorAddress = thorclient.getAddress();
-      const chainAddress = chainClient.getAddress();
+      if (this.user.type === 'XDEFI' || this.user.type === 'keystore') {
+        const thorclient = this.user.clients.thorchain;
+        const chainClient = this.userService.getChainClient(
+          this.user,
+          this.asset.chain
+        );
+        if (!thorclient || !chainClient) {
+          console.error('no client found');
+          return;
+        }
+        thorAddress = thorclient.getAddress();
+        chainAddress = chainClient.getAddress();
+      } else if (this.user.type === 'metamask') {
+        chainAddress = this.user.wallet.toLowerCase();
+      }
 
       /**
        * Clear Member Pools
@@ -186,36 +192,40 @@ export class WithdrawComponent implements OnInit {
       this.asymRuneMemberPool = null;
       this.asymAssetMemberPool = null;
 
-      /**
-       * Check THOR
-       */
-      try {
-        const member = await this.midgardService
-          .getMember(thorAddress)
-          .toPromise();
-        const thorAssetPools = member.pools.filter(
-          (pool) => pool.pool === assetToString(this.asset)
-        );
+      if (thorAddress && thorAddress.length > 0) {
+        /**
+         * Check THOR
+         */
+        try {
+          const member = await this.midgardService
+            .getMember(thorAddress)
+            .toPromise();
+          const thorAssetPools = member.pools.filter(
+            (pool) => pool.pool === assetToString(this.asset)
+          );
 
-        this.setMemberPools(thorAssetPools);
-      } catch (error) {
-        console.error('error fetching thor pool member data: ', error);
+          this.setMemberPools(thorAssetPools);
+        } catch (error) {
+          console.error('error fetching thor pool member data: ', error);
+        }
       }
 
+      if (chainAddress && chainAddress.length > 0) {
+        try {
+          const member = await this.midgardService
+            .getMember(chainAddress)
+            .toPromise();
+          const assetPools = member.pools.filter(
+            (pool) => pool.pool === assetToString(this.asset)
+          );
+          this.setMemberPools(assetPools);
+        } catch (error) {
+          console.error('error fetching asset pool member data: ', error);
+        }
+      }
       /**
        * Check CHAIN
        */
-      try {
-        const member = await this.midgardService
-          .getMember(chainAddress)
-          .toPromise();
-        const assetPools = member.pools.filter(
-          (pool) => pool.pool === assetToString(this.asset)
-        );
-        this.setMemberPools(assetPools);
-      } catch (error) {
-        console.error('error fetching asset pool member data: ', error);
-      }
 
       this.setWithdrawOptions();
       if (this.withdrawOptions.sym) {

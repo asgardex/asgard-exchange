@@ -63,7 +63,7 @@ export class EthUtilsService {
           wallet
         );
         const tokenDecimals = await tokenContract.decimals();
-        return tokenDecimals.toNumber();
+        return tokenDecimals;
       }
     } else {
       throw new Error('asset chain not ETH');

@@ -301,12 +301,26 @@ export class SwapComponent implements OnInit, OnDestroy {
         if (
           outputAsset &&
           outputAsset.length > 0 &&
-          outputAsset != inputAsset
+          outputAsset !== inputAsset &&
+          (!this.selectedTargetAsset || // no selected target asset
+            (this.selectedTargetAsset && // or if target asset exists
+              assetToString(this.selectedTargetAsset) !== outputAsset)) // set if param doesn't match existing
         ) {
           this.setSelectedTargetAsset(
             new Asset(outputAsset),
             this.selectableTargetMarkets
           );
+          // if (!this.selectedTargetAsset) {
+          //   this.setSelectedTargetAsset(
+          //     new Asset(outputAsset),
+          //     this.selectableTargetMarkets
+          //   );
+          // } else if (assetToString(this.selectedTargetAsset) !== outputAsset) {
+          //   this.setSelectedTargetAsset(
+          //     new Asset(outputAsset),
+          //     this.selectableTargetMarkets
+          //   );
+          // }
         }
       });
 
@@ -360,21 +374,11 @@ export class SwapComponent implements OnInit, OnDestroy {
   }
 
   setTargetAddress() {
-    if (!this.targetAddress || this.targetAddress?.length <= 0) {
-      if (this.selectedTargetAsset && this.user) {
-        this.targetAddress = this.userService.getTokenAddress(
-          this.user,
-          this.selectedTargetAsset.chain
-        );
-      } else {
-        this.targetAddress = '';
-      }
-    } else {
-      this.targetAddress = this.mockClientService
-        .getMockClientByChain(this.selectedTargetAsset.chain)
-        .validateAddress(this.targetAddress)
-        ? this.targetAddress
-        : '';
+    if (this.selectedTargetAsset && this.user) {
+      this.targetAddress = this.userService.getTokenAddress(
+        this.user,
+        this.selectedTargetAsset.chain
+      );
     }
   }
 

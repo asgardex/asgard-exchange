@@ -204,116 +204,6 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
     }
   }
 
-  // async depositAsset(pools: PoolAddressDTO[]): Promise<string> {
-  //   const clients = this.data.user.clients;
-  //   const thorClient = clients.thorchain;
-  //   const thorchainAddress = await thorClient.getAddress();
-  //   let hash = '';
-
-  //   // get token address
-  //   const address = this.userService.getTokenAddress(
-  //     this.data.user,
-  //     this.data.asset.chain
-  //   );
-  //   if (!address || address === '') {
-  //     console.error('no address found');
-  //     return;
-  //   }
-
-  //   // find recipient pool
-  //   const recipientPool = pools.find(
-  //     (pool) => pool.chain === this.data.asset.chain
-  //   );
-  //   if (!recipientPool) {
-  //     console.error('no recipient pool found');
-  //     return;
-  //   }
-
-  //   // Deposit token
-  //   try {
-  //     // deposit using xchain
-  //     switch (this.data.asset.chain) {
-  //       case 'BNB':
-  //         hash = await this.keystoreDepositService.binanceDeposit({
-  //           asset: this.data.asset as Asset,
-  //           inputAmount: this.data.assetAmount,
-  //           client: this.data.user.clients.binance,
-  //           poolType: this.data.poolTypeOption,
-  //           thorchainAddress,
-  //           recipientPool,
-  //         });
-  //         break;
-
-  //       case 'BTC':
-  //         hash = await this.keystoreDepositService.bitcoinDeposit({
-  //           asset: this.data.asset as Asset,
-  //           inputAmount: this.data.assetAmount,
-  //           client: this.data.user.clients.bitcoin,
-  //           balances: this.balances,
-  //           thorchainAddress,
-  //           recipientPool,
-  //           estimatedFee: this.data.estimatedFee,
-  //           poolType: this.data.poolTypeOption,
-  //         });
-  //         break;
-
-  //       case 'LTC':
-  //         hash = await this.keystoreDepositService.litecoinDeposit({
-  //           asset: this.data.asset as Asset,
-  //           inputAmount: this.data.assetAmount,
-  //           client: this.data.user.clients.litecoin,
-  //           balances: this.balances,
-  //           thorchainAddress,
-  //           recipientPool,
-  //           estimatedFee: this.data.estimatedFee,
-  //           poolType: this.data.poolTypeOption,
-  //         });
-  //         break;
-
-  //       case 'BCH':
-  //         hash = await this.keystoreDepositService.bchDeposit({
-  //           asset: this.data.asset as Asset,
-  //           inputAmount: this.data.assetAmount,
-  //           client: this.data.user.clients.bitcoinCash,
-  //           balances: this.balances,
-  //           thorchainAddress,
-  //           recipientPool,
-  //           estimatedFee: this.data.estimatedFee,
-  //           poolType: this.data.poolTypeOption,
-  //         });
-
-  //         break;
-
-  //       case 'ETH':
-  //         hash = await this.keystoreDepositService.ethereumDeposit({
-  //           asset: this.data.asset as Asset,
-  //           inputAmount: this.data.assetAmount,
-  //           balances: this.balances,
-  //           client: this.data.user.clients.ethereum,
-  //           thorchainAddress,
-  //           recipientPool,
-  //           poolType: this.data.poolTypeOption,
-  //         });
-  //         break;
-
-  //       default:
-  //         console.error(`${this.data.asset.chain} does not match`);
-  //         return;
-  //     }
-
-  //     if (hash === '') {
-  //       console.error('no hash set');
-  //       return;
-  //     }
-  //     return hash;
-  //   } catch (error) {
-  //     console.error('error making token transfer: ', error);
-  //     this.txState = TransactionConfirmationState.ERROR;
-  //     this.error = error;
-  //     return;
-  //   }
-  // }
-
   async metaMaskDepositAsset(pools: PoolAddressDTO[]) {
     const asset = this.data.asset;
     if (asset.chain !== 'ETH') {
@@ -341,16 +231,6 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
     const signer = this.metaMaskProvider.getSigner();
 
     try {
-      // const hash = await this.keystoreDepositService.ethereumDeposit({
-      //   asset: this.data.asset as Asset,
-      //   inputAmount: this.data.assetAmount,
-      //   balances: this.balances,
-      //   client: this.data.user.clients.ethereum,
-      //   thorchainAddress,
-      //   recipientPool,
-      //   poolType: this.data.poolTypeOption,
-      // });
-
       const hash = await this.metaMaskService.callDeposit({
         ethInboundAddress: recipientPool,
         asset,
