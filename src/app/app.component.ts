@@ -12,6 +12,7 @@ import { AssetAndBalance } from './_classes/asset-and-balance';
 import { Asset } from './_classes/asset';
 import { ReconnectXDEFIDialogComponent } from './_components/reconnect-xdefi-dialog/reconnect-xdefi-dialog.component';
 import { environment } from 'src/environments/environment';
+import { User } from './_classes/user';
 
 @Component({
   selector: 'app-root',
@@ -24,6 +25,7 @@ export class AppComponent implements OnInit, OnDestroy {
   chainBalanceErrors: Chain[];
   nonNativeRuneAssets: AssetAndBalance[];
   appLocked: boolean;
+  user: User;
 
   constructor(
     private dialog: MatDialog,
@@ -66,7 +68,11 @@ export class AppComponent implements OnInit, OnDestroy {
       }
     });
 
-    this.subs = [chainBalanceErrors$, balances$];
+    const user$ = this.userService.user$.subscribe(
+      (user) => (this.user = user)
+    );
+
+    this.subs = [chainBalanceErrors$, balances$, user$];
   }
 
   async ngOnInit(): Promise<void> {
