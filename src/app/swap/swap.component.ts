@@ -45,6 +45,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MetamaskService } from '../_services/metamask.service';
 import { ethers } from 'ethers';
 import { EthUtilsService } from '../_services/eth-utils.service';
+import { MockClientService } from '../_services/mock-client.service';
 
 export enum SwapType {
   DOUBLE_SWAP = 'double_swap',
@@ -179,7 +180,8 @@ export class SwapComponent implements OnInit, OnDestroy {
     private router: Router,
     private route: ActivatedRoute,
     private metaMaskService: MetamaskService,
-    private ethUtilService: EthUtilsService
+    private ethUtilService: EthUtilsService,
+    private mockClientService: MockClientService
   ) {
     this.ethContractApprovalRequired = false;
     this.haltedChains = [];
@@ -358,17 +360,21 @@ export class SwapComponent implements OnInit, OnDestroy {
   }
 
   setTargetAddress() {
-    if (
-      this.selectedTargetAsset != null &&
-      ((this.user != null &&
-        this.user?.type &&
-        this.user?.type === 'keystore') ||
-        this.user?.type === 'XDEFI')
-    ) {
-      this.targetAddress = this.userService.getTokenAddress(
-        this.user,
-        this.selectedTargetAsset.chain
-      );
+    if (!this.targetAddress || this.targetAddress?.length <= 0) {
+      if (this.selectedTargetAsset && this.user) {
+        this.targetAddress = this.userService.getTokenAddress(
+          this.user,
+          this.selectedTargetAsset.chain
+        );
+      } else {
+        this.targetAddress = '';
+      }
+    } else {
+      this.targetAddress = this.mockClientService
+        .getMockClientByChain(this.selectedTargetAsset.chain)
+        .validateAddress(this.targetAddress)
+        ? this.targetAddress
+        : '';
     }
   }
 
@@ -582,7 +588,10 @@ export class SwapComponent implements OnInit, OnDestroy {
         1.5 *
           this.inboundFees[
             assetToString(getChainAsset(this.selectedSourceAsset.chain))
-          ]
+          ] ||
+      !this.mockClientService
+        .getMockClientByChain(this.selectedTargetAsset.chain)
+        .validateAddress(this.targetAddress)
     );
   }
 
@@ -675,6 +684,15 @@ export class SwapComponent implements OnInit, OnDestroy {
     /** Exceeds slip tolerance set in user settings */
     if (this.slip * 100 > this.slippageTolerance) {
       return 'Slip Limit Exceeded';
+    }
+
+    /** Validate Address */
+    if (
+      !this.mockClientService
+        .getMockClientByChain(this.selectedTargetAsset.chain)
+        .validateAddress(this.targetAddress)
+    ) {
+      return 'Enter Valid Address';
     }
 
     /** Good to go */

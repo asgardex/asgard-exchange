@@ -400,40 +400,48 @@ export class UserService {
   }
 
   getTokenAddress(user: User, chain: Chain): string {
-    const clients: AvailableClients = user.clients;
+    if (user.type === 'metamask') {
+      if (chain === 'ETH') {
+        return user.wallet ?? '';
+      } else {
+        return '';
+      }
+    } else {
+      const clients: AvailableClients = user.clients;
 
-    switch (chain) {
-      case 'BNB':
-        const bnbClient = clients.binance;
-        return bnbClient.getAddress();
+      switch (chain) {
+        case 'BNB':
+          const bnbClient = clients.binance;
+          return bnbClient.getAddress();
 
-      case 'BTC':
-        const btcClient = clients.bitcoin;
-        return btcClient.getAddress();
+        case 'BTC':
+          const btcClient = clients.bitcoin;
+          return btcClient.getAddress();
 
-      case 'BCH':
-        const bchClient = clients.bitcoinCash;
-        const address = bchClient.getAddress();
+        case 'BCH':
+          const bchClient = clients.bitcoinCash;
+          const address = bchClient.getAddress();
 
-        // bch testnet addresses look like bchtest:qpmhkjgp89d8uuyl3je5gw09kgsr5t4ndyj9mzvrcm
-        // the colon interferes with the THORChain memo, and needs to be removed
-        return address.indexOf(':') > 0 ? address.split(':')[1] : address;
+          // bch testnet addresses look like bchtest:qpmhkjgp89d8uuyl3je5gw09kgsr5t4ndyj9mzvrcm
+          // the colon interferes with the THORChain memo, and needs to be removed
+          return address.indexOf(':') > 0 ? address.split(':')[1] : address;
 
-      case 'ETH':
-        const ethClient = clients.ethereum;
-        return ethClient.getAddress();
+        case 'ETH':
+          const ethClient = clients.ethereum;
+          return ethClient.getAddress();
 
-      case 'LTC':
-        const litcoinClient = clients.litecoin;
-        return litcoinClient.getAddress();
+        case 'LTC':
+          const litcoinClient = clients.litecoin;
+          return litcoinClient.getAddress();
 
-      case 'THOR':
-        const thorClient = clients.thorchain;
-        return thorClient.getAddress();
+        case 'THOR':
+          const thorClient = clients.thorchain;
+          return thorClient.getAddress();
 
-      default:
-        console.error(`${chain} does not match getting token address`);
-        return;
+        default:
+          console.error(`${chain} does not match getting token address`);
+          return;
+      }
     }
   }
 
