@@ -46,6 +46,7 @@ import { MetamaskService } from '../_services/metamask.service';
 import { ethers } from 'ethers';
 import { EthUtilsService } from '../_services/eth-utils.service';
 import { MockClientService } from '../_services/mock-client.service';
+import { environment } from 'src/environments/environment';
 
 export enum SwapType {
   DOUBLE_SWAP = 'double_swap',
@@ -168,6 +169,7 @@ export class SwapComponent implements OnInit, OnDestroy {
 
   haltedChains: string[];
   metaMaskProvider?: ethers.providers.Web3Provider;
+  metaMaskNetwork?: 'testnet' | 'mainnet';
 
   constructor(
     private dialog: MatDialog,
@@ -236,6 +238,10 @@ export class SwapComponent implements OnInit, OnDestroy {
       (provider) => (this.metaMaskProvider = provider)
     );
 
+    const metaMaskNetwork$ = this.metaMaskService.metaMaskNetwork$.subscribe(
+      (network) => (this.metaMaskNetwork = network)
+    );
+
     const queue$ = this.networkQueueService.networkQueue$.subscribe(
       (queue) => (this.queue = queue)
     );
@@ -251,6 +257,7 @@ export class SwapComponent implements OnInit, OnDestroy {
       slippageTolerange$,
       queue$,
       metaMaskProvider$,
+      metaMaskNetwork$,
     ];
   }
 
@@ -584,7 +591,9 @@ export class SwapComponent implements OnInit, OnDestroy {
           ] ||
       !this.mockClientService
         .getMockClientByChain(this.selectedTargetAsset.chain)
-        .validateAddress(this.targetAddress)
+        .validateAddress(this.targetAddress) ||
+      (this.user?.type === 'metamask' &&
+        this.metaMaskNetwork !== environment.network)
     );
   }
 
@@ -686,6 +695,13 @@ export class SwapComponent implements OnInit, OnDestroy {
         .validateAddress(this.targetAddress)
     ) {
       return 'Enter Valid Address';
+    }
+
+    if (
+      this.user?.type === 'metamask' &&
+      this.metaMaskNetwork !== environment.network
+    ) {
+      return 'Change MetaMask Network';
     }
 
     /** Good to go */

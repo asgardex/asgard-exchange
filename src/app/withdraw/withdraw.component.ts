@@ -32,6 +32,8 @@ import {
 } from '../_const/pool-type-options';
 import { Balances } from '@xchainjs/xchain-client';
 import { debounceTime } from 'rxjs/operators';
+import { MetamaskService } from '../_services/metamask.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-withdraw',
@@ -86,6 +88,7 @@ export class WithdrawComponent implements OnInit {
   assetBalance: number;
   runeBalance: number;
   balances: Balances;
+  metaMaskNetwork?: 'testnet' | 'mainnet';
 
   constructor(
     private dialog: MatDialog,
@@ -94,7 +97,8 @@ export class WithdrawComponent implements OnInit {
     private lastBlockService: LastBlockService,
     private midgardService: MidgardService,
     private router: Router,
-    private txUtilsService: TransactionUtilsService
+    private txUtilsService: TransactionUtilsService,
+    private metaMaskService: MetamaskService
   ) {
     this.withdrawPercent = 0;
     this.removeAssetAmount = 0;
@@ -113,7 +117,11 @@ export class WithdrawComponent implements OnInit {
       this.checkCooldown();
     });
 
-    this.subs = [user$, lastBlock$];
+    const metaMaskNetwork$ = this.metaMaskService.metaMaskNetwork$.subscribe(
+      (network) => (this.metaMaskNetwork = network)
+    );
+
+    this.subs = [user$, lastBlock$, metaMaskNetwork$];
   }
 
   ngOnInit(): void {
@@ -465,6 +473,13 @@ export class WithdrawComponent implements OnInit {
       return true;
     }
 
+    if (
+      this.user?.type === 'metamask' &&
+      this.metaMaskNetwork !== environment.network
+    ) {
+      return true;
+    }
+
     return false;
   }
 
@@ -515,6 +530,13 @@ export class WithdrawComponent implements OnInit {
       this.runeBalance - this.runeFee < 3
     ) {
       return 'Min 3 RUNE in Wallet Required';
+    }
+
+    if (
+      this.user?.type === 'metamask' &&
+      this.metaMaskNetwork !== environment.network
+    ) {
+      return 'Change MetaMask Network';
     }
 
     /** Good to go */

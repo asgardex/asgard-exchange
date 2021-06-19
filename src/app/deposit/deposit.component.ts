@@ -36,6 +36,7 @@ import {
 import { EthUtilsService } from '../_services/eth-utils.service';
 import { MetamaskService } from '../_services/metamask.service';
 import { ethers } from 'ethers';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-deposit',
@@ -114,6 +115,7 @@ export class DepositComponent implements OnInit, OnDestroy {
     isValid: boolean;
   };
   metaMaskProvider?: ethers.providers.Web3Provider;
+  metaMaskNetwork?: 'testnet' | 'mainnet';
 
   constructor(
     private dialog: MatDialog,
@@ -251,10 +253,19 @@ export class DepositComponent implements OnInit, OnDestroy {
       (provider) => (this.metaMaskProvider = provider)
     );
 
+    const metaMaskNetwork$ = this.metaMaskService.metaMaskNetwork$.subscribe(
+      (network) => (this.metaMaskNetwork = network)
+    );
+
     this.getPools();
     this.getEthRouter();
     this.getPoolCap();
-    this.subs.push(userSub, combinedPoolSub, metaMaskProvider$);
+    this.subs.push(
+      userSub,
+      combinedPoolSub,
+      metaMaskProvider$,
+      metaMaskNetwork$
+    );
   }
 
   /**
@@ -594,6 +605,17 @@ export class DepositComponent implements OnInit, OnDestroy {
     if (this.assetAmount <= this.networkFee * 4) {
       this.formValidation = {
         message: 'Amount too low',
+        isValid: false,
+      };
+      return;
+    }
+
+    if (
+      this.user?.type === 'metamask' &&
+      this.metaMaskNetwork !== environment.network
+    ) {
+      this.formValidation = {
+        message: 'Change MetaMask Network',
         isValid: false,
       };
       return;
