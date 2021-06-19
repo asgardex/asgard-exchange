@@ -18,7 +18,7 @@ import {
 } from '@xchainjs/xchain-util';
 import BigNumber from 'bignumber.js';
 import { combineLatest, Subscription } from 'rxjs';
-import { Asset } from '../_classes/asset';
+import { Asset, assetIsChainAsset } from '../_classes/asset';
 import { MemberPool } from '../_classes/member';
 import { User } from '../_classes/user';
 import { LastBlockService } from '../_services/last-block.service';
@@ -445,6 +445,7 @@ export class WithdrawComponent implements OnInit {
      */
     if (
       this.withdrawType === 'ASYM_ASSET' &&
+      assetIsChainAsset(this.asset) &&
       this.assetBalance < this.networkFee
     ) {
       return true;
@@ -503,6 +504,7 @@ export class WithdrawComponent implements OnInit {
 
     if (
       this.withdrawType === 'ASYM_ASSET' &&
+      assetIsChainAsset(this.asset) &&
       this.assetBalance < this.networkFee
     ) {
       return 'Insufficient Balance';

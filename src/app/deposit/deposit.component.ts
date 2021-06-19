@@ -12,7 +12,12 @@ import {
   assetToString,
 } from '@xchainjs/xchain-util';
 import { combineLatest, Subscription } from 'rxjs';
-import { Asset, getChainAsset, isNonNativeRuneToken } from '../_classes/asset';
+import {
+  Asset,
+  getChainAsset,
+  isNonNativeRuneToken,
+  assetIsChainAsset,
+} from '../_classes/asset';
 import { MidgardService } from '../_services/midgard.service';
 import { UserService } from '../_services/user.service';
 import { MatDialog } from '@angular/material/dialog';
@@ -613,7 +618,9 @@ export class DepositComponent implements OnInit, OnDestroy {
     if (
       this.poolType === 'ASYM_ASSET' &&
       this.assetAmount &&
-      this.assetAmount + this.networkFee * 3 <= this.assetBalance
+      (assetIsChainAsset(this.asset)
+        ? this.assetAmount + this.networkFee * 3 <= this.assetBalance
+        : this.assetAmount <= this.assetBalance)
     ) {
       this.formValidation = {
         message: 'Deposit',

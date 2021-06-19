@@ -5,6 +5,7 @@ import { Subscription } from 'rxjs';
 import { AssetAndBalance } from 'src/app/_classes/asset-and-balance';
 import { PoolDTO } from 'src/app/_classes/pool';
 import { User } from 'src/app/_classes/user';
+import { MetamaskService } from 'src/app/_services/metamask.service';
 import { MidgardService } from 'src/app/_services/midgard.service';
 import { TransactionStatusService } from 'src/app/_services/transaction-status.service';
 import { UserService } from 'src/app/_services/user.service';
@@ -51,7 +52,8 @@ export class UserSettingsDialogComponent implements OnInit, OnDestroy {
     private txStatusService: TransactionStatusService,
     private midgardService: MidgardService,
     private transactionStatusService: TransactionStatusService,
-    public dialogRef: MatDialogRef<UserSettingsDialogComponent>
+    public dialogRef: MatDialogRef<UserSettingsDialogComponent>,
+    private metaMaskService: MetamaskService
   ) {
     this.pools = [];
     this.pendingTxCount = 0;
@@ -120,7 +122,6 @@ export class UserSettingsDialogComponent implements OnInit, OnDestroy {
   confirmUpgradeRune(p: { amount: number }) {
     this.amountToSend = p.amount;
     this.mode = 'CONFIRM_UPGRADE_RUNE';
-    console.log(this.mode);
   }
 
   clearSelectedAsset() {
@@ -140,6 +141,7 @@ export class UserSettingsDialogComponent implements OnInit, OnDestroy {
   disconnect() {
     localStorage.clear();
     this.userService.setUser(null);
+    this.metaMaskService.setProvider(null);
     this.transactionStatusService.clearPendingTransactions();
     this.dialogRef.close();
   }

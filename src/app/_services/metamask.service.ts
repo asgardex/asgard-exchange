@@ -1,11 +1,10 @@
 import { Injectable } from '@angular/core';
 import { assetAmount, assetToBase, baseAmount } from '@xchainjs/xchain-util';
 import { ethers } from 'ethers';
-import { ReplaySubject } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { erc20ABI } from '../_abi/erc20.abi';
 import { Asset } from '../_classes/asset';
 import { PoolAddressDTO } from '../_classes/pool-address';
-// import { erc20ABI } from '../_abi/erc20.abi';
 import { UserService } from './user.service';
 import { ETH_DECIMAL, getTokenAddress } from '@xchainjs/xchain-ethereum';
 import { TCAbi } from '../_abi/thorchain.abi';
@@ -31,7 +30,7 @@ window.ethereum = window.ethereum || {};
   providedIn: 'root',
 })
 export class MetamaskService {
-  private _provider = new ReplaySubject<ethers.providers.Web3Provider>();
+  private _provider = new BehaviorSubject<ethers.providers.Web3Provider>(null);
   provider$ = this._provider.asObservable();
 
   constructor(private userService: UserService) {
@@ -40,13 +39,12 @@ export class MetamaskService {
         this.handleAccountsChanged(a, this._provider)
       );
       this.init();
-      console.log('this provider is: ', this._provider);
     }
   }
 
   handleAccountsChanged(
     accounts: any,
-    provider: ReplaySubject<ethers.providers.Web3Provider>
+    provider: BehaviorSubject<ethers.providers.Web3Provider>
   ) {
     const ethProvider = new ethers.providers.Web3Provider(window.ethereum);
     console.log('mm provider is: ', provider);
@@ -124,13 +122,21 @@ export class MetamaskService {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const lastLoginType = localStorage.getItem('lastLoginType');
     if (provider && lastLoginType === 'metamask') {
-      this._provider.next(provider);
+      this.setProvider(provider);
     } else {
-      this._provider.next(null);
+      this.setProvider(null);
     }
   }
 
+  setProvider(provider?: ethers.providers.Web3Provider) {
+    this._provider.next(provider);
+  }
+
   async connect() {
-    return await window.ethereum.enable();
+    const enable = await window.ethereum.enable();
+    if (enable instanceof Array && enable.length > 0) {
+      this.handleAccountsChanged(enable, this._provider);
+    }
+    return enable;
   }
 }

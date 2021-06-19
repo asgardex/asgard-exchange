@@ -304,23 +304,12 @@ export class SwapComponent implements OnInit, OnDestroy {
           outputAsset !== inputAsset &&
           (!this.selectedTargetAsset || // no selected target asset
             (this.selectedTargetAsset && // or if target asset exists
-              assetToString(this.selectedTargetAsset) !== outputAsset)) // set if param doesn't match existing
+              assetToString(this.selectedTargetAsset) !== outputAsset)) // but param doesn't match existing
         ) {
           this.setSelectedTargetAsset(
             new Asset(outputAsset),
             this.selectableTargetMarkets
           );
-          // if (!this.selectedTargetAsset) {
-          //   this.setSelectedTargetAsset(
-          //     new Asset(outputAsset),
-          //     this.selectableTargetMarkets
-          //   );
-          // } else if (assetToString(this.selectedTargetAsset) !== outputAsset) {
-          //   this.setSelectedTargetAsset(
-          //     new Asset(outputAsset),
-          //     this.selectableTargetMarkets
-          //   );
-          // }
         }
       });
 

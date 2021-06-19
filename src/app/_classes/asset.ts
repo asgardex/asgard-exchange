@@ -1,5 +1,5 @@
 import { CoinIconsFromTrustWallet } from 'src/app/_const/icon-list';
-import { Chain } from '@xchainjs/xchain-util';
+import { assetToString, Chain } from '@xchainjs/xchain-util';
 import { ethers } from 'ethers';
 
 export class Asset {
@@ -147,4 +147,8 @@ export const getChainAsset = (chain: Chain): Asset => {
     default:
       return null;
   }
+};
+
+export const assetIsChainAsset = (asset: Asset): boolean => {
+  return assetToString(getChainAsset(asset.chain)) === assetToString(asset);
 };
