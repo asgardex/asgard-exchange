@@ -1,11 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { connected } from 'process';
 import { User } from 'src/app/_classes/user';
 import { MetamaskService } from 'src/app/_services/metamask.service';
 import { UserService } from 'src/app/_services/user.service';
 import { environment } from 'src/environments/environment';
-// import { Web3Provider } from 'ethers';
 import { ethers } from 'ethers';
 import { combineLatest, Subscription } from 'rxjs';
 
@@ -36,13 +34,10 @@ export class ConnectComponent implements OnInit, OnDestroy {
     const metaMaskProvider$ = this.metaMaskService.provider$;
     const combined = combineLatest([user$, metaMaskProvider$]);
     const subs = combined.subscribe(async ([_user, _metaMaskProvider]) => {
-      console.log('hello world... sub provider is: ', _metaMaskProvider);
       if (_metaMaskProvider) {
         const accounts = await _metaMaskProvider.listAccounts();
         if (accounts.length > 0 && !_user) {
           const signer = _metaMaskProvider.getSigner();
-          console.log('signer is: ', signer);
-          // this._signer.next(signer);
           const address = await signer.getAddress();
           const user = new User({
             type: 'metamask',
