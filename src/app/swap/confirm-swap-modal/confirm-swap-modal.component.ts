@@ -18,13 +18,15 @@ import {
   baseAmount,
   assetToBase,
   assetAmount,
-  Asset,
   assetToString,
 } from '@xchainjs/xchain-util';
 import { Balances } from '@xchainjs/xchain-client';
+import { MetamaskService } from 'src/app/_services/metamask.service';
+import { Asset } from 'src/app/_classes/asset';
+import { ethers } from 'ethers';
 
 export interface SwapData {
-  sourceAsset;
+  sourceAsset: Asset;
   targetAsset;
   basePrice: number;
   inputValue: number;
@@ -51,6 +53,7 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
   insufficientChainBalance: boolean;
   estimatedMinutes: number;
   balances: Balances;
+  metaMaskProvider: ethers.providers.Web3Provider;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public swapData: SwapData,
@@ -59,7 +62,8 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
     private txStatusService: TransactionStatusService,
     private userService: UserService,
     private slipLimitService: SlippageToleranceService,
-    private ethUtilsService: EthUtilsService
+    private ethUtilsService: EthUtilsService,
+    private metaMaskService: MetamaskService
   ) {
     this.txState = TransactionConfirmationState.PENDING_CONFIRMATION;
     this.insufficientChainBalance = false;
@@ -70,11 +74,15 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
       }
     });
 
+    const metaMaskProvider$ = this.metaMaskService.provider$.subscribe(
+      (provider) => (this.metaMaskProvider = provider)
+    );
+
     const balances$ = this.userService.userBalances$.subscribe(
       (balances) => (this.balances = balances)
     );
 
-    this.subs = [user$, balances$];
+    this.subs = [user$, balances$, metaMaskProvider$];
   }
 
   ngOnInit() {
@@ -122,12 +130,16 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
           );
 
           if (matchingPool) {
+            const userType = this.swapData.user.type;
+
             if (
-              this.swapData.user.type === 'keystore' ||
-              this.swapData.user.type === 'ledger' ||
-              this.swapData.user.type === 'XDEFI'
+              userType === 'keystore' ||
+              userType === 'ledger' ||
+              userType === 'XDEFI'
             ) {
               this.keystoreTransfer(matchingPool);
+            } else if (userType === 'metamask') {
+              this.metaMaskTransfer(matchingPool);
             } else {
               console.log('no error type matches');
             }
@@ -154,6 +166,46 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
     }
 
     return client.validateAddress(this.swapData.targetAddress);
+  }
+
+  async metaMaskTransfer(matchingPool?: PoolAddressDTO) {
+    try {
+      const floor = this.slipLimitService.getSlipLimitFromAmount(
+        this.swapData.outputValue
+      );
+
+      const memo = this.getSwapMemo(
+        this.swapData.targetAsset.chain,
+        this.swapData.targetAsset.symbol,
+        this.swapData.targetAddress,
+        Math.floor(floor.toNumber())
+      );
+
+      const userAddress = this.swapData.user.wallet;
+
+      if (!this.metaMaskProvider) {
+        console.error('no metaMask provider');
+        return;
+      }
+
+      const signer = this.metaMaskProvider.getSigner();
+      const hash = await this.metaMaskService.callDeposit({
+        ethInboundAddress: matchingPool,
+        asset: this.swapData.sourceAsset,
+        memo,
+        userAddress,
+        signer,
+        input: this.swapData.inputValue,
+      });
+
+      this.hash = hash.substr(2);
+      this.pushTxStatus(hash, this.swapData.sourceAsset);
+      this.txState = TransactionConfirmationState.SUCCESS;
+    } catch (error) {
+      console.log('error is: ', error);
+      this.error = 'ETH transaction failed.';
+      this.txState = TransactionConfirmationState.ERROR;
+    }
   }
 
   async keystoreTransfer(matchingPool?: PoolAddressDTO) {

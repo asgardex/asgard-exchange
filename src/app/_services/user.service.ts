@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AvailableClients, User } from '../_classes/user';
+import { AvailableClients, User, WalletType } from '../_classes/user';
 import { Client as BinanceClient } from '@thorchain/asgardex-binance';
 import { environment } from 'src/environments/environment';
 import { Asset, checkSummedAsset } from '../_classes/asset';
@@ -23,9 +23,8 @@ import BigNumber from 'bignumber.js';
 import { PoolAddressDTO } from '../_classes/pool-address';
 import { TransactionUtilsService } from './transaction-utils.service';
 import { TxType } from '../_const/tx-type';
-import { ETH_DECIMAL } from '@xchainjs/xchain-ethereum';
+import { ETH_DECIMAL, Client as EthClient } from '@xchainjs/xchain-ethereum';
 import { HaskoinService } from './haskoin.service';
-import { BTC_DECIMAL } from '@xchainjs/xchain-bitcoin';
 
 export interface MidgardData<T> {
   key: string;
@@ -69,6 +68,7 @@ export class UserService {
   setUser(user: User) {
     this._user = user;
     this.userSource.next(user);
+    this.setLastLoginType(user?.type);
     if (user) {
       this.fetchBalances();
     } else {
@@ -81,16 +81,39 @@ export class UserService {
     this._chainBalanceErrors = [];
     this.chainBalanceErrorsSource.next([]);
 
-    if (this._user && this._user.clients) {
+    // Keystore / XDEFI
+    if (
+      this._user &&
+      this._user.clients &&
+      (this._user.type === 'XDEFI' || this._user.type === 'keystore')
+    ) {
       for (const [key, _value] of Object.entries(this._user.clients)) {
         if (key === 'binance') {
           this.getBinanceBalances();
         } else if (key === 'ethereum') {
-          this.getEthereumBalances();
+          const client = this._user.clients.ethereum;
+          const address = client.getAddress();
+          this.getEthereumBalances(client, address);
         } else {
           this.getGeneralBalance(key);
         }
       }
+
+      // MetaMask
+    } else if (this._user && this._user.type === 'metamask') {
+      // mock client to fetch balances
+      const network = environment.network === 'testnet' ? 'testnet' : 'mainnet';
+      const MOCK_PHRASE =
+        'image rally need wedding health address purse army antenna leopard sea gain';
+      const phrase = MOCK_PHRASE;
+      const userEthereumClient = new EthClient({
+        network,
+        phrase,
+        etherscanApiKey: environment.etherscanKey,
+        infuraCreds: { projectId: environment.infuraProjectId },
+      });
+
+      this.getEthereumBalances(userEthereumClient, this._user.wallet);
     }
   }
 
@@ -158,14 +181,11 @@ export class UserService {
     }
   }
 
-  async getEthereumBalances() {
+  async getEthereumBalances(client: EthClient, address: string) {
     try {
-      const client = this._user.clients.ethereum;
-
       // ETH
       const provider = client.getProvider();
-      const ethAddress = client.getAddress();
-      const ethBalance = await provider.getBalance(ethAddress);
+      const ethBalance = await provider.getBalance(address);
       this.pushBalances([
         {
           asset: new Asset('ETH.ETH'),
@@ -206,13 +226,13 @@ export class UserService {
        * Check localstorage for user-added tokens
        */
       const userAddedTokens: string[] =
-        JSON.parse(localStorage.getItem(`${ethAddress}_user_added`)) || [];
+        JSON.parse(localStorage.getItem(`${address}_user_added`)) || [];
       for (const token of userAddedTokens) {
         const tokenAsset = checkSummedAsset(token);
         assetsToQuery.push(tokenAsset);
       }
 
-      const tokenBalances = await client.getBalance(ethAddress, assetsToQuery);
+      const tokenBalances = await client.getBalance(address, assetsToQuery);
       this.pushBalances(tokenBalances);
     } catch (error) {
       console.error(error);
@@ -380,40 +400,48 @@ export class UserService {
   }
 
   getTokenAddress(user: User, chain: Chain): string {
-    const clients: AvailableClients = user.clients;
+    if (user.type === 'metamask') {
+      if (chain === 'ETH') {
+        return user.wallet ?? '';
+      } else {
+        return '';
+      }
+    } else {
+      const clients: AvailableClients = user.clients;
 
-    switch (chain) {
-      case 'BNB':
-        const bnbClient = clients.binance;
-        return bnbClient.getAddress();
+      switch (chain) {
+        case 'BNB':
+          const bnbClient = clients.binance;
+          return bnbClient.getAddress();
 
-      case 'BTC':
-        const btcClient = clients.bitcoin;
-        return btcClient.getAddress();
+        case 'BTC':
+          const btcClient = clients.bitcoin;
+          return btcClient.getAddress();
 
-      case 'BCH':
-        const bchClient = clients.bitcoinCash;
-        const address = bchClient.getAddress();
+        case 'BCH':
+          const bchClient = clients.bitcoinCash;
+          const address = bchClient.getAddress();
 
-        // bch testnet addresses look like bchtest:qpmhkjgp89d8uuyl3je5gw09kgsr5t4ndyj9mzvrcm
-        // the colon interferes with the THORChain memo, and needs to be removed
-        return address.indexOf(':') > 0 ? address.split(':')[1] : address;
+          // bch testnet addresses look like bchtest:qpmhkjgp89d8uuyl3je5gw09kgsr5t4ndyj9mzvrcm
+          // the colon interferes with the THORChain memo, and needs to be removed
+          return address.indexOf(':') > 0 ? address.split(':')[1] : address;
 
-      case 'ETH':
-        const ethClient = clients.ethereum;
-        return ethClient.getAddress();
+        case 'ETH':
+          const ethClient = clients.ethereum;
+          return ethClient.getAddress();
 
-      case 'LTC':
-        const litcoinClient = clients.litecoin;
-        return litcoinClient.getAddress();
+        case 'LTC':
+          const litcoinClient = clients.litecoin;
+          return litcoinClient.getAddress();
 
-      case 'THOR':
-        const thorClient = clients.thorchain;
-        return thorClient.getAddress();
+        case 'THOR':
+          const thorClient = clients.thorchain;
+          return thorClient.getAddress();
 
-      default:
-        console.error(`${chain} does not match getting token address`);
-        return;
+        default:
+          console.error(`${chain} does not match getting token address`);
+          return;
+      }
     }
   }
 
@@ -439,5 +467,39 @@ export class UserService {
     }
 
     throw new Error(`no matching client for chain: ${chain}`);
+  }
+
+  setLastLoginType(walletType: WalletType) {
+    localStorage.setItem('lastLoginType', walletType ?? '');
+  }
+
+  getLastLoginType(): string {
+    return localStorage.getItem('lastLoginType');
+  }
+
+  filterAvailableSourceChains({
+    userType,
+    assets,
+  }: {
+    userType?: WalletType;
+    assets: AssetAndBalance[];
+  }): AssetAndBalance[] {
+    switch (userType) {
+      case 'metamask':
+        return assets.filter((pool) => pool.asset.chain === 'ETH');
+
+      case 'XDEFI':
+      case 'keystore':
+      default:
+        return assets.filter(
+          (pool) =>
+            pool.asset.chain === 'BNB' ||
+            pool.asset.chain === 'THOR' ||
+            pool.asset.chain === 'BTC' ||
+            pool.asset.chain === 'ETH' ||
+            pool.asset.chain === 'LTC' ||
+            pool.asset.chain === 'BCH'
+        );
+    }
   }
 }

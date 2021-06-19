@@ -1,19 +1,13 @@
 import { Injectable } from '@angular/core';
 import { get } from 'lodash';
 import { environment } from 'src/environments/environment';
-import { Client as binanceClient } from '@xchainjs/xchain-binance';
-import { Client as bitcoinClient } from '@xchainjs/xchain-bitcoin';
-import { Client as thorchainClient } from '@xchainjs/xchain-thorchain';
 import {
   ApproveParams,
-  Client as ethereumClient,
   estimateDefaultFeesWithGasPricesAndLimits,
   ETHAddress,
   getTokenAddress,
   TxOverrides,
 } from '@xchainjs/xchain-ethereum/lib';
-import { Client as litecoinClient } from '@xchainjs/xchain-litecoin';
-import { Client as bitcoinCashClient } from '@xchainjs/xchain-bitcoincash';
 import { User } from '../_classes/user';
 import { BigNumber } from '@ethersproject/bignumber';
 import { ethers } from 'ethers';
@@ -22,6 +16,7 @@ import { AssetETH, assetToString } from '@xchainjs/xchain-util';
 import { toUtf8Bytes } from '@ethersproject/strings';
 import { Address } from '@xchainjs/xchain-client';
 import { hexlify } from '@ethersproject/bytes';
+import { MockClientService } from './mock-client.service';
 
 @Injectable({
   providedIn: 'root',
@@ -60,7 +55,7 @@ export class XDEFIService {
       enabled: true,
     },
   ];
-  constructor() {}
+  constructor(private mockClientService: MockClientService) {}
 
   isValidNetwork() {
     const invalidNetworkProvider = XDEFIService.listProvider.find(
@@ -198,26 +193,12 @@ export class XDEFIService {
   }
 
   async connectXDEFI() {
-    const network = environment.network === 'testnet' ? 'testnet' : 'mainnet';
-    const MOCK_PHRASE =
-      'image rally need wedding health address purse army antenna leopard sea gain';
-    const phrase = MOCK_PHRASE;
-    const userBinanceClient = new binanceClient({ network, phrase });
-    const userBtcClient = new bitcoinClient({
-      network,
-      phrase,
-      sochainUrl: 'https://sochain.com/api/v2',
-      blockstreamUrl: 'https://blockstream.info',
-    });
-    const userThorchainClient = new thorchainClient({ network, phrase });
-    const userEthereumClient = new ethereumClient({
-      network,
-      phrase,
-      etherscanApiKey: environment.etherscanKey,
-      infuraCreds: { projectId: environment.infuraProjectId },
-    });
-    const userLtcClient = new litecoinClient({ network, phrase });
-    const userbchClient = new bitcoinCashClient({ network, phrase });
+    const userBinanceClient = this.mockClientService.mockBinanceClient;
+    const userBtcClient = this.mockClientService.mockBtcClient;
+    const userThorchainClient = this.mockClientService.mockThorchainClient;
+    const userEthereumClient = this.mockClientService.mockEthereumClient;
+    const userLtcClient = this.mockClientService.mockLtcClient;
+    const userbchClient = this.mockClientService.mockBchClient;
     const [thorAddress] = await Promise.all([
       this.getThorChainAddress(),
       new Promise((resolve) => setTimeout(resolve, 100)),

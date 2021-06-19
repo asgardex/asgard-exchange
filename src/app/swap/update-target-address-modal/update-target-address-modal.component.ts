@@ -2,6 +2,7 @@ import { Component, Output, EventEmitter, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Chain } from '@xchainjs/xchain-util';
 import { User } from 'src/app/_classes/user';
+import { MockClientService } from 'src/app/_services/mock-client.service';
 import { UserService } from 'src/app/_services/user.service';
 
 @Component({
@@ -17,6 +18,7 @@ export class UpdateTargetAddressModalComponent {
 
   constructor(
     private userService: UserService,
+    private mockClientService: MockClientService,
     @Inject(MAT_DIALOG_DATA)
     public data: {
       chain: Chain;
@@ -32,16 +34,11 @@ export class UpdateTargetAddressModalComponent {
   }
 
   updateAddress() {
-    if (!this.user?.clients) {
-      return;
-    }
-
-    const client = this.userService.getChainClient(this.user, this.chain);
-    if (!client) {
-      return;
-    }
-
-    if (!client.validateAddress(this.targetAddress)) {
+    if (
+      !this.mockClientService
+        .getMockClientByChain(this.chain)
+        .validateAddress(this.targetAddress)
+    ) {
       return;
     }
 
@@ -49,16 +46,15 @@ export class UpdateTargetAddressModalComponent {
   }
 
   formDisabled(): boolean {
-    if (!this.user?.clients) {
+    if (!this.user) {
       return true;
     }
 
-    const client = this.userService.getChainClient(this.user, this.chain);
-    if (!client) {
-      return true;
-    }
-
-    if (!client.validateAddress(this.targetAddress)) {
+    if (
+      !this.mockClientService
+        .getMockClientByChain(this.chain)
+        .validateAddress(this.targetAddress)
+    ) {
       return true;
     }
 
@@ -66,16 +62,15 @@ export class UpdateTargetAddressModalComponent {
   }
 
   updateAddressBtnText() {
-    if (!this.user?.clients) {
+    if (!this.user) {
       return 'No User found';
     }
 
-    const client = this.userService.getChainClient(this.user, this.chain);
-    if (!client) {
-      return `No ${this.chain} Client Found`;
-    }
-
-    if (!client.validateAddress(this.targetAddress)) {
+    if (
+      !this.mockClientService
+        .getMockClientByChain(this.chain)
+        .validateAddress(this.targetAddress)
+    ) {
       return `Invalid ${this.chain} Address`;
     }
 

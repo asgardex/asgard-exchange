@@ -20,6 +20,11 @@
           <span class="ml-1" *ngIf="!isXDEFIConnected">Install XDEFI</span>
         </button>
 
+        <button class="connect-option focus:outline-none pl-3 flex items-center w-full h-14 hover:bg-gray-600 hover:bg-opacity-25" (click)="connectMetaMask()">
+          <img class="connect-option__logo" src="https://raw.githubusercontent.com/MetaMask/metamask-extension/develop/app/images/icon-64.png" />
+          <span class="ml-4">MetaMask</span>
+        </button>
+
         <button class="connect-option focus:outline-none pl-3 flex items-center w-full h-14 hover:bg-gray-600 hover:bg-opacity-25" (click)="createKeystore()">
           <mat-icon class="connect-option__logo">add</mat-icon>
           <span class="ml-4">Create Keystore</span>

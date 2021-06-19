@@ -42,6 +42,11 @@ import {
 } from 'rxjs/operators';
 import { UpdateTargetAddressModalComponent } from './update-target-address-modal/update-target-address-modal.component';
 import { ActivatedRoute, Router } from '@angular/router';
+import { MetamaskService } from '../_services/metamask.service';
+import { ethers } from 'ethers';
+import { EthUtilsService } from '../_services/eth-utils.service';
+import { MockClientService } from '../_services/mock-client.service';
+import { environment } from 'src/environments/environment';
 
 export enum SwapType {
   DOUBLE_SWAP = 'double_swap',
@@ -138,7 +143,8 @@ export class SwapComponent implements OnInit, OnDestroy {
   calculatingTargetAsset: boolean;
   poolDetailTargetError: boolean;
   poolDetailSourceError: boolean;
-  selectableMarkets: AssetAndBalance[];
+  selectableSourceMarkets: AssetAndBalance[] = [];
+  selectableTargetMarkets: AssetAndBalance[] = [];
 
   inboundFees: { [key: string]: number } = {};
 
@@ -162,6 +168,8 @@ export class SwapComponent implements OnInit, OnDestroy {
   sourceChainBalance: number;
 
   haltedChains: string[];
+  metaMaskProvider?: ethers.providers.Web3Provider;
+  metaMaskNetwork?: 'testnet' | 'mainnet';
 
   constructor(
     private dialog: MatDialog,
@@ -172,7 +180,10 @@ export class SwapComponent implements OnInit, OnDestroy {
     private txUtilsService: TransactionUtilsService,
     private networkQueueService: NetworkQueueService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private metaMaskService: MetamaskService,
+    private ethUtilService: EthUtilsService,
+    private mockClientService: MockClientService
   ) {
     this.ethContractApprovalRequired = false;
     this.haltedChains = [];
@@ -210,7 +221,26 @@ export class SwapComponent implements OnInit, OnDestroy {
     const user$ = this.userService.user$.subscribe(async (user) => {
       this.user = user;
       this.setTargetAddress();
+      if (this.user && this.user.type === 'metamask') {
+        this.router.navigate(['/', 'swap', 'ETH.ETH', 'BTC.BTC']);
+      }
+
+      if (
+        this.selectedSourceAsset &&
+        this.selectedSourceAsset.chain === 'ETH' &&
+        this.selectedSourceAsset.ticker !== 'ETH'
+      ) {
+        this.checkContractApproved();
+      }
     });
+
+    const metaMaskProvider$ = this.metaMaskService.provider$.subscribe(
+      (provider) => (this.metaMaskProvider = provider)
+    );
+
+    const metaMaskNetwork$ = this.metaMaskService.metaMaskNetwork$.subscribe(
+      (network) => (this.metaMaskNetwork = network)
+    );
 
     const queue$ = this.networkQueueService.networkQueue$.subscribe(
       (queue) => (this.queue = queue)
@@ -221,7 +251,14 @@ export class SwapComponent implements OnInit, OnDestroy {
         (limit) => (this.slippageTolerance = limit)
       );
 
-    this.subs = [balances$, user$, slippageTolerange$, queue$];
+    this.subs = [
+      balances$,
+      user$,
+      slippageTolerange$,
+      queue$,
+      metaMaskProvider$,
+      metaMaskNetwork$,
+    ];
   }
 
   ngOnInit(): void {
@@ -255,20 +292,30 @@ export class SwapComponent implements OnInit, OnDestroy {
         this.setNetworkFees();
 
         const inputAsset = params.get('inputAsset');
-        this.setSelectedSourceAsset(
-          new Asset(inputAsset),
-          this.selectableMarkets
-        );
+
+        if (
+          !this.selectedSourceAsset || // no input asset
+          (this.selectedSourceAsset && // or asset
+            assetToString(this.selectedSourceAsset) !== inputAsset) // does not match input param
+        ) {
+          this.setSelectedSourceAsset(
+            new Asset(inputAsset),
+            this.selectableSourceMarkets
+          );
+        }
 
         const outputAsset = params.get('outputAsset');
         if (
           outputAsset &&
           outputAsset.length > 0 &&
-          outputAsset != inputAsset
+          outputAsset !== inputAsset &&
+          (!this.selectedTargetAsset || // no selected target asset
+            (this.selectedTargetAsset && // or if target asset exists
+              assetToString(this.selectedTargetAsset) !== outputAsset)) // but param doesn't match existing
         ) {
           this.setSelectedTargetAsset(
             new Asset(outputAsset),
-            this.selectableMarkets
+            this.selectableTargetMarkets
           );
         }
       });
@@ -323,13 +370,7 @@ export class SwapComponent implements OnInit, OnDestroy {
   }
 
   setTargetAddress() {
-    if (
-      this.selectedTargetAsset != null &&
-      ((this.user != null &&
-        this.user?.type &&
-        this.user?.type === 'keystore') ||
-        this.user?.type === 'XDEFI')
-    ) {
+    if (this.selectedTargetAsset && this.user) {
       this.targetAddress = this.userService.getTokenAddress(
         this.user,
         this.selectedTargetAsset.chain
@@ -446,32 +487,40 @@ export class SwapComponent implements OnInit, OnDestroy {
 
   setSelectableMarkets() {
     if (!this.availablePools) {
-      this.selectableMarkets = [];
+      this.selectableSourceMarkets = [];
+      this.selectableTargetMarkets = [];
     } else {
-      this.selectableMarkets = this.availablePools
+      const availablePools = this.availablePools
         .sort((a, b) => a.asset.localeCompare(b.asset))
         .map((pool) => ({
           asset: new Asset(pool.asset),
           assetPriceUSD: +pool.assetPriceUSD,
-        }))
-        // filter out until we can add support
-        .filter(
-          (pool) =>
-            pool.asset.chain === 'BNB' ||
-            pool.asset.chain === 'THOR' ||
-            pool.asset.chain === 'BTC' ||
-            pool.asset.chain === 'ETH' ||
-            pool.asset.chain === 'LTC' ||
-            pool.asset.chain === 'BCH'
-        );
+        }));
 
-      // Keeping RUNE at top by default
-      this.selectableMarkets.unshift({
+      this.selectableSourceMarkets =
+        this.userService.filterAvailableSourceChains({
+          userType: this.user?.type,
+          assets: availablePools,
+        });
+
+      this.selectableTargetMarkets = availablePools;
+      const runeMarket = {
         asset: new Asset('THOR.RUNE'),
         assetPriceUSD: this.thorchainPricesService.estimateRunePrice(
           this.availablePools
         ),
-      });
+      };
+
+      this.selectableTargetMarkets.unshift(runeMarket);
+
+      if (
+        this.user?.type === 'XDEFI' ||
+        this.user?.type === 'keystore' ||
+        !this.user
+      ) {
+        // Keeping RUNE at top by default
+        this.selectableSourceMarkets.unshift(runeMarket);
+      }
     }
   }
 
@@ -481,10 +530,20 @@ export class SwapComponent implements OnInit, OnDestroy {
         this.selectedSourceAsset.ticker.length + 1
       );
       const strip0x = assetAddress.substr(2);
-      const isApproved = await this.user.clients.ethereum.isApproved(
-        this.ethInboundAddress.router,
+      const provider =
+        this.user.type === 'keystore' || this.user.type === 'XDEFI'
+          ? this.user.clients.ethereum.getProvider()
+          : this.metaMaskProvider;
+      const userAddress =
+        this.user.type === 'keystore' || this.user.type === 'XDEFI'
+          ? this.user.clients.ethereum.getAddress()
+          : await this.metaMaskProvider.getSigner().getAddress();
+
+      const isApproved = await this.ethUtilService.isApproved(
+        provider,
         strip0x,
-        baseAmount(1)
+        this.ethInboundAddress.router,
+        userAddress
       );
       this.ethContractApprovalRequired = !isApproved;
     }
@@ -529,7 +588,12 @@ export class SwapComponent implements OnInit, OnDestroy {
         1.5 *
           this.inboundFees[
             assetToString(getChainAsset(this.selectedSourceAsset.chain))
-          ]
+          ] ||
+      !this.mockClientService
+        .getMockClientByChain(this.selectedTargetAsset.chain)
+        .validateAddress(this.targetAddress) ||
+      (this.user?.type === 'metamask' &&
+        this.metaMaskNetwork !== environment.network)
     );
   }
 
@@ -624,6 +688,22 @@ export class SwapComponent implements OnInit, OnDestroy {
       return 'Slip Limit Exceeded';
     }
 
+    /** Validate Address */
+    if (
+      !this.mockClientService
+        .getMockClientByChain(this.selectedTargetAsset.chain)
+        .validateAddress(this.targetAddress)
+    ) {
+      return 'Enter Valid Address';
+    }
+
+    if (
+      this.user?.type === 'metamask' &&
+      this.metaMaskNetwork !== environment.network
+    ) {
+      return 'Change MetaMask Network';
+    }
+
     /** Good to go */
     if (
       this.user &&
@@ -710,6 +790,15 @@ export class SwapComponent implements OnInit, OnDestroy {
         assetToString(this.selectedSourceAsset),
       ]);
     }
+  }
+
+  reverseTransactionDisabled(): boolean {
+    return (
+      !this.selectedSourceAsset ||
+      !this.selectedTargetAsset ||
+      (this.user?.type === 'metamask' &&
+        this.selectedTargetAsset?.chain !== 'ETH')
+    );
   }
 
   /**

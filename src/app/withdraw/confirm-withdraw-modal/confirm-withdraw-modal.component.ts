@@ -15,6 +15,8 @@ import { Asset } from 'src/app/_classes/asset';
 import { PoolTypeOption } from 'src/app/_const/pool-type-options';
 import { TransactionUtilsService } from 'src/app/_services/transaction-utils.service';
 import { MidgardService } from 'src/app/_services/midgard.service';
+import { MetamaskService } from 'src/app/_services/metamask.service';
+import { ethers } from 'ethers';
 
 // TODO: this is the same as ConfirmStakeData in confirm stake modal
 export interface ConfirmWithdrawData {
@@ -41,6 +43,7 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
   error: string;
   estimatedMinutes: number;
   rune = new Asset('THOR.RUNE');
+  metaMaskProvider?: ethers.providers.Web3Provider;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: ConfirmWithdrawData,
@@ -49,7 +52,8 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
     private txUtilsService: TransactionUtilsService,
     private userService: UserService,
     private ethUtilsService: EthUtilsService,
-    private midgardService: MidgardService
+    private midgardService: MidgardService,
+    private metaMaskService: MetamaskService
   ) {
     this.txState = TransactionConfirmationState.PENDING_CONFIRMATION;
     const user$ = this.userService.user$.subscribe((user) => {
@@ -58,7 +62,11 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
       }
     });
 
-    this.subs = [user$];
+    const metaMaskProvider$ = this.metaMaskService.provider$.subscribe(
+      (provider) => (this.metaMaskProvider = provider)
+    );
+
+    this.subs = [user$, metaMaskProvider$];
   }
 
   ngOnInit(): void {
@@ -85,11 +93,16 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
     const memo = `WITHDRAW:${this.data.asset.chain}.${this.data.asset.symbol}:${
       this.data.unstakePercent * 100
     }`;
+    const user = this.data.user;
 
-    if (this.data.withdrawType === 'ASYM_ASSET') {
-      this.assetWithdraw(memo);
-    } else {
-      this.runeWithdraw(memo);
+    if (user?.type === 'XDEFI' || user?.type === 'keystore') {
+      if (this.data.withdrawType === 'ASYM_ASSET') {
+        this.keystoreAssetWithdraw(memo);
+      } else {
+        this.runeWithdraw(memo);
+      }
+    } else if (user?.type === 'metamask') {
+      this.metaMaskAssetWithdraw(memo);
     }
   }
 
@@ -117,7 +130,59 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
     }
   }
 
-  async assetWithdraw(memo: string) {
+  async metaMaskAssetWithdraw(memo: string) {
+    const asset = this.data.asset;
+    const inboundAddresses = await this.midgardService
+      .getInboundAddresses()
+      .toPromise();
+    if (!inboundAddresses) {
+      console.error('no inbound addresses found');
+      this.error = 'No Inbound Addresses Found. Please try again later.';
+      this.txState = TransactionConfirmationState.ERROR;
+      return;
+    }
+
+    const matchingInboundAddress = inboundAddresses.find(
+      (inbound) => inbound.chain === asset.chain
+    );
+    if (!matchingInboundAddress) {
+      console.error('no matching inbound addresses found');
+      this.error = 'No Matching Inbound Address Found. Please try again later.';
+      this.txState = TransactionConfirmationState.ERROR;
+      return;
+    }
+
+    if (!this.metaMaskProvider) {
+      this.error = 'No MetaMask Provider found.';
+      this.txState = TransactionConfirmationState.ERROR;
+      return;
+    }
+
+    try {
+      const hash = await this.metaMaskService.callDeposit({
+        ethInboundAddress: matchingInboundAddress,
+        asset: new Asset('ETH.ETH'),
+        input: 0.00000001,
+        memo,
+        userAddress: this.data.user.wallet,
+        signer: this.metaMaskProvider.getSigner(),
+      });
+
+      if (hash.length > 0) {
+        this.txSuccess(this.ethUtilsService.strip0x(hash));
+      } else {
+        console.error('hash empty');
+        this.error = 'Error withdrawing, hash is empty. Please try again later';
+        this.txState = TransactionConfirmationState.ERROR;
+      }
+    } catch (error) {
+      console.error(error);
+      this.error = 'Error withdrawing. Please try again later';
+      this.txState = TransactionConfirmationState.ERROR;
+    }
+  }
+
+  async keystoreAssetWithdraw(memo: string) {
     try {
       const asset = this.data.asset;
 

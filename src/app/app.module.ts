@@ -52,6 +52,8 @@ import { TransactionUtilsService } from './_services/transaction-utils.service';
 import { KeystoreDepositService } from './_services/keystore-deposit.service';
 import { NetworkQueueService } from './_services/network-queue.service';
 import { ThorchainRpcService } from './_services/thorchain-rpc.service';
+import { MockClientService } from './_services/mock-client.service';
+import { MetamaskService } from './_services/metamask.service';
 
 /** MATERIAL */
 import { MatButtonModule } from '@angular/material/button';
@@ -158,6 +160,8 @@ import { KeystoreCreateStorePhraseComponent } from './_components/connect/keysto
     KeystoreDepositService,
     NetworkQueueService,
     ThorchainRpcService,
+    MetamaskService,
+    MockClientService,
   ],
   bootstrap: [AppComponent],
 })

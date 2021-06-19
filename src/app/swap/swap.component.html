@@ -9,12 +9,12 @@
       [(assetUnit)]="sourceAssetUnit"
       [balance]="sourceBalance"
       [disabledAssetSymbol]="selectedTargetAsset ? selectedTargetAsset.symbol : null"
-      [selectableMarkets]="selectableMarkets">
+      [selectableMarkets]="selectableSourceMarkets">
     </app-asset-input>
 
     <div class="flex justify-between items-center float-right">
-      <button class="reverse-transaction" (click)="reverseTransaction()" [disabled]="!selectedSourceAsset || !selectedTargetAsset">
-        <mat-icon [class.disabled]="!selectedSourceAsset || !selectedTargetAsset" class="to-btn-icon text-xl">swap_vert</mat-icon>
+      <button class="reverse-transaction" (click)="reverseTransaction()" [disabled]="reverseTransactionDisabled()">
+        <mat-icon [class.disabled]="reverseTransactionDisabled()" class="to-btn-icon text-xl">swap_vert</mat-icon>
       </button>
     </div>
 
@@ -29,7 +29,7 @@
       [loading]="calculatingTargetAsset"
       [hideMax]="true"
       [error]="poolDetailTargetError || poolDetailSourceError"
-      [selectableMarkets]="selectableMarkets">
+      [selectableMarkets]="selectableTargetMarkets">
     </app-asset-input>
 
     <div>
