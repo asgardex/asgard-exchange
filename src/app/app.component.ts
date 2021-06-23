@@ -74,22 +74,24 @@ export class AppComponent implements OnInit, OnDestroy {
       (user) => (this.user = user)
     );
 
-    const metaMaskProvider$ = this.metaMaskService.provider$.subscribe(async (_metaMaskProvider) => {
-      if (_metaMaskProvider) {
-        const accounts = await _metaMaskProvider.listAccounts();
-        if (accounts.length > 0 && this.user) {
-          const signer = _metaMaskProvider.getSigner();
-          const address = await signer.getAddress();
-          const user = new User({
-            type: 'metamask',
-            wallet: address,
-          });
-          this.userService.setUser(user);
+    const metaMaskProvider$ = this.metaMaskService.provider$.subscribe(
+      async (_metaMaskProvider) => {
+        if (_metaMaskProvider) {
+          const accounts = await _metaMaskProvider.listAccounts();
+          if (accounts.length > 0 && this.user) {
+            const signer = _metaMaskProvider.getSigner();
+            const address = await signer.getAddress();
+            const user = new User({
+              type: 'metamask',
+              wallet: address,
+            });
+            this.userService.setUser(user);
+          }
+        } else {
+          console.log('metamask provider is null');
         }
-      } else {
-        console.log('metamask provider is null');
       }
-    });
+    );
 
     this.subs = [chainBalanceErrors$, balances$, user$, metaMaskProvider$];
   }

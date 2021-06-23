@@ -539,21 +539,21 @@ export class XDEFIService {
       });
     };
     userThorchainClient.transfer = async (transferParams) => {
-      console.log("userThorchainClient.transfer", transferParams);
+      console.log('userThorchainClient.transfer', transferParams);
       return new Promise((resolve, reject) => {
         (window as any).xfi.thorchain.request(
           {
-            method: "transfer",
+            method: 'transfer',
             params: [
               {
                 ...transferParams,
                 from: thorAddress,
                 amount: {
                   amount: transferParams.amount.amount().toString(),
-                  decimals: transferParams.amount.decimal
-                }
-              }
-            ]
+                  decimals: transferParams.amount.decimal,
+                },
+              },
+            ],
           },
           (err, result) => {
             if (err) {
@@ -561,9 +561,9 @@ export class XDEFIService {
             }
             return resolve(result);
           }
-        )
-      })
-    }
+        );
+      });
+    };
     // Ltc
     userLtcClient.transfer = async (transferParams) => {
       console.log('userLtcClient.transfer', transferParams);
