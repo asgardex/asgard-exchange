@@ -13,6 +13,7 @@ import { Asset } from './_classes/asset';
 import { ReconnectXDEFIDialogComponent } from './_components/reconnect-xdefi-dialog/reconnect-xdefi-dialog.component';
 import { environment } from 'src/environments/environment';
 import { User } from './_classes/user';
+import { MetamaskService } from './_services/metamask.service';
 
 @Component({
   selector: 'app-root',
@@ -31,7 +32,8 @@ export class AppComponent implements OnInit, OnDestroy {
     private dialog: MatDialog,
     private midgardService: MidgardService,
     private lastBlockService: LastBlockService,
-    private userService: UserService
+    private userService: UserService,
+    private metaMaskService: MetamaskService
   ) {
     this.appLocked = environment.appLocked ?? false;
 
@@ -72,7 +74,24 @@ export class AppComponent implements OnInit, OnDestroy {
       (user) => (this.user = user)
     );
 
-    this.subs = [chainBalanceErrors$, balances$, user$];
+    const metaMaskProvider$ = this.metaMaskService.provider$.subscribe(async (_metaMaskProvider) => {
+      if (_metaMaskProvider) {
+        const accounts = await _metaMaskProvider.listAccounts();
+        if (accounts.length > 0 && this.user) {
+          const signer = _metaMaskProvider.getSigner();
+          const address = await signer.getAddress();
+          const user = new User({
+            type: 'metamask',
+            wallet: address,
+          });
+          this.userService.setUser(user);
+        }
+      } else {
+        console.log('metamask provider is null');
+      }
+    });
+
+    this.subs = [chainBalanceErrors$, balances$, user$, metaMaskProvider$];
   }
 
   async ngOnInit(): Promise<void> {
