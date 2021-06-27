@@ -89,6 +89,7 @@ export class WithdrawComponent implements OnInit {
   runeBalance: number;
   balances: Balances;
   metaMaskNetwork?: 'testnet' | 'mainnet';
+  poolStatus?: string;
 
   constructor(
     private dialog: MatDialog,
@@ -459,6 +460,16 @@ export class WithdrawComponent implements OnInit {
       return true;
     }
 
+    /** Still fetching pool details */
+    if (!this.poolStatus) {
+      return true;
+    }
+
+    /** Pool is not Available */
+    if (this.poolStatus !== 'available') {
+      return true;
+    }
+
     /**
      * Check SYM or ASYM RUNE sufficient RUNE
      */
@@ -501,6 +512,16 @@ export class WithdrawComponent implements OnInit {
     /** No asset amount set */
     if (this.removeAssetAmount <= 0 && this.removeRuneAmount <= 0) {
       return 'Enter an Amount';
+    }
+
+    /** Still fetching pool details */
+    if (!this.poolStatus) {
+      return 'Loading';
+    }
+
+    /** Pool is not Available */
+    if (this.poolStatus !== 'available') {
+      return `Pool ${this.poolStatus}`;
     }
 
     /**
@@ -584,6 +605,7 @@ export class WithdrawComponent implements OnInit {
             runeBalance: baseAmount(res.runeDepth),
           };
           this.poolUnits = +res.units;
+          this.poolStatus = res.status;
 
           this.runeBasePrice = getValueOfAssetInRune(
             assetToBase(assetAmount(1)),
