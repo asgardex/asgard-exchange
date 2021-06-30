@@ -11,15 +11,15 @@ import {
   baseAmount,
   bn,
 } from '@xchainjs/xchain-util';
-import { combineLatest, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { Asset, isNonNativeRuneToken } from '../_classes/asset';
 import { AssetAndBalance } from '../_classes/asset-and-balance';
 import { LiquidityProvider } from '../_classes/liquidity-provider';
+import { PoolDTO } from '../_classes/pool';
 import { PoolAddressDTO } from '../_classes/pool-address';
 import { User } from '../_classes/user';
 import { MarketsModalComponent } from '../_components/markets-modal/markets-modal.component';
 import { TransactionConfirmationState } from '../_const/transaction-confirmation-state';
-import { KeystoreDepositService } from '../_services/keystore-deposit.service';
 import { MidgardService } from '../_services/midgard.service';
 import { NetworkQueueService } from '../_services/network-queue.service';
 import {
@@ -57,6 +57,11 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
   depositsDisabled: boolean;
   runeBalance: number;
   outboundTransactionFee: number;
+  pool?: PoolDTO;
+  formValidation: {
+    message: string;
+    isValid: boolean;
+  };
 
   constructor(
     private route: ActivatedRoute,
@@ -64,7 +69,6 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
     private midgardService: MidgardService,
     private userService: UserService,
     private dialog: MatDialog,
-    private keystoreDepositService: KeystoreDepositService,
     private txUtilsService: TransactionUtilsService,
     private txStatusService: TransactionStatusService,
     private networkQueueService: NetworkQueueService
@@ -73,9 +77,15 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
     this.rune = new Asset('THOR.RUNE');
     this.depositsDisabled = false;
     this.txState = TransactionConfirmationState.PENDING_CONFIRMATION;
+    this.formValidation = {
+      message: 'Loading',
+      isValid: false,
+    };
+
     const balances$ = this.userService.userBalances$.subscribe((balances) => {
       this.balances = balances;
       this.runeBalance = this.userService.findBalance(balances, this.rune);
+      this.validate();
     });
 
     const queue$ = this.networkQueueService.networkQueue$.subscribe(
@@ -87,6 +97,7 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
       if (this.searchingAsset && !this.missingAsset) {
         this.searchLiquidityProviders(this.searchingAsset);
       }
+      this.validate();
     });
 
     this.subs = [balances$, user$, queue$];
@@ -94,7 +105,6 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.getPools();
-    this.getPoolCap();
     this.getConstants();
 
     const params$ = this.route.paramMap.subscribe((params) => {
@@ -104,6 +114,8 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
         this.searchingAsset = new Asset(asset);
         this.searchLiquidityProviders(this.searchingAsset);
       }
+
+      this.validate();
     });
 
     this.subs.push(params$);
@@ -127,6 +139,8 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
       (res) => {
         this.selectableMarkets = res
           .sort((a, b) => a.asset.localeCompare(b.asset))
+          .filter((pool) => pool.status === 'available')
+          .filter((pool) => +pool.runeDepth > 0)
           .map((pool) => ({
             asset: new Asset(pool.asset),
             assetPriceUSD: +pool.assetPriceUSD,
@@ -143,6 +157,8 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
 
           // filter out non-native RUNE tokens
           .filter((pool) => !isNonNativeRuneToken(pool.asset));
+
+        this.validate();
       },
       (err) => console.error('error fetching pools:', err)
     );
@@ -188,19 +204,21 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
     if (matches && poolData) {
       this.updateRuneAmount(matches[0].pending_asset, poolData);
     }
+
+    this.validate();
   }
 
   async getPoolData(
     asset: Asset
   ): Promise<{ assetBalance: BaseAmount; runeBalance: BaseAmount }> {
     try {
-      const pool = await this.midgardService
+      this.pool = await this.midgardService
         .getPool(assetToString(asset))
         .toPromise();
 
       const poolData = {
-        assetBalance: baseAmount(pool.assetDepth),
-        runeBalance: baseAmount(pool.runeDepth),
+        assetBalance: baseAmount(this.pool.assetDepth),
+        runeBalance: baseAmount(this.pool.runeDepth),
       };
 
       this.missingAssetBalance = this.userService.findBalance(
@@ -212,7 +230,7 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
         this.missingAsset,
         this.inboundAddresses,
         'OUTBOUND',
-        pool
+        this.pool
       );
 
       return poolData;
@@ -285,146 +303,51 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
     }
   }
 
-  getPoolCap() {
-    const mimir$ = this.midgardService.getMimir();
-    const network$ = this.midgardService.getNetwork();
-    const combined = combineLatest([mimir$, network$]);
-    const sub = combined.subscribe(([mimir, network]) => {
-      // prettier-ignore
-      const totalPooledRune = +network.totalPooledRune / (10 ** 8);
-
-      if (mimir && mimir['mimir//MAXIMUMLIQUIDITYRUNE']) {
-        // prettier-ignore
-        const maxLiquidityRune = mimir['mimir//MAXIMUMLIQUIDITYRUNE'] / (10 ** 8);
-        this.depositsDisabled = totalPooledRune / maxLiquidityRune >= 0.9;
-      }
-    });
-
-    this.subs.push(sub);
-  }
-
-  submitDisabled(): boolean {
-    /** Wallet not connected */
+  validate() {
     if (!this.balances) {
-      return true;
+      this.formValidation = {
+        message: 'Please Connect Wallet',
+        isValid: false,
+      };
+      return;
     }
 
-    /** User either lacks asset balance or RUNE balance */
-    if (this.balances && !this.missingAssetAmount) {
-      return true;
+    if (!this.runeBalance || this.runeBalance < 0.2) {
+      this.formValidation = {
+        message: 'Insufficient RUNE',
+        isValid: false,
+      };
+      return;
     }
 
-    if (!this.missingAsset) {
-      return true;
+    if (!this.pool) {
+      this.formValidation = {
+        message: 'Loading',
+        isValid: false,
+      };
+      return;
     }
 
-    if (!this.missingAssetBalance) {
-      return true;
+    if (this.pool && this.pool.status !== 'available') {
+      this.formValidation = {
+        message: `Pool ${this.pool.status}`,
+        isValid: false,
+      };
+      return;
     }
 
-    if (this.depositsDisabled) {
-      return true;
+    if (this.pool && +this.pool.runeDepth <= 0) {
+      this.formValidation = {
+        message: `Pool Empty`,
+        isValid: false,
+      };
+      return;
     }
 
-    if (this.runeBalance < 3) {
-      return true;
-    }
-
-    if (
-      this.missingAsset.chain === 'BNB' &&
-      this.userService.findBalance(this.balances, new Asset('BNB.BNB')) <
-        0.000375
-    ) {
-      return true;
-    }
-
-    if (!this.inboundAddresses) {
-      return true;
-    }
-
-    /** tx amount is higher than spendable amount */
-    if (
-      this.missingAssetAmount >
-      this.userService.maximumSpendableBalance(
-        this.missingAsset,
-        this.missingAssetBalance,
-        this.inboundAddresses
-      )
-    ) {
-      return true;
-    }
-
-    // /** Amount is too low, considered "dusting" */
-    if (
-      this.missingAssetAmount <=
-      this.userService.minimumSpendable(this.missingAsset)
-    ) {
-      return true;
-    }
-
-    return false;
-  }
-
-  mainButtonText(): string {
-    /** Wallet not connected */
-    if (!this.balances) {
-      return 'Please connect wallet';
-    }
-
-    /** User either lacks asset balance or RUNE balance */
-    if (this.balances && !this.missingAssetAmount) {
-      return 'Enter an amount';
-    }
-
-    if (!this.missingAsset) {
-      return 'No missing Asset';
-    }
-
-    if (this.depositsDisabled) {
-      return 'Pool Cap > 90%';
-    }
-
-    if (!this.missingAssetBalance) {
-      return 'Insufficient Balance';
-    }
-
-    if (this.runeBalance < 3) {
-      return 'Min 3 RUNE in Wallet Required';
-    }
-
-    if (
-      this.missingAsset.chain === 'BNB' &&
-      this.userService.findBalance(this.balances, new Asset('BNB.BNB')) <
-        0.000375
-    ) {
-      return 'Insufficient BNB';
-    }
-
-    if (!this.inboundAddresses) {
-      return 'Loading';
-    }
-
-    /** tx amount is higher than spendable amount */
-    if (
-      this.missingAssetAmount >
-      this.userService.maximumSpendableBalance(
-        this.missingAsset,
-        this.missingAssetBalance,
-        this.inboundAddresses
-      )
-    ) {
-      return 'Insufficient balance';
-    }
-
-    // /** Amount is too low, considered "dusting" */
-    if (
-      this.missingAssetAmount <=
-      this.userService.minimumSpendable(this.missingAsset)
-    ) {
-      return 'Amount too low';
-    }
-
-    return `Resubmit ${this.missingAsset.chain}.${this.missingAsset.ticker}`;
+    this.formValidation = {
+      message: `Withdraw All`,
+      isValid: true,
+    };
   }
 
   updateRuneAmount(
@@ -438,122 +361,6 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
           .amount()
           .div(10 ** 8)
           .toNumber();
-  }
-
-  async submitDeposit() {
-    this.txState = TransactionConfirmationState.SUBMITTING;
-    this.error = null;
-
-    try {
-      const inboundAddresses = await this.midgardService
-        .getInboundAddresses()
-        .toPromise();
-      const thorchainAddress = this.user.clients.thorchain.getAddress();
-      // find recipient pool
-      const recipientPool = inboundAddresses.find(
-        (pool) => pool.chain === this.searchingAsset.chain
-      );
-
-      if (!recipientPool) {
-        console.error('no recipient pool found');
-        this.error = 'no recipeint pool found';
-        this.txState = TransactionConfirmationState.PENDING_CONFIRMATION;
-      }
-
-      let hash = '';
-
-      switch (this.missingAsset.chain) {
-        case 'BTC':
-          hash = await this.keystoreDepositService.bitcoinDeposit({
-            asset: this.missingAsset,
-            inputAmount: this.missingAssetAmount,
-            client: this.user.clients.bitcoin,
-            balances: this.balances,
-            thorchainAddress,
-            recipientPool,
-            estimatedFee: this.networkFee,
-            poolType: 'SYM',
-          });
-          break;
-
-        case 'BNB':
-          hash = await this.keystoreDepositService.binanceDeposit({
-            asset: this.missingAsset,
-            inputAmount: this.missingAssetAmount,
-            client: this.user.clients.binance,
-            thorchainAddress,
-            recipientPool,
-            poolType: 'SYM',
-          });
-          break;
-
-        case 'LTC':
-          hash = await this.keystoreDepositService.litecoinDeposit({
-            asset: this.missingAsset,
-            inputAmount: this.missingAssetAmount,
-            client: this.user.clients.litecoin,
-            balances: this.balances,
-            thorchainAddress,
-            recipientPool,
-            estimatedFee: this.networkFee,
-            poolType: 'SYM',
-          });
-          break;
-
-        case 'BCH':
-          hash = await this.keystoreDepositService.bchDeposit({
-            asset: this.missingAsset,
-            inputAmount: this.missingAssetAmount,
-            client: this.user.clients.bitcoinCash,
-            balances: this.balances,
-            thorchainAddress,
-            recipientPool,
-            estimatedFee: this.networkFee,
-            poolType: 'SYM',
-          });
-          break;
-
-        case 'ETH':
-          hash = await this.keystoreDepositService.ethereumDeposit({
-            asset: this.missingAsset,
-            inputAmount: this.missingAssetAmount,
-            balances: this.balances,
-            client: this.user.clients.ethereum,
-            thorchainAddress,
-            recipientPool,
-            poolType: 'SYM',
-          });
-          break;
-
-        case 'THOR':
-          const address = this.userService.getTokenAddress(
-            this.user,
-            this.searchingAsset.chain
-          );
-          hash = await this.keystoreDepositService.runeDeposit({
-            client: this.user.clients.thorchain,
-            inputAmount: this.missingAssetAmount,
-            memo: `+:${this.searchingAsset.chain}.${this.searchingAsset.symbol}:${address}`,
-          });
-          break;
-      }
-
-      this.txStatusService.addTransaction({
-        chain: this.missingAsset.chain,
-        hash,
-        ticker: `${this.missingAsset.ticker}-RUNE`,
-        status: TxStatus.PENDING,
-        action: TxActions.DEPOSIT,
-        symbol: this.missingAsset.symbol,
-        isThorchainTx: true,
-      });
-
-      this.txState = TransactionConfirmationState.SUCCESS;
-    } catch (error) {
-      console.error('error depositing: ', error);
-      this.txState = TransactionConfirmationState.PENDING_CONFIRMATION;
-      this.error = error;
-    }
   }
 
   async withdrawPendingDeposit() {
