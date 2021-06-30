@@ -478,6 +478,10 @@ export class DepositComponent implements OnInit, OnDestroy {
       (res) => {
         this.selectableMarkets = res
           .sort((a, b) => a.asset.localeCompare(b.asset))
+          // only allow available
+          .filter((pool) => pool.status === 'available')
+          // pool must not be empty
+          .filter((pool) => +pool.runeDepth > 0)
           .map((pool) => ({
             asset: new Asset(pool.asset),
             assetPriceUSD: +pool.assetPriceUSD,
@@ -589,10 +593,19 @@ export class DepositComponent implements OnInit, OnDestroy {
       return;
     }
 
+    /** Pool is empty/abandoned, no RUNE depth */
+    if (this.assetPoolData.runeBalance.amount().toNumber() <= 0) {
+      this.formValidation = {
+        message: `Pool Empty`,
+        isValid: false,
+      };
+      return;
+    }
+
     /** Amount is too low, considered "dusting" */
     if (this.assetAmount <= this.userService.minimumSpendable(this.asset)) {
       this.formValidation = {
-        message: '!! Amount too low',
+        message: 'Amount too low',
         isValid: false,
       };
       return;
