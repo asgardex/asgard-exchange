@@ -14,58 +14,7 @@ export class Asset {
     this.symbol = symbol;
     this.ticker = ticker;
 
-    const trustWalletMatch = CoinIconsFromTrustWallet[this.ticker];
-
-    if (trustWalletMatch && chain !== 'THOR') {
-      this.iconPath = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/${trustWalletMatch}/logo.png`;
-    } else {
-      // Override token icons when not found in trustwallet
-
-      switch (chain) {
-        case 'BTC':
-          this.iconPath =
-            'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/BTCB-1DE/logo.png';
-          break;
-
-        case 'LTC':
-          this.iconPath =
-            'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/litecoin/info/logo.png';
-          break;
-
-        case 'BNB':
-          if (ticker === 'BNB') {
-            this.iconPath =
-              'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/info/logo.png';
-          }
-          break;
-
-        case 'ETH':
-          if (this.symbol !== 'ETH') {
-            // for ETH tokens
-            this.iconPath = this._setEthIconPath(symbol, ticker);
-          }
-          break;
-
-        case 'THOR':
-          this.iconPath = 'assets/images/token-icons/thorchain-logo.png';
-          break;
-
-        case 'BCH':
-          this.iconPath =
-            'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/bitcoincash/info/logo.png';
-          break;
-
-        default:
-          break;
-      }
-    }
-  }
-
-  private _setEthIconPath(assetSymbol: string, assetTicker: string): string {
-    const assetAddress = assetSymbol.slice(assetTicker.length + 1);
-    const strip0x = assetAddress.substr(2);
-    const checkSummedAddress = ethers.utils.getAddress(strip0x);
-    return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${checkSummedAddress}/logo.png`;
+    this.iconPath = getAssetIconPath({ chain, symbol, ticker });
   }
 
   private _getAssetFromString(poolName: string): {
@@ -91,6 +40,61 @@ export class Asset {
     return { chain, symbol, ticker };
   }
 }
+
+const _setEthIconPath = (assetSymbol: string, assetTicker: string): string => {
+  const assetAddress = assetSymbol.slice(assetTicker.length + 1);
+  const strip0x = assetAddress.substr(2);
+  const checkSummedAddress = ethers.utils.getAddress(strip0x);
+  return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${checkSummedAddress}/logo.png`;
+};
+
+export const getAssetIconPath = ({
+  chain,
+  ticker,
+  symbol,
+}: {
+  chain: string;
+  ticker: string;
+  symbol: string;
+}): string => {
+  const trustWalletMatch = CoinIconsFromTrustWallet[ticker];
+
+  if (trustWalletMatch && chain !== 'THOR') {
+    return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/${trustWalletMatch}/logo.png`;
+  } else {
+    // Override token icons when not found in trustwallet
+
+    switch (chain) {
+      case 'BTC':
+        return 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/BTCB-1DE/logo.png';
+
+      case 'LTC':
+        return 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/litecoin/info/logo.png';
+
+      case 'BNB':
+        if (ticker === 'BNB') {
+          return 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/info/logo.png';
+        }
+        break;
+
+      case 'ETH':
+        if (symbol !== 'ETH') {
+          // for ETH tokens
+          return _setEthIconPath(symbol, ticker);
+        }
+        break;
+
+      case 'THOR':
+        return 'assets/images/token-icons/thorchain-logo.png';
+
+      case 'BCH':
+        return 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/bitcoincash/info/logo.png';
+
+      default:
+        break;
+    }
+  }
+};
 
 export const checkSummedAsset = (
   poolName: string

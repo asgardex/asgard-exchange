@@ -1,0 +1,9 @@
+<div class="mx-2">
+  <button class="pr-2 pl-1 py-1 items-center flex font-semibold" [class.active]="active" (click)="selectGroup.emit()">
+    <div class="asset-icon-container w-4 flex-shrink-0" style="margin-right: 8px;">
+      <img *ngIf="iconPaths[key]" class="asset-icon" [src]="iconPaths[key]" />
+      <mat-icon *ngIf="!iconPaths[key]">help_outline</mat-icon>
+    </div>
+    {{key}}
+  </button>
+</div>

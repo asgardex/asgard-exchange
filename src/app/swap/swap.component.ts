@@ -19,6 +19,7 @@ import {
   assetToBase,
   assetAmount,
   assetToString,
+  assetFromString,
 } from '@xchainjs/xchain-util';
 import { PoolDetail } from '../_classes/pool-detail';
 import { MidgardService, ThorchainQueue } from '../_services/midgard.service';

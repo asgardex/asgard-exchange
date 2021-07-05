@@ -1,0 +1,9 @@
+button {
+  color: darken(#c3c5cb, 20%);
+
+  &.active {
+    border-radius: 0.75rem;
+    color: white;
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+}
