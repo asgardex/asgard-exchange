@@ -49,40 +49,39 @@ export class AssetsListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.groupedAssets = this.assetListItems.reduce(
-      (groups, assetAndBalance) => {
-        // Group SYNTH assets into THOR
-        if (assetAndBalance.asset.isSynth) {
-          if (!groups['THOR']) {
-            groups['THOR'] = [assetAndBalance];
+    this.groupedAssets = this.assetListItems
+      ? this.assetListItems.reduce((groups, assetAndBalance) => {
+          // Group SYNTH assets into THOR
+          if (assetAndBalance.asset.isSynth) {
+            if (!groups['THOR']) {
+              groups['THOR'] = [assetAndBalance];
+            } else {
+              groups['THOR'].push(assetAndBalance);
+            }
+
+            return groups;
+          }
+
+          // L1 assets
+          if (!groups[assetAndBalance.asset.chain]) {
+            groups[assetAndBalance.asset.chain] = [assetAndBalance];
           } else {
-            groups['THOR'].push(assetAndBalance);
+            groups[assetAndBalance.asset.chain].push(assetAndBalance);
+          }
+
+          // set icon path
+          if (!this.iconPaths[assetAndBalance.asset.chain]) {
+            const chain = assetAndBalance.asset.chain;
+            this.iconPaths[assetAndBalance.asset.chain] = getAssetIconPath({
+              chain,
+              ticker: chain,
+              symbol: chain,
+            });
           }
 
           return groups;
-        }
-
-        // L1 assets
-        if (!groups[assetAndBalance.asset.chain]) {
-          groups[assetAndBalance.asset.chain] = [assetAndBalance];
-        } else {
-          groups[assetAndBalance.asset.chain].push(assetAndBalance);
-        }
-
-        // set icon path
-        if (!this.iconPaths[assetAndBalance.asset.chain]) {
-          const chain = assetAndBalance.asset.chain;
-          this.iconPaths[assetAndBalance.asset.chain] = getAssetIconPath({
-            chain,
-            ticker: chain,
-            symbol: chain,
-          });
-        }
-
-        return groups;
-      },
-      {}
-    );
+        }, {})
+      : {};
 
     this.iconPaths = Object.keys(this.groupedAssets).reduce(
       (iconPaths, key) => {

@@ -48,7 +48,7 @@ export class Asset {
       data = poolName.split('.');
     }
 
-    if (data.length > 0) {
+    if (data && data.length > 0) {
       chain = data[0] as Chain;
       symbol = data[1];
     }
