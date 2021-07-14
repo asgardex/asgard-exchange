@@ -7,37 +7,56 @@ export class Asset {
   symbol: string;
   ticker: string;
   iconPath: string;
+  isSynth: boolean;
 
   constructor(poolName: string) {
-    const { chain, symbol, ticker } = this._getAssetFromString(poolName);
+    const { chain, symbol, ticker, isSynth } =
+      this._getAssetFromString(poolName);
     this.chain = chain;
     this.symbol = symbol;
     this.ticker = ticker;
+    this.isSynth = isSynth;
 
     this.iconPath = getAssetIconPath({ chain, symbol, ticker });
+  }
+
+  getSynth(): Asset {
+    const synth = Object.assign({}, this);
+    synth.isSynth = true;
+    synth.chain = synth.chain.toLowerCase() as Chain;
+    synth.ticker = synth.ticker.toLowerCase();
+    synth.symbol = synth.symbol.toLowerCase();
+    return synth;
   }
 
   private _getAssetFromString(poolName: string): {
     chain: Chain;
     symbol: string;
     ticker: string;
+    isSynth: boolean;
   } {
     let chain: Chain;
     let symbol: string;
     let ticker: string;
+    let data: string[];
+    let isSynth = false;
 
-    const data = poolName.split('.');
-    if (poolName.includes('.')) {
+    if (poolName.includes('/')) {
+      data = poolName.split('/');
+      isSynth = true;
+    } else if (poolName.includes('.')) {
+      data = poolName.split('.');
+    }
+
+    if (data.length > 0) {
       chain = data[0] as Chain;
       symbol = data[1];
-    } else {
-      symbol = data[0];
     }
     if (symbol) {
       ticker = symbol.split('-')[0];
     }
 
-    return { chain, symbol, ticker };
+    return { chain, symbol, ticker, isSynth };
   }
 }
 
@@ -59,12 +78,12 @@ export const getAssetIconPath = ({
 }): string => {
   const trustWalletMatch = CoinIconsFromTrustWallet[ticker];
 
-  if (trustWalletMatch && chain !== 'THOR') {
+  if (trustWalletMatch && chain.toUpperCase() !== 'THOR') {
     return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/${trustWalletMatch}/logo.png`;
   } else {
     // Override token icons when not found in trustwallet
 
-    switch (chain) {
+    switch (chain.toUpperCase()) {
       case 'BTC':
         return 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/BTCB-1DE/logo.png';
 
@@ -78,7 +97,7 @@ export const getAssetIconPath = ({
         break;
 
       case 'ETH':
-        if (symbol !== 'ETH') {
+        if (symbol.toUpperCase() !== 'ETH') {
           // for ETH tokens
           return _setEthIconPath(symbol, ticker);
         }
@@ -128,7 +147,17 @@ export const isNonNativeRuneToken = (asset: {
   return runeTokens.includes(`${asset.chain}.${asset.symbol}`.toUpperCase());
 };
 
-export const getChainAsset = (chain: Chain): Asset => {
+export const getChainAsset = ({
+  chain,
+  isSynth,
+}: {
+  chain: Chain;
+  isSynth: boolean;
+}): Asset => {
+  if (isSynth) {
+    return new Asset('THOR.RUNE');
+  }
+
   switch (chain) {
     case 'BTC':
       return new Asset('BTC.BTC');
@@ -154,5 +183,9 @@ export const getChainAsset = (chain: Chain): Asset => {
 };
 
 export const assetIsChainAsset = (asset: Asset): boolean => {
-  return assetToString(getChainAsset(asset.chain)) === assetToString(asset);
+  return (
+    assetToString(
+      getChainAsset({ chain: asset.chain, isSynth: asset.isSynth })
+    ) === assetToString(asset)
+  );
 };

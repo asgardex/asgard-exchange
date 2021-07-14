@@ -89,7 +89,7 @@ export class TransactionUtilsService {
           // prettier-ignore
           return (multiplier * (+matchingInboundAddress.gas_rate) * 1) / (10 ** 8);
       }
-    } else if (asset.chain === 'THOR') {
+    } else if (asset.chain === 'THOR' || asset.isSynth) {
       return this._outboundTransactionFee ?? 0.2;
     } else {
       console.error('calculateNetworkFee no chain match');

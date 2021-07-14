@@ -51,6 +51,18 @@ export class AssetsListComponent implements OnInit {
   ngOnInit(): void {
     this.groupedAssets = this.assetListItems.reduce(
       (groups, assetAndBalance) => {
+        // Group SYNTH assets into THOR
+        if (assetAndBalance.asset.isSynth) {
+          if (!groups['THOR']) {
+            groups['THOR'] = [assetAndBalance];
+          } else {
+            groups['THOR'].push(assetAndBalance);
+          }
+
+          return groups;
+        }
+
+        // L1 assets
         if (!groups[assetAndBalance.asset.chain]) {
           groups[assetAndBalance.asset.chain] = [assetAndBalance];
         } else {

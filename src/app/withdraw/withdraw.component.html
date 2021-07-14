@@ -35,14 +35,14 @@
       <div *ngIf="asset" class="unstake-calc flex justify-between">
         <span *ngIf="removeAssetAmount">{{removeAssetAmount | number:"0.0-6"}}</span>
         <span *ngIf="!removeAssetAmount">0</span>
-        <app-icon-ticker [iconPath]="asset.iconPath" [ticker]="asset.ticker"></app-icon-ticker>
+        <app-icon-ticker [asset]="asset"></app-icon-ticker>
 
       </div>
 
       <div class="unstake-calc flex justify-between">
         <span *ngIf="removeRuneAmount">{{removeRuneAmount | number:"0.0-6"}}</span>
         <span *ngIf="!removeRuneAmount">0</span>
-        <app-icon-ticker [iconPath]="rune.iconPath" [ticker]="rune.ticker"></app-icon-ticker>
+        <app-icon-ticker [asset]="rune"></app-icon-ticker>
 
       </div>
 

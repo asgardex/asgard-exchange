@@ -1,7 +1,13 @@
-<div class="flex items-center">
-  <div class="asset-icon-container flex items-center mr-3">
-    <img *ngIf="iconPath" [src]="iconPath" appImgFallback />
-    <mat-icon *ngIf="!iconPath">help_outline</mat-icon>
+<div *ngIf="asset" class="flex items-center">
+  <div *ngIf="chainAsset" matTooltip="{{chainAsset.chain}}.{{asset.ticker}}" class="relative w-12 h-6">
+    <div class="asset-icon-container absolute left-0 top-0" *ngIf="!isChainAsset">
+      <img *ngIf="chainAsset.iconPath" [src]="chainAsset.iconPath" appImgFallback />
+      <mat-icon *ngIf="!chainAsset.iconPath">help_outline</mat-icon>
+    </div>
+    <div class="asset-icon-container absolute left-4 top-0">
+      <img *ngIf="asset.iconPath" [src]="asset.iconPath" appImgFallback />
+      <mat-icon *ngIf="!asset.iconPath">help_outline</mat-icon>
+    </div>
   </div>
-  <span style="font-size: 20px">{{ticker}}</span>
+  <span style="font-size: 20px">{{asset.ticker | uppercase}}</span>
 </div>

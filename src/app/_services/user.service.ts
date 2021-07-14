@@ -327,11 +327,18 @@ export class UserService {
 
   findBalance(balances: Balances, asset: Asset) {
     if (balances && asset) {
-      const match = balances.find(
-        (balance) =>
-          `${balance.asset.chain}.${balance.asset.symbol}`.toUpperCase() ===
-          `${asset.chain}.${asset.symbol}`.toUpperCase()
-      );
+      const match = balances.find((balance) => {
+        const separator = asset.isSynth ? '/' : '.';
+        const assetChain = asset.isSynth ? 'THOR' : balance.asset.chain;
+        const assetSymbol = asset.isSynth
+          ? `${asset.chain}/${asset.symbol}`
+          : asset.symbol;
+
+        return (
+          `${balance.asset.chain}${separator}${balance.asset.symbol}`.toUpperCase() ===
+          `${assetChain}${separator}${assetSymbol}`.toUpperCase()
+        );
+      });
 
       if (match) {
         return baseToAsset(match.amount).amount().toNumber();
@@ -368,13 +375,16 @@ export class UserService {
     });
 
     marketListItems = marketListItems.map((mItem) => {
-      if (balMap[`${mItem.asset.chain}.${mItem.asset.symbol}`.toUpperCase()]) {
+      let assetString = `${mItem.asset.chain}.${mItem.asset.symbol}`;
+
+      if (mItem.asset.isSynth) {
+        assetString = `THOR.${mItem.asset.chain}/${mItem.asset.symbol}`;
+      }
+
+      if (balMap[assetString.toUpperCase()]) {
         return {
           asset: mItem.asset,
-          balance: baseToAsset(
-            balMap[`${mItem.asset.chain}.${mItem.asset.symbol}`.toUpperCase()]
-              .amount
-          ),
+          balance: baseToAsset(balMap[assetString.toUpperCase()].amount),
         };
       } else {
         return {
@@ -409,7 +419,7 @@ export class UserService {
     } else {
       const clients: AvailableClients = user.clients;
 
-      switch (chain) {
+      switch (chain.toUpperCase()) {
         case 'BNB':
           const bnbClient = clients.binance;
           return bnbClient.getAddress();

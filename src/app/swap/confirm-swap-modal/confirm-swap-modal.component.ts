@@ -159,7 +159,9 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
   validateTargetAddress(): boolean {
     const client = this.userService.getChainClient(
       this.swapData.user,
-      this.swapData.targetAsset.chain
+      this.swapData.targetAsset.isSynth
+        ? 'THOR'
+        : this.swapData.targetAsset.chain
     );
     if (!client) {
       return false;
@@ -174,12 +176,13 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
         this.swapData.outputValue
       );
 
-      const memo = this.getSwapMemo(
-        this.swapData.targetAsset.chain,
-        this.swapData.targetAsset.symbol,
-        this.swapData.targetAddress,
-        Math.floor(floor.toNumber())
-      );
+      const memo = this.getSwapMemo({
+        chain: this.swapData.targetAsset.chain,
+        symbol: this.swapData.targetAsset.symbol,
+        addr: this.swapData.targetAddress,
+        sliplimit: Math.floor(floor.toNumber()),
+        isSynth: this.swapData.targetAsset.isSynth,
+      });
 
       const userAddress = this.swapData.user.wallet;
 
@@ -220,12 +223,13 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
       this.swapData.outputValue
     );
 
-    const memo = this.getSwapMemo(
-      this.swapData.targetAsset.chain,
-      this.swapData.targetAsset.symbol,
-      this.swapData.targetAddress,
-      Math.floor(floor.toNumber())
-    );
+    const memo = this.getSwapMemo({
+      chain: this.swapData.targetAsset.chain,
+      symbol: this.swapData.targetAsset.symbol,
+      addr: this.swapData.targetAddress,
+      sliplimit: Math.floor(floor.toNumber()),
+      isSynth: this.swapData.targetAsset.isSynth,
+    });
 
     if (!memo || memo === '') {
       this.error = 'Error creating tx memo';
@@ -239,7 +243,10 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (this.swapData.sourceAsset.chain === 'THOR') {
+    if (
+      this.swapData.sourceAsset.chain === 'THOR' ||
+      this.swapData.sourceAsset.isSynth
+    ) {
       try {
         const hash = await thorClient.deposit({
           amount: assetToBase(assetAmount(amountNumber)),
@@ -475,12 +482,19 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
     });
   }
 
-  getSwapMemo(
-    chain: string,
-    symbol: string,
-    addr: string,
-    sliplimit: number
-  ): string {
+  getSwapMemo({
+    chain,
+    symbol,
+    addr,
+    sliplimit,
+    isSynth,
+  }: {
+    chain: string;
+    symbol: string;
+    addr: string;
+    sliplimit: number;
+    isSynth: boolean;
+  }): string {
     const tag =
       this.swapData.user &&
       this.swapData.user.type &&
@@ -489,7 +503,7 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
         : '444';
 
     /** shorten ERC20 tokens */
-    if (chain === 'ETH' && symbol !== 'ETH') {
+    if (chain.toUpperCase() === 'ETH' && symbol.toUpperCase() !== 'ETH') {
       const ticker = symbol.split('-')[0];
       const trimmedAddress = symbol.substring(symbol.length - 3);
       symbol = `${ticker}-${trimmedAddress.toUpperCase()}`;
@@ -498,9 +512,13 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
     if (sliplimit && sliplimit.toString().length > 3) {
       const taggedSlip =
         sliplimit.toString().slice(0, sliplimit.toString().length - 3) + tag;
-      return `=:${chain}.${symbol}:${addr}:${taggedSlip}`;
+      return isSynth
+        ? `=:${chain.toLowerCase()}/${symbol}:${addr}:${taggedSlip}`
+        : `=:${chain}.${symbol}:${addr}:${taggedSlip}`;
     } else {
-      return `=:${chain}.${symbol}:${addr}:${sliplimit}`;
+      return isSynth
+        ? `=:${chain}/${symbol}:${addr}:${sliplimit}`
+        : `=:${chain}.${symbol}:${addr}:${sliplimit}`;
     }
   }
 

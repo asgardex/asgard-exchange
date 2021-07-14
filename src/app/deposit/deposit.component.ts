@@ -323,7 +323,10 @@ export class DepositComponent implements OnInit, OnDestroy {
 
   setSourceChainBalance() {
     if (this.asset && this.balances) {
-      const sourceChainAsset = getChainAsset(this.asset.chain);
+      const sourceChainAsset = getChainAsset({
+        chain: this.asset.chain,
+        isSynth: this.asset.isSynth,
+      });
       const sourceChainBalance = this.userService.findBalance(
         this.balances,
         sourceChainAsset
@@ -450,7 +453,10 @@ export class DepositComponent implements OnInit, OnDestroy {
           );
 
           this.chainNetworkFee = this.txUtilsService.calculateNetworkFee(
-            getChainAsset(this.asset.chain),
+            getChainAsset({
+              chain: this.asset.chain,
+              isSynth: this.asset.isSynth,
+            }),
             this.inboundAddresses,
             'INBOUND',
             res
@@ -577,8 +583,9 @@ export class DepositComponent implements OnInit, OnDestroy {
      */
     if (
       this.requiresAsset() &&
-      assetToString(getChainAsset(this.asset.chain)) ===
-        assetToString(this.asset) &&
+      assetToString(
+        getChainAsset({ chain: this.asset.chain, isSynth: this.asset.isSynth })
+      ) === assetToString(this.asset) &&
       this.assetAmount + this.networkFee * 4 >=
         this.userService.maximumSpendableBalance(
           this.asset,
