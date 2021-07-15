@@ -4,7 +4,7 @@ import { Subject, Subscription } from 'rxjs';
 import { User } from '../../_classes/user';
 import { TransactionConfirmationState } from '../../_const/transaction-confirmation-state';
 import { UserService } from '../../_services/user.service';
-import { assetAmount, assetToBase, assetToString } from '@xchainjs/xchain-util';
+import { assetToString, baseAmount } from '@xchainjs/xchain-util';
 import {
   TransactionStatusService,
   TxActions,
@@ -109,7 +109,7 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
   async runeWithdraw(memo: string) {
     // withdraw RUNE
     try {
-      const txCost = assetToBase(assetAmount(0.00000001));
+      const txCost = baseAmount(0);
 
       const thorClient = this.data.user.clients.thorchain;
       if (!thorClient) {
