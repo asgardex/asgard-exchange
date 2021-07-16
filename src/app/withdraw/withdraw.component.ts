@@ -30,7 +30,7 @@ import {
   AvailablePoolTypeOptions,
   PoolTypeOption,
 } from '../_const/pool-type-options';
-import { Balances } from '@xchainjs/xchain-client';
+import { Balance } from '@xchainjs/xchain-client';
 import { debounceTime } from 'rxjs/operators';
 import { MetamaskService } from '../_services/metamask.service';
 import { environment } from 'src/environments/environment';
@@ -87,7 +87,7 @@ export class WithdrawComponent implements OnInit {
   withdrawType: PoolTypeOption;
   assetBalance: number;
   runeBalance: number;
-  balances: Balances;
+  balances: Balance[];
   metaMaskNetwork?: 'testnet' | 'mainnet';
   poolStatus?: string;
 

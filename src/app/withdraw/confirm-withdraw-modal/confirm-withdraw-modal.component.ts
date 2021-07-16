@@ -4,7 +4,7 @@ import { Subject, Subscription } from 'rxjs';
 import { User } from '../../_classes/user';
 import { TransactionConfirmationState } from '../../_const/transaction-confirmation-state';
 import { UserService } from '../../_services/user.service';
-import { assetToString, baseAmount } from '@xchainjs/xchain-util';
+import { assetToString, baseAmount, Chain } from '@xchainjs/xchain-util';
 import {
   TransactionStatusService,
   TxActions,
@@ -277,7 +277,7 @@ export class ConfirmWithdrawModalComponent implements OnInit, OnDestroy {
     this.txState = TransactionConfirmationState.SUCCESS;
     this.hash = hash;
     this.txStatusService.addTransaction({
-      chain: 'THOR',
+      chain: Chain.THORChain,
       hash: this.hash,
       ticker: `${this.data.asset.ticker}-RUNE`,
       symbol: this.data.asset.symbol,

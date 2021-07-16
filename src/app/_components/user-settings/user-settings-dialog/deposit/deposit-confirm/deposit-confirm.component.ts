@@ -5,7 +5,7 @@ import {
   Input,
   OnDestroy,
 } from '@angular/core';
-import { assetAmount, assetToBase } from '@xchainjs/xchain-util';
+import { assetAmount, assetToBase, Chain } from '@xchainjs/xchain-util';
 import { Subscription } from 'rxjs';
 import { User } from 'src/app/_classes/user';
 import { TransactionConfirmationState } from 'src/app/_const/transaction-confirmation-state';
@@ -64,7 +64,7 @@ export class DepositConfirmComponent implements OnDestroy {
 
         this.hash = hash;
         this.txStatusService.addTransaction({
-          chain: 'THOR',
+          chain: Chain.THORChain,
           hash: this.hash,
           ticker: 'RUNE',
           status: TxStatus.PENDING,

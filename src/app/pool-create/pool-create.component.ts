@@ -8,7 +8,7 @@ import {
 import { MidgardService } from '../_services/midgard.service';
 import { Asset, isNonNativeRuneToken } from '../_classes/asset';
 import { UserService } from '../_services/user.service';
-import { Balances } from '@xchainjs/xchain-client';
+import { Balance } from '@xchainjs/xchain-client';
 import { AssetAndBalance } from '../_classes/asset-and-balance';
 import { ConfirmPoolCreateComponent } from './confirm-pool-create/confirm-pool-create.component';
 import { MatDialog } from '@angular/material/dialog';
@@ -79,7 +79,7 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
 
   assetUsdValue: number;
   runeUsdValue: number;
-  balances: Balances;
+  balances: Balance[];
   subs: Subscription[];
   coinGeckoList: CGCoinListItem[];
   runeBalance: number;
@@ -401,11 +401,16 @@ export class PoolCreateComponent implements OnInit, OnDestroy {
     if (this.ethRouter && this.user) {
       const assetAddress = asset.symbol.slice(asset.ticker.length + 1);
       const strip0x = assetAddress.substr(2);
-      const isApproved = await this.user.clients.ethereum.isApproved(
-        this.ethRouter,
-        strip0x,
-        baseAmount(1)
-      );
+      // const isApproved = await this.user.clients.ethereum.isApproved(
+      //   this.ethRouter,
+      //   strip0x,
+      //   baseAmount(1)
+      // );
+      const isApproved = await this.user.clients.ethereum.isApproved({
+        contractAddress: this.ethRouter,
+        spenderAddress: strip0x,
+        amount: baseAmount(1),
+      });
       this.ethContractApprovalRequired = !isApproved;
     }
   }

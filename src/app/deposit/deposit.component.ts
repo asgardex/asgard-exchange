@@ -23,7 +23,7 @@ import { UserService } from '../_services/user.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDepositModalComponent } from './confirm-deposit-modal/confirm-deposit-modal.component';
 import { User } from '../_classes/user';
-import { Balances } from '@xchainjs/xchain-client';
+import { Balance } from '@xchainjs/xchain-client';
 import { AssetAndBalance } from '../_classes/asset-and-balance';
 import { TransactionUtilsService } from '../_services/transaction-utils.service';
 import { debounceTime } from 'rxjs/operators';
@@ -79,7 +79,7 @@ export class DepositComponent implements OnInit, OnDestroy {
   /**
    * Balances
    */
-  balances: Balances;
+  balances: Balance[];
   runeBalance: number;
   assetBalance: number;
 

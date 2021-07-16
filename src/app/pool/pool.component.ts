@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Balances } from '@xchainjs/xchain-client';
+import { Balance } from '@xchainjs/xchain-client';
 import { combineLatest, Subscription } from 'rxjs';
 import { User } from '../_classes/user';
 import { MidgardService } from '../_services/midgard.service';
@@ -20,7 +20,7 @@ export class PoolComponent implements OnInit, OnDestroy {
   userPoolError: boolean;
   subs: Subscription[];
   loading: boolean;
-  balances: Balances;
+  balances: Balance[];
   createablePools: string[];
   memberPools: MemberPool[];
   addresses: string[];
