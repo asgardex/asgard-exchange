@@ -78,7 +78,7 @@ export class ApproveEthContractModalComponent implements OnInit, OnDestroy {
       let approve: TransactionResponse;
 
       try {
-        if (this.user.type === 'keystore' || this.user.type === 'XDEFI') {
+        if (this.user.type === 'keystore') {
           const inboundAddresses = await this.midgardService
             .getInboundAddresses()
             .toPromise();
@@ -99,6 +99,12 @@ export class ApproveEthContractModalComponent implements OnInit, OnDestroy {
             ethClient,
             ethInbound,
             userAddress: ethClient.getAddress(),
+          });
+        } else if (this.user.type === 'XDEFI') {
+          approve = await this.ethUtilService.approveXDEFI({
+            ethClient: this.user.clients.ethereum,
+            contractAddress: strip0x,
+            spenderAddress: routerContractAddress,
           });
         } else if (this.user.type === 'metamask') {
           approve = await this.ethUtilService.approveMetaMask({

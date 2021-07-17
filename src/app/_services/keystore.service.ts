@@ -8,6 +8,7 @@ import { Client as thorchainClient } from '@xchainjs/xchain-thorchain';
 import { Client as ethereumClient } from '@xchainjs/xchain-ethereum/lib';
 import { Client as litecoinClient } from '@xchainjs/xchain-litecoin';
 import { Client as bitcoinCashClient } from '@xchainjs/xchain-bitcoincash';
+import { Network } from '@xchainjs/xchain-client';
 
 @Injectable({
   providedIn: 'root',
@@ -17,7 +18,8 @@ export class KeystoreService {
 
   async unlockKeystore(keystore, password: string): Promise<User> {
     const phrase = await decryptFromKeystore(keystore, password);
-    const network = environment.network === 'testnet' ? 'testnet' : 'mainnet';
+    const network =
+      environment.network === 'testnet' ? Network.Testnet : Network.Mainnet;
     const userBinanceClient = new binanceClient({ network, phrase });
     const userBtcClient = new bitcoinClient({
       network,

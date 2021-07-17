@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { assetToString } from '@xchainjs/xchain-util';
+import { assetToString, Chain } from '@xchainjs/xchain-util';
 import { Subscription } from 'rxjs';
 import { PoolAddressDTO } from 'src/app/_classes/pool-address';
 import { User } from 'src/app/_classes/user';
@@ -13,7 +13,7 @@ import {
   TxStatus,
 } from 'src/app/_services/transaction-status.service';
 import { EthUtilsService } from 'src/app/_services/eth-utils.service';
-import { Balances } from '@xchainjs/xchain-client';
+import { Balance } from '@xchainjs/xchain-client';
 import { KeystoreDepositService } from 'src/app/_services/keystore-deposit.service';
 import { Asset } from 'src/app/_classes/asset';
 import { PoolTypeOption } from 'src/app/_const/pool-type-options';
@@ -47,7 +47,7 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
   insufficientChainBalance: boolean;
   loading: boolean;
   estimatedMinutes: number;
-  balances: Balances;
+  balances: Balance[];
   metaMaskProvider?: ethers.providers.Web3Provider;
 
   constructor(
@@ -409,7 +409,7 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
   runeDepositSuccess(runeHash: string) {
     this.hash = runeHash;
     this.txStatusService.addTransaction({
-      chain: 'THOR',
+      chain: Chain.THORChain,
       hash: runeHash,
       ticker: `RUNE`,
       status: TxStatus.PENDING,
@@ -423,7 +423,7 @@ export class ConfirmDepositModalComponent implements OnInit, OnDestroy {
   withdrawSuccess(hash: string) {
     this.hash = hash;
     this.txStatusService.addTransaction({
-      chain: 'THOR',
+      chain: Chain.THORChain,
       hash,
       ticker: `${this.data.asset.ticker}-RUNE`,
       status: TxStatus.PENDING,

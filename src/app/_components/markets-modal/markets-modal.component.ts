@@ -5,7 +5,7 @@ import { Asset } from '../../_classes/asset';
 import { Subscription } from 'rxjs';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { User } from 'src/app/_classes/user';
-import { Balances } from '@xchainjs/xchain-client';
+import { Balance } from '@xchainjs/xchain-client';
 import { AssetAndBalance } from 'src/app/_classes/asset-and-balance';
 
 @Component({
@@ -33,7 +33,7 @@ export class MarketsModalComponent implements OnInit, OnDestroy {
   markets: Market[] = [];
   marketListItems: AssetAndBalance[];
   filteredMarketListItems: AssetAndBalance[];
-  userBalances: Balances;
+  userBalances: Balance[];
   subs: Subscription[];
   loading: boolean;
   user: User;

@@ -30,7 +30,7 @@ import {
   AvailablePoolTypeOptions,
   PoolTypeOption,
 } from '../_const/pool-type-options';
-import { Balances } from '@xchainjs/xchain-client';
+import { Balance } from '@xchainjs/xchain-client';
 import { debounceTime } from 'rxjs/operators';
 import { MetamaskService } from '../_services/metamask.service';
 import { environment } from 'src/environments/environment';
@@ -87,7 +87,7 @@ export class WithdrawComponent implements OnInit {
   withdrawType: PoolTypeOption;
   assetBalance: number;
   runeBalance: number;
-  balances: Balances;
+  balances: Balance[];
   metaMaskNetwork?: 'testnet' | 'mainnet';
   poolStatus?: string;
 
@@ -207,7 +207,7 @@ export class WithdrawComponent implements OnInit {
          */
         try {
           const member = await this.midgardService
-            .getMember(thorAddress)
+            .getMember(thorAddress.toLowerCase())
             .toPromise();
           const thorAssetPools = member.pools.filter(
             (pool) => pool.pool === assetToString(this.asset)
@@ -222,7 +222,7 @@ export class WithdrawComponent implements OnInit {
       if (chainAddress && chainAddress.length > 0) {
         try {
           const member = await this.midgardService
-            .getMember(chainAddress)
+            .getMember(chainAddress.toLowerCase())
             .toPromise();
           const assetPools = member.pools.filter(
             (pool) => pool.pool === assetToString(this.asset)
