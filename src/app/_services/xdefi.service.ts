@@ -488,6 +488,7 @@ export class XDEFIService {
       funcParams,
     }) => {
       try {
+        let params = funcParams ?? [];
         if (!contractAddress) {
           return Promise.reject(new Error('address must be provided'));
         }
@@ -496,7 +497,7 @@ export class XDEFIService {
           abi,
           userEthereumClient.getProvider()
         );
-        const txResult = await contract[funcName](...funcParams, {
+        const txResult = await contract[funcName](...params, {
           from: ethAddresses[0],
         });
         console.log({ txResult });

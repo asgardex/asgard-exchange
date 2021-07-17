@@ -152,18 +152,20 @@ export class PoolComponent implements OnInit, OnDestroy {
       }
 
       for (const address of this.addresses) {
-        this.midgardService.getMember(address).subscribe((res) => {
-          for (const pool of res.pools) {
-            const match = this.memberPools.find(
-              (existingPool) => existingPool.pool === pool.pool
-            );
-            if (!match) {
-              const memberPools = this.memberPools;
-              memberPools.push(pool);
-              this.memberPools = [...memberPools];
+        this.midgardService
+          .getMember(address.toLowerCase())
+          .subscribe((res) => {
+            for (const pool of res.pools) {
+              const match = this.memberPools.find(
+                (existingPool) => existingPool.pool === pool.pool
+              );
+              if (!match) {
+                const memberPools = this.memberPools;
+                memberPools.push(pool);
+                this.memberPools = [...memberPools];
+              }
             }
-          }
-        });
+          });
       }
     }
 
