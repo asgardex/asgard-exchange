@@ -158,6 +158,22 @@ export class EthUtilsService {
     });
   }
 
+  async approveXDEFI({
+    ethClient,
+    contractAddress,
+    spenderAddress,
+  }: {
+    ethClient: EthClient;
+    contractAddress: string;
+    spenderAddress: string;
+  }): Promise<TransactionResponse> {
+    return await ethClient.approve({
+      contractAddress,
+      amount: baseAmount(this.MAX_UINT256.toString()),
+      spenderAddress,
+    });
+  }
+
   async approveMetaMask({
     contractAddress,
     provider,
