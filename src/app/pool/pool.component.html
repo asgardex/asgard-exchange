@@ -21,7 +21,8 @@
 
       <div class="flex float-right mt-3 items-center">
 
-        <a
+        <!-- Temporarily disable until https://github.com/asgardex/asgard-exchange/pull/429 merged -->
+        <!-- <a
           *ngIf="createablePools && createablePools.length > 0"
           [routerLink]="['/', 'create-pool']"
           [queryParams]="{pool: createablePools[0]}"
@@ -29,7 +30,7 @@
           style="text-decoration: none; font-size: 0.8rem;"
         >
           Create Pool
-        </a>
+        </a> -->
 
         <span class="text-gray-600 ml-2 text-xs" *ngIf="createablePools && createablePools.length > 0"> | </span>
 
