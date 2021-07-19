@@ -19,8 +19,9 @@ import {
   assetToBase,
   assetAmount,
   assetToString,
+  Chain,
 } from '@xchainjs/xchain-util';
-import { Balances } from '@xchainjs/xchain-client';
+import { Balance } from '@xchainjs/xchain-client';
 import { MetamaskService } from 'src/app/_services/metamask.service';
 import { Asset } from 'src/app/_classes/asset';
 import { ethers } from 'ethers';
@@ -52,7 +53,7 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
   ethNetworkFee: number;
   insufficientChainBalance: boolean;
   estimatedMinutes: number;
-  balances: Balances;
+  balances: Balance[];
   metaMaskProvider: ethers.providers.Web3Provider;
 
   constructor(
@@ -248,7 +249,7 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
 
         this.hash = hash;
         this.txStatusService.addTransaction({
-          chain: 'THOR',
+          chain: Chain.THORChain,
           hash: this.hash,
           ticker: this.swapData.sourceAsset.ticker,
           status: TxStatus.PENDING,

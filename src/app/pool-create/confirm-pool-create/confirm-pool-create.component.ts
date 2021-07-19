@@ -1,6 +1,6 @@
 import { Component, Inject, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { assetAmount, assetToBase } from '@xchainjs/xchain-util';
+import { assetAmount, assetToBase, Chain } from '@xchainjs/xchain-util';
 import { Subscription } from 'rxjs';
 import { User } from 'src/app/_classes/user';
 import { TransactionConfirmationState } from 'src/app/_const/transaction-confirmation-state';
@@ -15,7 +15,7 @@ import { Client as BinanceClient } from '@xchainjs/xchain-binance';
 import { PoolAddressDTO } from 'src/app/_classes/pool-address';
 import { Client as EthereumClient } from '@xchainjs/xchain-ethereum/lib';
 import { EthUtilsService } from 'src/app/_services/eth-utils.service';
-import { Balances } from '@xchainjs/xchain-client';
+import { Balance } from '@xchainjs/xchain-client';
 
 export interface ConfirmCreatePoolData {
   asset;
@@ -37,7 +37,7 @@ export class ConfirmPoolCreateComponent implements OnDestroy {
   txState: TransactionConfirmationState;
   hash: string;
   error: string;
-  balances: Balances;
+  balances: Balance[];
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: ConfirmCreatePoolData,
@@ -157,7 +157,7 @@ export class ConfirmPoolCreateComponent implements OnDestroy {
     }
 
     this.txStatusService.addTransaction({
-      chain: 'THOR',
+      chain: Chain.THORChain,
       hash: this.hash,
       ticker: `${asset.ticker}-RUNE`,
       status: TxStatus.PENDING,

@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { baseToAsset, Chain } from '@xchainjs/xchain-util';
-import { Balances } from '@xchainjs/xchain-client';
+import { Balance } from '@xchainjs/xchain-client';
 import { Subscription } from 'rxjs';
 import { Asset } from 'src/app/_classes/asset';
 import { AssetAndBalance } from 'src/app/_classes/asset-and-balance';
@@ -25,7 +25,7 @@ export class UserAddressComponent implements OnInit {
   @Output() navigateToAddToken: EventEmitter<null>;
   iconPath: string;
   user: User;
-  balances: Balances;
+  balances: Balance[];
   subs: Subscription[];
   assets: AssetAndBalance[];
   loading: boolean;

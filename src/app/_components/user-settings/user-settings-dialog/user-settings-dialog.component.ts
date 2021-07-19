@@ -40,7 +40,7 @@ export class UserSettingsDialogComponent implements OnInit, OnDestroy {
     | 'CONFIRM_DEPOSIT'
     | 'ADDRESS_ADD_TOKEN';
   selectedAddress: string;
-  selectedChain: Chain;
+  selectedChain: string;
   selectedAsset: AssetAndBalance;
   amountToSend: number;
   recipient: string;
@@ -95,7 +95,7 @@ export class UserSettingsDialogComponent implements OnInit, OnDestroy {
     this.midgardService.getPools().subscribe((res) => (this.pools = res));
   }
 
-  selectAddress(address: string, chain: Chain) {
+  selectAddress(address: string, chain: string) {
     this.selectedAddress = address;
     this.selectedChain = chain;
     this.mode = 'ADDRESS';

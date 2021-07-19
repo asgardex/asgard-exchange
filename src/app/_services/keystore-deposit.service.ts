@@ -5,7 +5,7 @@ import { PoolAddressDTO } from '../_classes/pool-address';
 import { EthUtilsService } from './eth-utils.service';
 import { Client } from '@xchainjs/xchain-ethereum/lib';
 import { UserService } from './user.service';
-import { Balances } from '@xchainjs/xchain-client';
+import { Balance } from '@xchainjs/xchain-client';
 import { Client as BinanceClient } from '@xchainjs/xchain-binance';
 import { Client as BitcoinClient } from '@xchainjs/xchain-bitcoin';
 import { Client as LitecoinClient } from '@xchainjs/xchain-litecoin';
@@ -19,7 +19,7 @@ export interface EthDepositParams {
   client: Client;
   thorchainAddress?: string;
   recipientPool: PoolAddressDTO;
-  balances: Balances;
+  balances: Balance[];
   poolType: PoolTypeOption;
 }
 
@@ -38,7 +38,7 @@ export interface BitcoinDepositParams {
   client: BitcoinClient;
   thorchainAddress?: string;
   recipientPool: PoolAddressDTO;
-  balances: Balances;
+  balances: Balance[];
   estimatedFee: number;
   poolType: PoolTypeOption;
 }
@@ -49,7 +49,7 @@ export interface LitecoinDepositParams {
   client: LitecoinClient;
   thorchainAddress?: string;
   recipientPool: PoolAddressDTO;
-  balances: Balances;
+  balances: Balance[];
   estimatedFee: number;
   poolType: PoolTypeOption;
 }
@@ -60,7 +60,7 @@ export interface BchDepositParams {
   client: BchClient;
   thorchainAddress?: string;
   recipientPool: PoolAddressDTO;
-  balances: Balances;
+  balances: Balance[];
   estimatedFee: number;
   poolType: PoolTypeOption;
 }

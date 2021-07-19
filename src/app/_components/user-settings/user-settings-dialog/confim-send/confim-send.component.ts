@@ -27,7 +27,7 @@ import {
 import { UserService } from 'src/app/_services/user.service';
 import { BigNumber, ethers } from 'ethers';
 import { Asset as AsgrsxAsset } from 'src/app/_classes/asset';
-import { Balances } from '@xchainjs/xchain-client';
+import { Balance } from '@xchainjs/xchain-client';
 import { MidgardService } from 'src/app/_services/midgard.service';
 import { PoolAddressDTO } from 'src/app/_classes/pool-address';
 import { TransactionUtilsService } from 'src/app/_services/transaction-utils.service';
@@ -56,7 +56,7 @@ export class ConfimSendComponent implements OnInit, OnDestroy {
   txState: TransactionConfirmationState;
   error: string;
   insufficientChainBalance: boolean;
-  balances: Balances;
+  balances: Balance[];
 
   constructor(
     private userService: UserService,

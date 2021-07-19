@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Balances } from '@xchainjs/xchain-client';
+import { Balance } from '@xchainjs/xchain-client';
 import { combineLatest, Subscription } from 'rxjs';
 import { User } from '../_classes/user';
 import { MidgardService } from '../_services/midgard.service';
@@ -20,7 +20,7 @@ export class PoolComponent implements OnInit, OnDestroy {
   userPoolError: boolean;
   subs: Subscription[];
   loading: boolean;
-  balances: Balances;
+  balances: Balance[];
   createablePools: string[];
   memberPools: MemberPool[];
   addresses: string[];
@@ -152,18 +152,20 @@ export class PoolComponent implements OnInit, OnDestroy {
       }
 
       for (const address of this.addresses) {
-        this.midgardService.getMember(address).subscribe((res) => {
-          for (const pool of res.pools) {
-            const match = this.memberPools.find(
-              (existingPool) => existingPool.pool === pool.pool
-            );
-            if (!match) {
-              const memberPools = this.memberPools;
-              memberPools.push(pool);
-              this.memberPools = [...memberPools];
+        this.midgardService
+          .getMember(address.toLowerCase())
+          .subscribe((res) => {
+            for (const pool of res.pools) {
+              const match = this.memberPools.find(
+                (existingPool) => existingPool.pool === pool.pool
+              );
+              if (!match) {
+                const memberPools = this.memberPools;
+                memberPools.push(pool);
+                this.memberPools = [...memberPools];
+              }
             }
-          }
-        });
+          });
       }
     }
 
