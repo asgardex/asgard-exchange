@@ -15,14 +15,13 @@ const routes: Routes = [
     path: 'pool',
     loadChildren: () => import('./pool/pool.module').then((m) => m.PoolModule),
   },
-  // <!-- Temporarily disable until https://github.com/asgardex/asgard-exchange/pull/429 merged -->
-  // {
-  //   path: 'create-pool',
-  //   loadChildren: () =>
-  //     import('./pool-create/pool-create.module').then(
-  //       (m) => m.PoolCreateModule
-  //     ),
-  // },
+  {
+    path: 'create-pool',
+    loadChildren: () =>
+      import('./pool-create/pool-create.module').then(
+        (m) => m.PoolCreateModule
+      ),
+  },
   {
     path: 'deposit',
     loadChildren: () =>

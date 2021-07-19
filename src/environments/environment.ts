@@ -4,5 +4,5 @@ export const environment = {
    network: 'testnet',
    etherscanKey: '',
    infuraProjectId: '',
-   appLocked: false,
+   appLocked: false
 };

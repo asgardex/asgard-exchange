@@ -95,12 +95,30 @@ export class ConfirmPoolCreateComponent implements OnDestroy {
       return;
     }
 
-    let hash = '';
+    /**
+     * Deposit RUNE
+     */
+    try {
+      const runeMemo = `+:${asset.chain}.${asset.symbol}:${address}`;
+
+      const runeHash = await thorClient.deposit({
+        amount: assetToBase(assetAmount(this.data.runeAmount)),
+        memo: runeMemo,
+      });
+
+      this.hash = runeHash;
+    } catch (error) {
+      console.error('error making RUNE transfer: ', error);
+      this.txState = TransactionConfirmationState.ERROR;
+      this.error = error;
+      return;
+    }
 
     /**
      * Deposit Token
      */
     try {
+      let hash = '';
       // deposit using xchain
       switch (this.data.asset.chain) {
         case 'BNB':
@@ -127,43 +145,27 @@ export class ConfirmPoolCreateComponent implements OnDestroy {
       }
 
       if (hash === '') {
-        console.error('no hash set');
+        this.txState = TransactionConfirmationState.ERROR;
+        this.error = 'Error getting hash from asset transaction';
         return;
       }
     } catch (error) {
-      console.error('error depositing asset');
       console.error(error);
+      this.txState = TransactionConfirmationState.ERROR;
+      this.error = 'Error depositing asset';
       return;
     }
 
-    /**
-     * Deposit RUNE
-     */
-    try {
-      const runeMemo = `+:${asset.chain}.${asset.symbol}:${address}`;
-
-      const runeHash = await thorClient.deposit({
-        amount: assetToBase(assetAmount(this.data.runeAmount)),
-        memo: runeMemo,
-      });
-
-      this.hash = runeHash;
-      this.txStatusService.addTransaction({
-        chain: Chain.THORChain,
-        hash: runeHash,
-        ticker: `${asset.ticker}-RUNE`,
-        status: TxStatus.PENDING,
-        action: TxActions.DEPOSIT,
-        symbol: asset.symbol,
-        isThorchainTx: true,
-      });
-
-      this.txState = TransactionConfirmationState.SUCCESS;
-    } catch (error) {
-      console.error('error making RUNE transfer: ', error);
-      this.txState = TransactionConfirmationState.ERROR;
-      this.error = error;
-    }
+    this.txStatusService.addTransaction({
+      chain: Chain.THORChain,
+      hash: this.hash,
+      ticker: `${asset.ticker}-RUNE`,
+      status: TxStatus.PENDING,
+      action: TxActions.DEPOSIT,
+      symbol: asset.symbol,
+      isThorchainTx: true,
+    });
+    this.txState = TransactionConfirmationState.SUCCESS;
   }
 
   async binanceDeposit(
