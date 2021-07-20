@@ -6,7 +6,7 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import { Balances } from '@xchainjs/xchain-client';
+import { Balance } from '@xchainjs/xchain-client';
 import { assetAmount, assetToBase } from '@xchainjs/xchain-util';
 import { Subscription } from 'rxjs';
 import { Asset } from 'src/app/_classes/asset';
@@ -40,7 +40,7 @@ export class UpgradeRuneConfirmComponent implements OnInit, OnDestroy {
   hash: string;
   runeBalance: number;
   insufficientChainBalance: boolean;
-  balances: Balances;
+  balances: Balance[];
   networkFee: number;
 
   constructor(

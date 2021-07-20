@@ -26,7 +26,7 @@ import { MidgardService, ThorchainQueue } from '../_services/midgard.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmSwapModalComponent } from './confirm-swap-modal/confirm-swap-modal.component';
 import { User } from '../_classes/user';
-import { Balances } from '@xchainjs/xchain-client';
+import { Balance } from '@xchainjs/xchain-client';
 import { AssetAndBalance } from '../_classes/asset-and-balance';
 import { PoolDTO } from '../_classes/pool';
 import { SlippageToleranceService } from '../_services/slippage-tolerance.service';
@@ -144,7 +144,7 @@ export class SwapComponent implements OnInit, OnDestroy, OnChanges {
   user: User;
   basePrice: number;
 
-  balances: Balances;
+  balances: Balance[];
   sourceBalance: number;
   targetBalance: number;
 

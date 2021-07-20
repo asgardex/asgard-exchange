@@ -3,7 +3,7 @@ import { AvailableClients, User, WalletType } from '../_classes/user';
 import { Client as BinanceClient } from '@thorchain/asgardex-binance';
 import { environment } from 'src/environments/environment';
 import { Asset, checkSummedAsset } from '../_classes/asset';
-import { Balance, Balances } from '@xchainjs/xchain-client';
+import { Balance, Network } from '@xchainjs/xchain-client';
 import { BncClient } from '@binance-chain/javascript-sdk/lib/client';
 import {
   assetAmount,
@@ -24,7 +24,6 @@ import { PoolAddressDTO } from '../_classes/pool-address';
 import { TransactionUtilsService } from './transaction-utils.service';
 import { TxType } from '../_const/tx-type';
 import { ETH_DECIMAL, Client as EthClient } from '@xchainjs/xchain-ethereum';
-import { HaskoinService } from './haskoin.service';
 
 export interface MidgardData<T> {
   key: string;
@@ -40,9 +39,9 @@ export class UserService {
   private userSource = new BehaviorSubject<User>(null);
   user$ = this.userSource.asObservable();
 
-  private userBalancesSource = new BehaviorSubject<Balances>(null);
+  private userBalancesSource = new BehaviorSubject<Balance[]>(null);
   userBalances$ = this.userBalancesSource.asObservable();
-  private _balances: Balances;
+  private _balances: Balance[];
 
   private chainBalanceErrorsSource = new BehaviorSubject<Chain[]>([]);
   chainBalanceErrors$ = this.chainBalanceErrorsSource.asObservable();
@@ -54,7 +53,6 @@ export class UserService {
 
   constructor(
     private midgardService: MidgardService,
-    private haskoinService: HaskoinService,
     private txUtilsService: TransactionUtilsService
   ) {
     this._balances = [];
@@ -102,7 +100,8 @@ export class UserService {
       // MetaMask
     } else if (this._user && this._user.type === 'metamask') {
       // mock client to fetch balances
-      const network = environment.network === 'testnet' ? 'testnet' : 'mainnet';
+      const network =
+        environment.network === 'testnet' ? Network.Testnet : Network.Mainnet;
       const MOCK_PHRASE =
         'image rally need wedding health address purse army antenna leopard sea gain';
       const phrase = MOCK_PHRASE;
@@ -117,12 +116,12 @@ export class UserService {
     }
   }
 
-  setBalances(balances: Balances) {
+  setBalances(balances: Balance[]) {
     this._balances = balances;
     this.userBalancesSource.next(balances);
   }
 
-  pushBalances(balances: Balances) {
+  pushBalances(balances: Balance[]) {
     this._balances = [...this._balances, ...balances];
     this.userBalancesSource.next(this._balances);
   }
@@ -143,16 +142,16 @@ export class UserService {
       // ethereum and binance are handled in respected functions
       switch (key) {
         case 'bitcoin':
-          this.pushChainBalanceErrors('BTC');
+          this.pushChainBalanceErrors(Chain.Bitcoin);
           break;
         case 'bitcoinCash':
-          this.pushChainBalanceErrors('BCH');
+          this.pushChainBalanceErrors(Chain.BitcoinCash);
           break;
         case 'litecoin':
-          this.pushChainBalanceErrors('LTC');
+          this.pushChainBalanceErrors(Chain.Litecoin);
           break;
         case 'thorchain':
-          this.pushChainBalanceErrors('THOR');
+          this.pushChainBalanceErrors(Chain.THORChain);
           break;
       }
     }
@@ -257,7 +256,7 @@ export class UserService {
           // catchError handles http throws
           catchError((error) => of(error))
         )
-        .subscribe(async (res: Balances) => {
+        .subscribe(async (res: Balance[]) => {
           const runeBalance = this.findBalance(res, new Asset('THOR.RUNE'));
           if (runeBalance && currentBalance < runeBalance) {
             console.log('increased!');
@@ -325,7 +324,7 @@ export class UserService {
     }
   }
 
-  findBalance(balances: Balances, asset: Asset) {
+  findBalance(balances: Balance[], asset: Asset) {
     if (balances && asset) {
       const match = balances.find((balance) => {
         const separator = asset.isSynth ? '/' : '.';
@@ -349,7 +348,7 @@ export class UserService {
   }
 
   // TODO -> hacky bandaid for erc20 dusting
-  findRawBalance(balances: Balances, asset: Asset): BigNumber {
+  findRawBalance(balances: Balance[], asset: Asset): BigNumber {
     if (balances && asset) {
       const match = balances.find(
         (balance) =>
@@ -366,7 +365,7 @@ export class UserService {
   }
 
   sortMarketsByUserBalance(
-    userBalances: Balances,
+    userBalances: Balance[],
     marketListItems: AssetAndBalance[]
   ): AssetAndBalance[] {
     const balMap: { [key: string]: Balance } = {};

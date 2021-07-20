@@ -7,6 +7,7 @@ import { Client as bitcoinCashClient } from '@xchainjs/xchain-bitcoincash';
 import { Client as ethereumClient } from '@xchainjs/xchain-ethereum/lib';
 import { Chain } from '@xchainjs/xchain-util';
 import { environment } from 'src/environments/environment';
+import { Network } from '@xchainjs/xchain-client';
 
 /**
  * this is used for convenience methods when user is not using keystore
@@ -25,7 +26,8 @@ export class MockClientService {
   mockBchClient: bitcoinCashClient;
 
   constructor() {
-    const network = environment.network === 'testnet' ? 'testnet' : 'mainnet';
+    const network =
+      environment.network === 'testnet' ? Network.Testnet : Network.Mainnet;
     const phrase = this.MOCK_PHRASE;
 
     this.mockBinanceClient = new binanceClient({ network, phrase });

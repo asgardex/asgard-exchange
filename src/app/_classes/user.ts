@@ -10,7 +10,7 @@ import { Client as ThorchainClient } from '@xchainjs/xchain-thorchain';
 import { Client as EthereumClient } from '@xchainjs/xchain-ethereum/lib';
 import { Client as LitecoinClient } from '@xchainjs/xchain-litecoin';
 import { Client as BitcoinCashClient } from '@xchainjs/xchain-bitcoincash';
-import { Balances } from '@xchainjs/xchain-client';
+import { Balance } from '@xchainjs/xchain-client';
 
 export interface AvailableClients {
   binance: BinanceClient;
@@ -30,7 +30,7 @@ export class User {
   // for Ledger
   ledger?: any;
   hdPath?: number[];
-  balances: Balances;
+  balances: Balance[];
 
   constructor(user: {
     type: WalletType;

@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { getValueOfAssetInRune } from '@thorchain/asgardex-util';
-import { Balances } from '@xchainjs/xchain-client';
+import { Balance } from '@xchainjs/xchain-client';
 import {
   assetAmount,
   assetToBase,
@@ -10,6 +10,7 @@ import {
   BaseAmount,
   baseAmount,
   bn,
+  Chain,
 } from '@xchainjs/xchain-util';
 import { Subscription } from 'rxjs';
 import { Asset, isNonNativeRuneToken } from '../_classes/asset';
@@ -39,7 +40,7 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
   rune: Asset;
   selectableMarkets: AssetAndBalance[];
   subs: Subscription[];
-  balances: Balances;
+  balances: Balance[];
   searchingAsset: Asset;
   user: User;
   runeNativeTxFee: number;
@@ -386,7 +387,7 @@ export class DepositSymRecoveryComponent implements OnInit, OnDestroy {
 
       this.txState = TransactionConfirmationState.SUCCESS;
       this.txStatusService.addTransaction({
-        chain: 'THOR',
+        chain: Chain.THORChain,
         hash,
         ticker: `${this.searchingAsset.ticker}-RUNE`,
         symbol: this.searchingAsset.symbol,

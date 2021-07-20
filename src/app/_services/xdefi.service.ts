@@ -304,8 +304,10 @@ export class XDEFIService {
     };
     // Eth
     userEthereumClient.approve = async ({
-      spender,
-      sender,
+      // spender,
+      // sender,
+      spenderAddress,
+      contractAddress,
       amount,
       feeOptionKey,
     }: ApproveParams) => {
@@ -326,15 +328,15 @@ export class XDEFIService {
             .toFixed()
         );
       const gasLimit = await userEthereumClient
-        .estimateApprove({ spender, sender, amount })
+        .estimateApprove({ spenderAddress, contractAddress, amount })
         .catch(() => undefined);
 
       const txAmount = amount
         ? BigNumber.from(amount.amount().toFixed())
         : BigNumber.from(2).pow(256).sub(1);
-      const contract = new ethers.Contract(sender, erc20ABI);
+      const contract = new ethers.Contract(contractAddress, erc20ABI);
       const unsignedTx = await contract.populateTransaction.approve(
-        spender,
+        spenderAddress,
         txAmount,
         {
           from: userEthereumClient.getAddress(),
@@ -477,30 +479,25 @@ export class XDEFIService {
         return Promise.reject(error);
       }
     };
-    userEthereumClient.call = async (
-      walletIndex: number,
-      address: Address,
-      abi: ethers.ContractInterface,
-      func: string,
-      params: Array<any>
-    ) => {
-      console.log({
-        method: 'ethCLient.call',
-        address,
-        abi,
-        func,
-        params,
-      });
+
+    userEthereumClient.call = async ({
+      walletIndex,
+      contractAddress,
+      abi,
+      funcName,
+      funcParams,
+    }) => {
       try {
-        if (!address) {
+        let params = funcParams ?? [];
+        if (!contractAddress) {
           return Promise.reject(new Error('address must be provided'));
         }
         const contract = new ethers.Contract(
-          address,
+          contractAddress,
           abi,
           userEthereumClient.getProvider()
         );
-        const txResult = await contract[func](...params, {
+        const txResult = await contract[funcName](...params, {
           from: ethAddresses[0],
         });
         console.log({ txResult });
