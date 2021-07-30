@@ -416,7 +416,7 @@ export class SwapComponent implements OnInit, OnDestroy, OnChanges {
       this.targetAddress = this.userService.getTokenAddress(
         this.user,
         this.selectedTargetAsset.isSynth
-          ? 'THOR'
+          ? Chain.THORChain
           : this.selectedTargetAsset.chain
       );
     }

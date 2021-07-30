@@ -232,6 +232,8 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
       isSynth: this.swapData.targetAsset.isSynth,
     });
 
+    console.log('memo is: ', memo);
+
     if (!memo || memo === '') {
       this.error = 'Error creating tx memo';
       this.txState = TransactionConfirmationState.ERROR;
@@ -249,8 +251,24 @@ export class ConfirmSwapModalComponent implements OnInit, OnDestroy {
       this.swapData.sourceAsset.isSynth
     ) {
       try {
+        const isSynth = this.swapData.sourceAsset.isSynth;
         const hash = await thorClient.deposit({
           amount: assetToBase(assetAmount(amountNumber)),
+          asset: {
+            chain: Chain.THORChain,
+            symbol: isSynth
+              ? `${this.swapData.sourceAsset.chain}/${this.swapData.sourceAsset.symbol}`.toUpperCase()
+              : this.swapData.sourceAsset.symbol,
+            ticker: isSynth
+              ? `${this.swapData.sourceAsset.chain}/${this.swapData.sourceAsset.ticker}`.toUpperCase()
+              : this.swapData.sourceAsset.ticker,
+          },
+          // asset: {
+          //   // chain: Chain.THORChain,
+          //   chain: 'THOR' as Chain,
+          //   symbol: 'LTC/LTC',
+          //   ticker: 'LTC/LTC',
+          // },
           memo,
         });
 

@@ -114,7 +114,7 @@ export class AssetsListComponent implements OnInit {
     this.filteredGroup = this.selectedGroup;
   }
 
-  selectGroup(key: Chain) {
+  selectGroup(key: string) {
     this.selectedGroup = this.groupedAssets[key] ?? [];
     this.selectedChain = key;
     this.searchTerm = '';
