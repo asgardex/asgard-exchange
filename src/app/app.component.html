@@ -8,7 +8,9 @@
 
     <div class="relative">
       <div id="notifications" class="relative xl:absolute xl:top-2 xl:right-2 float-right py-4 px-8 w-full xl:w-96">
-        <app-native-rune-prompt *ngIf="user && (user?.type === 'keystore' || user?.type === 'XDEFI')" [nonNativeRuneAssets]="nonNativeRuneAssets"></app-native-rune-prompt>
+
+        <!-- Commenting out for now while the network is down -->
+        <!-- <app-native-rune-prompt *ngIf="user && (user?.type === 'keystore' || user?.type === 'XDEFI')" [nonNativeRuneAssets]="nonNativeRuneAssets"></app-native-rune-prompt> -->
 
         <div *ngIf="chainBalanceErrors && chainBalanceErrors.length > 0" class="border-opacity-75 border rounded-lg text-yellow-500 border-yellow-500 px-6 py-4 mb-8">
           <div class="flex items-center">
