@@ -24,6 +24,7 @@ import { PoolAddressDTO } from '../_classes/pool-address';
 import { TransactionUtilsService } from './transaction-utils.service';
 import { TxType } from '../_const/tx-type';
 import { ETH_DECIMAL, Client as EthClient } from '@xchainjs/xchain-ethereum';
+import { addressIsBlockListed, ETH_BLOCKLIST } from '../_const/blocklist';
 
 export interface MidgardData<T> {
   key: string;
@@ -192,7 +193,7 @@ export class UserService {
         },
       ]);
 
-      const assetsToQuery: { chain: Chain; ticker: string; symbol: string }[] =
+      let assetsToQuery: { chain: Chain; ticker: string; symbol: string }[] =
         [];
 
       /**
@@ -230,6 +231,17 @@ export class UserService {
         const tokenAsset = checkSummedAsset(token);
         assetsToQuery.push(tokenAsset);
       }
+
+      /**
+       * Remove malicious tokens
+       */
+      assetsToQuery = assetsToQuery.filter((asset) => {
+        const assetAddress = asset.symbol.slice(asset.ticker.length + 1);
+        return !addressIsBlockListed({
+          address: assetAddress,
+          blocklist: ETH_BLOCKLIST,
+        });
+      });
 
       const tokenBalances = await client.getBalance(address, assetsToQuery);
       this.pushBalances(tokenBalances);
