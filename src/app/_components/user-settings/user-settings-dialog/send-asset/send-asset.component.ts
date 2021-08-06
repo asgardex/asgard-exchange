@@ -11,6 +11,7 @@ import { getChainAsset } from 'src/app/_classes/asset';
 import { AssetAndBalance } from 'src/app/_classes/asset-and-balance';
 import { PoolAddressDTO } from 'src/app/_classes/pool-address';
 import { User } from 'src/app/_classes/user';
+import { addressIsBlockListed, ETH_BLOCKLIST } from 'src/app/_const/blocklist';
 import { MidgardService } from 'src/app/_services/midgard.service';
 import { TransactionUtilsService } from 'src/app/_services/transaction-utils.service';
 import { UserService } from 'src/app/_services/user.service';
@@ -121,6 +122,17 @@ export class SendAssetComponent implements OnInit, OnDestroy {
       return true;
     }
 
+    // malicious ETH address
+    if (
+      this.asset.asset.chain === 'ETH' &&
+      addressIsBlockListed({
+        address: this.recipientAddress,
+        blocklist: ETH_BLOCKLIST,
+      })
+    ) {
+      return true;
+    }
+
     return (
       !this.amountSpendable ||
       !client.validateAddress(this.recipientAddress) ||
@@ -147,6 +159,17 @@ export class SendAssetComponent implements OnInit, OnDestroy {
 
     if (!client.validateAddress(this.recipientAddress)) {
       return `Invalid ${this.asset.asset.chain} Address`;
+    }
+
+    // malicious ETH address
+    if (
+      this.asset.asset.chain === 'ETH' &&
+      addressIsBlockListed({
+        address: this.recipientAddress,
+        blocklist: ETH_BLOCKLIST,
+      })
+    ) {
+      return 'Malicious Address Detected';
     }
 
     if (this.amount <= 0) {
