@@ -1,10 +1,12 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
+import { SkipRedirectGuard } from './_guards/skip-redirect.guard';
 
 const routes: Routes = [
   {
     path: '',
-    redirectTo: 'swap',
+    canActivate: [SkipRedirectGuard],
+    children: [],
     pathMatch: 'full',
   },
   {
