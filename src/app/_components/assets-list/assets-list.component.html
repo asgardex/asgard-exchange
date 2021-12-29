@@ -1,11 +1,38 @@
+<div class="py-2 mb-4 overflow-x-auto bg-black bg-opacity-75 clear-both min-w-full">
+  <ul class="chain-list flex p-1">
+    <li *ngIf="groupedAssets['THOR']">
+      <app-assets-list-group-select key="THOR" [iconPaths]="iconPaths" [active]="selectedChain === 'THOR'" (selectGroup)="selectGroup('THOR')"></app-assets-list-group-select>
+    </li>
+    <li *ngIf="groupedAssets['BTC']">
+      <app-assets-list-group-select key="BTC" [iconPaths]="iconPaths" [active]="selectedChain === 'BTC'" (selectGroup)="selectGroup('BTC')"></app-assets-list-group-select>
+    </li>
+    <li *ngIf="groupedAssets['ETH']">
+      <app-assets-list-group-select key="ETH" [iconPaths]="iconPaths" [active]="selectedChain === 'ETH'" (selectGroup)="selectGroup('ETH')"></app-assets-list-group-select>
+    </li>
+    <li *ngIf="groupedAssets['BNB']">
+      <app-assets-list-group-select key="BNB" [iconPaths]="iconPaths" [active]="selectedChain === 'BNB'" (selectGroup)="selectGroup('BNB')"></app-assets-list-group-select>
+    </li>
+    <li *ngIf="groupedAssets['BCH']">
+      <app-assets-list-group-select key="BCH" [iconPaths]="iconPaths" [active]="selectedChain === 'BCH'" (selectGroup)="selectGroup('BCH')"></app-assets-list-group-select>
+    </li>
+    <li *ngIf="groupedAssets['LTC']">
+      <app-assets-list-group-select key="LTC" [iconPaths]="iconPaths" [active]="selectedChain === 'LTC'" (selectGroup)="selectGroup('LTC')"></app-assets-list-group-select>
+    </li>
+  </ul>
+</div>
+
+<div class="px-4 my-4">
+  <div class="uni-input" style="padding: 0px 12px">
+    <input class="p-0" [(ngModel)]="searchTerm" name="keystore-password" placeholder="Search Token Symbol" />
+  </div>
+</div>
+
 <div class="flex justify-between items-center pb-4 px-4" >
   <div class="font-medium">
     Token Name
   </div>
   <span class="mr-2 text-gray-400 text-xs">BALANCE</span>
 </div>
-
-<div class="text-xs text-gray-400 px-4 pb-2">Upgrade to THOR.RUNE to access THORChain pools</div>
 
 <div class="market-list-container relative w-full h-80 overflow-y-auto border-t border-gray-700">
 
@@ -15,7 +42,7 @@
 
   <ul *ngIf="!loading && assetListItems" class="market-list">
 
-    <li *ngFor="let item of assetListItems"
+    <li *ngFor="let item of filteredGroup"
       class="flex items-center py-1 px-4 cursor-pointer hover:bg-white hover:bg-opacity-10 h-16"
       [class.text-gray-600]="item.asset.symbol == disabledAssetSymbol"
       (click)="selectAsset.emit(item.asset)"
@@ -29,7 +56,7 @@
       <div class="flex flex-col flex-grow">
 
         <div class="flex justify-between">
-          <span class="font-medium">{{item.asset.ticker}}</span>
+          <span class="font-medium">{{item.asset.ticker | uppercase}}</span>
           <div *ngIf="item.balance" class="flex flex-col justify-end text-right">
             <span class="text-sm font-normal">{{item.balance.amount().toNumber()}}</span>
           </div>
@@ -38,8 +65,9 @@
           </div>
         </div>
 
-        <span *ngIf="item.asset.chain === 'ETH' && item.asset.ticker !== 'ETH'" class="text-xs text-gray-400">{{item.asset.symbol.split('-')[1]}}</span>
-        <span class="text-xs text-gray-400">{{item.asset.chain}}</span>
+        <span *ngIf="(item.asset.chain === 'ETH' || item.asset.chain === 'eth') && (item.asset.ticker !== 'ETH' && item.asset.ticker !== 'eth')" class="text-xs text-gray-400">{{item.asset.symbol.split('-')[1]}}</span>
+        <span *ngIf="!item.asset.isSynth" class="text-xs text-gray-400">{{item.asset.chain | uppercase}}</span>
+        <span *ngIf="item.asset.isSynth" class="text-xs text-gray-400">THOR/{{item.asset.chain | uppercase}}</span>
       </div>
 
     </li>

@@ -18,8 +18,8 @@ describe('ConfirmSwapModalComponent', () => {
         {
           provide: MAT_DIALOG_DATA,
           useValue: {
-            sourceAsset: new Asset('RUNE-B1A'),
-            targetAsset: new Asset('BNB'),
+            sourceAsset: new Asset('THOR.RUNE'),
+            targetAsset: new Asset('BNB.BNB'),
             runeFee: 100000000,
             bnbFee: 0.0000035,
             basePrice: 100000000,

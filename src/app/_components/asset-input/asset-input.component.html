@@ -53,7 +53,9 @@
 
         <button *ngIf="selectedAsset" class="launch-markets-btn focus:outline-none" (click)="launchMarketsModal()" [disabled]="disabledMarketSelect">
           <div class="flex items-center asset-selector">
-            <app-icon-ticker [iconPath]="selectedAsset.iconPath" [ticker]="selectedAsset.ticker"></app-icon-ticker>
+            <div>
+              <app-icon-ticker [asset]="selectedAsset"></app-icon-ticker>
+            </div>
             <mat-icon *ngIf="!disabledMarketSelect">expand_more</mat-icon>
           </div>
         </button>

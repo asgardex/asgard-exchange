@@ -15,8 +15,8 @@ describe('ConfirmPoolCreateComponent', () => {
         {
           provide: MAT_DIALOG_DATA,
           useValue: {
-            asset: new Asset('BUSD'),
-            rune: new Asset('RUNE-B1A'),
+            asset: new Asset('BNB.BUSD'),
+            rune: new Asset('THOR.RUNE'),
             assetAmount: 100,
             runeAmount: 100,
           },

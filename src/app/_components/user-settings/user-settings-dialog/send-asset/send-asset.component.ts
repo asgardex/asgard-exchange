@@ -72,7 +72,10 @@ export class SendAssetComponent implements OnInit, OnDestroy {
 
         this.chainBalance = this.userService.findBalance(
           balances,
-          getChainAsset(this.asset?.asset.chain)
+          getChainAsset({
+            chain: this.asset?.asset.chain,
+            isSynth: this.asset?.asset.isSynth,
+          })
         );
       });
 
@@ -114,7 +117,10 @@ export class SendAssetComponent implements OnInit, OnDestroy {
     if (
       this.chainBalance <
       this.txUtilsService.calculateNetworkFee(
-        getChainAsset(this.asset.asset.chain),
+        getChainAsset({
+          chain: this.asset.asset.chain,
+          isSynth: this.asset.asset.isSynth,
+        }),
         this.inboundAddresses,
         'EXTERNAL'
       )
@@ -180,7 +186,10 @@ export class SendAssetComponent implements OnInit, OnDestroy {
     if (
       this.chainBalance <
       this.txUtilsService.calculateNetworkFee(
-        getChainAsset(this.asset.asset.chain),
+        getChainAsset({
+          chain: this.asset.asset.chain,
+          isSynth: this.asset.asset.isSynth,
+        }),
         this.inboundAddresses,
         'EXTERNAL'
       )

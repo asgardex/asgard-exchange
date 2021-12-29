@@ -48,7 +48,11 @@ export class MockClientService {
     this.mockBchClient = new bitcoinCashClient({ network, phrase });
   }
 
-  getMockClientByChain(chain: Chain) {
+  getMockClientByChain({ chain, isSynth }: { chain: Chain; isSynth: boolean }) {
+    if (isSynth) {
+      return this.mockThorchainClient;
+    }
+
     switch (chain) {
       case 'BTC':
         return this.mockBtcClient;

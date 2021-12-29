@@ -18,8 +18,8 @@ describe('ConfirmWithdrawModalComponent', () => {
         {
           provide: MAT_DIALOG_DATA,
           useValue: {
-            asset: new Asset('BNB'),
-            rune: new Asset('RUNE-B1A'),
+            asset: new Asset('BNB.BNB'),
+            rune: new Asset('THOR.RUNE'),
             assetAmount: 100,
             runeAmount: 100,
             user: new User({ type: 'keystore', wallet: '' }),

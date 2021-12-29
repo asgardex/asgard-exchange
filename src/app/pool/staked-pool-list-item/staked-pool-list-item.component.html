@@ -3,7 +3,7 @@
 
   <div class="flex justify-between items-center">
 
-    <app-icon-ticker [iconPath]="asset.iconPath" [ticker]="asset.ticker"></app-icon-ticker>
+    <app-icon-ticker [asset]="asset"></app-icon-ticker>
 
     <button (click)="toggleExpanded()" class="text-white" mat-icon-button>
       <mat-icon>expand_more</mat-icon>

@@ -3,7 +3,13 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Chain } from '@xchainjs/xchain-util';
 import { User } from 'src/app/_classes/user';
 import { MockClientService } from 'src/app/_services/mock-client.service';
-import { UserService } from 'src/app/_services/user.service';
+
+export type UpdateTargetAddressInput = {
+  chain: Chain;
+  targetAddress: string;
+  user: User;
+  isSynth: boolean;
+};
 
 @Component({
   selector: 'app-update-target-address-modal',
@@ -15,20 +21,17 @@ export class UpdateTargetAddressModalComponent {
   targetAddress: string;
   user: User;
   chain: Chain;
+  isSynth: boolean;
 
   constructor(
-    private userService: UserService,
     private mockClientService: MockClientService,
     @Inject(MAT_DIALOG_DATA)
-    public data: {
-      chain: Chain;
-      targetAddress: string;
-      user: User;
-    },
+    public data: UpdateTargetAddressInput,
     public dialogRef: MatDialogRef<UpdateTargetAddressModalComponent>
   ) {
     this.user = data?.user ?? null;
     this.chain = data?.chain ?? null;
+    this.isSynth = data.isSynth;
     this.back = new EventEmitter<null>();
     this.targetAddress = data?.targetAddress ?? '';
   }
@@ -36,7 +39,7 @@ export class UpdateTargetAddressModalComponent {
   updateAddress() {
     if (
       !this.mockClientService
-        .getMockClientByChain(this.chain)
+        .getMockClientByChain({ chain: this.chain, isSynth: this.isSynth })
         .validateAddress(this.targetAddress)
     ) {
       return;
@@ -52,7 +55,7 @@ export class UpdateTargetAddressModalComponent {
 
     if (
       !this.mockClientService
-        .getMockClientByChain(this.chain)
+        .getMockClientByChain({ chain: this.chain, isSynth: this.isSynth })
         .validateAddress(this.targetAddress)
     ) {
       return true;
@@ -68,7 +71,7 @@ export class UpdateTargetAddressModalComponent {
 
     if (
       !this.mockClientService
-        .getMockClientByChain(this.chain)
+        .getMockClientByChain({ chain: this.chain, isSynth: this.isSynth })
         .validateAddress(this.targetAddress)
     ) {
       return `Invalid ${this.chain} Address`;

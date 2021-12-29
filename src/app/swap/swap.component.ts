@@ -19,6 +19,7 @@ import {
   assetToBase,
   assetAmount,
   assetToString,
+  Chain,
 } from '@xchainjs/xchain-util';
 import { PoolDetail } from '../_classes/pool-detail';
 import { MidgardService, ThorchainQueue } from '../_services/midgard.service';
@@ -40,7 +41,10 @@ import {
   switchMap,
   take,
 } from 'rxjs/operators';
-import { UpdateTargetAddressModalComponent } from './update-target-address-modal/update-target-address-modal.component';
+import {
+  UpdateTargetAddressInput,
+  UpdateTargetAddressModalComponent,
+} from './update-target-address-modal/update-target-address-modal.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MetamaskService } from '../_services/metamask.service';
 import { ethers } from 'ethers';
@@ -84,14 +88,12 @@ export class SwapComponent implements OnInit, OnDestroy, OnChanges {
     return this._selectedSourceAsset;
   }
   set selectedSourceAsset(asset: Asset) {
+    let inputPath = asset.isSynth
+      ? `THOR.${assetToString(asset)}`
+      : assetToString(asset);
     const path = this.selectedTargetAsset
-      ? [
-          '/',
-          'swap',
-          assetToString(asset),
-          assetToString(this.selectedTargetAsset),
-        ]
-      : ['/', 'swap', assetToString(asset)];
+      ? ['/', 'swap', inputPath, assetToString(this.selectedTargetAsset)]
+      : ['/', 'swap', inputPath];
 
     this.router.navigate(path);
   }
@@ -120,11 +122,15 @@ export class SwapComponent implements OnInit, OnDestroy, OnChanges {
     return this._selectedTargetAsset;
   }
   set selectedTargetAsset(asset: Asset) {
+    let outputPath = asset.isSynth
+      ? `THOR.${assetToString(asset)}`
+      : assetToString(asset);
+
     const path = [
       '/',
       'swap',
       assetToString(this.selectedSourceAsset),
-      assetToString(asset),
+      outputPath,
     ];
 
     this.router.navigate(path);
@@ -315,10 +321,8 @@ export class SwapComponent implements OnInit, OnDestroy, OnChanges {
           (this.selectedSourceAsset && // or asset
             assetToString(this.selectedSourceAsset) !== inputAsset) // does not match input param
         ) {
-          this.setSelectedSourceAsset(
-            new Asset(inputAsset),
-            this.selectableSourceMarkets
-          );
+          const asset = this.parseUrlAsset(inputAsset);
+          this.setSelectedSourceAsset(asset, this.selectableSourceMarkets);
         }
 
         const outputAsset = params.get('outputAsset');
@@ -330,15 +334,29 @@ export class SwapComponent implements OnInit, OnDestroy, OnChanges {
             (this.selectedTargetAsset && // or if target asset exists
               assetToString(this.selectedTargetAsset) !== outputAsset)) // but param doesn't match existing
         ) {
-          this.setSelectedTargetAsset(
-            new Asset(outputAsset),
-            this.selectableTargetMarkets
-          );
+          const asset = this.parseUrlAsset(outputAsset);
+          this.setSelectedTargetAsset(asset, this.selectableTargetMarkets);
         }
         this.validate();
       });
 
     this.subs.push(sub);
+  }
+
+  parseUrlAsset(str: string): Asset {
+    let asset = new Asset(str);
+
+    // check to handle THOR synth
+    if (str.includes('THOR', 0)) {
+      const pieces = str.split('.');
+
+      // is a synth
+      if (pieces.length > 2) {
+        str = str.replace('THOR.', '');
+        asset = new Asset(str).getSynth();
+      }
+    }
+    return asset;
   }
 
   ngOnChanges(): void {
@@ -397,7 +415,9 @@ export class SwapComponent implements OnInit, OnDestroy, OnChanges {
     if (this.selectedTargetAsset && this.user) {
       this.targetAddress = this.userService.getTokenAddress(
         this.user,
-        this.selectedTargetAsset.chain
+        this.selectedTargetAsset.isSynth
+          ? Chain.THORChain
+          : this.selectedTargetAsset.chain
       );
     }
     this.validate();
@@ -405,7 +425,10 @@ export class SwapComponent implements OnInit, OnDestroy, OnChanges {
 
   setSourceChainBalance() {
     if (this.selectedSourceAsset && this.balances) {
-      const sourceChainAsset = getChainAsset(this.selectedSourceAsset?.chain);
+      const sourceChainAsset = getChainAsset({
+        chain: this.selectedSourceAsset?.chain,
+        isSynth: this.selectedSourceAsset?.isSynth,
+      });
       const sourceChainBalance = this.userService.findBalance(
         this.balances,
         sourceChainAsset
@@ -430,7 +453,8 @@ export class SwapComponent implements OnInit, OnDestroy, OnChanges {
         chain: this.selectedTargetAsset.chain,
         targetAddress: this.targetAddress,
         user: this.user,
-      },
+        isSynth: this.selectedTargetAsset.isSynth,
+      } as UpdateTargetAddressInput,
     });
 
     dialogRef.afterClosed().subscribe((newAddress: string) => {
@@ -483,7 +507,7 @@ export class SwapComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   isRune(asset: Asset): boolean {
-    return asset && asset.ticker === 'RUNE'; // covers BNB and native
+    return asset && asset.ticker === 'RUNE'; // covers BNB, ETH, and native
   }
 
   isNativeRune(asset: Asset): boolean {
@@ -527,13 +551,21 @@ export class SwapComponent implements OnInit, OnDestroy, OnChanges {
           assetPriceUSD: +pool.assetPriceUSD,
         }));
 
-      this.selectableSourceMarkets =
-        this.userService.filterAvailableSourceChains({
+      const synths = this.getSynths(this.availablePools);
+
+      this.selectableSourceMarkets = [
+        // available source chains
+        ...this.userService.filterAvailableSourceChains({
           userType: this.user?.type,
           assets: availablePools,
-        });
+        }),
+        // ...synths,
+      ];
 
-      this.selectableTargetMarkets = availablePools;
+      this.selectableTargetMarkets =
+        environment.network === 'testnet'
+          ? [...availablePools, ...synths] // add synths to testnet
+          : availablePools;
       const runeMarket = {
         asset: new Asset('THOR.RUNE'),
         assetPriceUSD: this.thorchainPricesService.estimateRunePrice(
@@ -550,9 +582,26 @@ export class SwapComponent implements OnInit, OnDestroy, OnChanges {
       ) {
         // Keeping RUNE at top by default
         this.selectableSourceMarkets.unshift(runeMarket);
+        if (environment.network === 'testnet') {
+          // add synths to testnet
+          this.selectableSourceMarkets.push(...synths);
+        }
       }
     }
     this.validate();
+  }
+
+  getSynths(pools: PoolDTO[]): { asset: Asset; assetPriceUSD: number }[] {
+    const synths = pools.map((pool) => {
+      const asset = new Asset(pool.asset);
+
+      return {
+        asset: asset.getSynth(),
+        assetPriceUSD: +pool.assetPriceUSD,
+      };
+    });
+
+    return synths;
   }
 
   async checkContractApproved() {
@@ -665,7 +714,12 @@ export class SwapComponent implements OnInit, OnDestroy, OnChanges {
       this.sourceChainBalance <
       1.05 *
         this.inboundFees[
-          assetToString(getChainAsset(this.selectedSourceAsset.chain))
+          assetToString(
+            getChainAsset({
+              chain: this.selectedSourceAsset.chain,
+              isSynth: this.selectedSourceAsset.isSynth,
+            })
+          )
         ]
     ) {
       this.formValidation = {
@@ -737,7 +791,10 @@ export class SwapComponent implements OnInit, OnDestroy, OnChanges {
     /** Validate Address */
     if (
       !this.mockClientService
-        .getMockClientByChain(this.selectedTargetAsset.chain)
+        .getMockClientByChain({
+          chain: this.selectedTargetAsset.chain,
+          isSynth: this.selectedTargetAsset.isSynth,
+        })
         .validateAddress(this.targetAddress)
     ) {
       this.formValidation = {
@@ -831,10 +888,22 @@ export class SwapComponent implements OnInit, OnDestroy, OnChanges {
       } else if (
         swapType === SwapType.DOUBLE_SWAP &&
         this.availablePools.find(
-          (pool) => pool.asset === assetToString(this.selectedTargetAsset)
+          (pool) =>
+            pool.asset ===
+            assetToString({
+              chain: this.selectedTargetAsset.chain.toUpperCase() as Chain,
+              symbol: this.selectedTargetAsset.symbol.toUpperCase(),
+              ticker: this.selectedTargetAsset.ticker.toUpperCase(),
+            })
         ) &&
         this.availablePools.find(
-          (pool) => pool.asset === assetToString(this.selectedSourceAsset)
+          (pool) =>
+            pool.asset ===
+            assetToString({
+              chain: this.selectedSourceAsset.chain.toUpperCase() as Chain,
+              symbol: this.selectedSourceAsset.symbol.toUpperCase(),
+              ticker: this.selectedSourceAsset.ticker.toUpperCase(),
+            })
         )
       ) {
         this.calculateDoubleSwap();
@@ -846,13 +915,17 @@ export class SwapComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   reverseTransaction() {
+    const outputPath = this.selectedSourceAsset.isSynth
+      ? `THOR.${assetToString(this.selectedSourceAsset)}`
+      : assetToString(this.selectedSourceAsset);
+
+    const inputPath = this.selectedTargetAsset.isSynth
+      ? `THOR.${assetToString(this.selectedTargetAsset)}`
+      : assetToString(this.selectedTargetAsset);
+
     if (this.selectedSourceAsset && this.selectedTargetAsset) {
-      this.router.navigate([
-        '/',
-        'swap',
-        assetToString(this.selectedTargetAsset),
-        assetToString(this.selectedSourceAsset),
-      ]);
+      console.log(`reversing to ${inputPath}/${outputPath}`);
+      this.router.navigate(['/', 'swap', inputPath, outputPath]);
     }
     this.validate();
   }
@@ -875,10 +948,22 @@ export class SwapComponent implements OnInit, OnDestroy, OnChanges {
 
     const poolDetail = toRune
       ? this.availablePools.find(
-          (pool) => pool.asset === assetToString(this.selectedSourceAsset)
+          (pool) =>
+            pool.asset ===
+            assetToString({
+              chain: this.selectedSourceAsset.chain.toUpperCase() as Chain,
+              symbol: this.selectedSourceAsset.symbol.toUpperCase(),
+              ticker: this.selectedSourceAsset.ticker.toUpperCase(),
+            })
         )
       : this.availablePools.find(
-          (pool) => pool.asset === assetToString(this.selectedTargetAsset)
+          (pool) =>
+            pool.asset ===
+            assetToString({
+              chain: this.selectedTargetAsset.chain.toUpperCase() as Chain,
+              symbol: this.selectedTargetAsset.symbol.toUpperCase(),
+              ticker: this.selectedTargetAsset.ticker.toUpperCase(),
+            })
         );
 
     if (poolDetail) {
@@ -964,10 +1049,22 @@ export class SwapComponent implements OnInit, OnDestroy, OnChanges {
    */
   calculateDoubleSwap() {
     const sourcePool = this.availablePools.find(
-      (pool) => pool.asset === assetToString(this.selectedSourceAsset)
+      (pool) =>
+        pool.asset ===
+        assetToString({
+          chain: this.selectedSourceAsset.chain.toUpperCase() as Chain,
+          symbol: this.selectedSourceAsset.symbol.toUpperCase(),
+          ticker: this.selectedSourceAsset.ticker.toUpperCase(),
+        })
     );
     const targetPool = this.availablePools.find(
-      (pool) => pool.asset === assetToString(this.selectedTargetAsset)
+      (pool) =>
+        pool.asset ===
+        assetToString({
+          chain: this.selectedTargetAsset.chain.toUpperCase() as Chain,
+          symbol: this.selectedTargetAsset.symbol.toUpperCase(),
+          ticker: this.selectedTargetAsset.ticker.toUpperCase(),
+        })
     );
 
     if (sourcePool && targetPool) {

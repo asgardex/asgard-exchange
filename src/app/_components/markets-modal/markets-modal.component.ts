@@ -14,22 +14,6 @@ import { AssetAndBalance } from 'src/app/_classes/asset-and-balance';
   styleUrls: ['./markets-modal.component.scss'],
 })
 export class MarketsModalComponent implements OnInit, OnDestroy {
-  get searchTerm(): string {
-    return this._searchTerm;
-  }
-  set searchTerm(term: string) {
-    this._searchTerm = term;
-
-    if (term && term.length > 0) {
-      this.filteredMarketListItems = this.marketListItems.filter((item) => {
-        const search = term.toUpperCase();
-        return item.asset.symbol.includes(search);
-      });
-    } else {
-      this.filteredMarketListItems = this.marketListItems;
-    }
-  }
-  _searchTerm: string;
   markets: Market[] = [];
   marketListItems: AssetAndBalance[];
   filteredMarketListItems: AssetAndBalance[];

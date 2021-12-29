@@ -35,9 +35,12 @@
     <div>
 
       <div class="flex justify-between swap-details h-7">
-        <span *ngIf="selectedTargetAsset">To {{selectedTargetAsset.chain}} Address:</span>
+        <div *ngIf="selectedTargetAsset">
+          <span *ngIf="!selectedTargetAsset.isSynth">To {{selectedTargetAsset.chain | uppercase}} Address:</span>
+          <span *ngIf="selectedTargetAsset.isSynth">To THOR Address:</span>
+        </div>
         <span *ngIf="!selectedTargetAsset">To - Address:</span>
-        <div class="flex items-center" *ngIf="targetAddress.length > 0">
+        <div class="flex items-center" *ngIf="targetAddress && targetAddress.length > 0">
           {{targetAddress.substring(0, 8)}}...{{targetAddress.substring(targetAddress.length - 4, targetAddress.length)}}
           <div class="w-4">
             <mat-icon style="transform: scale(0.7);" class="cursor-pointer text-white" (click)="launchEditTargetAddressModal()">edit</mat-icon>

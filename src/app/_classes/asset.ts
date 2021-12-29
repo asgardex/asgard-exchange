@@ -7,90 +7,113 @@ export class Asset {
   symbol: string;
   ticker: string;
   iconPath: string;
+  isSynth: boolean;
 
   constructor(poolName: string) {
-    const { chain, symbol, ticker } = this._getAssetFromString(poolName);
+    const { chain, symbol, ticker, isSynth } =
+      this._getAssetFromString(poolName);
     this.chain = chain;
     this.symbol = symbol;
     this.ticker = ticker;
+    this.isSynth = isSynth;
 
-    const trustWalletMatch = CoinIconsFromTrustWallet[this.ticker];
-
-    if (trustWalletMatch && chain !== 'THOR') {
-      this.iconPath = `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/${trustWalletMatch}/logo.png`;
-    } else {
-      // Override token icons when not found in trustwallet
-
-      switch (chain) {
-        case 'BTC':
-          this.iconPath =
-            'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/BTCB-1DE/logo.png';
-          break;
-
-        case 'LTC':
-          this.iconPath =
-            'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/litecoin/info/logo.png';
-          break;
-
-        case 'BNB':
-          if (ticker === 'BNB') {
-            this.iconPath =
-              'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/info/logo.png';
-          }
-          break;
-
-        case 'ETH':
-          if (this.symbol !== 'ETH') {
-            // for ETH tokens
-            this.iconPath = this._setEthIconPath(symbol, ticker);
-          }
-          break;
-
-        case 'THOR':
-          this.iconPath = 'assets/images/token-icons/thorchain-logo.png';
-          break;
-
-        case 'BCH':
-          this.iconPath =
-            'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/bitcoincash/info/logo.png';
-          break;
-
-        default:
-          break;
-      }
-    }
+    this.iconPath = getAssetIconPath({ chain, symbol, ticker });
   }
 
-  private _setEthIconPath(assetSymbol: string, assetTicker: string): string {
-    const assetAddress = assetSymbol.slice(assetTicker.length + 1);
-    const strip0x = assetAddress.substr(2);
-    const checkSummedAddress = ethers.utils.getAddress(strip0x);
-    return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${checkSummedAddress}/logo.png`;
+  getSynth(): Asset {
+    const synth = Object.assign({}, this);
+    synth.isSynth = true;
+    synth.chain = synth.chain.toLowerCase() as Chain;
+    synth.ticker = synth.ticker.toLowerCase();
+    synth.symbol = synth.symbol.toLowerCase();
+    return synth;
   }
 
   private _getAssetFromString(poolName: string): {
     chain: Chain;
     symbol: string;
     ticker: string;
+    isSynth: boolean;
   } {
     let chain: Chain;
     let symbol: string;
     let ticker: string;
+    let data: string[];
+    let isSynth = false;
 
-    const data = poolName.split('.');
-    if (poolName.includes('.')) {
+    if (poolName.includes('/')) {
+      data = poolName.split('/');
+      isSynth = true;
+    } else if (poolName.includes('.')) {
+      data = poolName.split('.');
+    }
+
+    if (data && data.length > 0) {
       chain = data[0] as Chain;
       symbol = data[1];
-    } else {
-      symbol = data[0];
     }
     if (symbol) {
       ticker = symbol.split('-')[0];
     }
 
-    return { chain, symbol, ticker };
+    return { chain, symbol, ticker, isSynth };
   }
 }
+
+const _setEthIconPath = (assetSymbol: string, assetTicker: string): string => {
+  const assetAddress = assetSymbol.slice(assetTicker.length + 1);
+  const strip0x = assetAddress.substr(2);
+  const checkSummedAddress = ethers.utils.getAddress(strip0x);
+  return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${checkSummedAddress}/logo.png`;
+};
+
+export const getAssetIconPath = ({
+  chain,
+  ticker,
+  symbol,
+}: {
+  chain: string;
+  ticker: string;
+  symbol: string;
+}): string => {
+  const trustWalletMatch = CoinIconsFromTrustWallet[ticker];
+
+  if (trustWalletMatch && chain.toUpperCase() !== 'THOR') {
+    return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/${trustWalletMatch}/logo.png`;
+  } else {
+    // Override token icons when not found in trustwallet
+
+    switch (chain.toUpperCase()) {
+      case 'BTC':
+        return 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/BTCB-1DE/logo.png';
+
+      case 'LTC':
+        return 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/litecoin/info/logo.png';
+
+      case 'BNB':
+        if (ticker === 'BNB') {
+          return 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/info/logo.png';
+        }
+        break;
+
+      case 'ETH':
+        if (symbol.toUpperCase() !== 'ETH') {
+          // for ETH tokens
+          return _setEthIconPath(symbol, ticker);
+        }
+        break;
+
+      case 'THOR':
+        return 'assets/images/token-icons/thorchain-logo.png';
+
+      case 'BCH':
+        return 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/bitcoincash/info/logo.png';
+
+      default:
+        break;
+    }
+  }
+};
 
 export const checkSummedAsset = (
   poolName: string
@@ -124,7 +147,17 @@ export const isNonNativeRuneToken = (asset: {
   return runeTokens.includes(`${asset.chain}.${asset.symbol}`.toUpperCase());
 };
 
-export const getChainAsset = (chain: Chain): Asset => {
+export const getChainAsset = ({
+  chain,
+  isSynth,
+}: {
+  chain: Chain;
+  isSynth: boolean;
+}): Asset => {
+  if (isSynth) {
+    return new Asset('THOR.RUNE');
+  }
+
   switch (chain) {
     case 'BTC':
       return new Asset('BTC.BTC');
@@ -150,5 +183,9 @@ export const getChainAsset = (chain: Chain): Asset => {
 };
 
 export const assetIsChainAsset = (asset: Asset): boolean => {
-  return assetToString(getChainAsset(asset.chain)) === assetToString(asset);
+  return (
+    assetToString(
+      getChainAsset({ chain: asset.chain, isSynth: asset.isSynth })
+    ) === assetToString(asset)
+  );
 };
